@@ -1,0 +1,529 @@
+'use client'
+// The application shell: a navy CMS sidebar, and everything else to
+// the right of it.
+//
+// This is V1's shape, kept because it works. A CMS is a place you *are* rather
+// than a set of pages you visit, and a persistent rail is what makes that true:
+// it says which product this is, where you are in it, who you are signed in as,
+// and what else you could go and do — none of which a breadcrumb in a top bar
+// can say at the same time. The previous V2 admin had only the breadcrumb, so
+// every screen looked like a document that happened to be hosted next to some
+// other documents.
+//
+// WHAT IS DIFFERENT FROM V1
+//
+// V1's sidebar lists ten global destinations because V1 has ten. This one lists
+// only what V2 actually implements; new destinations appear when their full
+// command, authorization, read model, and browser journey exist.
+//
+// The rail is the same idea as V1's fold, including the reason the fold control
+// sits directly under the brand rather than at the bottom: a control that moves
+// when you use it is a control people stop trusting.
+//
+// THREE STATES, NOT TWO
+//
+//   * Desktop: the sidebar is in the layout. It can be folded to an icon rail,
+//     and the choice is remembered.
+//   * Below 60rem: it leaves the layout and becomes an overlay with a scrim,
+//     opened from a button in a slim top bar, dismissed by the scrim, by Escape
+//     or by the close control — a drawer that cannot be dismissed is the defect
+//     this is written to avoid.
+//   * Folded: labels are visually hidden rather than removed, so every link
+//     keeps its accessible name and the tab order does not change with the
+//     width of the rail.
+import { GuardedLink as Link } from './guarded-link.tsx'
+import { usePathname } from 'next/navigation'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { signOut } from '../app/actions/auth.ts'
+import {
+  IconHome,
+  IconLocation,
+  IconBrush,
+  IconChevronDown,
+  IconChevronLeft,
+  IconClock,
+  IconClose,
+  IconCollection,
+  IconFrame,
+  IconImage,
+  IconMail,
+  IconMenu,
+  IconPage,
+  IconSearch,
+  IconSections,
+  IconSignOut,
+  IconSite,
+  IconPeople,
+  IconSettings,
+} from './icons.tsx'
+import { COMMAND_SEARCH_EVENT } from '../lib/command-search-model.ts'
+import { Button, IconButton } from './ui/button.tsx'
+import { Menu } from './ui/menu.tsx'
+import styles from './app-shell.module.css'
+import { navItemIsCurrent, type NavGroup, type NavIconName } from './nav.ts'
+
+const NAV_ICON = {
+  home: IconHome,
+  chapters: IconLocation,
+  sites: IconSite,
+  pages: IconPage,
+  collections: IconCollection,
+  design: IconBrush,
+  globalElements: IconFrame,
+  navigation: IconMenu,
+  sections: IconSections,
+  media: IconImage,
+  inbox: IconMail,
+  publishing: IconClock,
+  people: IconPeople,
+  settings: IconSettings,
+  activity: IconClock,
+} as const
+function NavIcon({ name }: { name: NavIconName }) {
+  const Glyph = NAV_ICON[name]
+  return <Glyph size={16} />
+}
+
+const RAIL_KEY = 'cms.sidebar.rail'
+
+export function AppShell({
+  email,
+  role,
+  groups,
+  children,
+}: {
+  email: string
+  /** What this person is, in the words the product uses. */
+  role: string
+  groups: NavGroup[]
+  children: ReactNode
+}) {
+  const pathname = usePathname()
+  const currentSite = groups.find(group => group.label !== 'CMS')
+  const [sites, setSites] = useState<{ id: string; name: string }[] | null>(null)
+  const [sitesError, setSitesError] = useState(false)
+  useEffect(() => {
+    const controller = new AbortController()
+    void fetch('/api/sites', { cache: 'no-store', signal: controller.signal })
+      .then(async response => {
+        if (!response.ok) throw new Error('Sites unavailable')
+        const body = await response.json()
+        setSites(body.sites)
+        setSitesError(false)
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) setSitesError(true)
+      })
+    return () => controller.abort()
+  }, [currentSite?.label])
+  const [open, setOpen] = useState(false)
+  const [rail, setRail] = useState(false)
+  const [compact, setCompact] = useState(false)
+  const [inboxCount, setInboxCount] = useState<number | null>(null)
+  const sidebar = useRef<HTMLElement>(null)
+  const closeButton = useRef<HTMLButtonElement>(null)
+  const opener = useRef<HTMLButtonElement>(null)
+
+  // Read-only, user-scoped counts. A failed lookup is unknown, never a made-up
+  // zero. Refresh on navigation, window focus, or an in-app request update.
+  useEffect(() => {
+    let request: AbortController | null = null
+    async function refresh() {
+      request?.abort()
+      const current = new AbortController()
+      request = current
+      try {
+        const response = await fetch('/api/inbox/summary', { cache: 'no-store', signal: current.signal })
+        if (!response.ok) throw new Error('Inbox count unavailable')
+        const body = await response.json()
+        if (!current.signal.aborted)
+          setInboxCount(Number.isSafeInteger(body.count) && body.count >= 0 ? body.count : null)
+      } catch {
+        if (!current.signal.aborted) setInboxCount(null)
+      }
+    }
+    void refresh()
+    window.addEventListener('focus', refresh)
+    window.addEventListener('cms:inbox-changed', refresh)
+    return () => {
+      request?.abort()
+      window.removeEventListener('focus', refresh)
+      window.removeEventListener('cms:inbox-changed', refresh)
+    }
+  }, [pathname])
+
+  // Read once on mount rather than during render: the server has no
+  // localStorage, and a value read during render is a hydration mismatch.
+  useEffect(() => {
+    try {
+      setRail(window.localStorage.getItem(RAIL_KEY) === '1')
+    } catch {
+      /* private mode */
+    }
+  }, [])
+
+  // `inert` is an HTML behaviour, not a CSS behaviour. Applying it whenever
+  // the mobile drawer is shut also disables the *visible desktop sidebar*.
+  // Follow the same breakpoint as the stylesheet and only inert the rail when
+  // it is actually off-canvas. Starting at false keeps the server and first
+  // client render identical; matchMedia updates it immediately after mount.
+  useEffect(() => {
+    const query = window.matchMedia('(max-width: 60rem)')
+    const update = () => {
+      const nextCompact = query.matches
+      setCompact(nextCompact)
+      // A mobile drawer is modal state. Once the layout becomes desktop it is
+      // an ordinary sidebar again, so retain neither the open flag nor its
+      // focus trap for a future resize back to mobile.
+      if (!nextCompact) setOpen(false)
+    }
+    update()
+    query.addEventListener('change', update)
+    return () => query.removeEventListener('change', update)
+  }, [])
+
+  // A route change closes the drawer. Without this, tapping a link on a phone
+  // navigates behind a sheet that is still covering the screen.
+  useEffect(() => {
+    setOpen(false)
+  }, [pathname])
+
+  useEffect(() => {
+    if (!open || !compact) return
+    closeButton.current?.focus()
+    function onKey(event: KeyboardEvent) {
+      if (event.key === 'Escape') closeDrawer()
+      if (event.key !== 'Tab') return
+      const controls = [
+        ...(sidebar.current?.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ) ?? []),
+      ].filter(control => control.getClientRects().length > 0)
+      if (controls.length === 0) return
+      const first = controls[0]!
+      const last = controls.at(-1)!
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault()
+        last.focus()
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault()
+        first.focus()
+      }
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [open, compact])
+
+  function closeDrawer() {
+    setOpen(false)
+    // While open, `.app-main` is inert and the opener inside it cannot accept
+    // focus. Restore it after React has removed inert, not in the same event
+    // that merely requested the state change.
+    window.requestAnimationFrame(() => opener.current?.focus())
+  }
+
+  useEffect(() => {
+    function onKey(event: KeyboardEvent) {
+      if ((event.metaKey || event.ctrlKey) && event.key === '\\') {
+        event.preventDefault()
+        toggleRail()
+      }
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [])
+
+  function toggleRail() {
+    setRail(current => {
+      const next = !current
+      try {
+        window.localStorage.setItem(RAIL_KEY, next ? '1' : '0')
+      } catch {
+        /* private mode */
+      }
+      return next
+    })
+  }
+
+  const globalItems = groups.find(group => group.label === 'CMS')?.items ?? []
+  const siteItems = groups.filter(group => group.label !== 'CMS').flatMap(group => group.items)
+  const contentSite = Boolean(currentSite?.content)
+  const nativeSite = Boolean(currentSite && !siteItems.some(item => item.label === 'Menu & footer'))
+  const siteWide = new Set(['Header & menu', 'Footer', 'Site look']),
+    publishing = new Set(['Publish', 'Settings']),
+    advanced = siteItems.filter(item => item.label === 'Sections' || item.label === 'Template')
+  const siteBadge =
+    currentSite?.label
+      .trim()
+      .split(/\s+/)
+      .map(word => word[0])
+      .slice(0, 2)
+      .join('')
+      .toUpperCase() ?? ''
+  function siteSwitcher() {
+    return (
+      currentSite && (
+        <div className={styles.switcher}>
+          <Menu
+            accessibleLabel={`Switch site · ${currentSite.label}`}
+            label={
+              <>
+                <span className={styles.siteBadge} aria-hidden="true">
+                  {siteBadge.length === 1 ? currentSite.label.slice(0, 2).toUpperCase() : siteBadge}
+                </span>
+                <span className={styles.siteName}>{currentSite.label}</span>
+                <IconChevronDown size={14} />
+              </>
+            }
+          >
+            <Link href="/sites">All sites</Link>
+            {sites?.map(site => (
+              <Link key={site.id} href={`/sites/${site.id}`}>
+                {site.name}
+              </Link>
+            ))}
+            {!sites && (
+              <p role="status">{sitesError ? 'Couldn’t load sites. Open All sites to try again.' : 'Loading sites…'}</p>
+            )}
+          </Menu>
+        </div>
+      )
+    )
+  }
+  function navGroup(label: string, items: NavGroup['items']) {
+    return (
+      items.length > 0 && (
+        <div className={styles.navGroup}>
+          {label && <h2 className={styles.groupLabel}>{label}</h2>}
+          {navItems(items)}
+        </div>
+      )
+    )
+  }
+  function navItems(items: NavGroup['items']) {
+    return items.map(item => {
+      const current = navItemIsCurrent(item, pathname)
+      return (
+        <Link
+          key={item.href}
+          href={item.href}
+          className="navlink"
+          aria-label={item.label}
+          aria-describedby={item.icon === 'inbox' && inboxCount !== null ? 'inbox-count-description' : undefined}
+          aria-current={current ? 'page' : undefined}
+          title={rail ? item.label : undefined}
+        >
+          <span className="navlink-icon">
+            <NavIcon name={item.icon} />
+          </span>
+          <span className="navlink-label">{item.label}</span>
+          {item.icon === 'inbox' && inboxCount !== null && (
+            <>
+              {inboxCount > 0 && (
+                <span className="nav-count" aria-hidden="true">
+                  {inboxCount > 99 ? '99+' : inboxCount}
+                </span>
+              )}
+              <span className="sr-only" id="inbox-count-description">
+                {inboxCount} open requests, reviews and recorded failures
+              </span>
+            </>
+          )}
+        </Link>
+      )
+    })
+  }
+
+  return (
+    <div
+      className={`app ${styles.frame} ${rail ? styles.rail : ''}`}
+      data-rail={rail ? 'on' : 'off'}
+      data-site-shell={nativeSite ? 'native' : currentSite ? 'original' : 'global'}
+      data-drawer={open ? 'open' : 'shut'}
+    >
+      {/* The scrim is a button so it is dismissible by pointer and announced as
+          a control; the drawer is what has focus, so this stays out of the tab
+          order. */}
+      <button type="button" className="app-scrim" tabIndex={-1} aria-hidden="true" onClick={closeDrawer} />
+
+      <aside
+        ref={sidebar}
+        id="cms-sidebar"
+        className="sidebar"
+        aria-label="CMS navigation"
+        aria-hidden={compact && !open ? true : undefined}
+        inert={compact && !open ? true : undefined}
+      >
+        <div className={`sidebar-brand ${styles.brand}`}>
+          <span className={styles.wordmark} aria-hidden="true">
+            C
+          </span>
+          <span className="sidebar-brandtext">
+            <strong>NCRD CMS</strong>
+            <span>Content manager</span>
+          </span>
+          <IconButton
+            className={styles.fold}
+            variant="tertiary"
+            tooltip={rail ? 'Expand sidebar · ⌘\\' : 'Collapse sidebar · ⌘\\'}
+            onClick={toggleRail}
+            aria-expanded={!rail}
+            aria-controls="cms-sidebar"
+          >
+            <IconChevronLeft size={16} />
+          </IconButton>
+          <button
+            ref={closeButton}
+            type="button"
+            className="sidebar-close"
+            aria-label="Close navigation"
+            onClick={closeDrawer}
+          >
+            <IconClose size={18} />
+          </button>
+        </div>
+
+        {siteSwitcher()}
+        <div className={styles.searchArea}>
+          {rail ? (
+            <IconButton
+              variant="tertiary"
+              tooltip="Search or jump to · ⌘K"
+              onClick={() => window.dispatchEvent(new Event(COMMAND_SEARCH_EVENT))}
+            >
+              <IconSearch size={18} />
+            </IconButton>
+          ) : (
+            <Button
+              variant="tertiary"
+              className={styles.searchButton}
+              onClick={() => window.dispatchEvent(new Event(COMMAND_SEARCH_EVENT))}
+            >
+              <IconSearch size={18} />
+              <span>Search or jump to…</span>
+              <kbd>⌘K</kbd>
+            </Button>
+          )}
+        </div>
+        <nav className={`sidebar-nav ${styles.navigation}`} aria-label="Sections of the CMS">
+          {!currentSite && (
+            <>
+              {navGroup('', globalItems)}
+              {sites &&
+                navGroup(
+                  'Your sites',
+                  sites.map(site => ({ href: '/sites/' + site.id, label: site.name, icon: 'sites', match: 'exact' })),
+                )}
+            </>
+          )}
+          {currentSite && (
+            <>
+              {navGroup(
+                '',
+                siteItems.filter(
+                  item => !siteWide.has(item.label) && !publishing.has(item.label) && !advanced.includes(item),
+                ),
+              )}
+              {nativeSite && !contentSite ? (
+                <>
+                  {navGroup(
+                    'Site-wide',
+                    siteItems.filter(item => siteWide.has(item.label)),
+                  )}
+                  {navGroup(
+                    'Publishing',
+                    siteItems.filter(item => publishing.has(item.label)),
+                  )}
+                </>
+              ) : (
+                navGroup(
+                  '',
+                  siteItems.filter(item => siteWide.has(item.label) || publishing.has(item.label)),
+                )
+              )}
+              {advanced.length > 0 && (
+                <details
+                  className={styles.advanced}
+                  open={advanced.some(item =>
+                    [item.href, ...(item.also ?? [])].some(
+                      href => pathname === href || pathname.startsWith(href + '/'),
+                    ),
+                  )}
+                >
+                  <summary aria-label="Advanced site tools" title={rail ? 'Advanced site tools' : undefined}>
+                    <span className="navlink-icon">
+                      <IconSections size={16} />
+                    </span>
+                    <span className="navlink-label">Advanced</span>
+                    <span className={styles.advancedChevron}>
+                      <IconChevronDown size={14} />
+                    </span>
+                  </summary>
+                  {navItems(advanced)}
+                </details>
+              )}
+              {contentSite
+                ? navGroup(
+                    '',
+                    globalItems.filter(
+                      item => item.icon === 'inbox' && (Boolean(inboxCount) || pathname.startsWith('/inbox')),
+                    ),
+                  )
+                : navGroup('Workspace', globalItems)}
+            </>
+          )}
+        </nav>
+
+        <div className="sidebar-foot">
+          <div className="whoami" title={rail ? `${email} — ${role}` : undefined}>
+            <span className="whoami-initial" aria-hidden="true">
+              {email.slice(0, 1).toUpperCase()}
+            </span>
+            <span className="navlink-label whoami-text">
+              <span className="whoami-email" title={email}>
+                {email}
+              </span>
+              <span className="whoami-role" title={role}>
+                {role}
+              </span>
+            </span>
+            <span className="sr-only">
+              Signed in as {email}, {role}
+            </span>
+          </div>
+          <form action={signOut}>
+            <button type="submit" className="navlink navlink-button" title={rail ? 'Sign out' : undefined}>
+              <span className="navlink-icon">
+                <IconSignOut size={18} />
+              </span>
+              <span className="navlink-label">Sign out</span>
+            </button>
+          </form>
+        </div>
+      </aside>
+
+      <div className="app-main" inert={compact && open ? true : undefined}>
+        <div className="app-topbar">
+          <button
+            ref={opener}
+            type="button"
+            className="icon-btn"
+            aria-label="Open navigation"
+            aria-controls="cms-sidebar"
+            aria-expanded={open}
+            onClick={() => setOpen(true)}
+          >
+            <IconMenu size={20} />
+          </button>
+          <span className="app-topbar-title">
+            <span className={styles.wordmark} aria-hidden="true">
+              C
+            </span>
+            NCRD CMS
+          </span>
+        </div>
+        {children}
+      </div>
+    </div>
+  )
+}

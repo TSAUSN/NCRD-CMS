@@ -1,0 +1,78 @@
+-- A preset header may name a partner, as HNI's “In partnership with …” does
+-- (SPEC §6 step 4: “optional partner identity”). The partner is words and an
+-- optional web address — a label, the partner's name and an internal path or
+-- https address — checked like every other header link. It is optional, so
+-- every header saved before it existed keeps its meaning. Logos are not part
+-- of it yet, so no new media reference is introduced.
+CREATE OR REPLACE FUNCTION app.global_header_preset_defect(p_content jsonb)
+RETURNS text
+LANGUAGE plpgsql IMMUTABLE SET search_path = pg_catalog, public AS $$
+DECLARE brand jsonb; link jsonb; defect text; media_value jsonb; partner jsonb;
+BEGIN
+  IF jsonb_typeof(p_content) IS DISTINCT FROM 'object'
+     OR (p_content - ARRAY['schemaVersion','enabled','preset','brand','surface','sticky','utilityLinks','cta','partner']) <> '{}'::jsonb
+     OR NOT (p_content ?& ARRAY['schemaVersion','enabled','preset','brand','surface','sticky','utilityLinks','cta']) THEN
+    RETURN 'header must contain exactly the version-1 header properties';
+  END IF;
+  IF p_content->'schemaVersion' <> '1'::jsonb THEN RETURN 'header schemaVersion must be 1'; END IF;
+  IF jsonb_typeof(p_content->'enabled') IS DISTINCT FROM 'boolean'
+     OR jsonb_typeof(p_content->'sticky') IS DISTINCT FROM 'boolean' THEN
+    RETURN 'header enabled and sticky must be booleans';
+  END IF;
+  IF jsonb_typeof(p_content->'preset') IS DISTINCT FROM 'string'
+     OR p_content->>'preset' NOT IN ('standard','centered','compact','minimal') THEN
+    RETURN 'header preset is unsupported';
+  END IF;
+  IF jsonb_typeof(p_content->'surface') IS DISTINCT FROM 'string'
+     OR p_content->>'surface' NOT IN ('page','soft','primary','accent','transparent') THEN
+    RETURN 'header surface is unsupported';
+  END IF;
+  brand := p_content->'brand';
+  IF jsonb_typeof(brand) IS DISTINCT FROM 'object'
+     OR (brand - ARRAY['siteName','showName','logoMediaId','compactLogoMediaId']) <> '{}'::jsonb
+     OR NOT (brand ?& ARRAY['siteName','showName','logoMediaId','compactLogoMediaId']) THEN
+    RETURN 'header brand must contain exactly siteName, showName, logoMediaId, and compactLogoMediaId';
+  END IF;
+  IF jsonb_typeof(brand->'siteName') IS DISTINCT FROM 'string'
+     OR char_length(brand->>'siteName') > 120
+     OR jsonb_typeof(brand->'showName') IS DISTINCT FROM 'boolean' THEN
+    RETURN 'header brand name is invalid';
+  END IF;
+  FOREACH media_value IN ARRAY ARRAY[brand->'logoMediaId', brand->'compactLogoMediaId'] LOOP
+    IF jsonb_typeof(media_value) NOT IN ('null','string')
+       OR (jsonb_typeof(media_value) = 'string'
+           AND NOT (media_value #>> '{}' ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$')) THEN
+      RETURN 'header logo references must be UUIDs or null';
+    END IF;
+  END LOOP;
+  IF jsonb_typeof(p_content->'utilityLinks') IS DISTINCT FROM 'array'
+     OR jsonb_array_length(p_content->'utilityLinks') > 4 THEN
+    RETURN 'header utilityLinks must contain at most 4 links';
+  END IF;
+  FOR link IN SELECT value FROM jsonb_array_elements(p_content->'utilityLinks') LOOP
+    defect := app.global_link_defect(link); IF defect IS NOT NULL THEN RETURN defect; END IF;
+  END LOOP;
+  IF jsonb_typeof(p_content->'cta') <> 'null' THEN
+    defect := app.global_link_defect(p_content->'cta'); IF defect IS NOT NULL THEN RETURN defect; END IF;
+  END IF;
+  -- Optional, and absent from every header saved before it existed.
+  partner := p_content->'partner';
+  IF partner IS NOT NULL AND jsonb_typeof(partner) <> 'null' THEN
+    IF jsonb_typeof(partner) IS DISTINCT FROM 'object'
+       OR (partner - ARRAY['label','name','url']) <> '{}'::jsonb
+       OR NOT (partner ?& ARRAY['label','name','url']) THEN
+      RETURN 'header partner must contain exactly label, name and url';
+    END IF;
+    IF jsonb_typeof(partner->'label') IS DISTINCT FROM 'string' OR btrim(partner->>'label') = '' OR char_length(partner->>'label') > 80
+       OR jsonb_typeof(partner->'name') IS DISTINCT FROM 'string' OR btrim(partner->>'name') = '' OR char_length(partner->>'name') > 120 THEN
+      RETURN 'header partner label and name must be short text';
+    END IF;
+    IF jsonb_typeof(partner->'url') <> 'null' THEN
+      defect := app.global_link_defect(jsonb_build_object('label', 'Partner',
+        'target', jsonb_build_object('type', 'url', 'url', partner->'url')));
+      IF defect IS NOT NULL THEN RETURN defect; END IF;
+    END IF;
+  END IF;
+  RETURN NULL;
+END
+$$;

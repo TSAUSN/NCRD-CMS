@@ -1,0 +1,1773 @@
+{
+  "activeContent": {
+    "withActiveSchemeUrls": [],
+    "withButton": [
+      "hero-search-v1",
+      "locator-form-v1",
+      "newsletter-signup-v1",
+      "contact-form-v1",
+      "hni-footer-v1",
+      "hni-explore-timeline-v1",
+      "hni-explore-map-v1"
+    ],
+    "withForm": [
+      "hero-search-v1",
+      "locator-form-v1",
+      "newsletter-signup-v1",
+      "contact-form-v1"
+    ],
+    "withIframe": [
+      "map-embed-v1",
+      "video-embed-v1",
+      "form-embed-v1",
+      "hni-explore-timeline-v1",
+      "hni-explore-map-v1"
+    ],
+    "withInlineHandlers": [],
+    "withInput": [
+      "hero-search-v1",
+      "locator-form-v1",
+      "newsletter-signup-v1",
+      "contact-form-v1"
+    ],
+    "withScript": [],
+    "withStyleTag": [],
+    "withSvg": [
+      "feature-columns-v1",
+      "icon-card-grid-v1",
+      "program-cards-v1",
+      "alert-banner-v1",
+      "announcement-bar-v1",
+      "eligibility-checklist-v1",
+      "faq-accordion-v1",
+      "feature-grid-v1",
+      "hero-triage-v1",
+      "media-text-row-v1",
+      "mission-band-v1",
+      "newsletter-signup-v1",
+      "process-steps-v1",
+      "resource-library-v1",
+      "split-cta-v1",
+      "stats-band-v1",
+      "volunteer-opportunities-v1",
+      "ways-to-give-grid-v1",
+      "ways-to-help-grid-v1",
+      "share-row-v1",
+      "event-schedule-v1",
+      "event-venue-v1",
+      "event-list-v1",
+      "document-list-v1",
+      "location-list-v1",
+      "job-listings-v1",
+      "tabs-v1",
+      "social-links-v1",
+      "contact-form-v1",
+      "hni-measuring-poverty-v1",
+      "hni-explore-resources-v1",
+      "hni-footer-v1",
+      "hni-methodology-explore-v1",
+      "hni-resources-hero-v1",
+      "hni-resources-about-orgs-v1",
+      "hni-explore-hero-v1",
+      "hni-explore-timeline-v1",
+      "hni-explore-map-v1",
+      "hni-explore-explore-v1",
+      "hni-home-measuring-v1",
+      "hni-home-explore-v1",
+      "event-agenda-v1",
+      "hero-event-v1",
+      "venue-location-v1"
+    ],
+    "withVideoAudio": []
+  },
+  "assetDivergence": {
+    "count": 23
+  },
+  "capabilityCounts": {
+    "hasCta": 61,
+    "readsSectionFg": 80,
+    "usesMobileOrder": 1,
+    "usesProgress": 2,
+    "usesProgress2": 1
+  },
+  "categoryCounts": {
+    "Bars & Alerts": 3,
+    "CTA": 5,
+    "Cards": 10,
+    "Content": 23,
+    "Conversion": 15,
+    "Events": 9,
+    "Existing page": 20,
+    "Freeform": 1,
+    "Hero": 13,
+    "Layout": 7,
+    "Media": 5,
+    "Proof": 1,
+    "Site Chrome": 2,
+    "Speakers": 1,
+    "Stats": 3
+  },
+  "classification": [
+    [
+      "shared-generic",
+      78
+    ],
+    [
+      "site-specific:humanneedsindex",
+      27
+    ],
+    [
+      "site-specific:echelonsymposium",
+      13
+    ]
+  ],
+  "crossSectionAnchors": {
+    "resolvedWithinCatalog": 20,
+    "totalEdges": 41,
+    "unresolved": [
+      {
+        "anchor": "proof",
+        "from": "proof-callout-v1"
+      },
+      {
+        "anchor": "downloads",
+        "from": "hni-resources-hero-v1"
+      },
+      {
+        "anchor": "faq",
+        "from": "hni-resources-hero-v1"
+      },
+      {
+        "anchor": "agenda",
+        "from": "event-agenda-v1"
+      },
+      {
+        "anchor": "register",
+        "from": "hero-event-v1"
+      },
+      {
+        "anchor": "agenda",
+        "from": "hero-event-v1"
+      },
+      {
+        "anchor": "register",
+        "from": "pricing-tiers-v1"
+      },
+      {
+        "anchor": "register",
+        "from": "pricing-tiers-v1"
+      },
+      {
+        "anchor": "register",
+        "from": "pricing-tiers-v1"
+      },
+      {
+        "anchor": "speakers",
+        "from": "speakers-grid-v1"
+      },
+      {
+        "anchor": "speakers",
+        "from": "speakers-grid-v1"
+      },
+      {
+        "anchor": "speakers",
+        "from": "speakers-grid-v1"
+      },
+      {
+        "anchor": "venue",
+        "from": "venue-location-v1"
+      },
+      {
+        "anchor": "register",
+        "from": "echelon-event-hero-v1"
+      },
+      {
+        "anchor": "agenda",
+        "from": "echelon-event-hero-v1"
+      },
+      {
+        "anchor": "register",
+        "from": "echelon-register-cta-v1"
+      },
+      {
+        "anchor": "register",
+        "from": "echelon-centered-media-hero-v1"
+      },
+      {
+        "anchor": "resources",
+        "from": "echelon-impact-data-split-v1"
+      },
+      {
+        "anchor": "agenda",
+        "from": "echelon-impact-data-split-v1"
+      },
+      {
+        "anchor": "register",
+        "from": "echelon-collage-hero-v1"
+      },
+      {
+        "anchor": "register",
+        "from": "echelon-overlay-hero-v1"
+      }
+    ]
+  },
+  "dataAttributeCensus": {
+    "data-block-id": 1246,
+    "data-cms-embed-frame": 3,
+    "data-cms-embed-placeholder": 3,
+    "data-cms-embed-src": 3,
+    "data-cms-label": 10,
+    "data-cms-section": 20,
+    "data-content-epoch": 4,
+    "data-current-through": 2,
+    "data-editable": 1244,
+    "data-fe-block": 5,
+    "data-form-action": 4,
+    "data-icon-name": 6,
+    "data-registration-cta": 9,
+    "data-tone": 4,
+    "data-visually-hidden": 5
+  },
+  "dataAttributeOwners": {
+    "data-cms-embed-frame": [
+      "map-embed-v1",
+      "video-embed-v1",
+      "form-embed-v1"
+    ],
+    "data-cms-embed-placeholder": [
+      "map-embed-v1",
+      "video-embed-v1",
+      "form-embed-v1"
+    ],
+    "data-cms-embed-src": [
+      "map-embed-v1",
+      "video-embed-v1",
+      "form-embed-v1"
+    ],
+    "data-cms-label": [
+      "hni-home-explore-v1",
+      "hni-home-hero-fe-v1"
+    ],
+    "data-cms-section": [
+      "hni-methodology-hero-v1",
+      "hni-methodology-stats-v1",
+      "hni-methodology-content-v1",
+      "hni-methodology-explore-v1",
+      "hni-resources-hero-v1",
+      "hni-resources-divider-1-v1",
+      "hni-resources-divider-2-v1",
+      "hni-resources-about-orgs-v1",
+      "hni-explore-hero-v1",
+      "hni-explore-timeline-v1",
+      "hni-explore-map-v1",
+      "hni-explore-insights-v1",
+      "hni-explore-explore-v1",
+      "hni-home-hero-v1",
+      "hni-home-divider-1-v1",
+      "hni-home-overview-v1",
+      "hni-home-divider-2-v1",
+      "hni-home-measuring-v1",
+      "hni-home-divider-3-v1",
+      "hni-home-explore-v1"
+    ],
+    "data-content-epoch": [
+      "hni-explore-timeline-v1",
+      "hni-explore-map-v1"
+    ],
+    "data-current-through": [
+      "hni-explore-hero-v1",
+      "hni-home-overview-v1"
+    ],
+    "data-fe-block": [
+      "hni-home-hero-fe-v1"
+    ],
+    "data-form-action": [
+      "hero-search-v1",
+      "locator-form-v1",
+      "newsletter-signup-v1",
+      "contact-form-v1"
+    ],
+    "data-icon-name": [
+      "hni-home-measuring-v1",
+      "hni-home-explore-v1"
+    ],
+    "data-registration-cta": [
+      "hero-event-v1",
+      "pricing-tiers-v1",
+      "echelon-event-hero-v1",
+      "echelon-register-cta-v1",
+      "echelon-centered-media-hero-v1",
+      "echelon-collage-hero-v1",
+      "echelon-overlay-hero-v1"
+    ],
+    "data-tone": [
+      "hni-explore-resources-v1"
+    ],
+    "data-visually-hidden": [
+      "split-cta-v1",
+      "contact-form-v1",
+      "map-embed-v1",
+      "video-embed-v1",
+      "form-embed-v1"
+    ]
+  },
+  "divergence": {
+    "cssDivergesAcrossSites": [],
+    "htmlDivergesAcrossSites": [
+      {
+        "hashes": {
+          "echelonsymposium": "a70018ec66c84454",
+          "humanneedsindex": "24137d0a7b9c1f43",
+          "site-host": "60b83581e7320c99"
+        },
+        "id": "hero-split-v1",
+        "sites": [
+          "humanneedsindex",
+          "echelonsymposium",
+          "site-host"
+        ]
+      },
+      {
+        "hashes": {
+          "echelonsymposium": "86f5c023bee2109b",
+          "humanneedsindex": "2d347c3f21738ffa",
+          "site-host": "95d63ee73977242c"
+        },
+        "id": "text-image-v1",
+        "sites": [
+          "humanneedsindex",
+          "echelonsymposium",
+          "site-host"
+        ]
+      },
+      {
+        "hashes": {
+          "echelonsymposium": "9d09aa72ef46ccc2",
+          "humanneedsindex": "52e2169149dfc63c",
+          "site-host": "3d10b2616133c9e8"
+        },
+        "id": "gallery-grid-v1",
+        "sites": [
+          "humanneedsindex",
+          "echelonsymposium",
+          "site-host"
+        ]
+      },
+      {
+        "hashes": {
+          "echelonsymposium": "baca936276d82ec9",
+          "humanneedsindex": "d212018aca80e68a",
+          "site-host": "0035658fcf664bce"
+        },
+        "id": "logo-strip-v1",
+        "sites": [
+          "humanneedsindex",
+          "echelonsymposium",
+          "site-host"
+        ]
+      },
+      {
+        "hashes": {
+          "echelonsymposium": "1a36aad188f7ba24",
+          "humanneedsindex": "2b8ea9fb83c840d3",
+          "site-host": "c4783f806c4b65fe"
+        },
+        "id": "impact-story-v1",
+        "sites": [
+          "humanneedsindex",
+          "echelonsymposium",
+          "site-host"
+        ]
+      },
+      {
+        "hashes": {
+          "echelonsymposium": "c69ebd5c54ea4dd3",
+          "humanneedsindex": "c69ebd5c54ea4dd3",
+          "site-host": "37766d94fd948f0f"
+        },
+        "id": "accreditation-strip-v1",
+        "sites": [
+          "humanneedsindex",
+          "echelonsymposium",
+          "site-host"
+        ]
+      },
+      {
+        "hashes": {
+          "echelonsymposium": "be2c3bdbc56fe1e7",
+          "humanneedsindex": "f28d6f3b0bce09ba",
+          "site-host": "df073a5dc4702a64"
+        },
+        "id": "disaster-cta-v1",
+        "sites": [
+          "humanneedsindex",
+          "echelonsymposium",
+          "site-host"
+        ]
+      },
+      {
+        "hashes": {
+          "echelonsymposium": "ca9e70c9f51ddf9a",
+          "humanneedsindex": "450a6a303a1cfeaa",
+          "site-host": "af5e499ef2ae9078"
+        },
+        "id": "hero-appeal-v1",
+        "sites": [
+          "humanneedsindex",
+          "echelonsymposium",
+          "site-host"
+        ]
+      },
+      {
+        "hashes": {
+          "echelonsymposium": "aaed3eccf0601906",
+          "humanneedsindex": "2024d9f92707b6fb",
+          "site-host": "df831d323165e8cc"
+        },
+        "id": "hero-fullbleed-v1",
+        "sites": [
+          "humanneedsindex",
+          "echelonsymposium",
+          "site-host"
+        ]
+      },
+      {
+        "hashes": {
+          "echelonsymposium": "8dc1604063e41de7",
+          "humanneedsindex": "fdb7af9ef6a9cbe0",
+          "site-host": "594aeab5d2aa50ad"
+        },
+        "id": "hero-search-v1",
+        "sites": [
+          "humanneedsindex",
+          "echelonsymposium",
+          "site-host"
+        ]
+      },
+      {
+        "hashes": {
+          "echelonsymposium": "845fd3c221eb9c1f",
+          "humanneedsindex": "bc227282b58d2b0b",
+          "site-host": "1985f1f08d0fd1ce"
+        },
+        "id": "media-text-row-v1",
+        "sites": [
+          "humanneedsindex",
+          "echelonsymposium",
+          "site-host"
+        ]
+      },
+      {
+        "hashes": {
+          "echelonsymposium": "4baebb43c14a13d2",
+          "humanneedsindex": "1ab1b5f9ea3b8d62",
+          "site-host": "3be56f629d54854d"
+        },
+        "id": "monthly-giving-v1",
+        "sites": [
+          "humanneedsindex",
+          "echelonsymposium",
+          "site-host"
+        ]
+      },
+      {
+        "hashes": {
+          "echelonsymposium": "a10e0e10e9ace446",
+          "humanneedsindex": "fd63e011abfcbb1b",
+          "site-host": "d6019e27fa8abb3d"
+        },
+        "id": "pull-quote-v1",
+        "sites": [
+          "humanneedsindex",
+          "echelonsymposium",
+          "site-host"
+        ]
+      },
+      {
+        "hashes": {
+          "echelonsymposium": "8efa60274ffd93d0",
+          "humanneedsindex": "fb1ea60247caae21",
+          "site-host": "fb1ea60247caae21"
+        },
+        "id": "registration-cta-v1",
+        "sites": [
+          "humanneedsindex",
+          "echelonsymposium",
+          "site-host"
+        ]
+      },
+      {
+        "hashes": {
+          "echelonsymposium": "eb4175e15e22fa99",
+          "humanneedsindex": "4865135164af094d",
+          "site-host": "0b427bc0a26f1620"
+        },
+        "id": "story-grid-v1",
+        "sites": [
+          "humanneedsindex",
+          "echelonsymposium",
+          "site-host"
+        ]
+      },
+      {
+        "hashes": {
+          "echelonsymposium": "5147b88352bb99fa",
+          "humanneedsindex": "d4305e0b21b12969",
+          "site-host": "8d6b0dda149091ae"
+        },
+        "id": "testimonial-cards-v1",
+        "sites": [
+          "humanneedsindex",
+          "echelonsymposium",
+          "site-host"
+        ]
+      },
+      {
+        "hashes": {
+          "echelonsymposium": "f06c9f2464a55e61",
+          "humanneedsindex": "406a143ae84a4c4d",
+          "site-host": "f06c9f2464a55e61"
+        },
+        "id": "team-grid-v1",
+        "sites": [
+          "humanneedsindex",
+          "echelonsymposium",
+          "site-host"
+        ]
+      },
+      {
+        "hashes": {
+          "echelonsymposium": "94f11bfff0e9e35b",
+          "humanneedsindex": "3fe869ea08d3ea22",
+          "site-host": "94f11bfff0e9e35b"
+        },
+        "id": "person-profile-v1",
+        "sites": [
+          "humanneedsindex",
+          "echelonsymposium",
+          "site-host"
+        ]
+      },
+      {
+        "hashes": {
+          "echelonsymposium": "b948103b77845aa8",
+          "humanneedsindex": "96479d96ea4a6b53",
+          "site-host": "bfe66fbfcc86ac64"
+        },
+        "id": "article-header-v1",
+        "sites": [
+          "humanneedsindex",
+          "echelonsymposium",
+          "site-host"
+        ]
+      },
+      {
+        "hashes": {
+          "echelonsymposium": "922bf572d4f503c8",
+          "humanneedsindex": "dae478681b347161",
+          "site-host": "922bf572d4f503c8"
+        },
+        "id": "event-speakers-v1",
+        "sites": [
+          "humanneedsindex",
+          "echelonsymposium",
+          "site-host"
+        ]
+      },
+      {
+        "hashes": {
+          "echelonsymposium": "1dfecb21ade8f6c3",
+          "humanneedsindex": "9447cc1d7ce2ec98",
+          "site-host": "c8500700e9a3c0e0"
+        },
+        "id": "event-venue-v1",
+        "sites": [
+          "humanneedsindex",
+          "echelonsymposium",
+          "site-host"
+        ]
+      },
+      {
+        "hashes": {
+          "echelonsymposium": "90c76445d7a575e0",
+          "humanneedsindex": "90c76445d7a575e0",
+          "site-host": "bb076e955396c5a6"
+        },
+        "id": "event-sponsors-v1",
+        "sites": [
+          "humanneedsindex",
+          "echelonsymposium",
+          "site-host"
+        ]
+      },
+      {
+        "hashes": {
+          "echelonsymposium": "f39d737edcafdc6d",
+          "humanneedsindex": "99c8df3545e53b73",
+          "site-host": "9503493c029f1563"
+        },
+        "id": "post-list-v1",
+        "sites": [
+          "humanneedsindex",
+          "echelonsymposium",
+          "site-host"
+        ]
+      },
+      {
+        "hashes": {
+          "echelonsymposium": "0925736c3f385ebc",
+          "humanneedsindex": "6df872dffcd89704",
+          "site-host": "1ecc1a5f3f3df718"
+        },
+        "id": "page-header-v1",
+        "sites": [
+          "humanneedsindex",
+          "echelonsymposium",
+          "site-host"
+        ]
+      }
+    ],
+    "inRegistryButNoHtml": [],
+    "inSiteSourceButNotRegistry": [],
+    "metadataDivergesAcrossSites": [],
+    "registrySourceNotCanonical": []
+  },
+  "editableTypeCounts": {
+    "icon": 105,
+    "image": 86,
+    "link": 240,
+    "richtext": 115,
+    "text": 698
+  },
+  "externalStylesheetDependency": {
+    "classesInvolved": [
+      "fx-",
+      "fx-none",
+      "fx-subtle",
+      "fx-lift",
+      "fx-fill",
+      "fx-dir-fill",
+      "fx-radial",
+      "fx-border",
+      "cms-form-action",
+      "fx-icon",
+      "fx-arrow",
+      "fx-icon-reveal",
+      "fx-ico",
+      "fx-chev",
+      "fx-zoom",
+      "fx-overlay",
+      "fx-cap",
+      "fx-glow",
+      "fx-brand",
+      "fx-underline",
+      "fx-gradient",
+      "fx-tilt",
+      "fx-press",
+      "fx-acc",
+      "fx-acc-body"
+    ],
+    "definitionsRelyingOnIt": 62,
+    "layoutCriticalCase": {
+      "class": "cms-form-action",
+      "consequenceIfMissing": "the hidden configuration link renders as visible body copy on the public page",
+      "definitions": [
+        "hero-search-v1",
+        "locator-form-v1",
+        "newsletter-signup-v1",
+        "contact-form-v1",
+        "map-embed-v1",
+        "video-embed-v1",
+        "form-embed-v1"
+      ],
+      "rule": ".cms-form-action{display:none;}"
+    },
+    "stylesheet": "<v1-checkout> Army - Websites/new-builds/tsa-humanneedsindex/src/cms/interaction-presets.js (INTERACTION_PRESET_CSS, injected once as #cms-interaction-presets)"
+  },
+  "familyCounts": {
+    "(none)": 24,
+    "agenda": 2,
+    "article": 2,
+    "bar": 3,
+    "callout": 1,
+    "card-grid": 16,
+    "contact": 2,
+    "cta": 6,
+    "donation": 3,
+    "embed": 3,
+    "faq": 3,
+    "form": 3,
+    "hero": 15,
+    "layout": 2,
+    "logo": 4,
+    "media": 1,
+    "media-text": 2,
+    "nav": 3,
+    "person": 1,
+    "person-grid": 2,
+    "quote": 4,
+    "social": 2,
+    "stat": 3,
+    "statement": 1,
+    "stats": 1,
+    "steps": 3,
+    "table": 1,
+    "text": 1,
+    "tiers": 2,
+    "venue": 2
+  },
+  "fieldDeclarationModel": {
+    "editableTypeVocabulary": [
+      "text",
+      "richtext",
+      "image",
+      "link",
+      "icon"
+    ],
+    "editableTypesAcceptedBySectionCreatorValidator": [
+      "text",
+      "richtext",
+      "image",
+      "link",
+      "html"
+    ],
+    "html": "each editable region is an element carrying data-block-id=\"<id>\" data-editable=\"<type>\"",
+    "manifest": "the same regions are re-declared as slots[] = { blockId, editable, label, role? }",
+    "repeatModel": "NO repeat/list primitive. Repetition is hand-flattened into numbered slot families (e.g. amount-1-*..amount-4-*) with fixed cardinality baked into the HTML; the card-N-part roles (N=1..6) give the swap engine a positional mapping.",
+    "rolesVocabulary": "tsa-cms-admin/src/utils/sectionSlotRoles.js SLOT_ROLES (51 values) \u2014 used only by the explicit Change-layout swap",
+    "vocabularyGap": "'icon' is used by 105 slots in 32 definitions but is not in SectionCreator.vue:399 EDITABLE_TYPES; 'html' is accepted by the validator but used by no git definition"
+  },
+  "forms": [
+    {
+      "action": [
+        "#"
+      ],
+      "count": 1,
+      "fieldTags": [
+        "input",
+        "select"
+      ],
+      "id": "hero-search-v1",
+      "sandbox": [],
+      "thirdPartyHost": []
+    },
+    {
+      "action": [
+        "#"
+      ],
+      "count": 1,
+      "fieldTags": [
+        "input"
+      ],
+      "id": "locator-form-v1",
+      "sandbox": [],
+      "thirdPartyHost": []
+    },
+    {
+      "action": [
+        "#"
+      ],
+      "count": 1,
+      "fieldTags": [
+        "input"
+      ],
+      "id": "newsletter-signup-v1",
+      "sandbox": [],
+      "thirdPartyHost": []
+    },
+    {
+      "action": [
+        "#"
+      ],
+      "count": 1,
+      "fieldTags": [
+        "input",
+        "textarea"
+      ],
+      "id": "contact-form-v1",
+      "sandbox": [],
+      "thirdPartyHost": []
+    }
+  ],
+  "generatedAt": "2026-08-22T05:17:17.228Z",
+  "idrefs": {
+    "withDanglingAriaRefs": [],
+    "withDanglingHashHrefs": [
+      {
+        "dangling": [
+          "proof"
+        ],
+        "id": "proof-callout-v1"
+      },
+      {
+        "dangling": [
+          "home",
+          "overview"
+        ],
+        "id": "hni-header-v1"
+      },
+      {
+        "dangling": [
+          "overview"
+        ],
+        "id": "hni-hero-v1"
+      },
+      {
+        "dangling": [
+          "overview"
+        ],
+        "id": "hni-explore-resources-v1"
+      },
+      {
+        "dangling": [
+          "overview"
+        ],
+        "id": "hni-footer-v1"
+      },
+      {
+        "dangling": [
+          "approach",
+          "construction",
+          "validation",
+          "final-model",
+          "indicators"
+        ],
+        "id": "hni-methodology-hero-v1"
+      },
+      {
+        "dangling": [
+          "downloads",
+          "faq",
+          "about-orgs"
+        ],
+        "id": "hni-resources-hero-v1"
+      },
+      {
+        "dangling": [
+          "timeline",
+          "map",
+          "insights"
+        ],
+        "id": "hni-explore-hero-v1"
+      },
+      {
+        "dangling": [
+          "overview"
+        ],
+        "id": "hni-home-hero-v1"
+      },
+      {
+        "dangling": [
+          "overview"
+        ],
+        "id": "hni-home-explore-v1"
+      },
+      {
+        "dangling": [
+          "overview"
+        ],
+        "id": "hni-home-hero-fe-v1"
+      },
+      {
+        "dangling": [
+          "agenda"
+        ],
+        "id": "event-agenda-v1"
+      },
+      {
+        "dangling": [
+          "register",
+          "agenda"
+        ],
+        "id": "hero-event-v1"
+      },
+      {
+        "dangling": [
+          "register",
+          "register",
+          "register"
+        ],
+        "id": "pricing-tiers-v1"
+      },
+      {
+        "dangling": [
+          "speakers",
+          "speakers",
+          "speakers"
+        ],
+        "id": "speakers-grid-v1"
+      },
+      {
+        "dangling": [
+          "venue"
+        ],
+        "id": "venue-location-v1"
+      },
+      {
+        "dangling": [
+          "register",
+          "agenda"
+        ],
+        "id": "echelon-event-hero-v1"
+      },
+      {
+        "dangling": [
+          "register"
+        ],
+        "id": "echelon-register-cta-v1"
+      },
+      {
+        "dangling": [
+          "register",
+          "about"
+        ],
+        "id": "echelon-centered-media-hero-v1"
+      },
+      {
+        "dangling": [
+          "resources",
+          "agenda"
+        ],
+        "id": "echelon-impact-data-split-v1"
+      },
+      {
+        "dangling": [
+          "register",
+          "about"
+        ],
+        "id": "echelon-collage-hero-v1"
+      },
+      {
+        "dangling": [
+          "register",
+          "about"
+        ],
+        "id": "echelon-overlay-hero-v1"
+      }
+    ],
+    "withElementIds": [
+      {
+        "elementIds": [
+          "hs-service",
+          "hs-zip"
+        ],
+        "id": "hero-search-v1"
+      },
+      {
+        "elementIds": [
+          "cms-locator-zip"
+        ],
+        "id": "locator-form-v1"
+      },
+      {
+        "elementIds": [
+          "cms-newsletter-email"
+        ],
+        "id": "newsletter-signup-v1"
+      },
+      {
+        "elementIds": [
+          "cms-contact-name",
+          "cms-contact-email",
+          "cms-contact-subject",
+          "cms-contact-message"
+        ],
+        "id": "contact-form-v1"
+      },
+      {
+        "elementIds": [
+          "site-header"
+        ],
+        "id": "hni-header-v1"
+      },
+      {
+        "elementIds": [
+          "home"
+        ],
+        "id": "hni-hero-v1"
+      },
+      {
+        "elementIds": [
+          "overview"
+        ],
+        "id": "hni-overview-v1"
+      },
+      {
+        "elementIds": [
+          "about"
+        ],
+        "id": "hni-measuring-poverty-v1"
+      },
+      {
+        "elementIds": [
+          "explore"
+        ],
+        "id": "hni-explore-resources-v1"
+      },
+      {
+        "elementIds": [
+          "footer",
+          "footer-year"
+        ],
+        "id": "hni-footer-v1"
+      },
+      {
+        "elementIds": [
+          "approach",
+          "construction",
+          "validation",
+          "final-model",
+          "indicators"
+        ],
+        "id": "hni-methodology-content-v1"
+      },
+      {
+        "elementIds": [
+          "about-orgs"
+        ],
+        "id": "hni-resources-about-orgs-v1"
+      },
+      {
+        "elementIds": [
+          "timeline"
+        ],
+        "id": "hni-explore-timeline-v1"
+      },
+      {
+        "elementIds": [
+          "map"
+        ],
+        "id": "hni-explore-map-v1"
+      },
+      {
+        "elementIds": [
+          "insights"
+        ],
+        "id": "hni-explore-insights-v1"
+      },
+      {
+        "elementIds": [
+          "home"
+        ],
+        "id": "hni-home-hero-v1"
+      },
+      {
+        "elementIds": [
+          "overview"
+        ],
+        "id": "hni-home-overview-v1"
+      },
+      {
+        "elementIds": [
+          "about"
+        ],
+        "id": "hni-home-measuring-v1"
+      },
+      {
+        "elementIds": [
+          "explore"
+        ],
+        "id": "hni-home-explore-v1"
+      }
+    ],
+    "withUseRefs": []
+  },
+  "iframes": [
+    {
+      "action": null,
+      "count": 1,
+      "fieldTags": null,
+      "id": "map-embed-v1",
+      "sandbox": [
+        "allow-scripts allow-same-origin allow-popups"
+      ],
+      "thirdPartyHost": [
+        null
+      ]
+    },
+    {
+      "action": null,
+      "count": 1,
+      "fieldTags": null,
+      "id": "video-embed-v1",
+      "sandbox": [
+        "allow-scripts allow-same-origin allow-popups allow-presentation"
+      ],
+      "thirdPartyHost": [
+        null
+      ]
+    },
+    {
+      "action": null,
+      "count": 1,
+      "fieldTags": null,
+      "id": "form-embed-v1",
+      "sandbox": [
+        "allow-scripts allow-same-origin allow-popups allow-forms"
+      ],
+      "thirdPartyHost": [
+        null
+      ]
+    },
+    {
+      "action": null,
+      "count": 1,
+      "fieldTags": null,
+      "id": "hni-explore-timeline-v1",
+      "sandbox": [
+        null
+      ],
+      "thirdPartyHost": [
+        "https://public.tableau.com"
+      ]
+    },
+    {
+      "action": null,
+      "count": 1,
+      "fieldTags": null,
+      "id": "hni-explore-map-v1",
+      "sandbox": [
+        null
+      ],
+      "thirdPartyHost": [
+        "https://public.tableau.com"
+      ]
+    }
+  ],
+  "markupLocations": {
+    "note": "registry.generated.js is metadata-only (no html/css). Markup+CSS exist in the site repos and, deduped, in registrySource.generated.js."
+  },
+  "otherCapabilityFlagMeanings": {
+    "derivedIn": "tsa-cms-admin/scripts/generate-section-manifest.mjs:110-142 (capabilities())",
+    "hasCta": "html.includes('cms-cta') \u2014 Interaction presets target .cms-cta",
+    "readsSectionFg": "css (comments stripped) includes '--section-fg' \u2014 a Background may be chosen without the text going unreadable",
+    "usesMobileOrder": "css includes 'data-mobile-order'",
+    "usesProgress": "css includes '--section-progress'",
+    "usesProgress2": "css includes '--section-progress-2'"
+  },
+  "repeats": {
+    "count": 56,
+    "withRepeatUnits": [
+      {
+        "id": "stats-grid-v1",
+        "units": [
+          {
+            "instances": 3,
+            "unit": "stat"
+          }
+        ]
+      },
+      {
+        "id": "feature-columns-v1",
+        "units": [
+          {
+            "instances": 3,
+            "unit": "feature-col"
+          }
+        ]
+      },
+      {
+        "id": "icon-card-grid-v1",
+        "units": [
+          {
+            "instances": 3,
+            "unit": "icon-grid-icon"
+          },
+          {
+            "instances": 3,
+            "unit": "icon-grid-link"
+          },
+          {
+            "instances": 3,
+            "unit": "icon-grid-card"
+          }
+        ]
+      },
+      {
+        "id": "faq-list-v1",
+        "units": [
+          {
+            "instances": 3,
+            "unit": "faqlist-q"
+          },
+          {
+            "instances": 3,
+            "unit": "faqlist-a"
+          }
+        ]
+      },
+      {
+        "id": "gallery-grid-v1",
+        "units": [
+          {
+            "instances": 3,
+            "unit": "gallery-img"
+          }
+        ]
+      },
+      {
+        "id": "contact-cards-v1",
+        "units": [
+          {
+            "instances": 2,
+            "unit": "contactcards-card"
+          }
+        ]
+      },
+      {
+        "id": "logo-strip-v1",
+        "units": [
+          {
+            "instances": 4,
+            "unit": "logostrip-logo"
+          },
+          {
+            "instances": 4,
+            "unit": "logostrip-link"
+          }
+        ]
+      },
+      {
+        "id": "rich-columns-v1",
+        "units": [
+          {
+            "instances": 2,
+            "unit": "richcols-col"
+          }
+        ]
+      },
+      {
+        "id": "program-cards-v1",
+        "units": [
+          {
+            "instances": 3,
+            "unit": "program"
+          }
+        ]
+      },
+      {
+        "id": "donation-ask-v1",
+        "units": [
+          {
+            "instances": 4,
+            "unit": "amount"
+          }
+        ]
+      },
+      {
+        "id": "accreditation-strip-v1",
+        "units": [
+          {
+            "instances": 4,
+            "unit": "accr-badge"
+          }
+        ]
+      },
+      {
+        "id": "eligibility-checklist-v1",
+        "units": [
+          {
+            "instances": 4,
+            "unit": "criterion"
+          },
+          {
+            "instances": 3,
+            "unit": "bring-item"
+          }
+        ]
+      },
+      {
+        "id": "faq-accordion-v1",
+        "units": [
+          {
+            "instances": 4,
+            "unit": "faqacc-q"
+          },
+          {
+            "instances": 4,
+            "unit": "faqacc-a"
+          }
+        ]
+      },
+      {
+        "id": "feature-grid-v1",
+        "units": [
+          {
+            "instances": 4,
+            "unit": "feature"
+          }
+        ]
+      },
+      {
+        "id": "hero-triage-v1",
+        "units": [
+          {
+            "instances": 3,
+            "unit": "triage"
+          }
+        ]
+      },
+      {
+        "id": "location-directory-v1",
+        "units": [
+          {
+            "instances": 3,
+            "unit": "location"
+          }
+        ]
+      },
+      {
+        "id": "process-steps-v1",
+        "units": [
+          {
+            "instances": 3,
+            "unit": "step"
+          }
+        ]
+      },
+      {
+        "id": "resource-library-v1",
+        "units": [
+          {
+            "instances": 4,
+            "unit": "resource"
+          }
+        ]
+      },
+      {
+        "id": "stats-band-v1",
+        "units": [
+          {
+            "instances": 4,
+            "unit": "bstat"
+          }
+        ]
+      },
+      {
+        "id": "story-grid-v1",
+        "units": [
+          {
+            "instances": 3,
+            "unit": "story"
+          }
+        ]
+      },
+      {
+        "id": "testimonial-cards-v1",
+        "units": [
+          {
+            "instances": 3,
+            "unit": "quote"
+          }
+        ]
+      },
+      {
+        "id": "utility-bar-v1",
+        "units": [
+          {
+            "instances": 3,
+            "unit": "util-link"
+          }
+        ]
+      },
+      {
+        "id": "volunteer-opportunities-v1",
+        "units": [
+          {
+            "instances": 3,
+            "unit": "volunteer"
+          }
+        ]
+      },
+      {
+        "id": "ways-to-give-grid-v1",
+        "units": [
+          {
+            "instances": 4,
+            "unit": "give-way"
+          }
+        ]
+      },
+      {
+        "id": "ways-to-help-grid-v1",
+        "units": [
+          {
+            "instances": 4,
+            "unit": "help-way"
+          }
+        ]
+      },
+      {
+        "id": "team-grid-v1",
+        "units": [
+          {
+            "instances": 6,
+            "unit": "person"
+          }
+        ]
+      },
+      {
+        "id": "share-row-v1",
+        "units": [
+          {
+            "instances": 4,
+            "unit": "share"
+          }
+        ]
+      },
+      {
+        "id": "event-schedule-v1",
+        "units": [
+          {
+            "instances": 6,
+            "unit": "session"
+          }
+        ]
+      },
+      {
+        "id": "event-speakers-v1",
+        "units": [
+          {
+            "instances": 6,
+            "unit": "speaker"
+          }
+        ]
+      },
+      {
+        "id": "event-venue-v1",
+        "units": [
+          {
+            "instances": 3,
+            "unit": "venue-fact"
+          }
+        ]
+      },
+      {
+        "id": "event-pricing-v1",
+        "units": [
+          {
+            "instances": 3,
+            "unit": "tier"
+          }
+        ]
+      },
+      {
+        "id": "event-sponsors-v1",
+        "units": [
+          {
+            "instances": 3,
+            "unit": "tier"
+          }
+        ]
+      },
+      {
+        "id": "post-list-v1",
+        "units": [
+          {
+            "instances": 6,
+            "unit": "post"
+          }
+        ]
+      },
+      {
+        "id": "event-list-v1",
+        "units": [
+          {
+            "instances": 4,
+            "unit": "event"
+          }
+        ]
+      },
+      {
+        "id": "document-list-v1",
+        "units": [
+          {
+            "instances": 8,
+            "unit": "doc"
+          }
+        ]
+      },
+      {
+        "id": "location-list-v1",
+        "units": [
+          {
+            "instances": 6,
+            "unit": "location"
+          }
+        ]
+      },
+      {
+        "id": "data-table-v1",
+        "units": [
+          {
+            "instances": 4,
+            "unit": "table-head"
+          }
+        ]
+      },
+      {
+        "id": "job-listings-v1",
+        "units": [
+          {
+            "instances": 5,
+            "unit": "job"
+          }
+        ]
+      },
+      {
+        "id": "breadcrumb-v1",
+        "units": [
+          {
+            "instances": 3,
+            "unit": "crumb"
+          }
+        ]
+      },
+      {
+        "id": "anchor-nav-v1",
+        "units": [
+          {
+            "instances": 6,
+            "unit": "anchornav-link"
+          }
+        ]
+      },
+      {
+        "id": "related-links-v1",
+        "units": [
+          {
+            "instances": 3,
+            "unit": "related"
+          }
+        ]
+      },
+      {
+        "id": "tabs-v1",
+        "units": [
+          {
+            "instances": 4,
+            "unit": "tab"
+          }
+        ]
+      },
+      {
+        "id": "timeline-v1",
+        "units": [
+          {
+            "instances": 5,
+            "unit": "milestone"
+          }
+        ]
+      },
+      {
+        "id": "social-links-v1",
+        "units": [
+          {
+            "instances": 6,
+            "unit": "social"
+          }
+        ]
+      },
+      {
+        "id": "contact-form-v1",
+        "units": [
+          {
+            "instances": 3,
+            "unit": "contact-fact"
+          }
+        ]
+      },
+      {
+        "id": "hni-overview-v1",
+        "units": [
+          {
+            "instances": 4,
+            "unit": "overview-stat"
+          }
+        ]
+      },
+      {
+        "id": "hni-explore-resources-v1",
+        "units": [
+          {
+            "instances": 4,
+            "unit": "explore-icon"
+          },
+          {
+            "instances": 4,
+            "unit": "cta"
+          }
+        ]
+      },
+      {
+        "id": "hni-footer-v1",
+        "units": [
+          {
+            "instances": 2,
+            "unit": "contact"
+          }
+        ]
+      },
+      {
+        "id": "hni-home-explore-v1",
+        "units": [
+          {
+            "instances": 4,
+            "unit": "cta"
+          },
+          {
+            "instances": 4,
+            "unit": "explore-icon"
+          }
+        ]
+      },
+      {
+        "id": "event-agenda-v1",
+        "units": [
+          {
+            "instances": 3,
+            "unit": "session"
+          }
+        ]
+      },
+      {
+        "id": "pricing-tiers-v1",
+        "units": [
+          {
+            "instances": 3,
+            "unit": "tier"
+          }
+        ]
+      },
+      {
+        "id": "speakers-grid-v1",
+        "units": [
+          {
+            "instances": 3,
+            "unit": "speaker"
+          }
+        ]
+      },
+      {
+        "id": "sponsors-tiered-v1",
+        "units": [
+          {
+            "instances": 2,
+            "unit": "tier"
+          }
+        ]
+      },
+      {
+        "id": "venue-location-v1",
+        "units": [
+          {
+            "instances": 3,
+            "unit": "venue-fact"
+          }
+        ]
+      },
+      {
+        "id": "echelon-speakers-v1",
+        "units": [
+          {
+            "instances": 3,
+            "unit": "sp"
+          }
+        ]
+      },
+      {
+        "id": "echelon-impact-data-split-v1",
+        "units": [
+          {
+            "instances": 2,
+            "unit": "impact-split-stat"
+          }
+        ]
+      }
+    ]
+  },
+  "sanitizerStrips": {
+    "nonEmptyCount": 9,
+    "tagFrequency": {
+      "form": 4,
+      "iframe": 5,
+      "input": 4
+    }
+  },
+  "sanitizerStripsMeaning": {
+    "consumedBy": "<v1-checkout> Army - Websites/new-builds/tsa-cms-admin/src/views/SectionLibrary.vue:243 (UI affordance withheld) \u2014 no other consumer in the codebase",
+    "definedIn": "<v1-checkout> Army - Websites/new-builds/tsa-cms-admin/scripts/generate-section-manifest.mjs:139",
+    "derivation": "SANITIZER_FORBIDS().filter(tag => new RegExp(`<${tag}[\\\\s/>]`,'i').test(html))",
+    "forbidList": [
+      "script",
+      "style",
+      "iframe",
+      "object",
+      "embed",
+      "form",
+      "input",
+      "link",
+      "base",
+      "meta"
+    ],
+    "forbidListReadFrom": "<v1-checkout> Army - Websites/new-builds/tsa-humanneedsindex/src/cms/sanitize.js:69 (sanitizeChrome FORBID_TAGS)",
+    "meaning": "Tags DOMPurify's sanitizeChrome would delete if this git built-in were replaced by a Firestore override ('Edit code'). resolveTemplate returns trusted:false for an override, so its markup is sanitized before innerHTML. A non-empty list means an override would silently gut the section."
+  },
+  "slotIntegrity": {
+    "editableTypeMismatchHtmlVsSlots": [],
+    "htmlBlocksNotDeclaredAsSlots": [],
+    "nonEditableBlockMarkers": [
+      {
+        "id": "hni-explore-timeline-v1",
+        "markers": [
+          {
+            "blockId": "timeline-viz",
+            "tag": "div"
+          }
+        ]
+      },
+      {
+        "id": "hni-explore-map-v1",
+        "markers": [
+          {
+            "blockId": "map-viz",
+            "tag": "div"
+          }
+        ]
+      }
+    ],
+    "slotsDeclaredButMissingFromHtml": []
+  },
+  "slotTotals": {
+    "maxSlots": 42,
+    "totalSlots": 1244,
+    "zeroSlot": [
+      "divider-v1",
+      "hni-resources-divider-1-v1",
+      "hni-resources-divider-2-v1",
+      "hni-home-divider-1-v1",
+      "hni-home-divider-2-v1",
+      "hni-home-divider-3-v1"
+    ]
+  },
+  "totals": {
+    "dedupedDefinitions": 118,
+    "functionsRegistryEntries": 118,
+    "globalNoSitesField": 78,
+    "libraryFalse": 27,
+    "libraryTrue": 1,
+    "libraryUnset": 90,
+    "perSiteExportedCounts": {
+      "echelonsymposium": 91,
+      "humanneedsindex": 105,
+      "site-host": 78
+    },
+    "registryGeneratedEntries": 118,
+    "registrySourceEntries": 118,
+    "scopedBySitesField": 40,
+    "sharedAcrossAllThreeSites": 78,
+    "sharedAcrossTwoSites": 0,
+    "singleSiteOnly": 40
+  },
+  "v1Root": "<v1-checkout> (read-only; not vendored)"
+}

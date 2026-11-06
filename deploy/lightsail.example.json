@@ -1,0 +1,7 @@
+{
+  "adminHost": "cms.example.org",
+  "stagingBaseDomain": "preview.example.org",
+  "certificateEmail": "owner@example.org",
+  "imageId": "REPLACE_WITH_LOADED_AMD64_IMAGE_ID_SHA256_DIGEST",
+  "caddyImage": "REPLACE_WITH_OFFICIAL_CADDY_MULTIARCH_IMAGE_DIGEST"
+}

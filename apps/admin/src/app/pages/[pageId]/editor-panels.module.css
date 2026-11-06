@@ -1,0 +1,284 @@
+.panes {
+  position: relative;
+  grid-template-columns: var(--structure-width) minmax(var(--canvas-min), 1fr) var(--right-width);
+}
+.panes > :global(.canvas-pane) {
+  position: relative;
+  grid-column: 2;
+  grid-row: 1;
+}
+.right {
+  grid-column: 3;
+  grid-row: 1;
+  min-height: 0;
+  width: 100% !important;
+  background: var(--surface);
+}
+.right > aside {
+  height: 100%;
+  box-sizing: border-box;
+}
+.structure {
+  grid-column: 1;
+  grid-row: 1;
+  min-height: 0;
+  position: relative;
+  background: var(--surface);
+}
+.structurePanel {
+  width: 100% !important;
+  height: 100%;
+}
+.structurePanel > aside {
+  height: 100%;
+  box-sizing: border-box;
+}
+.panes[data-collapsed='true'] {
+  grid-template-columns: var(--space-7) minmax(var(--canvas-min), 1fr) var(--right-width);
+}
+.panes[data-collapsed='true'] .structurePanel {
+  display: none;
+}
+.panes[data-collapsed='true'] .structure[data-open='true'] .structurePanel {
+  display: block;
+  position: absolute;
+  inset: 0 auto 0 var(--space-7);
+  width: var(--structure-width) !important;
+  z-index: var(--z-popover);
+  box-shadow: var(--shadow-2);
+}
+.structureToggle {
+  width: var(--target-medium);
+  min-height: var(--target-medium);
+  margin: var(--space-1);
+}
+.panes[data-right-overlay='true'] {
+  grid-template-columns: var(--space-7) minmax(0, 1fr);
+}
+.panes[data-right-overlay='true'] > .right {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: 0;
+  width: min(var(--right-width), calc(100% - var(--space-7))) !important;
+  z-index: var(--z-popover);
+  box-shadow: var(--shadow-2);
+}
+:global(.editor[data-focus-canvas='true']) .panes {
+  grid-template-columns: minmax(0, 1fr);
+}
+:global(.editor[data-focus-canvas='true']) .structure,
+:global(.editor[data-focus-canvas='true']) .right {
+  display: none;
+}
+@media (max-width: 48em) {
+  .panes,
+  .panes[data-collapsed='true'],
+  .panes[data-right-overlay='true'] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .panes > :global(.canvas-pane) {
+    grid-column: 1;
+  }
+  .structure {
+    display: none;
+  }
+  .panes[data-shown='tree'] > .structure {
+    display: block;
+  }
+  .panes[data-shown='tree'] .structurePanel {
+    display: block;
+    position: static;
+    width: 100% !important;
+  }
+  .right,
+  .panes[data-right-overlay='true'] > .right {
+    display: none;
+    grid-column: 1;
+    position: static;
+    width: 100% !important;
+  }
+  .panes[data-shown='inspector'] > .right,
+  .panes[data-shown='library'] > .right {
+    display: block;
+  }
+}
+
+:global(.editor[data-focus-canvas='true']) .panes > :global(.canvas-pane) {
+  grid-column: 1;
+}
+
+:global(.pane-tabs button[aria-selected='true']) {
+  border-color: var(--editor-select);
+}
+.structure :global(.dot) {
+  background: var(--editor-select);
+}
+.structure :global(.tree-slot.on) {
+  box-shadow: inset var(--line-focus) 0 0 var(--editor-select);
+}
+
+.structure :global(.tree-card .tree-section) {
+  display: grid;
+  grid-template-columns: var(--target-small) minmax(0, 1fr);
+  align-items: start;
+}
+.structure :global(.tree-card .tree-label) {
+  grid-column: 2;
+  grid-row: 1;
+  min-height: var(--target-small);
+}
+.structure :global(.tree-card .tree-collapse) {
+  grid-column: 1;
+  grid-row: 1;
+  width: var(--target-small);
+  min-height: var(--target-small);
+}
+.structure :global(.tree-card .tree-visibility) {
+  grid-column: 1;
+  grid-row: 2;
+  width: var(--target-small);
+  height: var(--target-small);
+}
+.structure :global(.tree-card .reorder) {
+  grid-column: 2;
+  grid-row: 2;
+  justify-self: end;
+}
+.structure :global(.reorder button) {
+  width: var(--target-small);
+  height: var(--target-small);
+  min-height: var(--target-small);
+}
+.structure :global(.tree-disclosures button),
+.structure :global(.tree-slot) {
+  min-height: var(--target-small);
+}
+.structure :global(.tree-card .tree-section.on .dot) {
+  background: var(--editor-select);
+}
+.structure :global(.tree-gap) {
+  height: var(--target-small);
+}
+
+.structure :global(.pane) {
+  padding: var(--space-3) var(--space-2);
+}
+.structure :global(.pane-head) {
+  padding-inline: var(--space-2);
+}
+.structure :global(.tree-card) {
+  border-color: transparent;
+  border-radius: var(--radius-control);
+  padding: 0;
+}
+.structure :global(.tree-card.is-selected) {
+  border-color: var(--border);
+}
+.structure :global(.tree-section.on) {
+  background: var(--brand-tint);
+}
+.structure :global(.tree-name) {
+  font-size: var(--text-meta);
+  font-weight: var(--weight-medium);
+}
+.structure :global(.tree-field-count) {
+  color: var(--text-muted);
+}
+.structure :global(.tree-slot) {
+  font-size: var(--text-meta);
+}
+.structure :global(.tree-tools) {
+  gap: var(--space-2);
+}
+.structure :global(.tree-card .tree-slots) {
+  border-left: 0;
+  padding-inline-start: var(--space-2);
+}
+.structure :global(.pane-head h2) {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+}
+
+.structure :global(.tree-card .tree-label) {
+  padding-block: var(--space-1);
+  line-height: var(--line-meta);
+}
+.structure :global(.tree-card .tree-slots) {
+  margin-block: var(--space-1);
+  margin-inline-start: var(--space-3);
+}
+.structure :global(.tree-label .tree-heading) {
+  line-height: var(--line-meta);
+}
+
+.panes[data-native='true'] {
+  --canvas-min: 0;
+}
+
+.structure :global(.tree[data-compact='true'] .tree-gap) {
+  height: var(--space-2);
+}
+.structure :global(.tree[data-compact='true'] .tree-gap > button) {
+  min-height: var(--space-2);
+  opacity: 0;
+}
+.structure :global(.tree[data-compact='true'] .tree-gap:focus-within),
+.structure :global(.tree[data-compact='true'] .tree-gap.drop-active) {
+  height: var(--target-small);
+}
+.structure :global(.tree[data-compact='true'] .tree-gap:focus-within > button),
+.structure :global(.tree[data-compact='true'] .tree-gap.drop-active > button) {
+  min-height: var(--target-small);
+  opacity: 1;
+}
+
+.panes[data-library-left='true'] {
+  grid-template-columns: var(--right-width) minmax(0, 1fr);
+}
+.panes[data-library-left='true'] > .structure {
+  display: none;
+}
+.panes[data-library-left='true'] > .right {
+  grid-column: 1;
+  position: static;
+  width: 100% !important;
+}
+.panes[data-library-left='true'] > :global(.canvas-pane) {
+  grid-column: 2;
+}
+
+/* Compact native structure rows share the section menu instead of a second bar. */
+.structure :global(.tree[data-compact='true'] .tree-section) {
+  grid-template-columns: var(--target-small) minmax(0, 1fr) var(--target-small);
+  align-items: center;
+}
+.structure :global(.tree[data-compact='true'] .tree-section > details) {
+  grid-column: 3;
+  grid-row: 1;
+}
+.structure :global(.tree[data-compact='true'] .tree-label) {
+  padding-block: var(--space-1);
+}
+
+.structure :global(.tree[data-compact='true'] .pane-head) {
+  margin-block-end: var(--space-2);
+}
+.structure :global(.tree[data-compact='true'] .tree-tools) {
+  margin-block-end: var(--space-1);
+}
+.structure :global(.tree[data-compact='true'] .tree-card) {
+  margin: 0;
+  border: 0;
+}
+.structure :global(.tree[data-compact='true'] .tree-section) {
+  padding: 0;
+}
+.structure :global(.tree[data-compact='true'] .tree-gap) {
+  height: var(--sidebar-flow-gap);
+}
+.structure :global(.tree[data-compact='true'] .tree-card .tree-slots) {
+  margin-inline-start: var(--space-4);
+}

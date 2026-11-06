@@ -1,0 +1,18 @@
+/* Token declarations are scoped to these owned controls by the canvas build;
+   original site CSS and theme variables remain untouched. */
+cms-editor-layer {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  contain: strict;
+  pointer-events: none;
+  z-index: var(--z-dialog);
+  font-family: var(--font-ui);
+}
+cms-editor-ui {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  transform-origin: top left;
+  pointer-events: none;
+}

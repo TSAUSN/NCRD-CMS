@@ -1,0 +1,105 @@
+.search {
+  display: grid;
+  gap: var(--space-3);
+  min-width: 0;
+  padding: var(--space-1);
+}
+.search label {
+  font-weight: var(--weight-medium);
+}
+.search input {
+  font-size: var(--text-emphasis);
+  width: 100%;
+  min-width: 0;
+  min-height: var(--target-medium);
+  padding: var(--space-3);
+  border: var(--line-thin) solid var(--border-strong);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--text);
+}
+.search input:focus-visible,
+.result:focus-visible {
+  outline: var(--line-focus) solid var(--focus);
+  outline-offset: var(--focus-offset);
+}
+.results {
+  display: grid;
+  gap: var(--space-1);
+  max-height: min(var(--size-360), 45dvh);
+  overflow: auto;
+  scrollbar-gutter: stable;
+  overscroll-behavior: contain;
+  padding: var(--space-1);
+  border-block: var(--line-thin) solid var(--border);
+}
+.resultSummary {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: var(--text-meta);
+}
+.results h3 {
+  margin: var(--space-3) 0 var(--space-2);
+  color: var(--text-muted);
+  font-size: var(--text-tag);
+  text-transform: uppercase;
+  font-weight: var(--weight-medium);
+}
+.result {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--target-medium);
+  padding: var(--space-3);
+  color: var(--text);
+  text-decoration: none;
+  border-radius: var(--radius-control);
+  overflow-wrap: anywhere;
+}
+.result span {
+  font-size: var(--text-meta);
+  color: var(--text-muted);
+}
+.result[aria-selected='true'],
+.result:hover {
+  background: var(--status-scheduled-bg);
+}
+.help {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  justify-content: space-between;
+  color: var(--text-muted);
+  font-size: var(--text-meta);
+}
+
+.resultCopy {
+  display: grid;
+  gap: var(--space-1);
+  flex: 1;
+  min-width: 0;
+}
+.resultCopy strong {
+  color: var(--text);
+  font-size: var(--text-meta);
+  font-weight: var(--weight-medium);
+}
+.resultIcon {
+  display: grid;
+  place-items: center;
+  width: var(--target-small);
+  height: var(--target-small);
+  flex: none;
+  border-radius: var(--radius-control);
+  background: var(--surface-sunken);
+}
+.result[aria-selected='true'] .resultIcon {
+  color: var(--focus);
+}
+.enter {
+  border: var(--line-thin) solid var(--border);
+  border-radius: var(--radius-control);
+  padding: 0 var(--space-1);
+  background: var(--surface);
+}

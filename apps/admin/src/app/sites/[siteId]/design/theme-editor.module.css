@@ -1,0 +1,88 @@
+.embedded {
+  height: auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.embedded > :global(.theme-grid) {
+  order: 1;
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  margin: 0;
+  padding-inline: var(--focus-offset);
+  padding-block-end: var(--space-3);
+  scroll-padding-block: var(--space-2);
+  overscroll-behavior: contain;
+}
+.embedded > :global(.theme-commandbar) {
+  order: 2;
+  flex: none;
+  display: grid;
+  justify-content: stretch;
+  align-items: stretch;
+  gap: var(--space-3);
+  padding: var(--space-3) 0 0;
+  margin: 0;
+  border: 0;
+  border-block-start: var(--line-thin) solid var(--border);
+  border-radius: 0;
+  background: var(--surface);
+}
+.embedded > :global(.theme-commandbar .actions) {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+.embedded :global(.theme-commandbar strong),
+.embedded :global(.theme-commandbar small) {
+  font-size: var(--text-meta);
+  line-height: var(--line-body);
+}
+.embedded :global(.theme-commandbar .actions button) {
+  flex: 1;
+}
+.embedded :global(.theme-controls) {
+  gap: var(--space-4);
+}
+.embedded :is(input, select) {
+  min-height: var(--target-medium);
+  font-size: var(--text-meta);
+  line-height: var(--line-body);
+}
+.fieldError {
+  color: var(--danger);
+  font-size: var(--text-meta);
+  line-height: var(--line-body);
+  margin: 0;
+}
+.embedded :global(.theme-colour[data-compact] > p),
+.embedded :global(.theme-colour[data-compact] > small) {
+  display: none;
+}
+.embedded :is(input, select):disabled {
+  opacity: 1;
+  color: var(--text-muted);
+  background: var(--surface-sunken);
+}
+
+.embedded :global(.theme-defaults-action) {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-2);
+}
+.embedded :global(.theme-defaults-action) button {
+  min-width: 0;
+  max-width: 100%;
+  white-space: normal;
+}
+.embedded :global(.theme-defaults-action) small {
+  flex: none;
+  min-width: 0;
+  max-width: 100%;
+  margin: 0;
+  overflow-wrap: anywhere;
+  line-height: var(--line-body);
+}

@@ -1,0 +1,154 @@
+.shelf {
+  container-type: inline-size;
+  padding: 0;
+  overflow: visible;
+}
+.shelf :global(.overlay-head) {
+  gap: var(--space-2);
+  align-items: flex-start;
+  padding: var(--space-4);
+}
+.shelf :global(.overlay-head h2) {
+  font-size: var(--text-section);
+}
+.shelf :global(.overlay-head .where) {
+  font-size: var(--text-body);
+  line-height: 1.5;
+}
+.shelf > button {
+  margin-inline: var(--space-4);
+}
+.shelf :global(.overlay-grid) {
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+  padding: var(--space-4);
+}
+.shelf :global(.section-card-body) {
+  padding: var(--space-4);
+  gap: var(--space-2);
+}
+.shelf :global(.section-card-name) {
+  font-size: var(--text-emphasis);
+}
+.shelf :global(.section-thumb-frame) {
+  aspect-ratio: 16 / 10;
+}
+.shelf :global(.section-card-actions) {
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.shelf :global(.section-card-actions button) {
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: normal;
+  min-height: var(--target-medium);
+}
+.request {
+  padding-block: var(--space-5);
+  grid-column: 1 / -1;
+}
+.expanded {
+  width: 100%;
+  max-height: 75vh;
+}
+.expanded :global(.overlay-body) {
+  display: grid;
+  grid-template-columns: var(--size-220) minmax(0, 1fr);
+}
+.expanded :global(.overlay-categories) {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  flex-wrap: nowrap;
+  padding: var(--space-4);
+  gap: var(--space-2);
+}
+.expanded :global(.overlay-categories button) {
+  justify-content: space-between;
+  white-space: normal;
+  text-align: start;
+}
+@media (max-width: 48em) {
+  .expanded :global(.overlay-body) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .expanded :global(.overlay-categories) {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}
+@container (min-width: 26.25rem) {
+  .shelf :global(.overlay-grid) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@container (min-width: 42.5rem) {
+  .shelf :global(.overlay-grid) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.shelf :global(.overlay-head .where .link) {
+  color: var(--text-on-dark);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  min-height: var(--target-small);
+}
+
+.shelf :global(.overlay-head) {
+  border-bottom-color: var(--editor-select);
+}
+.shelf :global(.section-card[data-active='true']::after) {
+  background: var(--editor-select);
+}
+
+.destination {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-4);
+}
+
+/* One scroll surface lets complete cards fit on short screens. Search remains
+   visible while categories and secondary controls scroll naturally above it. */
+.browser {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scroll-padding-block: calc(var(--target-medium) * 2 + var(--space-4)) var(--space-4);
+}
+.shelf .browser :global(.overlay-body) {
+  overflow: visible;
+}
+.shelf .browser :global(.overlay-grid) {
+  overflow: visible;
+  flex: none;
+}
+.shelf .browser :global(.overlay-controls) {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-popover);
+  background: var(--surface);
+  border-bottom: var(--line-thin) solid var(--border);
+}
+.shelf .browser > button {
+  margin: var(--space-4);
+  width: calc(100% - var(--space-4) * 2);
+}
+
+.shelf :global(.overlay-categories button) {
+  min-height: var(--target-small);
+}
+.shelf :global(.favourite-star) {
+  min-width: var(--target-small);
+  min-height: var(--target-small);
+}
+
+@container (min-width:22rem) {
+  .shelf[data-compact='true'] :global(.overlay-grid) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.shelf[data-compact='true'] :global(.section-card[aria-current='true']) {
+  border-color: var(--editor-select);
+}

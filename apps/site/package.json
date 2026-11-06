@@ -1,0 +1,31 @@
+{
+  "name": "site",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "node --env-file-if-exists=../../.env ../../scripts/build-editor-canvas.mjs && next dev --port 3001",
+    "build": "node --env-file-if-exists=../../.env ../../scripts/build-editor-canvas.mjs && next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests",
+    "test:db": "vitest run --config vitest.db.config.ts"
+  },
+  "dependencies": {
+    "@cms/domain": "workspace:*",
+    "@cms/platform": "workspace:*",
+    "@cms/renderer": "workspace:*",
+    "@cms/schema": "workspace:*",
+    "@cms/seeds": "workspace:*",
+    "next": "^16.3.8",
+    "parse5": "8.0.1",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  },
+  "devDependencies": {
+    "@types/node": "^26.2.0",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.11"
+  }
+}

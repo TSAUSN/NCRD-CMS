@@ -1,0 +1,41 @@
+.field {
+  display: grid;
+  gap: var(--space-3);
+  min-width: 0;
+}
+.field h3 {
+  margin: 0;
+  font-size: var(--text-emphasis);
+  line-height: var(--line-emphasis);
+}
+.preview {
+  display: grid;
+  place-items: center;
+  min-height: var(--space-7);
+  padding: var(--space-3);
+  background: var(--surface-sunken);
+  border: var(--line-thin) solid var(--border);
+  border-radius: var(--radius-control);
+  color: var(--text-muted);
+}
+.preview img {
+  max-width: 100%;
+  max-height: var(--space-7);
+  object-fit: contain;
+}
+.name,
+.help {
+  margin: 0;
+  font-size: var(--text-body);
+  line-height: var(--line-body);
+  overflow-wrap: anywhere;
+}
+.help {
+  color: var(--text-muted);
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: start;
+}

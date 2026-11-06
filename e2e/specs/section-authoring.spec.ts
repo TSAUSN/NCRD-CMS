@@ -1,0 +1,97 @@
+import { expect, test } from '@playwright/test'
+import { addSectionButton, canvas, fetchPublic, publish, saveDraft, signIn } from './helpers.ts'
+
+test('authors a visual section, versions it, and updates only one page instance after review', async ({ page }) => {
+  test.setTimeout(120_000)
+  await signIn(page, 'root@example.test')
+  await page.getByRole('main').getByRole('link', { name: 'Demo site', exact: true }).click()
+  await expect(page).toHaveURL(/\/sites\/[0-9a-f-]+$/)
+  const siteUrl = page.url()
+  const name = `Upgrade band ${Date.now()}`
+  await page.goto(`${siteUrl}/sections/new`)
+  await page.getByLabel('Section name', { exact: true }).fill(name)
+  await page.getByLabel('Category', { exact: true }).fill('Tests')
+  await page.locator('#section-change-note').fill('Create an editable responsive upgrade band')
+  await page.getByRole('button', { name: 'Check and preview', exact: true }).click()
+  await page.getByRole('button', { name: 'Save this section', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Section saved', exact: true })).toBeVisible()
+  await page.getByRole('link', { name: 'Back to sections', exact: true }).click()
+  await page.getByRole('link', { name: `Details ${name}`, exact: true }).click()
+  const editHref = await page.getByRole('link', { name: 'Edit section', exact: true }).getAttribute('href')
+
+  await page.goto(`${siteUrl}/pages`)
+  await page.getByRole('button', { name: 'New page', exact: true }).click()
+  const creator = page.getByRole('dialog', { name: 'New page', exact: true })
+  const slug = `section-update-${Date.now()}`
+  await creator.getByLabel('Page title', { exact: true }).fill('Section update test')
+  await creator.getByRole('button', { name: 'Change', exact: true }).click()
+  await creator.getByLabel('Web address', { exact: true }).fill(slug)
+  await creator.getByText('A blank page', { exact: true }).click()
+  await creator.getByRole('button', { name: 'Create draft', exact: true }).click()
+  await expect(page.getByRole('complementary', { name: 'Page structure' })).toBeVisible()
+  const editorUrl = page.url()
+  await expect(canvas(page).locator('[data-cms-section]').first()).toBeVisible()
+  const firstIndex = await canvas(page).locator('[data-cms-section]').count(),
+    secondIndex = firstIndex + 1
+  await addSectionButton(page).click()
+  const card = page.locator('#editor-panel-library .section-card').filter({ hasText: name })
+  await card.getByRole('button', { name: /^Add .+ (?:after|before|between|as the first)/ }).click()
+  await page
+    .getByRole('dialog', { name: 'Add a section', exact: true })
+    .getByRole('button', { name: 'Add this section', exact: true })
+    .click()
+  await page.locator(`#slot-${firstIndex}-heading`).fill('First instance')
+  await page.getByRole('button', { name: 'Duplicate section', exact: true }).click()
+  await canvas(page).locator(`#s${secondIndex} [data-cms-slot="heading"]`).click()
+  await page.locator(`#slot-${secondIndex}-heading`).fill('Second instance')
+  await saveDraft(page)
+  await publish(page)
+
+  await page.goto(editHref!)
+  await page.locator('#builder-label-0-0-0').fill('Updated heading')
+  await page.getByText('Advanced structure and styling', { exact: true }).click()
+  const css = page.getByLabel('Section CSS', { exact: true })
+  await css.fill(`${await css.inputValue()}\n.builder-root h2{color:#0055aa}`)
+  await page.locator('#section-change-note').fill('Updated heading label and colour')
+  await page.getByRole('button', { name: 'Check and preview', exact: true }).click()
+  await page.getByRole('button', { name: 'Save new section version', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Section saved', exact: true })).toBeVisible()
+
+  await page.goto(editorUrl)
+  await canvas(page).locator(`#s${firstIndex} [data-cms-slot="heading"]`).click()
+  await expect(page.getByLabel('Title', { exact: true })).toHaveValue('First instance')
+  await page
+    .getByRole('complementary', { name: 'Inspector' })
+    .getByRole('button', { name: 'Back', exact: true })
+    .click()
+  await page.getByRole('tab', { name: 'Advanced', exact: true }).click()
+  await page.getByRole('button', { name: 'Review layout update', exact: true }).click()
+  const update = page.getByRole('dialog', { name: 'Review section update' })
+  await expect(update.locator('iframe[title="Proposed section update in the page"]')).toBeVisible()
+  await expect(update.getByRole('heading', { name: 'Current draft', exact: true })).toBeVisible()
+  await expect(update.getByRole('heading', { name: 'With this update', exact: true })).toBeVisible()
+  await update.getByLabel('Compare at').selectOption('390')
+  for (const title of ['Current section version in the page', 'Proposed section update in the page']) {
+    await expect(update.locator(`iframe[title="${title}"]`)).toHaveCSS('width', '390px')
+    await expect(
+      page.frameLocator(`iframe[title="${title}"]`).getByRole('heading', { name: 'First instance' }),
+    ).toHaveCount(1)
+  }
+  await update.getByRole('button', { name: 'Apply to draft', exact: true }).click()
+  await page.getByRole('tab', { name: 'Content', exact: true }).click()
+  await expect(page.getByLabel('Updated heading', { exact: true })).toHaveValue('First instance')
+  expect((await fetchPublic(`/${slug}`)).body).not.toContain('#0055aa')
+  await publish(page)
+  await expect(canvas(page).locator(`#s${firstIndex} h2`)).toHaveCSS('color', 'rgb(0, 85, 170)')
+  await expect(canvas(page).locator(`#s${secondIndex} h2`)).not.toHaveCSS('color', 'rgb(0, 85, 170)')
+  await canvas(page).locator(`#s${secondIndex} [data-cms-slot="heading"]`).click()
+  await expect(page.getByLabel('Title', { exact: true })).toHaveValue('Second instance')
+  await page.goto(siteUrl)
+  const createdPage = page
+    .locator('table[aria-label="Pages"] tbody tr')
+    .filter({ has: page.locator(`a[href="${new URL(editorUrl).pathname}"]`) })
+  await createdPage.getByRole('button', { name: /^More actions for / }).click()
+  await createdPage.getByRole('button', { name: 'Archive', exact: true }).click()
+  await page.getByRole('alertdialog').getByRole('button', { name: 'Archive page' }).click()
+  await expect(createdPage).toHaveCount(0)
+})

@@ -1,0 +1,16 @@
+.stack {
+  display: grid;
+  gap: var(--space-4);
+  min-width: 0;
+}
+.stack p {
+  margin: 0;
+}
+.body {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.meta {
+  font-size: var(--text-meta);
+  color: var(--text-muted);
+}

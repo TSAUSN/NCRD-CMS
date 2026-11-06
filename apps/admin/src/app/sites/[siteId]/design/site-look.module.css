@@ -1,0 +1,117 @@
+.workspace {
+  display: grid;
+  gap: var(--space-4);
+}
+.toolbar {
+  display: flex;
+  align-items: end;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+.toolbar > button {
+  margin-inline-start: auto;
+}
+.layout {
+  display: flex;
+  min-width: 0;
+  border: var(--line-thin) solid var(--border);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  background: var(--surface-sunken);
+}
+.controls {
+  flex: none;
+  min-width: 0;
+  padding: var(--space-4);
+  background: var(--surface);
+  height: var(--site-look-height);
+  max-height: var(--site-look-height);
+  overflow: clip;
+  display: flex;
+  flex-direction: column;
+}
+.controls :global([hidden]) {
+  display: none !important;
+}
+.theme :global(.theme-grid),
+.theme :global(.theme-form-grid),
+.theme :global(.theme-form-grid-three) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+}
+.theme :global(.theme-colour-grid) {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+.theme :global(.theme-colour) {
+  min-width: 0;
+  padding: var(--space-4);
+}
+.theme :global(.theme-panel-head) {
+  margin-block-end: var(--space-4);
+}
+.frame :global(aside) {
+  padding: 0;
+}
+.theme,
+.frame {
+  min-height: 0;
+  flex: 1;
+  overflow: auto;
+}
+.theme {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  overflow: clip;
+}
+.frame {
+  overflow: hidden;
+}
+.controls > :global([role='separator']) {
+  margin: 0;
+}
+.controls > :global([role='group']) {
+  flex: none;
+}
+.canvas {
+  --site-look-preview-height: calc(var(--site-look-height) - var(--space-4) - var(--space-4));
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-4);
+  height: var(--site-look-height);
+  min-height: 0;
+  overflow: hidden;
+}
+.stage {
+  position: relative;
+  margin-inline: auto;
+  height: var(--site-look-preview-height);
+  overflow: hidden;
+  background: var(--surface);
+  box-shadow: var(--shadow-1);
+}
+.stage iframe {
+  border: 0;
+  transform-origin: top left;
+}
+.loading {
+  position: absolute;
+  inset: 0;
+  padding: var(--space-5);
+  background: var(--surface);
+  color: var(--text-muted);
+}
+
+.theme :global(.theme-workspace) {
+  flex: 1;
+  min-height: 0;
+  margin: 0;
+}
+
+.workspace[data-native='true'] {
+  overflow: clip;
+  --site-look-height: max(var(--size-340), calc(100dvh - var(--site-look-top) - var(--space-4)));
+}

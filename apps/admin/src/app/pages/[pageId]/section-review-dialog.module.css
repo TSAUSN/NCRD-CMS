@@ -1,0 +1,15 @@
+.content {
+  min-width: 0;
+}
+.previews > section {
+  min-width: 0;
+}
+.previews h3 {
+  font-size: var(--text-body);
+  margin: 0 0 var(--space-2);
+}
+.preview {
+  width: 100%;
+  height: var(--size-340);
+  border: var(--line-thin) solid var(--border);
+}

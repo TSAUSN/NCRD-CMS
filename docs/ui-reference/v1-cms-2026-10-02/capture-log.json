@@ -1,0 +1,170 @@
+[
+  {
+    "name": "01-dashboard",
+    "note": "Unmodified V1 dashboard; isolated emulator admin.",
+    "url": "http://127.0.0.1:5273/dashboard",
+    "capturedAt": "2026-10-03T01:53:53.268Z"
+  },
+  {
+    "name": "02-hni-workspace",
+    "note": "Site-scoped tools, page cards and draft states; empty emulator has no published records.",
+    "url": "http://127.0.0.1:5273/site/humanneedsindex",
+    "capturedAt": "2026-10-03T01:54:02.123Z"
+  },
+  {
+    "name": "03-hni-editor-desktop",
+    "note": "Loaded original HNI page, 7 sections and 71 editable regions; three-pane editor.",
+    "url": "http://127.0.0.1:5273/site/humanneedsindex/edit/home",
+    "capturedAt": "2026-10-03T01:54:18.067Z"
+  },
+  {
+    "name": "04-title-selection",
+    "note": "Selecting the outline focuses a caret in the actual heading; matching outline and canvas selection, contextual text inspector.",
+    "url": "http://127.0.0.1:5273/site/humanneedsindex/edit/home",
+    "capturedAt": "2026-10-03T01:54:25.044Z"
+  },
+  {
+    "name": "05-inline-edit-dirty",
+    "note": "Typed local review text directly into the canvas heading; verify dirty state and inspector synchronization.",
+    "url": "http://127.0.0.1:5273/site/humanneedsindex/edit/home",
+    "capturedAt": "2026-10-03T01:54:34.883Z"
+  },
+  {
+    "name": "06-rich-text",
+    "note": "Rich text has canvas formatting toolbar plus full inspector toolbar; two editing surfaces.",
+    "url": "http://127.0.0.1:5273/site/humanneedsindex/edit/home",
+    "capturedAt": "2026-10-03T01:54:42.760Z"
+  },
+  {
+    "name": "07-image-inspector",
+    "note": "Hero image selection with upload, media library, URL and alt text controls; no crop control observed in this panel.",
+    "url": "http://127.0.0.1:5273/site/humanneedsindex/edit/home",
+    "capturedAt": "2026-10-03T01:54:43.268Z"
+  },
+  {
+    "name": "08-link-inspector",
+    "note": "Button/link selection shows contextual link controls.",
+    "url": "http://127.0.0.1:5273/site/humanneedsindex/edit/home",
+    "capturedAt": "2026-10-03T01:54:53.970Z"
+  },
+  {
+    "name": "09-section-settings",
+    "note": "Section actions, change-layout chooser and source-aware styling rules; advanced controls extend below viewport.",
+    "url": "http://127.0.0.1:5273/site/humanneedsindex/edit/home",
+    "capturedAt": "2026-10-03T01:55:06.017Z"
+  },
+  {
+    "name": "10-docked-library",
+    "note": "Hero category: real section previews with above/below insertion beside the current page.",
+    "url": "http://127.0.0.1:5273/site/humanneedsindex/edit/home",
+    "capturedAt": "2026-10-03T01:55:20.978Z"
+  },
+  {
+    "name": "11-section-full-preview",
+    "note": "Centered Hero full-size preview with device switcher and editable-field summary.",
+    "url": "http://127.0.0.1:5273/site/humanneedsindex/edit/home",
+    "capturedAt": "2026-10-03T01:55:34.917Z"
+  },
+  {
+    "name": "12-page-templates",
+    "note": "Docked Page Templates view with page recipes alongside current page.",
+    "url": "http://127.0.0.1:5273/site/humanneedsindex/edit/home",
+    "capturedAt": "2026-10-03T01:55:35.768Z"
+  },
+  {
+    "name": "13-mobile-preview",
+    "note": "Mobile canvas mode within desktop editing shell; not a phone browser test.",
+    "url": "http://127.0.0.1:5273/site/humanneedsindex/edit/home",
+    "capturedAt": "2026-10-03T01:55:44.781Z"
+  },
+  {
+    "name": "14-tablet-preview",
+    "note": "Tablet canvas mode within desktop editing shell.",
+    "url": "http://127.0.0.1:5273/site/humanneedsindex/edit/home",
+    "capturedAt": "2026-10-03T01:55:45.083Z"
+  },
+  {
+    "name": "15-global-header",
+    "note": "Site-wide header editor with visual preview and layout options; emulator default preview-only data.",
+    "url": "http://127.0.0.1:5273/site/humanneedsindex/global-elements",
+    "capturedAt": "2026-10-03T01:56:06.526Z"
+  },
+  {
+    "name": "16-global-footer",
+    "note": "Footer preview and controls, preserving explicit site-wide scope and locked shared copyright.",
+    "url": "http://127.0.0.1:5273/site/humanneedsindex/global-elements",
+    "capturedAt": "2026-10-03T01:56:06.829Z"
+  },
+  {
+    "name": "17-design",
+    "note": "Theme controls distinguish source-page support from added-section-only settings; token preview clearly labeled.",
+    "url": "http://127.0.0.1:5273/design",
+    "capturedAt": "2026-10-03T01:56:12.441Z"
+  },
+  {
+    "name": "18-section-library",
+    "note": "Full library uses real site-themed thumbnails, source/type metadata, compatibility and usage.",
+    "url": "http://127.0.0.1:5273/section-library",
+    "capturedAt": "2026-10-03T01:56:23.760Z"
+  },
+  {
+    "name": "19-library-echelon-brand",
+    "note": "Same library rendered with Echelon typography and palette; 90 site-compatible code entries in this source snapshot.",
+    "url": "http://127.0.0.1:5273/section-library",
+    "capturedAt": "2026-10-03T01:56:30.431Z"
+  },
+  {
+    "name": "20-section-creator",
+    "note": "Advanced template authoring scaffold; Preview attempt reports required Name and Template ID, so successful creation was not tested.",
+    "url": "http://127.0.0.1:5273/section-creator",
+    "capturedAt": "2026-10-03T01:56:45.305Z"
+  },
+  {
+    "name": "21-site-wizard-name",
+    "note": "Five-step site creation wizard; no site created.",
+    "url": "http://127.0.0.1:5273/sites/new",
+    "capturedAt": "2026-10-03T01:57:08.668Z"
+  },
+  {
+    "name": "22-site-wizard-look",
+    "note": "Visual color/type/button choices with immediate branded preview; default contrast message shows 4.2:1.",
+    "url": "http://127.0.0.1:5273/sites/new",
+    "capturedAt": "2026-10-03T01:57:17.664Z"
+  },
+  {
+    "name": "23-site-wizard-pages",
+    "note": "Page recipe choices in site wizard.",
+    "url": "http://127.0.0.1:5273/sites/new",
+    "capturedAt": "2026-10-03T01:57:18.043Z"
+  },
+  {
+    "name": "24-site-wizard-global",
+    "note": "Header/footer visual choice cards and hosting choice; local draft only.",
+    "url": "http://127.0.0.1:5273/sites/new",
+    "capturedAt": "2026-10-03T01:57:34.747Z"
+  },
+  {
+    "name": "25-site-wizard-review",
+    "note": "Review step before creation; no site created or published.",
+    "url": "http://127.0.0.1:5273/sites/new",
+    "capturedAt": "2026-10-03T01:57:35.067Z"
+  },
+  {
+    "name": "26-echelon-editor",
+    "note": "Original Echelon design in V1; empty-emulator event-details fallback visibly overflows hero, a defect to fix rather than copy.",
+    "url": "http://127.0.0.1:5273/site/echelonsymposium/edit/home",
+    "capturedAt": "2026-10-03T01:58:13.272Z"
+  },
+  {
+    "name": "27-event-content",
+    "note": "Repeating speaker records with ordering and distinct draft/publish controls; source starter records.",
+    "url": "http://127.0.0.1:5273/site/echelonsymposium/content",
+    "capturedAt": "2026-10-03T01:58:23.778Z"
+  },
+  {
+    "name": "28-event-record",
+    "note": "Expanded speaker record in the list, with photo, biography and event fields; no record changed.",
+    "url": "http://127.0.0.1:5273/site/echelonsymposium/content",
+    "capturedAt": "2026-10-03T01:58:24.147Z"
+  }
+]

@@ -1,0 +1,667 @@
+/* Source Echelon CSS rule closure for the header/footer fixture.
+   Font files and the Tailwind import are excluded; native declarations are unchanged. */
+@theme {
+  --color-sa-red: #dd5251;
+  --color-sa-coral: #dd5251;
+  --color-sa-orange: #e47842;
+  --color-sa-yellow: #f6ca4f;
+  --color-sa-navy: #002856;
+  --color-sa-dark: #172333;
+  --color-sa-grey: #6a717a;
+  --color-sa-cream: #fbf7ee;
+  --color-sa-gold: #e9a23b;
+  --font-heading: 'Trajan Pro 3', Georgia, serif;
+  --font-body: 'Proxima Nova', system-ui, -apple-system, sans-serif;
+  --font-secondary: 'Adobe Jenson Pro', Georgia, serif;
+}
+
+:root {
+  /* CMS theme contract. The Design panel publishes these canonical tokens;
+     native Echelon aliases derive from them so editor choices reach the whole
+     page while these values preserve the built-in design when no theme exists. */
+  --color-primary: #dd5251;
+  --sa-navy: #002856;
+  --sa-dark: #14233a;
+  --sa-light: #fbf7ee;
+  --sa-cream: #fbf7ee;
+  --sa-gray: #5f6771;
+  --btn-radius: 6px;
+  /* Keep white CTA text readable even when a very light primary is published.
+     Primary still drives the hue; the black floor guarantees a dark surface. */
+  --btn-fill: color-mix(in srgb, var(--color-primary) 35%, #000);
+  --btn-hover: color-mix(in srgb, var(--color-primary) 27%, #000);
+  --btn-text: #fff;
+  --content-width: 1120px;
+  --section-pad: clamp(2.65rem, 4vw, 4.2rem);
+
+  /* Brand palette — pulled straight from the Echelon logo's gradient wordmark. */
+  --coral: var(--color-primary);
+  --orange: #e47842;
+  --yellow: #f6ca4f;
+  --red: var(--color-primary);
+  --red-deep: color-mix(in srgb, var(--color-primary) 72%, #000);
+  --accent-text: color-mix(in srgb, var(--color-primary) 45%, #000);
+  --navy: var(--sa-navy);
+  --ink: var(--sa-dark);
+  --muted: var(--sa-gray);
+  --cream: var(--sa-light);
+  --paper: #fffefb; /* near-white surface to break up the champagne fill */
+  --line: color-mix(in srgb, var(--sa-light) 88%, var(--sa-dark));
+  --gold: #e9a23b; /* single warm accent, nudged toward the logo orange */
+  --gold-text: #8a5700;
+  --focus: #a35d00;
+  --gold-soft: #f6dfab;
+  /* The recurring logo color-shift, used for rules, bars, accents. */
+  --grad: linear-gradient(118deg, var(--color-primary) 0%, var(--orange) 52%, var(--yellow) 100%);
+  --grad-warm: linear-gradient(118deg, var(--color-primary), var(--orange) 55%, var(--yellow));
+  /* Aliases consumed by the shared CMS renderers (render-sections.js, the
+     generic section templates, render-nav.js) so a CMS-rendered section/nav
+     re-skins to Echelon's palette instead of falling back to HNI defaults. */
+  --color-sa-dark: var(--sa-dark);
+  --color-sa-cream: var(--sa-cream);
+  --color-sa-light: var(--sa-light);
+  --shadow: 0 18px 52px rgba(21, 25, 34, 0.12);
+  --soft-shadow: 0 10px 30px rgba(21, 25, 34, 0.08);
+  --radius: 8px;
+  --font-heading: 'Trajan Pro 3', Georgia, serif;
+  --font-body: 'Proxima Nova', system-ui, -apple-system, sans-serif;
+  --font-secondary: 'Adobe Jenson Pro', Georgia, serif;
+  color: var(--ink);
+  background: var(--cream);
+  font-family: var(--font-body);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 94px;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background:
+    radial-gradient(circle at 6% 10%, rgba(246, 202, 79, 0.12), transparent 26rem),
+    radial-gradient(circle at 94% 6%, rgba(221, 82, 81, 0.07), transparent 30rem),
+    radial-gradient(circle at 80% 88%, rgba(228, 120, 66, 0.06), transparent 32rem), var(--cream);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(228, 120, 66, 0.16) 1px, transparent 1.4px);
+  background-size: 24px 24px;
+  mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  opacity: 0.32;
+}
+
+img,
+svg {
+  display: block;
+}
+
+img {
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  font: inherit;
+}
+
+/* Visible keyboard focus for every interactive element (mouse clicks stay clean
+   via :focus-visible). */
+a:focus-visible,
+button:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ---- Motion system ---------------------------------------------------------
+   Scroll-reveal: elements tagged `.reveal` start lowered + transparent and
+   ease in once they enter the viewport. The hidden state is gated behind the
+   `.js` class (added by main.js on boot) so the page is fully visible if the
+   script never runs. */
+
+/* Never hide content while the in-place CMS editor is active. */
+
+@keyframes rowIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  display: grid;
+  grid-template-columns: minmax(13rem, 1fr) auto minmax(10rem, 1fr);
+  align-items: center;
+  gap: 2rem;
+  min-height: 90px;
+  padding: 1rem clamp(1rem, 5vw, 4rem);
+  border-bottom: 1px solid rgba(20, 35, 58, 0.12);
+  background: rgba(255, 253, 248, 0.94);
+  backdrop-filter: blur(18px);
+  transition:
+    min-height 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.95rem;
+  width: max-content;
+}
+
+.brand span {
+  padding-left: 0.95rem;
+  border-left: 1px solid var(--line);
+}
+
+.brand img {
+  height: 50px;
+  width: auto;
+}
+
+.brand strong,
+.brand em {
+  display: block;
+  line-height: 1;
+}
+
+.brand strong {
+  width: max-content;
+  font-family: var(--font-heading);
+  font-size: 1.7rem;
+  line-height: 1;
+  padding-top: 0.16em;
+  margin-top: -0.16em;
+  letter-spacing: 0;
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.brand em {
+  margin-top: 0.24rem;
+  font-family: var(--font-secondary);
+  font-style: normal;
+  font-size: 1.06rem;
+  letter-spacing: 0.02em;
+  color: var(--navy);
+}
+
+.desktop-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(1.5rem, 4vw, 4rem);
+  font-weight: 700;
+  color: var(--navy);
+}
+
+.desktop-nav a {
+  position: relative;
+  padding: 0.35rem 0;
+}
+
+.desktop-nav a::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -0.15rem;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--grad);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 180ms ease;
+}
+
+.desktop-nav a:focus-visible::after,
+.desktop-nav a.active::after {
+  transform: scaleX(1);
+}
+
+.header-cta {
+  justify-self: end;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  min-height: 52px;
+  padding: 0.85rem 1.65rem;
+  border: 1.5px solid transparent;
+  border-radius: var(--btn-radius, 6px);
+  font-family: var(--font-body);
+  font-size: 0.98rem;
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    transform 170ms ease,
+    box-shadow 170ms ease,
+    background 170ms ease,
+    color 170ms ease,
+    border-color 170ms ease;
+}
+
+.button svg,
+.link-button svg {
+  width: 1rem;
+  height: 1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.button-red {
+  background: var(--btn-fill, var(--red-deep));
+  color: var(--btn-text, #fff);
+  box-shadow: 0 10px 22px rgba(221, 82, 81, 0.28);
+}
+
+.button-red:focus-visible {
+  background: var(--btn-hover, var(--red-deep));
+  transform: translateY(-2px);
+  box-shadow: 0 14px 28px rgba(221, 82, 81, 0.36);
+}
+
+.icon-button,
+.carousel-control {
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--navy);
+  cursor: pointer;
+  box-shadow: var(--soft-shadow);
+  transition:
+    transform 170ms ease,
+    border-color 170ms ease,
+    color 170ms ease;
+}
+
+.icon-button:focus-visible,
+.carousel-control:focus-visible {
+  border-color: var(--gold);
+  color: var(--red);
+  transform: translateY(-1px);
+}
+
+.icon-button svg,
+.carousel-control svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.menu-toggle {
+  display: none;
+  justify-self: end;
+  width: 44px;
+  height: 44px;
+  box-shadow: none;
+}
+
+.mobile-menu {
+  position: absolute;
+  top: calc(100% - 1px);
+  left: 1rem;
+  right: 1rem;
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #fff;
+  box-shadow: var(--shadow);
+}
+
+.mobile-menu[hidden] {
+  display: none;
+}
+
+.mobile-menu a {
+  padding: 0.8rem 0.9rem;
+  border-radius: 6px;
+  color: var(--navy);
+  font-weight: 800;
+}
+
+.mobile-menu a:focus-visible {
+  background: var(--cream);
+}
+
+@media (min-width: 901px) {
+  .mobile-menu {
+    display: none !important;
+  }
+}
+
+/* Centered section headings should center their action row, too. */
+
+/* Promote the trailing <img> to a full-bleed media band at the top of the card
+   (kept in source order for the CMS; positioned visually with `order`). */
+
+/* Soft navy scrim so the icon badge reads cleanly over any photo. */
+
+/* Pillar card: lift the icon so it straddles the photo's lower edge. */
+
+/* When a speaker is selected, dim the rest so the chosen card stands out. */
+
+@keyframes panelIn {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Animation: collapse bars only when JS is present and the chart has not yet
+   scrolled into view, so the no-JS page still renders the full chart. */
+
+/* Bars cascade upward left-to-right. */
+
+/* Keep the chart fully drawn while editing in the CMS. */
+
+/* Three-row shared grid: every card's media / rail / text lands in the same
+   row across all columns, so the connecting line and dots always align even
+   when the copy length differs. Cards use display:contents to hand their
+   children directly to this grid. */
+
+/* Animated red→gold accent bar across the top on hover. */
+
+/* Oversized ghost step number, watermarked in the top-right. */
+
+/* Distribute the items so they fill the column height evenly — the dividers
+   stay symmetrical and there's no dead space under the last question, while
+   each item's box keeps its shape. */
+
+/* Animate height by transitioning the grid track from 0fr → 1fr; the inner
+   wrapper clips overflow so the copy slides open smoothly. */
+
+/* Public readers never expose placeholder #register actions as working CTAs. */
+.registration-unavailable {
+  display: none !important;
+}
+
+.site-footer {
+  position: relative;
+  background: linear-gradient(180deg, #0b1c30, #0a1622);
+  color: rgba(255, 255, 255, 0.72);
+  padding: clamp(3rem, 5vw, 4.5rem) clamp(1rem, 5vw, 4rem) 2.25rem;
+}
+
+/* Brand-gradient divider gives the footer a defined top edge against the
+   register section above it. */
+.site-footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--grad);
+}
+
+.footer-inner {
+  max-width: var(--content-width, 1120px);
+  margin: 0 auto;
+}
+
+.footer-top {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.6fr);
+  gap: 3rem;
+  padding-bottom: 2.5rem;
+}
+
+.footer-lockup {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.footer-lockup img {
+  width: 46px;
+  height: auto;
+}
+
+.footer-lockup strong,
+.footer-lockup em {
+  display: block;
+  line-height: 1.1;
+}
+
+.footer-lockup strong {
+  color: #fff;
+  font-family: var(--font-heading);
+  font-size: 1.32rem;
+  font-weight: 400;
+}
+
+.footer-lockup em {
+  margin-top: 0.2rem;
+  color: rgba(255, 255, 255, 0.72);
+  font-family: var(--font-secondary);
+  font-style: normal;
+  font-size: 0.92rem;
+}
+
+.footer-tagline {
+  max-width: 24rem;
+  margin: 1.25rem 0 0;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+.footer-cols {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 2rem;
+}
+
+.footer-col h3 {
+  margin: 0 0 1.15rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-family: var(--font-body);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.footer-col ul {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.footer-link {
+  display: inline-block;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.9rem;
+  transition: color 150ms ease;
+}
+
+.footer-link:focus-visible {
+  color: #fff;
+}
+
+.footer-bottom {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 1.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.8rem;
+}
+
+.footer-bottom p {
+  margin: 0;
+}
+
+.footer-legal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.footer-legal a {
+  color: rgba(255, 255, 255, 0.72);
+  transition: color 150ms ease;
+}
+
+.footer-legal a:focus-visible {
+  color: #fff;
+}
+
+/* Editable-region affordance while the page is the CMS embedded editing
+   surface (cms-inplace-embed.js adds cms-edit-mode/cms-editable). */
+
+@media (max-width: 1180px) {
+  .site-header {
+    grid-template-columns: auto 1fr auto;
+  }
+
+  .desktop-nav {
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .site-header {
+    min-height: 78px;
+    grid-template-columns: 1fr auto;
+  }
+
+  .desktop-nav,
+  .header-cta {
+    display: none;
+  }
+
+  .menu-toggle {
+    display: inline-grid;
+  }
+
+  .brand img {
+    width: 46px;
+  }
+
+  .brand strong {
+    font-size: 1.4rem;
+  }
+
+  /* Stacked layout: keep the portrait from dominating the panel. */
+
+  .footer-top {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+}
+
+@media (max-width: 560px) {
+  .button {
+    width: 100%;
+  }
+}
+
+/* Hover polish is only enabled for devices that report a precise hover-capable
+   pointer. Keyboard equivalents remain in the base rules above, so focus
+   feedback is never coupled to mouse capability. */
+@media (hover: hover) and (pointer: fine) {
+  .desktop-nav a:hover::after {
+    transform: scaleX(1);
+  }
+
+  .button-red:hover {
+    background: var(--btn-hover, var(--red-deep));
+    transform: translateY(-2px);
+    box-shadow: 0 14px 28px rgba(221, 82, 81, 0.36);
+  }
+
+  .button.inverse:hover,
+  .mobile-menu a:hover {
+    background: var(--cream);
+  }
+
+  .icon-button:hover,
+  .carousel-control:hover {
+    border-color: var(--gold);
+    color: var(--red);
+    transform: translateY(-1px);
+  }
+
+  .footer-link:hover,
+  .footer-legal a:hover {
+    color: #fff;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ─── Event-content custom fields (editor-added via the CMS "Custom fields"
+       panel; rendered generically by renderCustomFields in event-content.js
+       under a record's built-in details) ─── */

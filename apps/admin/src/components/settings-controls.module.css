@@ -1,0 +1,58 @@
+/* Shared settings controls used by Site look and the editor inspector. */
+.controls {
+  font-size: var(--text-meta);
+}
+.controls :is(label, legend) {
+  font-size: var(--text-meta);
+  font-weight: var(--weight-medium);
+}
+.controls :is(input, textarea, select) {
+  font-size: var(--text-meta);
+}
+.controls :is(h2, h3) {
+  font-size: var(--text-body);
+  font-weight: var(--weight-semibold);
+}
+.controls :global(.theme-panel) {
+  border: var(--line-thin) solid var(--border);
+  border-radius: var(--radius-card);
+  box-shadow: none;
+  background: var(--surface);
+}
+.controls :global(.theme-panel-head) {
+  padding: var(--space-3) var(--space-4);
+  gap: var(--space-3);
+  background: var(--surface);
+  border-bottom: var(--line-thin) solid var(--line-soft);
+}
+.controls :global(.theme-panel-head) > span {
+  width: var(--target-small);
+  height: var(--target-small);
+  border-radius: var(--radius-control);
+  background: var(--brand-tint);
+  color: var(--primary);
+}
+.controls :global(.theme-panel-head h2) {
+  font-size: var(--text-body);
+}
+.controls :global(.theme-panel-head .eyebrow) {
+  font-size: var(--text-tag);
+  font-weight: var(--weight-medium);
+  color: var(--text-muted);
+}
+.controls :global(.theme-colour) {
+  padding: var(--space-3);
+}
+.controls :global(.theme-colour-input) {
+  align-items: center;
+}
+.controls :global(.theme-colour-input input[type='color']) {
+  border-radius: var(--radius-control);
+}
+.controls :global(.contrast-chip) {
+  font-size: var(--text-tag);
+}
+.controls :global(.theme-commandbar strong),
+.controls :global(.theme-commandbar small) {
+  font-size: var(--text-meta);
+}

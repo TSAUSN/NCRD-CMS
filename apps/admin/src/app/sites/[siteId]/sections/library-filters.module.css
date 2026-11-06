@@ -1,0 +1,5 @@
+.status a {
+  min-height: var(--target-small);
+  display: inline-flex;
+  align-items: center;
+}

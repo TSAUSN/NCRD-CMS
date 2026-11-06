@@ -1,0 +1,16 @@
+.previewViewport {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: var(--size-240);
+  margin-inline: auto;
+  background: var(--surface);
+  border: var(--line-thin) solid var(--border);
+}
+.previewViewport iframe {
+  position: absolute;
+  inset: 0;
+  transform-origin: top left;
+  border: none;
+  max-width: none;
+}

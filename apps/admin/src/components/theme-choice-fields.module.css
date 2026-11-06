@@ -1,0 +1,157 @@
+@font-face {
+  font-family: 'Open Sans';
+  src: url('/cms-samples/fonts/open-sans-latin-400-normal.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Open Sans';
+  src: url('/cms-samples/fonts/open-sans-latin-700-normal.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Source Serif 4';
+  src: url('/cms-samples/fonts/source-serif-4-latin-400-normal.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Source Serif 4';
+  src: url('/cms-samples/fonts/source-serif-4-latin-700-normal.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+.pairings,
+.buttonChoices {
+  display: grid;
+  gap: var(--space-4);
+  min-width: 0;
+}
+.pairings .choice,
+.buttonChoices .choice {
+  display: grid;
+  gap: var(--space-2);
+  justify-items: start;
+  text-align: start;
+  padding: var(--space-3);
+  min-width: 0;
+  width: 100%;
+  color: var(--text);
+  border-color: var(--border-strong);
+  background: var(--surface);
+}
+.pairings .choice[aria-pressed='true'],
+.buttonChoices .choice[aria-pressed='true'] {
+  border-color: var(--focus);
+  background: var(--status-scheduled-bg);
+  box-shadow: inset 0 0 0 var(--line-thin) var(--focus);
+}
+.pairings .choice:hover:not(:disabled),
+.buttonChoices .choice:hover:not(:disabled) {
+  filter: none;
+  border-color: var(--focus);
+}
+.typeHeading {
+  font-size: var(--text-dialog);
+  line-height: var(--line-section);
+  font-weight: var(--weight-semibold);
+}
+.typeBody {
+  font-size: var(--text-body);
+  line-height: var(--line-body);
+  font-weight: var(--weight-regular);
+}
+.help {
+  color: var(--text-muted);
+  font: var(--weight-regular) var(--text-meta)/var(--line-body) var(--font-ui);
+  margin: 0;
+}
+.buttonChoices fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+  display: grid;
+  gap: var(--space-3);
+}
+.buttonChoices legend {
+  padding: 0;
+  margin-block-end: var(--space-2);
+  font-weight: var(--weight-semibold);
+}
+.threeChoices {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+.twoChoices {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+.sample {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  min-height: var(--target-small);
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: var(--space-2);
+  border: var(--line-thin) solid var(--sample-fill);
+  border-radius: var(--sample-radius);
+  background: var(--sample-fill);
+  color: var(--sample-ink);
+  font: var(--sample-weight) var(--text-body)/var(--line-body) var(--font-ui);
+  transition: all var(--sample-speed) var(--ease);
+}
+.sample[data-style='outline'] {
+  background: var(--sample-surface);
+  color: var(--sample-fill);
+}
+.sample[data-style='text'] {
+  border-color: transparent;
+  background: var(--sample-surface);
+  color: var(--sample-fill);
+}
+.choice:hover .sample[data-hover='darken'] {
+  filter: brightness(0.86);
+}
+.choice:hover .sample[data-hover='lift'] {
+  transform: translateY(calc(-1 * var(--focus-offset)));
+  box-shadow: var(--shadow-2);
+}
+.choice:hover .sample[data-hover='invert'] {
+  background: var(--sample-ink);
+  color: var(--sample-fill);
+}
+.choice:hover .sample[data-hover='underline'] {
+  text-decoration: underline;
+  text-underline-offset: var(--space-1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .sample {
+    transition: none;
+  }
+  .choice:hover .sample[data-hover='lift'] {
+    transform: none;
+  }
+}
+.pairings .choice:disabled,
+.buttonChoices .choice:disabled {
+  opacity: 1;
+  color: var(--text-muted);
+  background: var(--surface-sunken);
+  cursor: not-allowed;
+}
+
+.pairings .choice,
+.buttonChoices .choice {
+  font-size: var(--text-meta);
+  border-radius: var(--radius-control);
+  box-shadow: none;
+}

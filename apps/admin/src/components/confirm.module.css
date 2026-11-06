@@ -1,0 +1,7 @@
+.content {
+  display: grid;
+  gap: var(--space-4);
+}
+.content > * {
+  margin-block: 0;
+}

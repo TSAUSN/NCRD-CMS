@@ -1,0 +1,4501 @@
+{
+  "importerVersion": 2,
+  "inventoryVersion": 1,
+  "runId": "d8de5f33e42694204da1ba53da4f2ccf",
+  "sourceManifest": {
+    "files": [
+      {
+        "path": "docs/v1-inventory/summary.json",
+        "sha256": "59dc157ad00be25487e569fb982a3ec7ccf8cdfa7349140a9b7409b1b4db1856",
+        "bytes": 38698,
+        "lines": 1774
+      },
+      {
+        "path": "tsa-cms-admin/src/sections/registry.generated.js",
+        "sha256": "12761f09b65a7a9ca75fb231b16a9d7e7a871ccab6bec288884845b618f636d2",
+        "bytes": 209092,
+        "lines": 8896
+      },
+      {
+        "path": "tsa-cms-admin/src/sections/registrySource.generated.js",
+        "sha256": "aa83c4bcbde5bbe40115fb5e3922d635053dccd88b91192a0261380f275e4986",
+        "bytes": 561134,
+        "lines": 482
+      },
+      {
+        "path": "tsa-humanneedsindex/src/cms/interaction-presets.js",
+        "sha256": "62a27080aa51538ec181eedee9b96d44dc831f14856b5563d6221c6d6dd90295",
+        "bytes": 18590,
+        "lines": 266
+      }
+    ],
+    "sha256": "c40fff5c3255f8101fcf08d26338b2cb4f73415bede629be9f5d0d585af57af3"
+  },
+  "codeBoundary": [
+    {
+      "code": "field-attributes-lost",
+      "population": "a `<a data-editable=\"link\">` or `<img data-editable=\"image\">` element",
+      "sentence": "The element becomes a field node, whose attributes are the governed static set schema v2 gave it and nothing else, so an attribute outside that set — or a value its closed grammar refuses — has nowhere to go. Widening the element-node attribute allowlist does not help: there is no element node here."
+    },
+    {
+      "code": "unsupported-attribute",
+      "population": "an element node — every element that is not a link or image field",
+      "sentence": "The element keeps its tag and becomes an element node, which does have attributes, and this one is not on the allowlist or its value is not one the allowlist’s grammar accepts. Widening that allowlist is exactly what would help."
+    }
+  ],
+  "counts": {
+    "definitions": 118,
+    "definitionsWithLinkField": 79,
+    "definitionsWithImageField": 40,
+    "linkFieldElements": 240,
+    "imageFieldElements": 86,
+    "definitionsWithLoss": 87,
+    "fieldAttributesLostCode": 17,
+    "unsupportedAttributeCode": 30,
+    "bothCodes": 10,
+    "eitherCode": 37,
+    "lostButNotCoded": 70
+  },
+  "absent": {
+    "link": [
+      "aria-describedby",
+      "aria-hidden",
+      "aria-label",
+      "aria-labelledby",
+      "id",
+      "onclick",
+      "referrerpolicy",
+      "role",
+      "style",
+      "title"
+    ],
+    "image": [
+      "aria-describedby",
+      "aria-hidden",
+      "aria-label",
+      "aria-labelledby",
+      "crossorigin",
+      "id",
+      "onclick",
+      "referrerpolicy",
+      "role",
+      "sizes",
+      "srcset",
+      "title"
+    ]
+  },
+  "attributes": [
+    {
+      "fieldKind": "image",
+      "name": "data-block-id",
+      "valueShape": "slot-id",
+      "occurrences": 86,
+      "definitions": 40,
+      "bindings": [
+        "generated"
+      ],
+      "ownership": "field-intrinsic",
+      "effects": [],
+      "anchorRole": "none",
+      "consumedByField": true,
+      "inSelector": 0,
+      "wrapperSafe": false,
+      "expressible": true,
+      "verdict": "support",
+      "definitionIds": [
+        "accreditation-strip-v1",
+        "article-header-v1",
+        "disaster-cta-v1",
+        "echelon-centered-media-hero-v1",
+        "echelon-collage-hero-v1",
+        "echelon-event-hero-v1",
+        "echelon-impact-data-split-v1",
+        "echelon-overlay-hero-v1",
+        "echelon-speakers-v1",
+        "event-speakers-v1",
+        "event-sponsors-v1",
+        "event-venue-v1",
+        "gallery-grid-v1",
+        "hero-appeal-v1",
+        "hero-event-v1",
+        "hero-fullbleed-v1",
+        "hero-search-v1",
+        "hero-split-v1",
+        "hni-explore-insights-v1",
+        "hni-header-v1",
+        "hni-hero-v1",
+        "hni-home-hero-fe-v1",
+        "hni-home-hero-v1",
+        "hni-home-overview-v1",
+        "hni-overview-v1",
+        "impact-story-v1",
+        "logo-strip-v1",
+        "media-text-row-v1",
+        "monthly-giving-v1",
+        "page-header-v1",
+        "person-profile-v1",
+        "post-list-v1",
+        "pull-quote-v1",
+        "speakers-grid-v1",
+        "sponsors-tiered-v1",
+        "story-grid-v1",
+        "team-grid-v1",
+        "testimonial-cards-v1",
+        "text-image-v1",
+        "venue-location-v1"
+      ]
+    },
+    {
+      "fieldKind": "image",
+      "name": "data-editable",
+      "valueShape": "field-type",
+      "occurrences": 86,
+      "definitions": 40,
+      "bindings": [
+        "generated"
+      ],
+      "ownership": "field-intrinsic",
+      "effects": [],
+      "anchorRole": "none",
+      "consumedByField": true,
+      "inSelector": 0,
+      "wrapperSafe": false,
+      "expressible": true,
+      "verdict": "support",
+      "definitionIds": [
+        "accreditation-strip-v1",
+        "article-header-v1",
+        "disaster-cta-v1",
+        "echelon-centered-media-hero-v1",
+        "echelon-collage-hero-v1",
+        "echelon-event-hero-v1",
+        "echelon-impact-data-split-v1",
+        "echelon-overlay-hero-v1",
+        "echelon-speakers-v1",
+        "event-speakers-v1",
+        "event-sponsors-v1",
+        "event-venue-v1",
+        "gallery-grid-v1",
+        "hero-appeal-v1",
+        "hero-event-v1",
+        "hero-fullbleed-v1",
+        "hero-search-v1",
+        "hero-split-v1",
+        "hni-explore-insights-v1",
+        "hni-header-v1",
+        "hni-hero-v1",
+        "hni-home-hero-fe-v1",
+        "hni-home-hero-v1",
+        "hni-home-overview-v1",
+        "hni-overview-v1",
+        "impact-story-v1",
+        "logo-strip-v1",
+        "media-text-row-v1",
+        "monthly-giving-v1",
+        "page-header-v1",
+        "person-profile-v1",
+        "post-list-v1",
+        "pull-quote-v1",
+        "speakers-grid-v1",
+        "sponsors-tiered-v1",
+        "story-grid-v1",
+        "team-grid-v1",
+        "testimonial-cards-v1",
+        "text-image-v1",
+        "venue-location-v1"
+      ]
+    },
+    {
+      "fieldKind": "image",
+      "name": "src",
+      "valueShape": "url-relative-root",
+      "occurrences": 86,
+      "definitions": 40,
+      "bindings": [
+        "static"
+      ],
+      "ownership": "field-intrinsic",
+      "effects": [
+        "loading",
+        "security"
+      ],
+      "anchorRole": "none",
+      "consumedByField": true,
+      "inSelector": 0,
+      "wrapperSafe": false,
+      "expressible": true,
+      "verdict": "support",
+      "definitionIds": [
+        "accreditation-strip-v1",
+        "article-header-v1",
+        "disaster-cta-v1",
+        "echelon-centered-media-hero-v1",
+        "echelon-collage-hero-v1",
+        "echelon-event-hero-v1",
+        "echelon-impact-data-split-v1",
+        "echelon-overlay-hero-v1",
+        "echelon-speakers-v1",
+        "event-speakers-v1",
+        "event-sponsors-v1",
+        "event-venue-v1",
+        "gallery-grid-v1",
+        "hero-appeal-v1",
+        "hero-event-v1",
+        "hero-fullbleed-v1",
+        "hero-search-v1",
+        "hero-split-v1",
+        "hni-explore-insights-v1",
+        "hni-header-v1",
+        "hni-hero-v1",
+        "hni-home-hero-fe-v1",
+        "hni-home-hero-v1",
+        "hni-home-overview-v1",
+        "hni-overview-v1",
+        "impact-story-v1",
+        "logo-strip-v1",
+        "media-text-row-v1",
+        "monthly-giving-v1",
+        "page-header-v1",
+        "person-profile-v1",
+        "post-list-v1",
+        "pull-quote-v1",
+        "speakers-grid-v1",
+        "sponsors-tiered-v1",
+        "story-grid-v1",
+        "team-grid-v1",
+        "testimonial-cards-v1",
+        "text-image-v1",
+        "venue-location-v1"
+      ]
+    },
+    {
+      "fieldKind": "image",
+      "name": "height",
+      "valueShape": "integer",
+      "occurrences": 85,
+      "definitions": 39,
+      "bindings": [
+        "static"
+      ],
+      "ownership": "field-element",
+      "effects": [
+        "layout"
+      ],
+      "anchorRole": "none",
+      "consumedByField": false,
+      "inSelector": 0,
+      "wrapperSafe": false,
+      "expressible": true,
+      "verdict": "support",
+      "definitionIds": [
+        "accreditation-strip-v1",
+        "article-header-v1",
+        "disaster-cta-v1",
+        "echelon-centered-media-hero-v1",
+        "echelon-collage-hero-v1",
+        "echelon-event-hero-v1",
+        "echelon-impact-data-split-v1",
+        "echelon-overlay-hero-v1",
+        "echelon-speakers-v1",
+        "event-speakers-v1",
+        "event-sponsors-v1",
+        "event-venue-v1",
+        "gallery-grid-v1",
+        "hero-appeal-v1",
+        "hero-event-v1",
+        "hero-fullbleed-v1",
+        "hero-search-v1",
+        "hero-split-v1",
+        "hni-explore-insights-v1",
+        "hni-hero-v1",
+        "hni-home-hero-fe-v1",
+        "hni-home-hero-v1",
+        "hni-home-overview-v1",
+        "hni-overview-v1",
+        "impact-story-v1",
+        "logo-strip-v1",
+        "media-text-row-v1",
+        "monthly-giving-v1",
+        "page-header-v1",
+        "person-profile-v1",
+        "post-list-v1",
+        "pull-quote-v1",
+        "speakers-grid-v1",
+        "sponsors-tiered-v1",
+        "story-grid-v1",
+        "team-grid-v1",
+        "testimonial-cards-v1",
+        "text-image-v1",
+        "venue-location-v1"
+      ]
+    },
+    {
+      "fieldKind": "image",
+      "name": "width",
+      "valueShape": "integer",
+      "occurrences": 85,
+      "definitions": 39,
+      "bindings": [
+        "static"
+      ],
+      "ownership": "field-element",
+      "effects": [
+        "layout"
+      ],
+      "anchorRole": "none",
+      "consumedByField": false,
+      "inSelector": 0,
+      "wrapperSafe": false,
+      "expressible": true,
+      "verdict": "support",
+      "definitionIds": [
+        "accreditation-strip-v1",
+        "article-header-v1",
+        "disaster-cta-v1",
+        "echelon-centered-media-hero-v1",
+        "echelon-collage-hero-v1",
+        "echelon-event-hero-v1",
+        "echelon-impact-data-split-v1",
+        "echelon-overlay-hero-v1",
+        "echelon-speakers-v1",
+        "event-speakers-v1",
+        "event-sponsors-v1",
+        "event-venue-v1",
+        "gallery-grid-v1",
+        "hero-appeal-v1",
+        "hero-event-v1",
+        "hero-fullbleed-v1",
+        "hero-search-v1",
+        "hero-split-v1",
+        "hni-explore-insights-v1",
+        "hni-hero-v1",
+        "hni-home-hero-fe-v1",
+        "hni-home-hero-v1",
+        "hni-home-overview-v1",
+        "hni-overview-v1",
+        "impact-story-v1",
+        "logo-strip-v1",
+        "media-text-row-v1",
+        "monthly-giving-v1",
+        "page-header-v1",
+        "person-profile-v1",
+        "post-list-v1",
+        "pull-quote-v1",
+        "speakers-grid-v1",
+        "sponsors-tiered-v1",
+        "story-grid-v1",
+        "team-grid-v1",
+        "testimonial-cards-v1",
+        "text-image-v1",
+        "venue-location-v1"
+      ]
+    },
+    {
+      "fieldKind": "image",
+      "name": "decoding",
+      "valueShape": "enum:async",
+      "occurrences": 74,
+      "definitions": 32,
+      "bindings": [
+        "static"
+      ],
+      "ownership": "field-element",
+      "effects": [
+        "loading"
+      ],
+      "anchorRole": "none",
+      "consumedByField": false,
+      "inSelector": 0,
+      "wrapperSafe": false,
+      "expressible": true,
+      "verdict": "support",
+      "definitionIds": [
+        "accreditation-strip-v1",
+        "article-header-v1",
+        "disaster-cta-v1",
+        "event-speakers-v1",
+        "event-sponsors-v1",
+        "event-venue-v1",
+        "gallery-grid-v1",
+        "hero-appeal-v1",
+        "hero-event-v1",
+        "hero-fullbleed-v1",
+        "hero-search-v1",
+        "hero-split-v1",
+        "hni-explore-insights-v1",
+        "hni-hero-v1",
+        "hni-home-hero-fe-v1",
+        "hni-home-hero-v1",
+        "hni-home-overview-v1",
+        "hni-overview-v1",
+        "impact-story-v1",
+        "logo-strip-v1",
+        "media-text-row-v1",
+        "monthly-giving-v1",
+        "page-header-v1",
+        "person-profile-v1",
+        "post-list-v1",
+        "pull-quote-v1",
+        "speakers-grid-v1",
+        "sponsors-tiered-v1",
+        "story-grid-v1",
+        "team-grid-v1",
+        "testimonial-cards-v1",
+        "venue-location-v1"
+      ]
+    },
+    {
+      "fieldKind": "image",
+      "name": "loading",
+      "valueShape": "enum:lazy",
+      "occurrences": 64,
+      "definitions": 22,
+      "bindings": [
+        "static"
+      ],
+      "ownership": "field-element",
+      "effects": [
+        "loading"
+      ],
+      "anchorRole": "none",
+      "consumedByField": false,
+      "inSelector": 0,
+      "wrapperSafe": false,
+      "expressible": true,
+      "verdict": "support",
+      "definitionIds": [
+        "accreditation-strip-v1",
+        "disaster-cta-v1",
+        "event-speakers-v1",
+        "event-sponsors-v1",
+        "event-venue-v1",
+        "gallery-grid-v1",
+        "hni-explore-insights-v1",
+        "hni-home-overview-v1",
+        "hni-overview-v1",
+        "impact-story-v1",
+        "logo-strip-v1",
+        "media-text-row-v1",
+        "monthly-giving-v1",
+        "person-profile-v1",
+        "post-list-v1",
+        "pull-quote-v1",
+        "speakers-grid-v1",
+        "sponsors-tiered-v1",
+        "story-grid-v1",
+        "team-grid-v1",
+        "testimonial-cards-v1",
+        "venue-location-v1"
+      ]
+    },
+    {
+      "fieldKind": "image",
+      "name": "alt",
+      "valueShape": "empty",
+      "occurrences": 34,
+      "definitions": 22,
+      "bindings": [
+        "static"
+      ],
+      "ownership": "field-intrinsic",
+      "effects": [
+        "accessibility"
+      ],
+      "anchorRole": "none",
+      "consumedByField": true,
+      "inSelector": 0,
+      "wrapperSafe": false,
+      "expressible": true,
+      "verdict": "support",
+      "definitionIds": [
+        "disaster-cta-v1",
+        "echelon-centered-media-hero-v1",
+        "echelon-collage-hero-v1",
+        "echelon-event-hero-v1",
+        "echelon-impact-data-split-v1",
+        "echelon-overlay-hero-v1",
+        "echelon-speakers-v1",
+        "gallery-grid-v1",
+        "hero-appeal-v1",
+        "hero-event-v1",
+        "hero-fullbleed-v1",
+        "hero-search-v1",
+        "hero-split-v1",
+        "impact-story-v1",
+        "media-text-row-v1",
+        "monthly-giving-v1",
+        "pull-quote-v1",
+        "speakers-grid-v1",
+        "story-grid-v1",
+        "testimonial-cards-v1",
+        "text-image-v1",
+        "venue-location-v1"
+      ]
+    },
+    {
+      "fieldKind": "image",
+      "name": "alt",
+      "valueShape": "free-text",
+      "occurrences": 52,
+      "definitions": 18,
+      "bindings": [
+        "static",
+        "repeat-indexed"
+      ],
+      "ownership": "field-intrinsic",
+      "effects": [
+        "accessibility"
+      ],
+      "anchorRole": "none",
+      "consumedByField": true,
+      "inSelector": 0,
+      "wrapperSafe": false,
+      "expressible": true,
+      "verdict": "support",
+      "definitionIds": [
+        "accreditation-strip-v1",
+        "article-header-v1",
+        "event-speakers-v1",
+        "event-sponsors-v1",
+        "event-venue-v1",
+        "hni-explore-insights-v1",
+        "hni-header-v1",
+        "hni-hero-v1",
+        "hni-home-hero-fe-v1",
+        "hni-home-hero-v1",
+        "hni-home-overview-v1",
+        "hni-overview-v1",
+        "logo-strip-v1",
+        "page-header-v1",
+        "person-profile-v1",
+        "post-list-v1",
+        "sponsors-tiered-v1",
+        "team-grid-v1"
+      ]
+    },
+    {
+      "fieldKind": "image",
+      "name": "fetchpriority",
+      "valueShape": "enum:high",
+      "occurrences": 10,
+      "definitions": 10,
+      "bindings": [
+        "static"
+      ],
+      "ownership": "field-element",
+      "effects": [
+        "loading"
+      ],
+      "anchorRole": "none",
+      "consumedByField": false,
+      "inSelector": 0,
+      "wrapperSafe": false,
+      "expressible": true,
+      "verdict": "support",
+      "definitionIds": [
+        "article-header-v1",
+        "hero-appeal-v1",
+        "hero-event-v1",
+        "hero-fullbleed-v1",
+        "hero-search-v1",
+        "hero-split-v1",
+        "hni-hero-v1",
+        "hni-home-hero-fe-v1",
+        "hni-home-hero-v1",
+        "page-header-v1"
+      ]
+    },
+    {
+      "fieldKind": "image",
+      "name": "class",
+      "valueShape": "class-token-list(1)",
+      "occurrences": 26,
+      "definitions": 8,
+      "bindings": [
+        "static"
+      ],
+      "ownership": "wrapper-capable",
+      "effects": [
+        "layout"
+      ],
+      "anchorRole": "none",
+      "consumedByField": false,
+      "inSelector": 26,
+      "wrapperSafe": false,
+      "expressible": true,
+      "verdict": "support",
+      "definitionIds": [
+        "accreditation-strip-v1",
+        "echelon-overlay-hero-v1",
+        "event-sponsors-v1",
+        "gallery-grid-v1",
+        "hero-appeal-v1",
+        "hero-search-v1",
+        "logo-strip-v1",
+        "testimonial-cards-v1"
+      ]
+    },
+    {
+      "fieldKind": "image",
+      "name": "loading",
+      "valueShape": "enum:eager",
+      "occurrences": 7,
+      "definitions": 7,
+      "bindings": [
+        "static"
+      ],
+      "ownership": "field-element",
+      "effects": [
+        "loading"
+      ],
+      "anchorRole": "none",
+      "consumedByField": false,
+      "inSelector": 0,
+      "wrapperSafe": false,
+      "expressible": true,
+      "verdict": "support",
+      "definitionIds": [
+        "article-header-v1",
+        "hero-appeal-v1",
+        "hero-event-v1",
+        "hero-fullbleed-v1",
+        "hero-search-v1",
+        "hero-split-v1",
+        "page-header-v1"
+      ]
+    },
+    {
+      "fieldKind": "image",
+      "name": "style",
+      "valueShape": "declaration-list(1)",
+      "occurrences": 3,
+      "definitions": 3,
+      "bindings": [
+        "static"
+      ],
+      "ownership": "field-element",
+      "effects": [
+        "layout",
+        "security"
+      ],
+      "anchorRole": "none",
+      "consumedByField": false,
+      "inSelector": 0,
+      "wrapperSafe": false,
+      "expressible": false,
+      "verdict": "quarantine",
+      "definitionIds": [
+        "hni-home-hero-fe-v1",
+        "hni-home-hero-v1",
+        "hni-home-overview-v1"
+      ]
+    },
+    {
+      "fieldKind": "image",
+      "name": "class",
+      "valueShape": "class-token-list(3)",
+      "occurrences": 2,
+      "definitions": 2,
+      "bindings": [
+        "static"
+      ],
+      "ownership": "wrapper-capable",
+      "effects": [
+        "layout"
+      ],
+      "anchorRole": "none",
+      "consumedByField": false,
+      "inSelector": 0,
+      "wrapperSafe": false,
+      "expressible": true,
+      "verdict": "support",
+      "definitionIds": [
+        "hni-explore-insights-v1",
+        "hni-home-overview-v1"
+      ]
+    },
+    {
+      "fieldKind": "image",
+      "name": "class",
+      "valueShape": "class-token-list(5)",
+      "occurrences": 1,
+      "definitions": 1,
+      "bindings": [
+        "static"
+      ],
+      "ownership": "wrapper-capable",
+      "effects": [
+        "layout"
+      ],
+      "anchorRole": "none",
+      "consumedByField": false,
+      "inSelector": 0,
+      "wrapperSafe": false,
+      "expressible": true,
+      "verdict": "support",
+      "definitionIds": [
+        "hni-home-hero-v1"
+      ]
+    },
+    {
+      "fieldKind": "link",
+      "name": "data-block-id",
+      "valueShape": "slot-id",
+      "occurrences": 240,
+      "definitions": 79,
+      "bindings": [
+        "generated"
+      ],
+      "ownership": "field-intrinsic",
+      "effects": [],
+      "anchorRole": "none",
+      "consumedByField": true,
+      "inSelector": 0,
+      "wrapperSafe": false,
+      "expressible": true,
+      "verdict": "support",
+      "definitionIds": [
+        "accreditation-strip-v1",
+        "alert-banner-v1",
+        "anchor-nav-v1",
+        "announcement-bar-v1",
+        "breadcrumb-v1",
+        "campaign-progress-v1",
+        "contact-form-v1",
+        "cta-band-v1",
+        "disaster-cta-v1",
+        "document-list-v1",
+        "donation-ask-v1",
+        "echelon-centered-media-hero-v1",
+        "echelon-collage-hero-v1",
+        "echelon-event-hero-v1",
+        "echelon-impact-data-split-v1",
+        "echelon-overlay-hero-v1",
+        "echelon-register-cta-v1",
+        "eligibility-checklist-v1",
+        "event-agenda-v1",
+        "event-list-v1",
+        "event-pricing-v1",
+        "event-speakers-v1",
+        "event-sponsors-v1",
+        "event-venue-v1",
+        "financial-transparency-v1",
+        "form-embed-v1",
+        "hero-appeal-v1",
+        "hero-centered-v1",
+        "hero-event-v1",
+        "hero-fullbleed-v1",
+        "hero-search-v1",
+        "hero-split-v1",
+        "hero-triage-v1",
+        "hni-explore-explore-v1",
+        "hni-explore-resources-v1",
+        "hni-footer-v1",
+        "hni-header-v1",
+        "hni-hero-v1",
+        "hni-home-explore-v1",
+        "hni-home-hero-fe-v1",
+        "hni-home-hero-v1",
+        "hni-methodology-explore-v1",
+        "icon-card-grid-v1",
+        "impact-story-v1",
+        "job-listings-v1",
+        "location-directory-v1",
+        "location-list-v1",
+        "locator-form-v1",
+        "logo-strip-v1",
+        "map-embed-v1",
+        "media-text-row-v1",
+        "mission-band-v1",
+        "monthly-giving-v1",
+        "newsletter-signup-v1",
+        "person-profile-v1",
+        "post-list-v1",
+        "pricing-tiers-v1",
+        "process-steps-v1",
+        "program-cards-v1",
+        "proof-callout-v1",
+        "registration-cta-v1",
+        "related-links-v1",
+        "resource-library-v1",
+        "share-row-v1",
+        "social-links-v1",
+        "speakers-grid-v1",
+        "split-cta-v1",
+        "sponsors-tiered-v1",
+        "stats-band-v1",
+        "story-grid-v1",
+        "team-grid-v1",
+        "text-image-v1",
+        "urgent-appeal-v1",
+        "utility-bar-v1",
+        "venue-location-v1",
+        "video-embed-v1",
+        "volunteer-opportunities-v1",
+        "ways-to-give-grid-v1",
+        "ways-to-help-grid-v1"
+      ]
+    },
+    {
+      "fieldKind": "link",
+      "name": "data-editable",
+      "valueShape": "field-type",
+      "occurrences": 240,
+      "definitions": 79,
+      "bindings": [
+        "generated"
+      ],
+      "ownership": "field-intrinsic",
+      "effects": [],
+      "anchorRole": "none",
+      "consumedByField": true,
+      "inSelector": 0,
+      "wrapperSafe": false,
+      "expressible": true,
+      "verdict": "support",
+      "definitionIds": [
+        "accreditation-strip-v1",
+        "alert-banner-v1",
+        "anchor-nav-v1",
+        "announcement-bar-v1",
+        "breadcrumb-v1",
+        "campaign-progress-v1",
+        "contact-form-v1",
+        "cta-band-v1",
+        "disaster-cta-v1",
+        "document-list-v1",
+        "donation-ask-v1",
+        "echelon-centered-media-hero-v1",
+        "echelon-collage-hero-v1",
+        "echelon-event-hero-v1",
+        "echelon-impact-data-split-v1",
+        "echelon-overlay-hero-v1",
+        "echelon-register-cta-v1",
+        "eligibility-checklist-v1",
+        "event-agenda-v1",
+        "event-list-v1",
+        "event-pricing-v1",
+        "event-speakers-v1",
+        "event-sponsors-v1",
+        "event-venue-v1",
+        "financial-transparency-v1",
+        "form-embed-v1",
+        "hero-appeal-v1",
+        "hero-centered-v1",
+        "hero-event-v1",
+        "hero-fullbleed-v1",
+        "hero-search-v1",
+        "hero-split-v1",
+        "hero-triage-v1",
+        "hni-explore-explore-v1",
+        "hni-explore-resources-v1",
+        "hni-footer-v1",
+        "hni-header-v1",
+        "hni-hero-v1",
+        "hni-home-explore-v1",
+        "hni-home-hero-fe-v1",
+        "hni-home-hero-v1",
+        "hni-methodology-explore-v1",
+        "icon-card-grid-v1",
+        "impact-story-v1",
+        "job-listings-v1",
+        "location-directory-v1",
+        "location-list-v1",
+        "locator-form-v1",
+        "logo-strip-v1",
+        "map-embed-v1",
+        "media-text-row-v1",
+        "mission-band-v1",
+        "monthly-giving-v1",
+        "newsletter-signup-v1",
+        "person-profile-v1",
+        "post-list-v1",
+        "pricing-tiers-v1",
+        "process-steps-v1",
+        "program-cards-v1",
+        "proof-callout-v1",
+        "registration-cta-v1",
+        "related-links-v1",
+        "resource-library-v1",
+        "share-row-v1",
+        "social-links-v1",
+        "speakers-grid-v1",
+        "split-cta-v1",
+        "sponsors-tiered-v1",
+        "stats-band-v1",
+        "story-grid-v1",
+        "team-grid-v1",
+        "text-image-v1",
+        "urgent-appeal-v1",
+        "utility-bar-v1",
+        "venue-location-v1",
+        "video-embed-v1",
+        "volunteer-opportunities-v1",
+        "ways-to-give-grid-v1",
+        "ways-to-help-grid-v1"
+      ]
+    },
+    {
+      "fieldKind": "link",
+      "name": "href",
+      "valueShape": "url-fragment-empty",
+      "occurrences": 178,
+      "definitions": 58,
+      "bindings": [
+        "static"
+      ],
+      "ownership": "field-intrinsic",
+      "effects": [
+        "navigation",
+        "security"
+      ],
+      "anchorRole": "anchor-source",
+      "consumedByField": true,
+      "inSelector": 0,
+      "wrapperSafe": false,
+      "expressible": true,
+      "verdict": "support",
+      "definitionIds": [
+        "accreditation-strip-v1",
+        "alert-banner-v1",
+        "anchor-nav-v1",
+        "announcement-bar-v1",
+        "breadcrumb-v1",
+        "campaign-progress-v1",
+        "contact-form-v1",
+        "cta-band-v1",
+        "disaster-cta-v1",
+        "document-list-v1",
+        "donation-ask-v1",
+        "eligibility-checklist-v1",
+        "event-list-v1",
+        "event-pricing-v1",
+        "event-speakers-v1",
+        "event-sponsors-v1",
+        "event-venue-v1",
+        "financial-transparency-v1",
+        "form-embed-v1",
+        "hero-appeal-v1",
+        "hero-centered-v1",
+        "hero-fullbleed-v1",
+        "hero-search-v1",
+        "hero-split-v1",
+        "hero-triage-v1",
+        "icon-card-grid-v1",
+        "impact-story-v1",
+        "job-listings-v1",
+        "location-directory-v1",
+        "location-list-v1",
+        "locator-form-v1",
+        "logo-strip-v1",
+        "map-embed-v1",
+        "media-text-row-v1",
+        "mission-band-v1",
+        "monthly-giving-v1",
+        "newsletter-signup-v1",
+        "person-profile-v1",
+        "post-list-v1",
+        "process-steps-v1",
+        "program-cards-v1",
+        "registration-cta-v1",
+        "related-links-v1",
+        "resource-library-v1",
+        "share-row-v1",
+        "social-links-v1",
+        "split-cta-v1",
+        "sponsors-tiered-v1",
+        "stats-band-v1",
+        "story-grid-v1",
+        "team-grid-v1",
+        "text-image-v1",
+        "urgent-appeal-v1",
+        "utility-bar-v1",
+        "video-embed-v1",
+        "volunteer-opportunities-v1",
+        "ways-to-give-grid-v1",
+        "ways-to-help-grid-v1"
+      ]
+    },
+    {
+      "fieldKind": "link",
+      "name": "class",
+      "valueShape": "class-token-list(3)",
+      "occurrences": 91,
+      "definitions": 35,
+      "bindings": [
+        "static"
+      ],
+      "ownership": "wrapper-capable",
+      "effects": [
+        "layout"
+      ],
+      "anchorRole": "none",
+      "consumedByField": false,
+      "inSelector": 91,
+      "wrapperSafe": false,
+      "expressible": true,
+      "verdict": "support",
+      "definitionIds": [
+        "alert-banner-v1",
+        "anchor-nav-v1",
+        "breadcrumb-v1",
+        "disaster-cta-v1",
+        "document-list-v1",
+        "donation-ask-v1",
+        "echelon-centered-media-hero-v1",
+        "echelon-collage-hero-v1",
+        "echelon-event-hero-v1",
+        "echelon-overlay-hero-v1",
+        "echelon-register-cta-v1",
+        "eligibility-checklist-v1",
+        "event-list-v1",
+        "event-pricing-v1",
+        "event-speakers-v1",
+        "event-venue-v1",
+        "financial-transparency-v1",
+        "hero-appeal-v1",
+        "hero-event-v1",
+        "impact-story-v1",
+        "job-listings-v1",
+        "location-directory-v1",
+        "location-list-v1",
+        "mission-band-v1",
+        "person-profile-v1",
+        "post-list-v1",
+        "process-steps-v1",
+        "related-links-v1",
+        "share-row-v1",
+        "social-links-v1",
+        "speakers-grid-v1",
+        "sponsors-tiered-v1",
+        "stats-band-v1",
+        "team-grid-v1",
+        "volunteer-opportunities-v1"
+      ]
+    },
+    {
+      "fieldKind": "link",
+      "name": "class",
+      "valueShape": "class-token-list(2)",
+      "occurrences": 49,
+      "definitions": 19,
+      "bindings": [
+        "static"
+      ],
+      "ownership": "wrapper-capable",
+      "effects": [
+        "layout"
+      ],
+      "anchorRole": "none",
+      "consumedByField": false,
+      "inSelector": 49,
+      "wrapperSafe": false,
+      "expressible": true,
+      "verdict": "support",
+      "definitionIds": [
+        "accreditation-strip-v1",
+        "cta-band-v1",
+        "donation-ask-v1",
+        "echelon-centered-media-hero-v1",
+        "echelon-collage-hero-v1",
+        "echelon-event-hero-v1",
+        "echelon-impact-data-split-v1",
+        "echelon-overlay-hero-v1",
+        "event-sponsors-v1",
+        "hero-centered-v1",
+        "hero-split-v1",
+        "icon-card-grid-v1",
+        "location-directory-v1",
+        "locator-form-v1",
+        "proof-callout-v1",
+        "registration-cta-v1",
+        "sponsors-tiered-v1",
+        "story-grid-v1",
+        "utility-bar-v1"
+      ]
+    },
+    {
+      "fieldKind": "link",
+      "name": "class",
+      "valueShape": "class-token-list(4)",
+      "occurrences": 34,
+      "definitions": 19,
+      "bindings": [
+        "static"
+      ],
+      "ownership": "wrapper-capable",
+      "effects": [
+        "layout"
+      ],
+      "anchorRole": "none",
+      "consumedByField": false,
+      "inSelector": 34,
+      "wrapperSafe": false,
+      "expressible": true,
+      "verdict": "support",
+      "definitionIds": [
+        "announcement-bar-v1",
+        "campaign-progress-v1",
+        "disaster-cta-v1",
+        "donation-ask-v1",
+        "event-agenda-v1",
+        "hero-appeal-v1",
+        "hero-fullbleed-v1",
+        "hero-triage-v1",
+        "media-text-row-v1",
+        "monthly-giving-v1",
+        "pricing-tiers-v1",
+        "program-cards-v1",
+        "registration-cta-v1",
+        "resource-library-v1",
+        "split-cta-v1",
+        "urgent-appeal-v1",
+        "venue-location-v1",
+        "ways-to-give-grid-v1",
+        "ways-to-help-grid-v1"
+      ]
+    },
+    {
+      "fieldKind": "link",
+      "name": "href",
+      "valueShape": "url-fragment",
+      "occurrences": 30,
+      "definitions": 19,
+      "bindings": [
+        "static"
+      ],
+      "ownership": "field-intrinsic",
+      "effects": [
+        "navigation",
+        "security"
+      ],
+      "anchorRole": "anchor-source",
+      "consumedByField": true,
+      "inSelector": 0,
+      "wrapperSafe": false,
+      "expressible": true,
+      "verdict": "support",
+      "definitionIds": [
+        "echelon-centered-media-hero-v1",
+        "echelon-collage-hero-v1",
+        "echelon-event-hero-v1",
+        "echelon-impact-data-split-v1",
+        "echelon-overlay-hero-v1",
+        "echelon-register-cta-v1",
+        "event-agenda-v1",
+        "hero-event-v1",
+        "hni-explore-resources-v1",
+        "hni-footer-v1",
+        "hni-header-v1",
+        "hni-hero-v1",
+        "hni-home-explore-v1",
+        "hni-home-hero-fe-v1",
+        "hni-home-hero-v1",
+        "pricing-tiers-v1",
+        "proof-callout-v1",
+        "speakers-grid-v1",
+        "venue-location-v1"
+      ]
+    },
+    {
+      "fieldKind": "link",
+      "name": "class",
+      "valueShape": "class-token-list(1)",
+      "occurrences": 35,
+      "definitions": 18,
+      "bindings": [
+        "static"
+      ],
+      "ownership": "wrapper-capable",
+      "effects": [
+        "layout"
+      ],
+      "anchorRole": "none",
+      "consumedByField": false,
+      "inSelector": 20,
+      "wrapperSafe": false,
+      "expressible": true,
+      "verdict": "support",
+      "definitionIds": [
+        "contact-form-v1",
+        "echelon-impact-data-split-v1",
+        "form-embed-v1",
+        "hero-search-v1",
+        "hni-explore-explore-v1",
+        "hni-explore-resources-v1",
+        "hni-footer-v1",
+        "hni-home-hero-fe-v1",
+        "hni-home-hero-v1",
+        "hni-methodology-explore-v1",
+        "location-list-v1",
+        "locator-form-v1",
+        "logo-strip-v1",
+        "map-embed-v1",
+        "newsletter-signup-v1",
+        "related-links-v1",
+        "text-image-v1",
+        "video-embed-v1"
+      ]
+    },
+    {
+      "fieldKind": "link",
+      "name": "href",
+      "valueShape": "url-relative-root",
+      "occurrences": 25,
+      "definitions": 9,
+      "bindings": [
+        "static"
+      ],
+      "ownership": "field-intrinsic",
+      "effects": [
+        "navigation",
+        "security"
+      ],
+      "anchorRole": "none",
+      "consumedByField": true,
+      "inSelector": 0,
+      "wrapperSafe": false,
+      "expressible": true,
+      "verdict": "support",
+      "definitionIds": [
+        "hni-explore-explore-v1",
+        "hni-explore-resources-v1",
+        "hni-footer-v1",
+        "hni-header-v1",
+        "hni-hero-v1",
+        "hni-home-explore-v1",
+        "hni-home-hero-fe-v1",
+        "hni-home-hero-v1",
+        "hni-methodology-explore-v1"
+      ]
+    },
+    {
+      "fieldKind": "link",
+      "name": "data-registration-cta",
+      "valueShape": "empty",
+      "occurrences": 9,
+      "definitions": 7,
+      "bindings": [
+        "static"
+      ],
+      "ownership": "wrapper-capable",
+      "effects": [],
+      "anchorRole": "none",
+      "consumedByField": false,
+      "inSelector": 0,
+      "wrapperSafe": true,
+      "expressible": false,
+      "verdict": "wrapper",
+      "definitionIds": [
+        "echelon-centered-media-hero-v1",
+        "echelon-collage-hero-v1",
+        "echelon-event-hero-v1",
+        "echelon-overlay-hero-v1",
+        "echelon-register-cta-v1",
+        "hero-event-v1",
+        "pricing-tiers-v1"
+      ]
+    },
+    {
+      "fieldKind": "link",
+      "name": "data-form-action",
+      "valueShape": "empty",
+      "occurrences": 4,
+      "definitions": 4,
+      "bindings": [
+        "static"
+      ],
+      "ownership": "wrapper-capable",
+      "effects": [],
+      "anchorRole": "none",
+      "consumedByField": false,
+      "inSelector": 0,
+      "wrapperSafe": true,
+      "expressible": false,
+      "verdict": "wrapper",
+      "definitionIds": [
+        "contact-form-v1",
+        "hero-search-v1",
+        "locator-form-v1",
+        "newsletter-signup-v1"
+      ]
+    },
+    {
+      "fieldKind": "link",
+      "name": "data-visually-hidden",
+      "valueShape": "empty",
+      "occurrences": 4,
+      "definitions": 4,
+      "bindings": [
+        "static"
+      ],
+      "ownership": "wrapper-capable",
+      "effects": [],
+      "anchorRole": "none",
+      "consumedByField": false,
+      "inSelector": 0,
+      "wrapperSafe": true,
+      "expressible": false,
+      "verdict": "wrapper",
+      "definitionIds": [
+        "contact-form-v1",
+        "form-embed-v1",
+        "map-embed-v1",
+        "video-embed-v1"
+      ]
+    },
+    {
+      "fieldKind": "link",
+      "name": "data-cms-embed-src",
+      "valueShape": "empty",
+      "occurrences": 3,
+      "definitions": 3,
+      "bindings": [
+        "static"
+      ],
+      "ownership": "wrapper-capable",
+      "effects": [],
+      "anchorRole": "none",
+      "consumedByField": false,
+      "inSelector": 0,
+      "wrapperSafe": true,
+      "expressible": false,
+      "verdict": "wrapper",
+      "definitionIds": [
+        "form-embed-v1",
+        "map-embed-v1",
+        "video-embed-v1"
+      ]
+    },
+    {
+      "fieldKind": "link",
+      "name": "href",
+      "valueShape": "url-scheme:tel",
+      "occurrences": 4,
+      "definitions": 2,
+      "bindings": [
+        "static"
+      ],
+      "ownership": "field-intrinsic",
+      "effects": [
+        "navigation",
+        "security"
+      ],
+      "anchorRole": "none",
+      "consumedByField": true,
+      "inSelector": 0,
+      "wrapperSafe": false,
+      "expressible": true,
+      "verdict": "support",
+      "definitionIds": [
+        "location-directory-v1",
+        "locator-form-v1"
+      ]
+    },
+    {
+      "fieldKind": "link",
+      "name": "class",
+      "valueShape": "class-token-list(5)",
+      "occurrences": 2,
+      "definitions": 2,
+      "bindings": [
+        "static"
+      ],
+      "ownership": "wrapper-capable",
+      "effects": [
+        "layout"
+      ],
+      "anchorRole": "none",
+      "consumedByField": false,
+      "inSelector": 2,
+      "wrapperSafe": false,
+      "expressible": true,
+      "verdict": "support",
+      "definitionIds": [
+        "hero-event-v1",
+        "split-cta-v1"
+      ]
+    },
+    {
+      "fieldKind": "link",
+      "name": "class",
+      "valueShape": "class-token-list(15,non-conforming)",
+      "occurrences": 4,
+      "definitions": 1,
+      "bindings": [
+        "static"
+      ],
+      "ownership": "wrapper-capable",
+      "effects": [
+        "layout"
+      ],
+      "anchorRole": "none",
+      "consumedByField": false,
+      "inSelector": 0,
+      "wrapperSafe": false,
+      "expressible": false,
+      "verdict": "quarantine",
+      "definitionIds": [
+        "hni-home-explore-v1"
+      ]
+    },
+    {
+      "fieldKind": "link",
+      "name": "data-cms-label",
+      "valueShape": "opaque-token",
+      "occurrences": 4,
+      "definitions": 1,
+      "bindings": [
+        "static"
+      ],
+      "ownership": "wrapper-capable",
+      "effects": [],
+      "anchorRole": "none",
+      "consumedByField": false,
+      "inSelector": 0,
+      "wrapperSafe": true,
+      "expressible": false,
+      "verdict": "wrapper",
+      "definitionIds": [
+        "hni-home-explore-v1"
+      ]
+    },
+    {
+      "fieldKind": "link",
+      "name": "data-tone",
+      "valueShape": "opaque-token",
+      "occurrences": 4,
+      "definitions": 1,
+      "bindings": [
+        "static"
+      ],
+      "ownership": "wrapper-capable",
+      "effects": [
+        "layout"
+      ],
+      "anchorRole": "none",
+      "consumedByField": false,
+      "inSelector": 4,
+      "wrapperSafe": false,
+      "expressible": false,
+      "verdict": "quarantine",
+      "definitionIds": [
+        "hni-explore-resources-v1"
+      ]
+    },
+    {
+      "fieldKind": "link",
+      "name": "rel",
+      "valueShape": "keyword-list(2)",
+      "occurrences": 3,
+      "definitions": 1,
+      "bindings": [
+        "static"
+      ],
+      "ownership": "field-element",
+      "effects": [
+        "navigation",
+        "security"
+      ],
+      "anchorRole": "none",
+      "consumedByField": false,
+      "inSelector": 0,
+      "wrapperSafe": false,
+      "expressible": true,
+      "verdict": "support",
+      "definitionIds": [
+        "hni-footer-v1"
+      ]
+    },
+    {
+      "fieldKind": "link",
+      "name": "target",
+      "valueShape": "enum:_blank",
+      "occurrences": 3,
+      "definitions": 1,
+      "bindings": [
+        "static"
+      ],
+      "ownership": "field-element",
+      "effects": [
+        "navigation",
+        "security"
+      ],
+      "anchorRole": "none",
+      "consumedByField": false,
+      "inSelector": 0,
+      "wrapperSafe": false,
+      "expressible": true,
+      "verdict": "support",
+      "definitionIds": [
+        "hni-footer-v1"
+      ]
+    },
+    {
+      "fieldKind": "link",
+      "name": "href",
+      "valueShape": "url-scheme:http",
+      "occurrences": 2,
+      "definitions": 1,
+      "bindings": [
+        "static"
+      ],
+      "ownership": "field-intrinsic",
+      "effects": [
+        "navigation",
+        "security"
+      ],
+      "anchorRole": "none",
+      "consumedByField": true,
+      "inSelector": 0,
+      "wrapperSafe": false,
+      "expressible": true,
+      "verdict": "support",
+      "definitionIds": [
+        "hni-footer-v1"
+      ]
+    },
+    {
+      "fieldKind": "link",
+      "name": "href",
+      "valueShape": "url-scheme:https",
+      "occurrences": 1,
+      "definitions": 1,
+      "bindings": [
+        "static"
+      ],
+      "ownership": "field-intrinsic",
+      "effects": [
+        "navigation",
+        "security"
+      ],
+      "anchorRole": "none",
+      "consumedByField": true,
+      "inSelector": 0,
+      "wrapperSafe": false,
+      "expressible": true,
+      "verdict": "support",
+      "definitionIds": [
+        "hni-footer-v1"
+      ]
+    }
+  ],
+  "allowlist": {
+    "link": [
+      {
+        "rank": 1,
+        "fieldKind": "link",
+        "added": [
+          "class"
+        ],
+        "allowlist": [
+          "class"
+        ],
+        "newlyCleared": 60,
+        "cumulativeCleared": 60,
+        "cumulativeUnlocked": 2,
+        "verdict": "support"
+      },
+      {
+        "rank": 2,
+        "fieldKind": "link",
+        "added": [
+          "rel",
+          "target"
+        ],
+        "allowlist": [
+          "class",
+          "rel",
+          "target"
+        ],
+        "newlyCleared": 1,
+        "cumulativeCleared": 61,
+        "cumulativeUnlocked": 2,
+        "verdict": "support"
+      }
+    ],
+    "image": [
+      {
+        "rank": 1,
+        "fieldKind": "image",
+        "added": [
+          "class",
+          "decoding",
+          "fetchpriority",
+          "height",
+          "loading",
+          "width"
+        ],
+        "allowlist": [
+          "class",
+          "decoding",
+          "fetchpriority",
+          "height",
+          "loading",
+          "width"
+        ],
+        "newlyCleared": 36,
+        "cumulativeCleared": 36,
+        "cumulativeUnlocked": 0,
+        "verdict": "support"
+      }
+    ],
+    "combined": [
+      {
+        "rank": 1,
+        "fieldKind": "both",
+        "added": [
+          "class"
+        ],
+        "allowlist": [
+          "class"
+        ],
+        "newlyCleared": 37,
+        "cumulativeCleared": 37,
+        "cumulativeUnlocked": 2,
+        "verdict": "support"
+      },
+      {
+        "rank": 2,
+        "fieldKind": "both",
+        "added": [
+          "decoding",
+          "height",
+          "loading",
+          "width"
+        ],
+        "allowlist": [
+          "class",
+          "decoding",
+          "height",
+          "loading",
+          "width"
+        ],
+        "newlyCleared": 24,
+        "cumulativeCleared": 61,
+        "cumulativeUnlocked": 2,
+        "verdict": "support"
+      },
+      {
+        "rank": 3,
+        "fieldKind": "both",
+        "added": [
+          "fetchpriority"
+        ],
+        "allowlist": [
+          "class",
+          "decoding",
+          "fetchpriority",
+          "height",
+          "loading",
+          "width"
+        ],
+        "newlyCleared": 6,
+        "cumulativeCleared": 67,
+        "cumulativeUnlocked": 2,
+        "verdict": "support"
+      },
+      {
+        "rank": 4,
+        "fieldKind": "both",
+        "added": [
+          "rel",
+          "target"
+        ],
+        "allowlist": [
+          "class",
+          "decoding",
+          "fetchpriority",
+          "height",
+          "loading",
+          "rel",
+          "target",
+          "width"
+        ],
+        "newlyCleared": 1,
+        "cumulativeCleared": 68,
+        "cumulativeUnlocked": 2,
+        "verdict": "support"
+      }
+    ],
+    "unclearable": [
+      "contact-form-v1",
+      "echelon-centered-media-hero-v1",
+      "echelon-collage-hero-v1",
+      "echelon-event-hero-v1",
+      "echelon-overlay-hero-v1",
+      "echelon-register-cta-v1",
+      "form-embed-v1",
+      "hero-event-v1",
+      "hero-search-v1",
+      "hni-explore-resources-v1",
+      "hni-home-explore-v1",
+      "hni-home-hero-fe-v1",
+      "hni-home-hero-v1",
+      "hni-home-overview-v1",
+      "locator-form-v1",
+      "map-embed-v1",
+      "newsletter-signup-v1",
+      "pricing-tiers-v1",
+      "video-embed-v1"
+    ]
+  },
+  "remainingBlockers": [
+    {
+      "code": "site-divergence",
+      "definitions": 4
+    },
+    {
+      "code": "repeat-family",
+      "definitions": 2
+    },
+    {
+      "code": "interaction-preset-css",
+      "definitions": 1
+    },
+    {
+      "code": "text-region-markup",
+      "definitions": 1
+    },
+    {
+      "code": "unresolved-anchor",
+      "definitions": 1
+    },
+    {
+      "code": "unsupported-attribute",
+      "definitions": 1
+    }
+  ],
+  "definitions": [
+    {
+      "id": "accreditation-strip-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "repeat-family",
+        "nested-editable",
+        "interaction-preset-css",
+        "site-divergence"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [
+        "class",
+        "decoding",
+        "height",
+        "loading",
+        "width"
+      ],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "interaction-preset-css",
+        "nested-editable",
+        "repeat-family",
+        "site-divergence"
+      ]
+    },
+    {
+      "id": "alert-banner-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "icon-field",
+        "interaction-preset-css"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "icon-field",
+        "interaction-preset-css"
+      ]
+    },
+    {
+      "id": "anchor-nav-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "repeat-family",
+        "unsupported-element",
+        "interaction-preset-css"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "interaction-preset-css",
+        "repeat-family",
+        "unsupported-element"
+      ]
+    },
+    {
+      "id": "announcement-bar-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "icon-field",
+        "interaction-preset-css"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "icon-field",
+        "interaction-preset-css"
+      ]
+    },
+    {
+      "id": "article-body-v1",
+      "status": "automatic",
+      "reasonCodes": [],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [],
+      "lostOnImage": [],
+      "lostButNotCoded": false,
+      "clearableByAllowlist": false,
+      "remainingCodes": []
+    },
+    {
+      "id": "article-header-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "static-text",
+        "site-divergence"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [],
+      "lostOnImage": [
+        "decoding",
+        "fetchpriority",
+        "height",
+        "loading",
+        "width"
+      ],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "site-divergence",
+        "static-text"
+      ]
+    },
+    {
+      "id": "breadcrumb-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "repeat-family",
+        "static-text",
+        "unsupported-element",
+        "interaction-preset-css"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "interaction-preset-css",
+        "repeat-family",
+        "static-text",
+        "unsupported-element"
+      ]
+    },
+    {
+      "id": "campaign-progress-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "interaction-preset-css",
+        "css-policy-dropped"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "css-policy-dropped",
+        "interaction-preset-css"
+      ]
+    },
+    {
+      "id": "contact-cards-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "repeat-family"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [],
+      "lostOnImage": [],
+      "lostButNotCoded": false,
+      "clearableByAllowlist": false,
+      "remainingCodes": [
+        "repeat-family"
+      ]
+    },
+    {
+      "id": "contact-form-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "icon-field",
+        "repeat-family",
+        "button-element",
+        "form-element",
+        "form-element",
+        "form-element",
+        "form-element",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "field-attributes-lost",
+        "interaction-preset-css"
+      ],
+      "fieldAttributesLost": true,
+      "unsupportedAttribute": true,
+      "lostOnLink": [
+        "class",
+        "data-form-action",
+        "data-visually-hidden"
+      ],
+      "lostOnImage": [],
+      "lostButNotCoded": false,
+      "clearableByAllowlist": false,
+      "remainingCodes": [
+        "button-element",
+        "form-element",
+        "icon-field",
+        "interaction-preset-css",
+        "repeat-family",
+        "unsupported-attribute"
+      ]
+    },
+    {
+      "id": "cta-band-v1",
+      "status": "automatic",
+      "reasonCodes": [],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": []
+    },
+    {
+      "id": "data-table-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "repeat-family",
+        "unsupported-element",
+        "unsupported-element",
+        "unsupported-element",
+        "unsupported-element",
+        "unsupported-element",
+        "unsupported-element"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [],
+      "lostOnImage": [],
+      "lostButNotCoded": false,
+      "clearableByAllowlist": false,
+      "remainingCodes": [
+        "repeat-family",
+        "unsupported-element"
+      ]
+    },
+    {
+      "id": "disaster-cta-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "interaction-preset-css",
+        "site-divergence"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [
+        "decoding",
+        "height",
+        "loading",
+        "width"
+      ],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "interaction-preset-css",
+        "site-divergence"
+      ]
+    },
+    {
+      "id": "divider-v1",
+      "status": "automatic",
+      "reasonCodes": [],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [],
+      "lostOnImage": [],
+      "lostButNotCoded": false,
+      "clearableByAllowlist": false,
+      "remainingCodes": []
+    },
+    {
+      "id": "document-list-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "icon-field",
+        "repeat-family",
+        "interaction-preset-css"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "icon-field",
+        "interaction-preset-css",
+        "repeat-family"
+      ]
+    },
+    {
+      "id": "donation-ask-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "repeat-family",
+        "nested-editable",
+        "interaction-preset-css"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "interaction-preset-css",
+        "nested-editable",
+        "repeat-family"
+      ]
+    },
+    {
+      "id": "echelon-centered-media-hero-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "field-attributes-lost",
+        "unresolved-anchor"
+      ],
+      "fieldAttributesLost": true,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class",
+        "data-registration-cta"
+      ],
+      "lostOnImage": [
+        "height",
+        "width"
+      ],
+      "lostButNotCoded": false,
+      "clearableByAllowlist": false,
+      "remainingCodes": [
+        "unresolved-anchor"
+      ]
+    },
+    {
+      "id": "echelon-collage-hero-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "field-attributes-lost",
+        "unresolved-anchor"
+      ],
+      "fieldAttributesLost": true,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class",
+        "data-registration-cta"
+      ],
+      "lostOnImage": [
+        "height",
+        "width"
+      ],
+      "lostButNotCoded": false,
+      "clearableByAllowlist": false,
+      "remainingCodes": [
+        "unresolved-anchor"
+      ]
+    },
+    {
+      "id": "echelon-event-hero-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "text-region-markup",
+        "field-attributes-lost",
+        "unresolved-anchor"
+      ],
+      "fieldAttributesLost": true,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class",
+        "data-registration-cta"
+      ],
+      "lostOnImage": [
+        "height",
+        "width"
+      ],
+      "lostButNotCoded": false,
+      "clearableByAllowlist": false,
+      "remainingCodes": [
+        "text-region-markup",
+        "unresolved-anchor"
+      ]
+    },
+    {
+      "id": "echelon-impact-data-split-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "repeat-family",
+        "unresolved-anchor"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [
+        "height",
+        "width"
+      ],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "repeat-family",
+        "unresolved-anchor"
+      ]
+    },
+    {
+      "id": "echelon-overlay-hero-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "field-attributes-lost",
+        "unresolved-anchor"
+      ],
+      "fieldAttributesLost": true,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class",
+        "data-registration-cta"
+      ],
+      "lostOnImage": [
+        "class",
+        "height",
+        "width"
+      ],
+      "lostButNotCoded": false,
+      "clearableByAllowlist": false,
+      "remainingCodes": [
+        "unresolved-anchor"
+      ]
+    },
+    {
+      "id": "echelon-register-cta-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "field-attributes-lost",
+        "unresolved-anchor"
+      ],
+      "fieldAttributesLost": true,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class",
+        "data-registration-cta"
+      ],
+      "lostOnImage": [],
+      "lostButNotCoded": false,
+      "clearableByAllowlist": false,
+      "remainingCodes": [
+        "unresolved-anchor"
+      ]
+    },
+    {
+      "id": "echelon-speakers-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "repeat-family"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [],
+      "lostOnImage": [
+        "height",
+        "width"
+      ],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "repeat-family"
+      ]
+    },
+    {
+      "id": "eligibility-checklist-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "icon-field",
+        "repeat-family",
+        "interaction-preset-css"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "icon-field",
+        "interaction-preset-css",
+        "repeat-family"
+      ]
+    },
+    {
+      "id": "event-agenda-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "repeat-family",
+        "inline-svg",
+        "unsupported-element",
+        "unsupported-element",
+        "interaction-preset-css",
+        "unresolved-anchor"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "inline-svg",
+        "interaction-preset-css",
+        "repeat-family",
+        "unresolved-anchor",
+        "unsupported-element"
+      ]
+    },
+    {
+      "id": "event-list-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "icon-field",
+        "repeat-family",
+        "interaction-preset-css"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "icon-field",
+        "interaction-preset-css",
+        "repeat-family"
+      ]
+    },
+    {
+      "id": "event-pricing-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "repeat-family",
+        "interaction-preset-css"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "interaction-preset-css",
+        "repeat-family"
+      ]
+    },
+    {
+      "id": "event-schedule-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "repeat-family",
+        "inline-svg",
+        "unsupported-element",
+        "unsupported-element",
+        "unsupported-attribute",
+        "interaction-preset-css"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": true,
+      "lostOnLink": [],
+      "lostOnImage": [],
+      "lostButNotCoded": false,
+      "clearableByAllowlist": false,
+      "remainingCodes": [
+        "inline-svg",
+        "interaction-preset-css",
+        "repeat-family",
+        "unsupported-attribute",
+        "unsupported-element"
+      ]
+    },
+    {
+      "id": "event-speakers-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "repeat-family",
+        "interaction-preset-css",
+        "site-divergence"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [
+        "decoding",
+        "height",
+        "loading",
+        "width"
+      ],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "interaction-preset-css",
+        "repeat-family",
+        "site-divergence"
+      ]
+    },
+    {
+      "id": "event-sponsors-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "repeat-family",
+        "nested-editable",
+        "interaction-preset-css",
+        "site-divergence"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [
+        "class",
+        "decoding",
+        "height",
+        "loading",
+        "width"
+      ],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "interaction-preset-css",
+        "nested-editable",
+        "repeat-family",
+        "site-divergence"
+      ]
+    },
+    {
+      "id": "event-venue-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "icon-field",
+        "repeat-family",
+        "interaction-preset-css",
+        "site-divergence"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [
+        "decoding",
+        "height",
+        "loading",
+        "width"
+      ],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "icon-field",
+        "interaction-preset-css",
+        "repeat-family",
+        "site-divergence"
+      ]
+    },
+    {
+      "id": "faq-accordion-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "repeat-family",
+        "inline-svg",
+        "unsupported-element",
+        "unsupported-element",
+        "unsupported-attribute",
+        "interaction-preset-css"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": true,
+      "lostOnLink": [],
+      "lostOnImage": [],
+      "lostButNotCoded": false,
+      "clearableByAllowlist": false,
+      "remainingCodes": [
+        "inline-svg",
+        "interaction-preset-css",
+        "repeat-family",
+        "unsupported-attribute",
+        "unsupported-element"
+      ]
+    },
+    {
+      "id": "faq-list-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "repeat-family"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [],
+      "lostOnImage": [],
+      "lostButNotCoded": false,
+      "clearableByAllowlist": false,
+      "remainingCodes": [
+        "repeat-family"
+      ]
+    },
+    {
+      "id": "feature-columns-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "icon-field",
+        "repeat-family"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [],
+      "lostOnImage": [],
+      "lostButNotCoded": false,
+      "clearableByAllowlist": false,
+      "remainingCodes": [
+        "icon-field",
+        "repeat-family"
+      ]
+    },
+    {
+      "id": "feature-grid-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "icon-field",
+        "repeat-family",
+        "interaction-preset-css"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [],
+      "lostOnImage": [],
+      "lostButNotCoded": false,
+      "clearableByAllowlist": false,
+      "remainingCodes": [
+        "icon-field",
+        "interaction-preset-css",
+        "repeat-family"
+      ]
+    },
+    {
+      "id": "financial-transparency-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "interaction-preset-css",
+        "css-policy-dropped"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "css-policy-dropped",
+        "interaction-preset-css"
+      ]
+    },
+    {
+      "id": "form-embed-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "embed-element",
+        "static-text",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "field-attributes-lost",
+        "interaction-preset-css"
+      ],
+      "fieldAttributesLost": true,
+      "unsupportedAttribute": true,
+      "lostOnLink": [
+        "class",
+        "data-cms-embed-src",
+        "data-visually-hidden"
+      ],
+      "lostOnImage": [],
+      "lostButNotCoded": false,
+      "clearableByAllowlist": false,
+      "remainingCodes": [
+        "embed-element",
+        "interaction-preset-css",
+        "static-text",
+        "unsupported-attribute"
+      ]
+    },
+    {
+      "id": "gallery-grid-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "repeat-family",
+        "site-divergence"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [],
+      "lostOnImage": [
+        "class",
+        "decoding",
+        "height",
+        "loading",
+        "width"
+      ],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "repeat-family",
+        "site-divergence"
+      ]
+    },
+    {
+      "id": "hero-appeal-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "interaction-preset-css",
+        "site-divergence"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [
+        "class",
+        "decoding",
+        "fetchpriority",
+        "height",
+        "loading",
+        "width"
+      ],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "interaction-preset-css",
+        "site-divergence"
+      ]
+    },
+    {
+      "id": "hero-centered-v1",
+      "status": "automatic",
+      "reasonCodes": [],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": []
+    },
+    {
+      "id": "hero-event-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "icon-field",
+        "field-attributes-lost",
+        "interaction-preset-css",
+        "unresolved-anchor"
+      ],
+      "fieldAttributesLost": true,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class",
+        "data-registration-cta"
+      ],
+      "lostOnImage": [
+        "decoding",
+        "fetchpriority",
+        "height",
+        "loading",
+        "width"
+      ],
+      "lostButNotCoded": false,
+      "clearableByAllowlist": false,
+      "remainingCodes": [
+        "icon-field",
+        "interaction-preset-css",
+        "unresolved-anchor"
+      ]
+    },
+    {
+      "id": "hero-fullbleed-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "interaction-preset-css",
+        "css-policy-dropped",
+        "site-divergence"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [
+        "decoding",
+        "fetchpriority",
+        "height",
+        "loading",
+        "width"
+      ],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "css-policy-dropped",
+        "interaction-preset-css",
+        "site-divergence"
+      ]
+    },
+    {
+      "id": "hero-search-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "button-element",
+        "form-element",
+        "form-element",
+        "form-element",
+        "form-element",
+        "form-element",
+        "static-text",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "field-attributes-lost",
+        "interaction-preset-css",
+        "site-divergence"
+      ],
+      "fieldAttributesLost": true,
+      "unsupportedAttribute": true,
+      "lostOnLink": [
+        "class",
+        "data-form-action"
+      ],
+      "lostOnImage": [
+        "class",
+        "decoding",
+        "fetchpriority",
+        "height",
+        "loading",
+        "width"
+      ],
+      "lostButNotCoded": false,
+      "clearableByAllowlist": false,
+      "remainingCodes": [
+        "button-element",
+        "form-element",
+        "interaction-preset-css",
+        "site-divergence",
+        "static-text",
+        "unsupported-attribute"
+      ]
+    },
+    {
+      "id": "hero-split-v1",
+      "status": "manual-decision",
+      "reasonCodes": [
+        "site-divergence"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [
+        "decoding",
+        "fetchpriority",
+        "height",
+        "loading",
+        "width"
+      ],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "site-divergence"
+      ]
+    },
+    {
+      "id": "hero-triage-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "icon-field",
+        "repeat-family",
+        "interaction-preset-css"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "icon-field",
+        "interaction-preset-css",
+        "repeat-family"
+      ]
+    },
+    {
+      "id": "hni-explore-explore-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "nested-editable"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": true,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "nested-editable",
+        "unsupported-attribute"
+      ]
+    },
+    {
+      "id": "hni-explore-hero-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "inline-svg",
+        "static-text",
+        "unsupported-element",
+        "unsupported-element",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": true,
+      "lostOnLink": [],
+      "lostOnImage": [],
+      "lostButNotCoded": false,
+      "clearableByAllowlist": false,
+      "remainingCodes": [
+        "inline-svg",
+        "static-text",
+        "unsupported-attribute",
+        "unsupported-element"
+      ]
+    },
+    {
+      "id": "hni-explore-insights-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "unsupported-attribute",
+        "unsupported-attribute"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": true,
+      "lostOnLink": [],
+      "lostOnImage": [
+        "class",
+        "decoding",
+        "height",
+        "loading",
+        "width"
+      ],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "unsupported-attribute"
+      ]
+    },
+    {
+      "id": "hni-explore-map-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "button-element",
+        "embed-element",
+        "inline-svg",
+        "static-text",
+        "unsupported-element",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": true,
+      "lostOnLink": [],
+      "lostOnImage": [],
+      "lostButNotCoded": false,
+      "clearableByAllowlist": false,
+      "remainingCodes": [
+        "button-element",
+        "embed-element",
+        "inline-svg",
+        "static-text",
+        "unsupported-attribute",
+        "unsupported-element"
+      ]
+    },
+    {
+      "id": "hni-explore-resources-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "icon-field",
+        "repeat-family",
+        "unsupported-element",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "nested-editable"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": true,
+      "lostOnLink": [
+        "class",
+        "data-tone"
+      ],
+      "lostOnImage": [],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": false,
+      "remainingCodes": [
+        "icon-field",
+        "nested-editable",
+        "repeat-family",
+        "unsupported-attribute",
+        "unsupported-element"
+      ]
+    },
+    {
+      "id": "hni-explore-timeline-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "button-element",
+        "embed-element",
+        "inline-svg",
+        "static-text",
+        "unsupported-element",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": true,
+      "lostOnLink": [],
+      "lostOnImage": [],
+      "lostButNotCoded": false,
+      "clearableByAllowlist": false,
+      "remainingCodes": [
+        "button-element",
+        "embed-element",
+        "inline-svg",
+        "static-text",
+        "unsupported-attribute",
+        "unsupported-element"
+      ]
+    },
+    {
+      "id": "hni-footer-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "repeat-family",
+        "button-element",
+        "inline-svg",
+        "unsupported-element",
+        "unsupported-attribute"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": true,
+      "lostOnLink": [
+        "class",
+        "rel",
+        "target"
+      ],
+      "lostOnImage": [],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "button-element",
+        "inline-svg",
+        "repeat-family",
+        "unsupported-attribute",
+        "unsupported-element"
+      ]
+    },
+    {
+      "id": "hni-header-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "unsupported-element",
+        "unsupported-element",
+        "unsupported-element",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": true,
+      "lostOnLink": [],
+      "lostOnImage": [],
+      "lostButNotCoded": false,
+      "clearableByAllowlist": false,
+      "remainingCodes": [
+        "unsupported-attribute",
+        "unsupported-element"
+      ]
+    },
+    {
+      "id": "hni-hero-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "text-region-markup"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [],
+      "lostOnImage": [
+        "decoding",
+        "fetchpriority",
+        "height",
+        "width"
+      ],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "text-region-markup"
+      ]
+    },
+    {
+      "id": "hni-home-divider-1-v1",
+      "status": "automatic",
+      "reasonCodes": [],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [],
+      "lostOnImage": [],
+      "lostButNotCoded": false,
+      "clearableByAllowlist": false,
+      "remainingCodes": []
+    },
+    {
+      "id": "hni-home-divider-2-v1",
+      "status": "automatic",
+      "reasonCodes": [],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [],
+      "lostOnImage": [],
+      "lostButNotCoded": false,
+      "clearableByAllowlist": false,
+      "remainingCodes": []
+    },
+    {
+      "id": "hni-home-divider-3-v1",
+      "status": "automatic",
+      "reasonCodes": [],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [],
+      "lostOnImage": [],
+      "lostButNotCoded": false,
+      "clearableByAllowlist": false,
+      "remainingCodes": []
+    },
+    {
+      "id": "hni-home-explore-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "icon-field",
+        "repeat-family",
+        "unsupported-element",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "nested-editable"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": true,
+      "lostOnLink": [
+        "class",
+        "data-cms-label"
+      ],
+      "lostOnImage": [],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": false,
+      "remainingCodes": [
+        "icon-field",
+        "nested-editable",
+        "repeat-family",
+        "unsupported-attribute",
+        "unsupported-element"
+      ]
+    },
+    {
+      "id": "hni-home-hero-fe-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "text-region-markup",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "field-attributes-lost"
+      ],
+      "fieldAttributesLost": true,
+      "unsupportedAttribute": true,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [
+        "decoding",
+        "fetchpriority",
+        "height",
+        "style",
+        "width"
+      ],
+      "lostButNotCoded": false,
+      "clearableByAllowlist": false,
+      "remainingCodes": [
+        "text-region-markup",
+        "unsupported-attribute"
+      ]
+    },
+    {
+      "id": "hni-home-hero-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "text-region-markup",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "field-attributes-lost"
+      ],
+      "fieldAttributesLost": true,
+      "unsupportedAttribute": true,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [
+        "class",
+        "decoding",
+        "fetchpriority",
+        "height",
+        "style",
+        "width"
+      ],
+      "lostButNotCoded": false,
+      "clearableByAllowlist": false,
+      "remainingCodes": [
+        "text-region-markup",
+        "unsupported-attribute"
+      ]
+    },
+    {
+      "id": "hni-home-measuring-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "icon-field",
+        "unsupported-attribute",
+        "unsupported-attribute"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": true,
+      "lostOnLink": [],
+      "lostOnImage": [],
+      "lostButNotCoded": false,
+      "clearableByAllowlist": false,
+      "remainingCodes": [
+        "icon-field",
+        "unsupported-attribute"
+      ]
+    },
+    {
+      "id": "hni-home-overview-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "static-text",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "field-attributes-lost"
+      ],
+      "fieldAttributesLost": true,
+      "unsupportedAttribute": true,
+      "lostOnLink": [],
+      "lostOnImage": [
+        "class",
+        "decoding",
+        "height",
+        "loading",
+        "style",
+        "width"
+      ],
+      "lostButNotCoded": false,
+      "clearableByAllowlist": false,
+      "remainingCodes": [
+        "static-text",
+        "unsupported-attribute"
+      ]
+    },
+    {
+      "id": "hni-measuring-poverty-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "icon-field"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [],
+      "lostOnImage": [],
+      "lostButNotCoded": false,
+      "clearableByAllowlist": false,
+      "remainingCodes": [
+        "icon-field"
+      ]
+    },
+    {
+      "id": "hni-methodology-content-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "static-text",
+        "text-region-markup",
+        "unsupported-element",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": true,
+      "lostOnLink": [],
+      "lostOnImage": [],
+      "lostButNotCoded": false,
+      "clearableByAllowlist": false,
+      "remainingCodes": [
+        "static-text",
+        "text-region-markup",
+        "unsupported-attribute",
+        "unsupported-element"
+      ]
+    },
+    {
+      "id": "hni-methodology-explore-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "nested-editable"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": true,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "nested-editable",
+        "unsupported-attribute"
+      ]
+    },
+    {
+      "id": "hni-methodology-hero-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "static-text",
+        "unsupported-element",
+        "unsupported-element",
+        "unsupported-attribute"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": true,
+      "lostOnLink": [],
+      "lostOnImage": [],
+      "lostButNotCoded": false,
+      "clearableByAllowlist": false,
+      "remainingCodes": [
+        "static-text",
+        "unsupported-attribute",
+        "unsupported-element"
+      ]
+    },
+    {
+      "id": "hni-methodology-stats-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "unsupported-attribute"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": true,
+      "lostOnLink": [],
+      "lostOnImage": [],
+      "lostButNotCoded": false,
+      "clearableByAllowlist": false,
+      "remainingCodes": [
+        "unsupported-attribute"
+      ]
+    },
+    {
+      "id": "hni-overview-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "repeat-family"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [],
+      "lostOnImage": [
+        "decoding",
+        "height",
+        "loading",
+        "width"
+      ],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "repeat-family"
+      ]
+    },
+    {
+      "id": "hni-resources-about-orgs-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "unsupported-attribute",
+        "unsupported-attribute"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": true,
+      "lostOnLink": [],
+      "lostOnImage": [],
+      "lostButNotCoded": false,
+      "clearableByAllowlist": false,
+      "remainingCodes": [
+        "unsupported-attribute"
+      ]
+    },
+    {
+      "id": "hni-resources-divider-1-v1",
+      "status": "automatic",
+      "reasonCodes": [],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [],
+      "lostOnImage": [],
+      "lostButNotCoded": false,
+      "clearableByAllowlist": false,
+      "remainingCodes": []
+    },
+    {
+      "id": "hni-resources-divider-2-v1",
+      "status": "automatic",
+      "reasonCodes": [],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [],
+      "lostOnImage": [],
+      "lostButNotCoded": false,
+      "clearableByAllowlist": false,
+      "remainingCodes": []
+    },
+    {
+      "id": "hni-resources-hero-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "inline-svg",
+        "static-text",
+        "unsupported-element",
+        "unsupported-element",
+        "unsupported-attribute",
+        "unresolved-anchor"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": true,
+      "lostOnLink": [],
+      "lostOnImage": [],
+      "lostButNotCoded": false,
+      "clearableByAllowlist": false,
+      "remainingCodes": [
+        "inline-svg",
+        "static-text",
+        "unresolved-anchor",
+        "unsupported-attribute",
+        "unsupported-element"
+      ]
+    },
+    {
+      "id": "icon-card-grid-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "icon-field",
+        "repeat-family",
+        "nested-editable"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "icon-field",
+        "nested-editable",
+        "repeat-family"
+      ]
+    },
+    {
+      "id": "impact-story-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "interaction-preset-css",
+        "site-divergence"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [
+        "decoding",
+        "height",
+        "loading",
+        "width"
+      ],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "interaction-preset-css",
+        "site-divergence"
+      ]
+    },
+    {
+      "id": "job-listings-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "icon-field",
+        "repeat-family",
+        "interaction-preset-css"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "icon-field",
+        "interaction-preset-css",
+        "repeat-family"
+      ]
+    },
+    {
+      "id": "location-directory-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "repeat-family",
+        "unsupported-element",
+        "interaction-preset-css"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "interaction-preset-css",
+        "repeat-family",
+        "unsupported-element"
+      ]
+    },
+    {
+      "id": "location-list-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "icon-field",
+        "repeat-family",
+        "interaction-preset-css"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "icon-field",
+        "interaction-preset-css",
+        "repeat-family"
+      ]
+    },
+    {
+      "id": "locator-form-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "button-element",
+        "form-element",
+        "form-element",
+        "form-element",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "field-attributes-lost",
+        "interaction-preset-css"
+      ],
+      "fieldAttributesLost": true,
+      "unsupportedAttribute": true,
+      "lostOnLink": [
+        "class",
+        "data-form-action"
+      ],
+      "lostOnImage": [],
+      "lostButNotCoded": false,
+      "clearableByAllowlist": false,
+      "remainingCodes": [
+        "button-element",
+        "form-element",
+        "interaction-preset-css",
+        "unsupported-attribute"
+      ]
+    },
+    {
+      "id": "logo-strip-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "repeat-family",
+        "nested-editable",
+        "site-divergence"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [
+        "class",
+        "decoding",
+        "height",
+        "loading",
+        "width"
+      ],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "nested-editable",
+        "repeat-family",
+        "site-divergence"
+      ]
+    },
+    {
+      "id": "map-embed-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "embed-element",
+        "static-text",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "field-attributes-lost",
+        "interaction-preset-css"
+      ],
+      "fieldAttributesLost": true,
+      "unsupportedAttribute": true,
+      "lostOnLink": [
+        "class",
+        "data-cms-embed-src",
+        "data-visually-hidden"
+      ],
+      "lostOnImage": [],
+      "lostButNotCoded": false,
+      "clearableByAllowlist": false,
+      "remainingCodes": [
+        "embed-element",
+        "interaction-preset-css",
+        "static-text",
+        "unsupported-attribute"
+      ]
+    },
+    {
+      "id": "media-text-row-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "icon-field",
+        "interaction-preset-css",
+        "site-divergence"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [
+        "decoding",
+        "height",
+        "loading",
+        "width"
+      ],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "icon-field",
+        "interaction-preset-css",
+        "site-divergence"
+      ]
+    },
+    {
+      "id": "mission-band-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "icon-field",
+        "interaction-preset-css"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "icon-field",
+        "interaction-preset-css"
+      ]
+    },
+    {
+      "id": "monthly-giving-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "interaction-preset-css",
+        "site-divergence"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [
+        "decoding",
+        "height",
+        "loading",
+        "width"
+      ],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "interaction-preset-css",
+        "site-divergence"
+      ]
+    },
+    {
+      "id": "newsletter-signup-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "icon-field",
+        "button-element",
+        "form-element",
+        "form-element",
+        "form-element",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "field-attributes-lost",
+        "interaction-preset-css"
+      ],
+      "fieldAttributesLost": true,
+      "unsupportedAttribute": true,
+      "lostOnLink": [
+        "class",
+        "data-form-action"
+      ],
+      "lostOnImage": [],
+      "lostButNotCoded": false,
+      "clearableByAllowlist": false,
+      "remainingCodes": [
+        "button-element",
+        "form-element",
+        "icon-field",
+        "interaction-preset-css",
+        "unsupported-attribute"
+      ]
+    },
+    {
+      "id": "page-header-v1",
+      "status": "manual-decision",
+      "reasonCodes": [
+        "site-divergence"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [],
+      "lostOnImage": [
+        "decoding",
+        "fetchpriority",
+        "height",
+        "loading",
+        "width"
+      ],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "site-divergence"
+      ]
+    },
+    {
+      "id": "person-profile-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "interaction-preset-css",
+        "site-divergence"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [
+        "decoding",
+        "height",
+        "loading",
+        "width"
+      ],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "interaction-preset-css",
+        "site-divergence"
+      ]
+    },
+    {
+      "id": "post-list-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "repeat-family",
+        "interaction-preset-css",
+        "site-divergence"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [
+        "decoding",
+        "height",
+        "loading",
+        "width"
+      ],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "interaction-preset-css",
+        "repeat-family",
+        "site-divergence"
+      ]
+    },
+    {
+      "id": "pricing-tiers-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "repeat-family",
+        "field-attributes-lost",
+        "interaction-preset-css",
+        "unresolved-anchor"
+      ],
+      "fieldAttributesLost": true,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class",
+        "data-registration-cta"
+      ],
+      "lostOnImage": [],
+      "lostButNotCoded": false,
+      "clearableByAllowlist": false,
+      "remainingCodes": [
+        "interaction-preset-css",
+        "repeat-family",
+        "unresolved-anchor"
+      ]
+    },
+    {
+      "id": "process-steps-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "icon-field",
+        "repeat-family",
+        "interaction-preset-css"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "icon-field",
+        "interaction-preset-css",
+        "repeat-family"
+      ]
+    },
+    {
+      "id": "program-cards-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "icon-field",
+        "repeat-family",
+        "interaction-preset-css"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "icon-field",
+        "interaction-preset-css",
+        "repeat-family"
+      ]
+    },
+    {
+      "id": "proof-callout-v1",
+      "status": "manual-decision",
+      "reasonCodes": [
+        "unresolved-anchor"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "unresolved-anchor"
+      ]
+    },
+    {
+      "id": "pull-quote-v1",
+      "status": "manual-decision",
+      "reasonCodes": [
+        "site-divergence"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [],
+      "lostOnImage": [
+        "decoding",
+        "height",
+        "loading",
+        "width"
+      ],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "site-divergence"
+      ]
+    },
+    {
+      "id": "quote-v1",
+      "status": "automatic",
+      "reasonCodes": [],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [],
+      "lostOnImage": [],
+      "lostButNotCoded": false,
+      "clearableByAllowlist": false,
+      "remainingCodes": []
+    },
+    {
+      "id": "registration-cta-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "interaction-preset-css",
+        "site-divergence"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "interaction-preset-css",
+        "site-divergence"
+      ]
+    },
+    {
+      "id": "related-links-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "repeat-family",
+        "interaction-preset-css"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "interaction-preset-css",
+        "repeat-family"
+      ]
+    },
+    {
+      "id": "resource-library-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "icon-field",
+        "repeat-family",
+        "interaction-preset-css"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "icon-field",
+        "interaction-preset-css",
+        "repeat-family"
+      ]
+    },
+    {
+      "id": "rich-columns-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "repeat-family"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [],
+      "lostOnImage": [],
+      "lostButNotCoded": false,
+      "clearableByAllowlist": false,
+      "remainingCodes": [
+        "repeat-family"
+      ]
+    },
+    {
+      "id": "share-row-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "icon-field",
+        "repeat-family",
+        "nested-editable",
+        "interaction-preset-css"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "icon-field",
+        "interaction-preset-css",
+        "nested-editable",
+        "repeat-family"
+      ]
+    },
+    {
+      "id": "social-links-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "icon-field",
+        "repeat-family",
+        "nested-editable",
+        "interaction-preset-css"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "icon-field",
+        "interaction-preset-css",
+        "nested-editable",
+        "repeat-family"
+      ]
+    },
+    {
+      "id": "spacer-v1",
+      "status": "automatic",
+      "reasonCodes": [],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [],
+      "lostOnImage": [],
+      "lostButNotCoded": false,
+      "clearableByAllowlist": false,
+      "remainingCodes": []
+    },
+    {
+      "id": "speakers-grid-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "repeat-family",
+        "interaction-preset-css",
+        "unresolved-anchor"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [
+        "decoding",
+        "height",
+        "loading",
+        "width"
+      ],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "interaction-preset-css",
+        "repeat-family",
+        "unresolved-anchor"
+      ]
+    },
+    {
+      "id": "split-cta-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "icon-field",
+        "unsupported-attribute",
+        "interaction-preset-css",
+        "css-policy-dropped"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": true,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "css-policy-dropped",
+        "icon-field",
+        "interaction-preset-css",
+        "unsupported-attribute"
+      ]
+    },
+    {
+      "id": "sponsors-tiered-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "repeat-family",
+        "nested-editable",
+        "interaction-preset-css"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [
+        "decoding",
+        "height",
+        "loading",
+        "width"
+      ],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "interaction-preset-css",
+        "nested-editable",
+        "repeat-family"
+      ]
+    },
+    {
+      "id": "stats-band-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "icon-field",
+        "repeat-family",
+        "interaction-preset-css"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "icon-field",
+        "interaction-preset-css",
+        "repeat-family"
+      ]
+    },
+    {
+      "id": "stats-grid-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "repeat-family"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [],
+      "lostOnImage": [],
+      "lostButNotCoded": false,
+      "clearableByAllowlist": false,
+      "remainingCodes": [
+        "repeat-family"
+      ]
+    },
+    {
+      "id": "story-grid-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "repeat-family",
+        "interaction-preset-css",
+        "site-divergence"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [
+        "decoding",
+        "height",
+        "loading",
+        "width"
+      ],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "interaction-preset-css",
+        "repeat-family",
+        "site-divergence"
+      ]
+    },
+    {
+      "id": "tabs-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "repeat-family",
+        "inline-svg",
+        "unsupported-element",
+        "unsupported-element",
+        "unsupported-attribute",
+        "interaction-preset-css"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": true,
+      "lostOnLink": [],
+      "lostOnImage": [],
+      "lostButNotCoded": false,
+      "clearableByAllowlist": false,
+      "remainingCodes": [
+        "inline-svg",
+        "interaction-preset-css",
+        "repeat-family",
+        "unsupported-attribute",
+        "unsupported-element"
+      ]
+    },
+    {
+      "id": "team-grid-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "repeat-family",
+        "interaction-preset-css",
+        "site-divergence"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [
+        "decoding",
+        "height",
+        "loading",
+        "width"
+      ],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "interaction-preset-css",
+        "repeat-family",
+        "site-divergence"
+      ]
+    },
+    {
+      "id": "testimonial-cards-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "repeat-family",
+        "interaction-preset-css",
+        "site-divergence"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [],
+      "lostOnImage": [
+        "class",
+        "decoding",
+        "height",
+        "loading",
+        "width"
+      ],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "interaction-preset-css",
+        "repeat-family",
+        "site-divergence"
+      ]
+    },
+    {
+      "id": "text-image-v1",
+      "status": "manual-decision",
+      "reasonCodes": [
+        "site-divergence"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [
+        "height",
+        "width"
+      ],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "site-divergence"
+      ]
+    },
+    {
+      "id": "timeline-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "repeat-family"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [],
+      "lostOnImage": [],
+      "lostButNotCoded": false,
+      "clearableByAllowlist": false,
+      "remainingCodes": [
+        "repeat-family"
+      ]
+    },
+    {
+      "id": "urgent-appeal-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "interaction-preset-css"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "interaction-preset-css"
+      ]
+    },
+    {
+      "id": "utility-bar-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "repeat-family",
+        "unsupported-element",
+        "interaction-preset-css"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "interaction-preset-css",
+        "repeat-family",
+        "unsupported-element"
+      ]
+    },
+    {
+      "id": "venue-location-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "icon-field",
+        "repeat-family",
+        "interaction-preset-css",
+        "unresolved-anchor"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [
+        "decoding",
+        "height",
+        "loading",
+        "width"
+      ],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "icon-field",
+        "interaction-preset-css",
+        "repeat-family",
+        "unresolved-anchor"
+      ]
+    },
+    {
+      "id": "video-embed-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "embed-element",
+        "static-text",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "unsupported-attribute",
+        "field-attributes-lost",
+        "interaction-preset-css"
+      ],
+      "fieldAttributesLost": true,
+      "unsupportedAttribute": true,
+      "lostOnLink": [
+        "class",
+        "data-cms-embed-src",
+        "data-visually-hidden"
+      ],
+      "lostOnImage": [],
+      "lostButNotCoded": false,
+      "clearableByAllowlist": false,
+      "remainingCodes": [
+        "embed-element",
+        "interaction-preset-css",
+        "static-text",
+        "unsupported-attribute"
+      ]
+    },
+    {
+      "id": "volunteer-opportunities-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "icon-field",
+        "repeat-family",
+        "interaction-preset-css"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "icon-field",
+        "interaction-preset-css",
+        "repeat-family"
+      ]
+    },
+    {
+      "id": "ways-to-give-grid-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "icon-field",
+        "repeat-family",
+        "interaction-preset-css"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "icon-field",
+        "interaction-preset-css",
+        "repeat-family"
+      ]
+    },
+    {
+      "id": "ways-to-help-grid-v1",
+      "status": "quarantined",
+      "reasonCodes": [
+        "icon-field",
+        "repeat-family",
+        "interaction-preset-css"
+      ],
+      "fieldAttributesLost": false,
+      "unsupportedAttribute": false,
+      "lostOnLink": [
+        "class"
+      ],
+      "lostOnImage": [],
+      "lostButNotCoded": true,
+      "clearableByAllowlist": true,
+      "remainingCodes": [
+        "icon-field",
+        "interaction-preset-css",
+        "repeat-family"
+      ]
+    }
+  ]
+}

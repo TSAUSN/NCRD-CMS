@@ -1,0 +1,33 @@
+/* Native hero layout rules extracted without declaration changes from the
+   sanitized Echelon src/style.css source transfer, October 2, 2026. */
+.hero {
+  min-height: min(690px, 92vh);
+  display: grid;
+  grid-template-columns: minmax(0, 50%) minmax(0, 50%);
+  align-items: stretch;
+  padding-top: 90px;
+  background: var(--paper);
+  box-shadow: inset 0 -1px 0 var(--line);
+}
+
+.hero-copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 520px;
+  padding: clamp(1.5rem, 5vw, 4rem);
+  position: relative;
+  z-index: 2;
+}
+
+@media (max-width: 900px) {
+  .hero {
+    grid-template-columns: 1fr;
+    padding-top: 78px;
+  }
+
+  .hero-copy {
+    min-height: auto;
+    padding: 3rem 1.25rem 2.35rem;
+  }
+}

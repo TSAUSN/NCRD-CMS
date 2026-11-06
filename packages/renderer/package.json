@@ -1,0 +1,34 @@
+{
+  "name": "@cms/renderer",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@cms/schema": "workspace:*",
+    "@csstools/css-tokenizer": "^3.0.4",
+    "entities": "^8.0.0",
+    "parse5": "8.0.1",
+    "postcss": "^8.5.29",
+    "postcss-selector-parser": "^7.1.6"
+  },
+  "devDependencies": {
+    "@types/node": "^26.2.0",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.11"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./fixtures": "./src/fixtures/malicious.ts",
+    "./source-html": "./src/source-html.ts",
+    "./source-organizer": "./src/source-organizer.ts",
+    "./richtext": "./src/richtext.ts",
+    "./escape": "./src/escape.ts",
+    "./preview-messages": "./src/preview-messages.ts"
+  }
+}

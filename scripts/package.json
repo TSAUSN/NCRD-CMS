@@ -1,0 +1,5 @@
+{
+  "name": "@cms/scripts",
+  "private": true,
+  "type": "module"
+}

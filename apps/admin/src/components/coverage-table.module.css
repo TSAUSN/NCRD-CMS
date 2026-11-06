@@ -1,0 +1,111 @@
+.table {
+  font-size: var(--text-meta);
+  table-layout: fixed;
+}
+.table th,
+.table td {
+  padding: var(--space-fact) var(--space-between-cards);
+  border-color: var(--line-soft);
+}
+.table th {
+  font-size: var(--text-help);
+  background: var(--surface-2);
+}
+.table th:first-child {
+  width: var(--coverage-name-width);
+}
+.table th:nth-child(3) {
+  width: var(--coverage-metric-width);
+}
+.table th:nth-child(4) {
+  width: var(--coverage-badge-width);
+}
+.table td:nth-child(4) {
+  white-space: nowrap;
+}
+.table th:nth-child(2) {
+  width: var(--coverage-bar-width);
+}
+.title {
+  display: block;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  text-align: start;
+  font: inherit;
+  cursor: pointer;
+  min-height: 0;
+  max-width: 100%;
+  white-space: normal;
+}
+.title:hover,
+.title[aria-expanded='true'] {
+  text-decoration: underline;
+}
+.count {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+}
+.bar {
+  flex: 1;
+  min-width: var(--space-6);
+  height: var(--space-2);
+  overflow: hidden;
+  background: var(--surface-sunken);
+  border-radius: var(--radius-pill);
+}
+.bar > span {
+  display: block;
+  height: 100%;
+  background: var(--tag-main);
+}
+.count > span {
+  min-width: var(--space-4);
+  text-align: end;
+}
+.uses {
+  font-size: var(--text-help);
+  overflow-wrap: anywhere;
+}
+.uses a {
+  display: inline;
+  color: var(--text-muted);
+  text-decoration: none;
+}
+.uses a:hover {
+  text-decoration: underline;
+}
+.details {
+  padding-block: var(--space-1);
+}
+.details ul {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding-inline-start: var(--space-4);
+}
+.details p {
+  margin: 0;
+  color: var(--text-muted);
+}
+.uses details {
+  display: inline;
+}
+.uses summary {
+  display: inline;
+  cursor: pointer;
+  margin-inline-start: var(--space-1);
+  color: var(--primary);
+  white-space: nowrap;
+}
+.uses summary::-webkit-details-marker {
+  display: none;
+}
+.uses details[open] {
+  display: block;
+}
+.uses details[open] a {
+  display: block;
+}

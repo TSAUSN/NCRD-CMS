@@ -1,0 +1,43 @@
+{
+  "profile": "google-on-demand",
+  "projectId": "cms-example",
+  "projectNumber": "123456789012",
+  "region": "us-central1",
+  "image": "us-central1-docker.pkg.dev/cms-example/cms-v2/app@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "recoveryImage": "us-central1-docker.pkg.dev/cms-example/cms-v2/app-recovery@sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "adminOrigin": "https://cms-admin.example.test",
+  "supabaseUrl": "https://example.supabase.co",
+  "authPublishableKey": "sb_publishable_replace_with_public_key",
+  "stagingBaseDomain": "web.app",
+  "firebaseSitePrefix": "c123456789012",
+  "storageBucket": "cms-example-media",
+  "backupBucket": "cms-example-backups",
+  "mailFrom": "CMS <cms@example.test>",
+  "schedulingVerified": false,
+  "secrets": {
+    "adminDatabase": {
+      "name": "cms-admin-database",
+      "version": "1"
+    },
+    "publicDatabase": {
+      "name": "cms-site-database",
+      "version": "1"
+    },
+    "workerDatabase": {
+      "name": "cms-worker-database",
+      "version": "1"
+    },
+    "migrationDatabase": {
+      "name": "cms-migration-database",
+      "version": "1"
+    },
+    "mail": {
+      "name": "cms-mail",
+      "version": "1"
+    },
+    "backupKey": {
+      "name": "cms-backup-key",
+      "version": "1"
+    }
+  }
+}

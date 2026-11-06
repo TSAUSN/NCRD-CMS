@@ -1,0 +1,93 @@
+# Isolated local rehearsal. These credentials and email-only login are local only.
+# docker compose --profile app up --build
+# docker compose --profile app --profile seed run --rm seed
+# All app roles share the database container's loopback network, so the local
+# authentication guard can require a loopback database and browser origin.
+name: cms-v2
+
+x-app: &app
+  image: cms-v2:${APP_VERSION:-dev}
+  build: { context: ., args: { APP_VERSION: "${APP_VERSION:-dev}" } }
+  network_mode: service:db
+  profiles: [app]
+  depends_on:
+    migrate: { condition: service_completed_successfully }
+
+x-local: &local
+  CMS_LOCAL_TEST_MODE: "true"
+  MEDIA_PROVIDER: filesystem
+  MEDIA_ROOT: /data/media
+  APP_VERSION: ${APP_VERSION:-dev}
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: cms
+      POSTGRES_PASSWORD: cms
+      POSTGRES_DB: cms_dev
+    ports:
+      - "127.0.0.1:${CMS_DB_PORT:-54329}:5432"
+      - "127.0.0.1:${CMS_ADMIN_PORT:-3000}:3000"
+      - "127.0.0.1:${CMS_SITE_PORT:-3001}:3001"
+      - "127.0.0.1:${CMS_WORKER_PORT:-3002}:3002"
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U cms -d cms_dev"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  migrate:
+    <<: *app
+    # Hosted migrations never create these development login credentials.
+    entrypoint: [node, --experimental-strip-types, /app/packages/schema/scripts/bootstrap.ts]
+    environment:
+      DATABASE_URL: postgres://cms:cms@127.0.0.1:5432/cms_dev
+    depends_on:
+      db: { condition: service_healthy }
+
+  seed:
+    <<: *app
+    command: [seed]
+    profiles: [seed]
+    environment:
+      DATABASE_URL: postgres://cms:cms@127.0.0.1:5432/cms_dev
+
+  admin:
+    <<: *app
+    command: [admin]
+    environment:
+      <<: *local
+      DATABASE_URL_AUTHENTICATED: postgres://cms_admin_app:devpassword@127.0.0.1:5432/cms_dev
+      AUTH_PROVIDER: local
+      AUTH_SECRET: ${AUTH_SECRET:-local-development-secret-change-me}
+      ADMIN_ORIGIN: http://127.0.0.1:${CMS_ADMIN_PORT:-3000}
+      PUBLIC_SITE_PORT: ${CMS_SITE_PORT:-3001}
+    volumes: ["media:/data/media"]
+
+  site:
+    <<: *app
+    command: [site]
+    environment:
+      <<: *local
+      DATABASE_URL_PUBLIC: postgres://cms_site_app:devpassword@127.0.0.1:5432/cms_dev
+      TRUST_PROXY_HEADERS: "false"
+    volumes: ["media:/data/media:ro"]
+
+  worker:
+    <<: *app
+    command: [worker]
+    environment:
+      <<: *local
+      DATABASE_URL_WORKER: postgres://cms_worker_app:devpassword@127.0.0.1:5432/cms_dev
+      WORKER_HEALTH_PORT: "3002"
+      ADMIN_ORIGIN: http://127.0.0.1:${CMS_ADMIN_PORT:-3000}
+      MAILER_PROVIDER: recording
+      DOMAIN_PROVIDER: fake
+    volumes: ["media:/data/media"]
+
+volumes:
+  dbdata:
+  media:

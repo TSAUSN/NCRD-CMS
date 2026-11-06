@@ -1,0 +1,121 @@
+.overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  overflow: clip;
+}
+.toolbar,
+.itemToolbar {
+  position: absolute;
+  inset-inline-end: var(--space-2);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  padding: var(--space-1);
+  max-width: calc(100% - var(--space-4));
+  background: var(--surface);
+  color: var(--text);
+  border: var(--line-thin) solid var(--editor-select);
+  border-radius: var(--radius-control);
+  box-shadow: var(--shadow-2);
+  pointer-events: auto;
+}
+.itemToolbar {
+  position: static;
+  max-width: none;
+  flex: none;
+  inset-inline-end: auto;
+  inset-inline-start: var(--space-2);
+  align-items: center;
+  font-size: var(--text-meta);
+  padding-inline-start: var(--space-2);
+}
+.insertion {
+  position: absolute;
+  inset-inline: 0;
+  display: flex;
+  justify-content: flex-end;
+  padding-inline: var(--space-2);
+  align-items: center;
+  border-block-start: var(--line-thin) solid var(--border-strong);
+}
+.insertion > button {
+  position: relative;
+  opacity: 1;
+  pointer-events: auto;
+}
+.insertion:hover,
+.insertion:focus-within {
+  border-color: var(--editor-select);
+  z-index: 3;
+}
+.insertion:hover > button,
+.insertion:focus-within > button {
+  opacity: 1;
+}
+.ghost {
+  position: absolute;
+  inset-inline-start: 50%;
+  transform: translateX(-50%);
+  border-style: dashed !important;
+  pointer-events: auto;
+}
+.insertion > button > span {
+  display: none;
+  position: absolute;
+  inset-inline-end: 100%;
+  white-space: nowrap;
+  pointer-events: none;
+  background: var(--surface);
+  padding: var(--space-2);
+  border-radius: var(--radius-control);
+  box-shadow: var(--shadow-1);
+}
+.insertion:hover > button > span,
+.insertion:focus-within > button > span {
+  display: inline;
+}
+
+.headerToolbar {
+  position: static;
+  max-width: 100%;
+  flex: 1;
+  min-width: 0;
+  flex-wrap: nowrap;
+}
+.sectionName {
+  align-self: center;
+  min-width: 0;
+  max-width: 100%;
+  flex: 1 1 auto;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-control);
+  background: var(--editor-select);
+  color: var(--surface);
+  font-size: var(--text-meta);
+  line-height: var(--line-meta);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.insertion[data-choosing='true'] {
+  border-block-start: var(--line-focus) dashed var(--editor-select);
+  justify-content: center;
+}
+.insertion[data-choosing='true'] > button {
+  color: var(--editor-select);
+  border-color: var(--editor-select);
+}
+.insertion[data-choosing='true'] > button > span {
+  display: inline;
+  position: static;
+  box-shadow: none;
+  padding: 0;
+}
+
+.toolbar > button,
+.toolbar > div {
+  flex-shrink: 0;
+}

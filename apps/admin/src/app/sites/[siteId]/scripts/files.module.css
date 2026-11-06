@@ -1,0 +1,129 @@
+.workspace {
+  display: grid;
+  gap: var(--space-6);
+}
+.heading,
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+.heading p,
+.file p {
+  margin: 0;
+}
+.stack {
+  display: grid;
+  gap: var(--space-4);
+}
+.upload {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+.upload > :last-child {
+  grid-column: 1 / -1;
+}
+.file {
+  border: var(--line-thin) solid var(--border);
+  border-radius: var(--radius-control);
+  padding: var(--space-4);
+  display: grid;
+  gap: var(--space-4);
+  min-width: 0;
+}
+.file h3 {
+  margin: 0;
+  font-size: var(--text-body);
+  overflow-wrap: anywhere;
+}
+.meta {
+  color: var(--text-muted);
+  overflow-wrap: anywhere;
+}
+.controls {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+.pages {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: var(--line-thin) solid var(--border);
+  border-radius: var(--radius-control);
+}
+.pages label,
+.ack {
+  display: flex;
+  align-items: start;
+  gap: var(--space-2);
+  min-height: var(--target-small);
+}
+.pages input,
+.ack input {
+  flex: none;
+  margin-block-start: var(--space-1);
+}
+.review {
+  display: grid;
+  gap: var(--space-4);
+}
+.review li {
+  padding-block: var(--space-2);
+  overflow-wrap: anywhere;
+}
+.review dl {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+}
+.review dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.hash {
+  font-family: var(--font-mono);
+  overflow-wrap: anywhere;
+  font-size: var(--text-meta);
+}
+.error {
+  color: var(--danger);
+  padding: var(--space-4);
+  border: var(--line-thin) solid var(--danger);
+  border-radius: var(--radius-control);
+}
+.success {
+  color: var(--status-live-text);
+}
+.versions {
+  display: grid;
+  gap: var(--space-3);
+}
+@media (max-width: 64em) {
+  .controls,
+  .upload {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.upload {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+
+.reviewFooter {
+  display: grid;
+  gap: var(--space-4);
+  width: 100%;
+}
+.review ol {
+  margin: 0;
+  padding-inline-start: var(--space-5);
+  display: grid;
+  gap: var(--space-4);
+}

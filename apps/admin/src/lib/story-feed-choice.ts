@@ -1,0 +1,39 @@
+import type { StoryTagFilter, StructuredRepeatBinding } from '@cms/schema'
+import { readCollectionBinding, type StoryFeedTags } from './collection-binding.ts'
+export function storyFeedChoice(value: unknown): {
+  selection: Extract<StructuredRepeatBinding['selection'], { mode: 'automatic' }> | null
+  tags: StoryTagFilter
+  keepEarlierFilter: boolean
+} {
+  const binding = readCollectionBinding(value),
+    selection = binding?.readerKey === 'stories' && binding.selection.mode === 'automatic' ? binding.selection : null,
+    filter = selection?.filter
+  const main = filter?.field === 'tags' ? [filter.value] : [],
+    secondary = filter && ['region', 'regions'].includes(filter.field) ? [filter.value] : []
+  return {
+    selection,
+    tags: selection?.storyTags ?? { main, secondary },
+    keepEarlierFilter: Boolean(
+      filter && (selection?.storyTags || !['tags', 'region', 'regions'].includes(filter.field)),
+    ),
+  }
+}
+export function storyFeedBinding(value: unknown, tags: StoryTagFilter, limit: number): StructuredRepeatBinding {
+  const previous = storyFeedChoice(value)
+  return {
+    readerKey: 'stories',
+    selection: {
+      mode: 'automatic',
+      order: 'newest',
+      dateField: 'published_date',
+      maxAgeMonths: 13,
+      limit,
+      storyTags: tags,
+      ...(previous.selection?.excludeStableKey ? { excludeStableKey: previous.selection.excludeStableKey } : {}),
+      ...(previous.keepEarlierFilter ? { filter: previous.selection!.filter } : {}),
+    },
+  }
+}
+export function storyFeedMaximum(catalog: StoryFeedTags, path: string): number {
+  return catalog.source === 'sawso' && /^\/ways-we-help\/[^/]+\/?$/.test(path) ? 6 : 200
+}

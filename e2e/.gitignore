@@ -1,0 +1,9 @@
+# Captured renderings from structured-parity.spec.ts.
+#
+# Ignored explicitly rather than left to the repository's `test-results/` rule,
+# because what is in here is not an ordinary test artifact: half of every pair is
+# a rendering of a V1 definition, so the directory holds licensed layout and
+# licensed copy. Nothing in it may ever be committed, including as a golden file
+# — a rendering comparison in this repository compares two captures taken in the
+# same run, never a capture against one somebody checked in.
+parity-artifacts/

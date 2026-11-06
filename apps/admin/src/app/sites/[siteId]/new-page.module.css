@@ -1,0 +1,41 @@
+.creator :global(.page-creator-head) {
+  border-bottom-color: var(--editor-select);
+}
+.creator :global(.page-outline li) {
+  grid-template-columns: var(--space-5) minmax(0, 1fr);
+  gap: var(--space-2);
+  padding: var(--space-3);
+}
+.creator :global(.outline-name strong) {
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  font-size: var(--text-body);
+}
+.creator :global(.outline-name small) {
+  font-size: var(--text-meta);
+}
+.creator :global(.outline-actions) {
+  grid-column: 2 / -1;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+.creator :global(.outline-actions .icon-btn) {
+  width: var(--target-small);
+  height: var(--target-small);
+}
+
+.duplicate {
+  padding: var(--space-4) var(--space-5);
+  border-block-end: var(--line-thin) solid var(--border);
+}
+.duplicate summary {
+  min-height: var(--target-small);
+  cursor: pointer;
+  font-weight: var(--weight-semibold);
+}
+.duplicate[open] {
+  display: grid;
+  gap: var(--space-3);
+}

@@ -1,0 +1,30 @@
+# Native amd64 builds; no database or runtime credentials enter this build.
+# Pass _REVISION and _POSTGRES_MAJOR explicitly when submitting a release.
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - --target=runtime
+      - --build-arg=APP_VERSION=${_REVISION}
+      - --tag=${_IMAGE}:${_REVISION}
+      - .
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - --target=recovery
+      - --build-arg=APP_VERSION=${_REVISION}
+      - --build-arg=POSTGRES_MAJOR=${_POSTGRES_MAJOR}
+      - --tag=${_IMAGE}-recovery:${_REVISION}
+      - .
+images:
+  - ${_IMAGE}:${_REVISION}
+  - ${_IMAGE}-recovery:${_REVISION}
+substitutions:
+  _IMAGE: us-central1-docker.pkg.dev/${PROJECT_ID}/cms-v2/app
+  _REVISION: must-be-supplied
+  _POSTGRES_MAJOR: '17'
+timeout: 3600s
+options:
+  dynamicSubstitutions: true
+  logging: CLOUD_LOGGING_ONLY
+  machineType: E2_STANDARD_2

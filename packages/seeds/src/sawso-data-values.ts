@@ -1,0 +1,68 @@
+import { DataValues } from '@cms/schema'
+/** Supplied 2026 report is authoritative; no live feed or automatic publication. */
+export const SAWSO_DATA_VALUES = DataValues.parse([
+  {
+    id: '91b1dd11-5d32-49aa-8322-000000000001',
+    label: 'Delivered last year',
+    value: '$50M',
+    source: '2026 Annual Report, p. 4',
+    asOf: 'FY2025',
+    status: 'matches-report',
+  },
+  {
+    id: '91b1dd11-5d32-49aa-8322-000000000002',
+    label: 'Projects',
+    value: '152',
+    source: '2026 Annual Report, p. 4',
+    asOf: 'FY2025',
+    status: 'matches-report',
+  },
+  {
+    id: '91b1dd11-5d32-49aa-8322-000000000003',
+    label: 'Countries supported',
+    value: '69',
+    source: '2026 Annual Report, p. 4',
+    asOf: 'FY2025',
+    status: 'matches-report',
+  },
+  {
+    id: '91b1dd11-5d32-49aa-8322-000000000004',
+    label: 'Countries in the global network',
+    value: '134',
+    source: '2026 Annual Report, p. 4',
+    asOf: 'FY2025',
+    status: 'matches-report',
+  },
+  {
+    id: '91b1dd11-5d32-49aa-8322-000000000005',
+    label: 'Jamaica: meals served',
+    value: '199,501',
+    source: '2026 Annual Report, pp. 8–10',
+    asOf: 'FY2025',
+    status: 'matches-report',
+  },
+  {
+    id: '91b1dd11-5d32-49aa-8322-000000000006',
+    label: 'Value of active projects',
+    value: '$50 million',
+    source: '2026 Annual Report, p. 4',
+    asOf: 'FY2025',
+    status: 'matches-report',
+  },
+  {
+    id: '91b1dd11-5d32-49aa-8322-000000000007',
+    label: 'Continents with active projects',
+    value: 'six',
+    source: '2026 Annual Report, pp. 18–19',
+    asOf: 'FY2025',
+    status: 'matches-report',
+  },
+  {
+    id: '91b1dd11-5d32-49aa-8322-000000000008',
+    label: 'People assisted',
+    value: 'About 4 million',
+    source: 'Older site text; no matching figure in the 2026 Annual Report',
+    asOf: 'Unknown',
+    status: 'needs-checking',
+  },
+])

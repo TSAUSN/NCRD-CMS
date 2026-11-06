@@ -1,0 +1,240 @@
+.inspector {
+  padding: var(--space-3);
+  font-size: var(--text-meta);
+  line-height: var(--line-meta);
+}
+.inspector :global(.pane-head) {
+  align-items: flex-start;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+.inspector :global(.pane-title) {
+  overflow-wrap: anywhere;
+}
+.inspector :global(.field) {
+  margin: 0;
+}
+.content {
+  grid-template-columns: minmax(0, 1fr);
+  display: grid;
+  gap: var(--space-5);
+  padding-block: var(--space-4);
+}
+.content > p,
+.content > h3 {
+  margin: 0;
+}
+.layoutChip {
+  margin-block-end: var(--space-4);
+  font-size: var(--text-meta);
+  white-space: normal;
+  text-align: start;
+}
+.visibility {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+.visibility label,
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--target-small);
+}
+.visibility input,
+.toggle input {
+  width: auto;
+  margin: 0;
+}
+.addBelow {
+  position: sticky;
+  inset-block-end: 0;
+  background: var(--surface);
+  padding-block: var(--space-4);
+  border-top: var(--line-thin) solid var(--border);
+}
+.addBelow > button {
+  width: 100%;
+  white-space: normal;
+}
+
+.swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.swatch {
+  display: inline-block;
+  width: var(--space-4);
+  height: var(--space-4);
+  border: var(--line-thin) solid var(--border-strong);
+  border-radius: var(--radius-control);
+}
+.choices :global([role='group']) {
+  flex-wrap: wrap;
+}
+
+.inspector :global(.pane-head h2.pane-title) {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  flex: 1;
+  min-width: 0;
+  line-height: var(--line-emphasis);
+  color: var(--text);
+}
+.inspector :global(.pane-head) > span {
+  flex: none;
+  white-space: nowrap;
+}
+.pageActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  align-items: center;
+  margin-block: var(--space-4);
+}
+
+.inspector[data-selected-section] {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.inspector[data-selected-section] > :not(:global([role='tabpanel'])) {
+  flex: none;
+}
+.inspector[data-selected-section] > :global([role='tabpanel']) {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  padding-inline-end: var(--space-1);
+}
+.inspector[data-selected-section] .addBelow {
+  position: static;
+}
+.inspector :global(.dot) {
+  background: var(--editor-select);
+}
+
+.checklist {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: var(--space-3);
+}
+.danger {
+  border: var(--line-thin) solid var(--danger-border);
+  background: var(--danger-bg);
+  padding: var(--space-4);
+  border-radius: var(--radius-card);
+  display: grid;
+  gap: var(--space-4);
+}
+.danger h3,
+.danger p {
+  margin: 0;
+  color: var(--danger);
+}
+
+.spacingSmall,
+.spacingMedium,
+.spacingLarge {
+  display: block;
+  width: var(--space-4);
+  border-block: var(--line-thin) solid currentColor;
+  margin-inline: auto;
+}
+.spacingSmall {
+  height: var(--space-1);
+}
+.spacingMedium {
+  height: var(--space-2);
+}
+.spacingLarge {
+  height: var(--space-4);
+}
+
+.settingGroup {
+  display: grid;
+  gap: var(--space-2);
+}
+.settingGroup p,
+.settingGroup label {
+  margin: 0;
+}
+
+.repeatList,
+.repeatItems {
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr);
+}
+.repeatItem {
+  min-width: 0;
+}
+.repeatItem > details > summary {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.inspector :global(.pane-head) {
+  padding-block-end: var(--space-3);
+  border-block-end: var(--line-thin) solid var(--line-soft);
+}
+.inspector :global(.field) > label {
+  color: var(--ink-2);
+  font-size: var(--text-meta);
+  font-weight: var(--weight-medium);
+}
+.content {
+  gap: var(--space-3);
+  padding-block: var(--space-3);
+}
+.inspector :global([role='tablist']) {
+  border-bottom: var(--line-thin) solid var(--line-soft);
+  margin-block-start: var(--space-2);
+}
+
+.inspector :global(h3) {
+  margin-block: var(--space-4) var(--space-2);
+  font-size: var(--text-meta);
+  line-height: var(--line-meta);
+}
+
+.repeatItem > details {
+  min-width: 0;
+  max-width: 100%;
+}
+.repeatItem > details > :global(.field),
+.repeatItem > details > :global(.repeat-item-actions) {
+  min-width: 0;
+  width: calc(100% - var(--space-3) * 2);
+  margin-inline: var(--space-3);
+}
+.repeatItem :global(.field),
+.repeatItem :global(.rich-editor),
+.repeatItem :global(input),
+.repeatItem :global(textarea) {
+  min-width: 0;
+  max-width: 100%;
+}
+.repeatItem :global(.rich-editor-content) {
+  overflow-wrap: anywhere;
+}
+
+.optionalIntroduction {
+  border-block: var(--line-thin) solid var(--border);
+  padding-block: var(--space-2);
+}
+
+.inspector :global(h3) {
+  padding: 0;
+  border: 0;
+  text-transform: none;
+  letter-spacing: normal;
+  font-weight: var(--weight-medium);
+}
+.content > :global(.field) {
+  padding-block: 0;
+}

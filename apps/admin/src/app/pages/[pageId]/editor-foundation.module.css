@@ -1,0 +1,289 @@
+.bar {
+  flex-wrap: wrap;
+  row-gap: var(--space-2);
+}
+.bar > a {
+  flex: none;
+  white-space: nowrap;
+}
+.bar .title {
+  min-width: 0;
+  flex: 1 0 auto;
+  gap: var(--space-2);
+  flex-wrap: nowrap;
+}
+.copy {
+  display: grid;
+  min-width: 16ch;
+  max-width: var(--editor-title-size);
+  gap: 0;
+}
+.copy a {
+  font-size: var(--text-meta);
+  line-height: var(--line-meta);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.bar .title .copy strong {
+  min-width: 16ch;
+  max-width: var(--editor-title-size);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.bar :global(.bar-tools) {
+  margin-inline-start: auto;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.bar .title > span {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.canvasTools {
+  min-height: calc(var(--target-small) + var(--space-2) + var(--line-thin) * 2);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  justify-content: space-between;
+  width: 100%;
+}
+.zoom {
+  flex: none;
+  align-self: flex-end;
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1);
+  border: var(--line-thin) solid var(--border);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+}
+.menuChoice {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  line-height: var(--line-body);
+  font-size: var(--text-body);
+}
+.menuChoice input {
+  width: auto;
+  flex: none;
+  margin-block-start: var(--space-1);
+}
+
+.siteWideBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-2) var(--space-4);
+  color: var(--status-review);
+  background: var(--status-review-bg);
+  border-block: var(--line-thin) solid currentColor;
+}
+
+.refreshing {
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-popover);
+  display: grid;
+  place-items: center;
+  background: var(--surface);
+  color: var(--text-muted);
+  opacity: var(--opacity-disabled);
+  font-size: var(--text-body);
+}
+
+.canvasFrame :global(.canvas-loading) {
+  pointer-events: auto;
+}
+
+.canvasViewport {
+  padding-inline-start: var(--space-7);
+  background: var(--surface-sunken);
+}
+
+.canvasViewport > :global(iframe.canvas) {
+  left: var(--space-7);
+}
+
+.contextTools {
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+}
+.contextTools:empty {
+  display: none;
+}
+.canvasTools > button {
+  margin-inline-start: auto;
+}
+
+.bar {
+  padding: var(--space-2) var(--space-3);
+  min-height: var(--target-small);
+  border-bottom-color: var(--border);
+}
+.bar :global(button),
+.bar :global(.btn) {
+  min-height: var(--target-small);
+  font-size: var(--text-meta);
+  padding-block: var(--space-1);
+  box-shadow: none;
+}
+.bar :global(.icon-btn) {
+  width: var(--target-small);
+  height: var(--target-small);
+  padding: 0;
+}
+.bar :global(.cluster) {
+  gap: var(--space-2);
+}
+.bar :global(.saved-state) {
+  font-size: var(--text-meta);
+  color: var(--text-muted);
+}
+.bar .title .copy strong {
+  font-size: var(--text-body);
+  line-height: var(--line-body);
+  font-weight: var(--weight-semibold);
+}
+.bar .title .copy a {
+  color: var(--text-muted);
+  text-decoration: none;
+}
+.bar :global(.group[aria-label='Preview width'] > button) {
+  padding-inline: var(--space-2);
+}
+@media (min-width: 1361px) {
+  .bar :global(.group[aria-label='Preview width'] svg) {
+    display: none;
+  }
+}
+
+/* Native workspace ancestors clip without becoming programmatic scroll boxes.
+   Scrolling a selected field remains inside its own page iframe. */
+.nativeEditor {
+  overflow: clip;
+}
+.nativeEditor :global(.canvas-pane),
+.nativeEditor .canvasFrame {
+  overflow: clip;
+}
+.nativeEditor .canvasViewport:not([data-zoom='actual']) {
+  overflow: clip;
+}
+
+.nativeViewTools {
+  display: flex;
+  flex: 0 1 auto;
+  order: 0;
+  overflow: visible;
+  border: 0;
+  padding: 0;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+}
+.nativeViewTools :global(button) {
+  min-height: var(--target-small);
+  font-size: var(--text-meta);
+  padding: var(--space-1) var(--space-2);
+}
+.nativeViewTools :global(.icon-btn) {
+  width: var(--target-small);
+  height: var(--target-small);
+  padding: 0;
+}
+.nativeViewTools :global(.device-label) {
+  display: none;
+}
+.nativeViewTools :global(.cluster) {
+  padding: 0;
+  border: 0;
+  margin: 0;
+}
+.nativeViewTools :global(.tip::after) {
+  top: calc(100% + var(--space-2));
+}
+@media (min-width: 1024px) {
+  .nativePaneTabs {
+    display: none;
+  }
+  .nativeEditor .bar {
+    column-gap: var(--space-2);
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+  .nativeEditor .bar .title {
+    order: 0;
+    flex: 1 1 auto;
+    min-width: 0;
+    padding-block: 0;
+  }
+  .nativeEditor .bar .copy {
+    min-width: 0;
+  }
+  .nativeEditor .bar .title .copy strong {
+    min-width: 0;
+  }
+  .nativeEditor .bar :global(.bar-tools) {
+    order: 0;
+    flex: 0 0 auto;
+    border: 0;
+    padding: 0;
+    overflow: visible;
+    flex-wrap: nowrap;
+  }
+  .nativeEditor .bar .title > span {
+    max-width: var(--size-160);
+    white-space: normal;
+  }
+}
+
+/* A narrow canvas reserves its section-tools row so selection never pushes the page. */
+.nativeEditor :global(.canvas-pane) {
+  container-type: inline-size;
+}
+@container (max-width:40rem) {
+  .nativeEditor .canvasTools {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: var(--target-small) calc(var(--target-small) + var(--space-2));
+    gap: var(--space-2);
+  }
+  .nativeEditor .nativeViewTools {
+    grid-column: 1;
+    grid-row: 1;
+    flex-wrap: nowrap;
+  }
+  .nativeEditor .contextTools {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    min-width: 0;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+  }
+  .nativeEditor .canvasTools > button {
+    grid-column: 2;
+    grid-row: 1;
+    margin: 0;
+  }
+}
+
+@media (max-width: 767px) {
+  .bar :global(.bar-tools) {
+    overflow: visible;
+    justify-content: space-between;
+  }
+  .bar :global(.saved-state .saved-words) {
+    display: inline;
+  }
+}

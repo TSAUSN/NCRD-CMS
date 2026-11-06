@@ -1,0 +1,306 @@
+[
+  {
+    "key": "story-8a8080a6a111475801a117c14b830095",
+    "url": "https://sawso.org/sawso/story/one-year-after-hurricane-melissa-recovery-continues-across-the-caribbean",
+    "sha256": "944093b9b1cf7514194b400dca1853f8f1a6f523c602a272f76b03fb5f35a03e",
+    "capturedAt": "2026-10-30T13:18:33.457151+00:00",
+    "kind": "story",
+    "review": "copied from live site, needs review"
+  },
+  {
+    "key": "story-8a8080f0a0d91c5401a0d938445e0001",
+    "url": "https://sawso.org/sawso/story/building-safer-futures-in-rios-favelas",
+    "sha256": "079087b95c77b34876948a1fddee0236d70e21bf7ac2b9819fe67c21a590979a",
+    "capturedAt": "2026-10-30T13:18:35.267642+00:00",
+    "kind": "story",
+    "review": "copied from live site, needs review"
+  },
+  {
+    "key": "story-8a8080b4a0d1f25a01a0d885d49b002f",
+    "url": "https://sawso.org/sawso/story/one-month-after-nepals-floods-the-salvation-army-continues-supporting-families",
+    "sha256": "71943ade2d44f6002095831f778e84d62bcb30da91628f845bd8e3a435f69673",
+    "capturedAt": "2026-10-30T13:18:36.768963+00:00",
+    "kind": "story",
+    "review": "copied from live site, needs review"
+  },
+  {
+    "key": "story-8a808084a060923701a0688c4b5c004b",
+    "url": "https://sawso.org/sawso/story/ebola-spreads-in-eastern-drc-as-the-salvation-army-expands-prevention-efforts",
+    "sha256": "571f98abf5f6de4aed193389877ec109aa3b6030ca3e4aa7349e9e4ca168a87c",
+    "capturedAt": "2026-10-30T13:18:38.248390+00:00",
+    "kind": "story",
+    "review": "copied from live site, needs review"
+  },
+  {
+    "key": "story-8a8080f99e66b594019e7512a71600aa",
+    "url": "https://sawso.org/sawso/story/life-in-ukraine-years-into-war",
+    "localFile": "ukraine-life-in-years-NEW-FINAL.html",
+    "sha256": "893a407ed39dfb03fbcefbbbb514d180941cc06e2631d1bdcae3f92c8346ca3b",
+    "kind": "local-story",
+    "review": "owner-supplied local article"
+  },
+  {
+    "key": "story-8a8080d5a042b95c01a04991d7fb006a",
+    "url": "https://sawso.org/sawso/story/the-salvation-army-responds-following-devastating-floods-in-nepal",
+    "sha256": "39906059a7054c5ba14dc1fddb1eaacc0a78488ec22c379623c311b1bdec4e27",
+    "capturedAt": "2026-10-30T13:18:39.763778+00:00",
+    "kind": "story",
+    "review": "copied from live site, needs review"
+  },
+  {
+    "key": "story-8a8080409ffdbfc501a001a31f90001d",
+    "url": "https://sawso.org/sawso/story/the-salvation-army-responds-following-deadly-earthquake-in-colombia",
+    "sha256": "2eac3d95d902765d89d5fb7942dd2813cafdf4346b587474671668f16f96b272",
+    "capturedAt": "2026-10-30T13:18:41.281026+00:00",
+    "kind": "story",
+    "review": "copied from live site, needs review"
+  },
+  {
+    "key": "story-8a8080caa00020f301a000d0ef830016",
+    "url": "https://sawso.org/sawso/story/from-ukraine-to-the-un",
+    "sha256": "94cbaf0b5df89d71551702be1ef561b5256adc22f1c2d27be6f73efeed7e23ed",
+    "capturedAt": "2026-10-30T13:18:42.736071+00:00",
+    "kind": "story",
+    "review": "copied from live site, needs review"
+  },
+  {
+    "key": "story-8a8080889ff0b9de01a000a9f560005e",
+    "url": "https://sawso.org/sawso/story/restoring-dignity-and-hope-for-women-living-with-hiv-in-india",
+    "sha256": "ecd6bd1fa9e1219cb98981cc9d1cc885012bf63bcb846c7d615bb5b5d731a68d",
+    "capturedAt": "2026-10-30T13:18:44.289182+00:00",
+    "kind": "story",
+    "review": "copied from live site, needs review"
+  },
+  {
+    "key": "story-8a8080ee9fd4940f019fd74102640004",
+    "url": "https://sawso.org/sawso/story/better-spaces-for-children-in-costa-rica",
+    "sha256": "60115b21868dd06ca72c586fb9e264ac4a19c5f5ba2f27e8104f3569911784af",
+    "capturedAt": "2026-10-30T13:18:45.743211+00:00",
+    "kind": "story",
+    "review": "copied from live site, needs review"
+  },
+  {
+    "key": "story-8a8080df9f02eab9019f03d085aa0003",
+    "url": "https://sawso.org/sawso/story/venezuela-earthquake-june-2026",
+    "sha256": "e40085247e6740e632a4b449bf33d489d86d601d3e3dfcebb4a3dcde8a0f8232",
+    "capturedAt": "2026-10-30T13:18:47.234442+00:00",
+    "kind": "story",
+    "review": "copied from live site, needs review"
+  },
+  {
+    "key": "story-8a8080439ef58df6019ef5a9ed440005",
+    "url": "https://sawso.org/sawso/story/join-the-effort-to-protect-communities-from-ebola-in-dr-congo",
+    "sha256": "d241d507cb327c4459f26133abc97bb370ba901e3da0f87c04230f60d3531911",
+    "capturedAt": "2026-10-30T13:18:48.715852+00:00",
+    "kind": "story",
+    "review": "copied from live site, needs review"
+  },
+  {
+    "key": "story-8a80807e9e824c0e019e898a49b9008e",
+    "url": "https://sawso.org/sawso/story/primary-health-care-to-support-the-growing-chikankata-community-1",
+    "localFile": "chikankata-primary-health.html",
+    "sha256": "a749085dec143fb92cb4ce445236746972be65209120df98800b2d5b9e3c3b53",
+    "kind": "local-story",
+    "review": "owner-supplied local article"
+  },
+  {
+    "key": "story-8a80807e9e824c0e019e898c23a70094",
+    "url": "https://sawso.org/sawso/story/clean-water-at-chikankata-a-change-felt-in-daily-life",
+    "sha256": "688e5b1144403340929843b25824ae10d1b32fba5b652abdecb32f7e001ede94",
+    "capturedAt": "2026-10-30T13:18:50.232592+00:00",
+    "kind": "story",
+    "review": "copied from live site, needs review"
+  },
+  {
+    "key": "story-8a80802c9e630476019e659c8955004c",
+    "url": "https://sawso.org/sawso/story/reliable-power-at-chikankata-when-outages-put-lives-at-risk",
+    "localFile": "chikankata-solar-power.html",
+    "sha256": "7da3bf9ca2fb167c36bf552a07924a8cfa4f59153e9d84be864dd11927fca625",
+    "kind": "local-story",
+    "review": "owner-supplied local article"
+  },
+  {
+    "key": "story-8a80807e9e824c0e019e8985e2e2008b",
+    "url": "https://sawso.org/sawso/story/a-diagnosis-without-the-long-journey",
+    "sha256": "0e37df4589e4563d14b893b8e373b8a0b2d80873aeb45626f6e65b24744df6e5",
+    "capturedAt": "2026-10-30T13:18:51.699085+00:00",
+    "kind": "story",
+    "review": "copied from live site, needs review"
+  },
+  {
+    "key": "story-8a80807e9e824c0e019e898dcc1b0097",
+    "url": "https://sawso.org/sawso/story/chikankata-mission-hospital-care-at-the-centre-of-rural-zambia",
+    "sha256": "0b675459e2a278b58ef02b0833e8ea4b395e4469fba10a2fa47be5e383f3c9de",
+    "capturedAt": "2026-10-30T13:18:53.214452+00:00",
+    "kind": "story",
+    "review": "copied from live site, needs review"
+  },
+  {
+    "key": "story-8a8080169e3eafae019e4cc8a621009d",
+    "url": "https://sawso.org/sawso/story/help-stop-the-spread-of-ebola-in-central-africa",
+    "sha256": "5d2ba65308dda7a75b743e148e177869f9857b06e754e0c4c56c7b3633585dbf",
+    "capturedAt": "2026-10-30T13:18:54.690127+00:00",
+    "kind": "story",
+    "review": "copied from live site, needs review"
+  },
+  {
+    "key": "story-8a8080189ccb35ea019cd7abec760045",
+    "url": "https://sawso.org/sawso/story/how-a-community-led-vision-in-guatemala-transformed-tecpans-soccer-field",
+    "sha256": "919ce239540163896caa2545b8c580cb5fcfa45d2aadaea999beedf3dd7845b6",
+    "capturedAt": "2026-10-30T13:18:56.134847+00:00",
+    "kind": "story",
+    "review": "copied from live site, needs review"
+  },
+  {
+    "key": "story-8a8080b99c759742019c76b700a50015",
+    "url": "https://sawso.org/sawso/story/powering-hope-how-solar-energy-is-transforming-communities-in-guatemala",
+    "sha256": "a9cf801f4fe5519ec6c376758ad8bd71e33163442399abbb23a2bd542f2d1245",
+    "capturedAt": "2026-10-30T13:18:57.589110+00:00",
+    "kind": "story",
+    "review": "copied from live site, needs review"
+  },
+  {
+    "key": "story-8a8080899c305b86019c333c0e0e000a",
+    "url": "https://sawso.org/sawso/story/rebuilding-education-and-stability-in-the-pool-region-republic-of-congo",
+    "sha256": "f066587dabceac073b09277c9a9c08d3201046b911290382655495e5bbe49568",
+    "capturedAt": "2026-10-30T13:18:59.103409+00:00",
+    "kind": "story",
+    "review": "copied from live site, needs review"
+  },
+  {
+    "key": "story-8a8080129c321ed4019c3332e879000a",
+    "url": "https://sawso.org/sawso/story/strengthening-early-childhood-education-in-rwanda",
+    "sha256": "b0755f3e41ebd73e881784c599213e1dcc86320cb83d1e0387d9fe5cea16fc13",
+    "capturedAt": "2026-10-30T13:19:00.572790+00:00",
+    "kind": "story",
+    "review": "copied from live site, needs review"
+  },
+  {
+    "key": "story-8a80801e9be9bba7019bebaaff54000b",
+    "url": "https://sawso.org/sawso/story/after-the-storm-a-farmers-fight-to-feed-her-family",
+    "sha256": "70357a67f76703b3180c28c4dcd0742d2e6c93fdeebd62cbccc20d048a83d277",
+    "capturedAt": "2026-10-30T13:19:02.010799+00:00",
+    "kind": "story",
+    "review": "copied from live site, needs review"
+  },
+  {
+    "key": "story-8a80809a9be9c87f019bebb405f80011",
+    "url": "https://sawso.org/sawso/story/after-the-storm-the-fight-to-restore-a-community-built-on-the-river",
+    "sha256": "0bf4e3d0ebb77b20613fcf045d1e602040908d31ee11fd57f08403d51df1f379",
+    "capturedAt": "2026-10-30T13:19:03.447181+00:00",
+    "kind": "story",
+    "review": "copied from live site, needs review"
+  },
+  {
+    "key": "story-8a8080259be87374019bebb9232f0012",
+    "url": "https://sawso.org/sawso/story/after-the-storm-all-under-one-roof",
+    "sha256": "d3fa898335c1ad4178bf719b0572611d2a7a5609bd7483abf3d03ab92082fde6",
+    "capturedAt": "2026-10-30T13:19:04.966937+00:00",
+    "kind": "story",
+    "review": "copied from live site, needs review"
+  },
+  {
+    "key": "story-8a8080259be87374019bebbde4f20015",
+    "url": "https://sawso.org/sawso/story/life-after-the-storm-ashoyas-daily-journey-for-water",
+    "sha256": "9642f3916e1435914bd12d85234edf44a794ec611552a6fa3438b14cdb517261",
+    "capturedAt": "2026-10-30T13:19:06.514501+00:00",
+    "kind": "story",
+    "review": "copied from live site, needs review"
+  },
+  {
+    "key": "story-8a8080259be87374019bebc02717001c",
+    "url": "https://sawso.org/sawso/story/life-after-the-storm-johans-two-weeks-of-silence",
+    "sha256": "3755fbe9502d3bf5a09118a736fd9d7b280cddae5355dfbd03d9adb56d94976f",
+    "capturedAt": "2026-10-30T13:19:08.024409+00:00",
+    "kind": "story",
+    "review": "copied from live site, needs review"
+  },
+  {
+    "key": "story-8a8080c09be9ca34019bebc31568001f",
+    "url": "https://sawso.org/sawso/story/finding-strength-after-the-storm",
+    "sha256": "a8c59dcd7c9c3a48ca7a700daa3e200f8ebbc7d52cba33106b70e804079f69bd",
+    "capturedAt": "2026-10-30T13:19:09.485439+00:00",
+    "kind": "story",
+    "review": "copied from live site, needs review"
+  },
+  {
+    "key": "story-8a8080339b965c84019b98eea75a000b",
+    "url": "https://sawso.org/sawso/story/diegos-story",
+    "sha256": "e83b713d75c00893c3fe870dfb904a501a81430512d827970a7c092d0d07e108",
+    "capturedAt": "2026-10-30T13:19:11.050402+00:00",
+    "kind": "story",
+    "review": "copied from live site, needs review"
+  },
+  {
+    "key": "story-8a8080e19b96d9b5019b98de4d0c0007",
+    "url": "https://sawso.org/sawso/story/kairas-story",
+    "sha256": "cd6e4635c090ca325d5c2012c8d97eb4beb3ad7cf7d03844f5eefabf98444445",
+    "capturedAt": "2026-10-30T13:19:12.492531+00:00",
+    "kind": "story",
+    "review": "copied from live site, needs review"
+  },
+  {
+    "key": "story-8a8080e19b96d9b5019b98ec97c3000b",
+    "url": "https://sawso.org/sawso/story/saanvi-and-ishras-story",
+    "sha256": "48a24551eeba6b93d6a30f4f9add6d60baf9a6b1206e548ba4216ac5ff1b69f2",
+    "capturedAt": "2026-10-30T13:19:13.931182+00:00",
+    "kind": "story",
+    "review": "copied from live site, needs review"
+  },
+  {
+    "key": "story-8a80801599d63af7019a2c5145f5046d",
+    "url": "https://sawso.org/sawso/story/hurricane-melissa-response-the-salvation-army-in-action",
+    "sha256": "b7fb36af9585400d897e5ef3c60b4a7771c298c058b1e2addbd51e70eb97ec3f",
+    "capturedAt": "2026-10-30T13:19:15.386355+00:00",
+    "kind": "story",
+    "review": "copied from live site, needs review"
+  },
+  {
+    "key": "story-8a80801f99d63b4c0199e4273f860112",
+    "url": "https://sawso.org/sawso/story/sawso-palu-nursing-dormitory-indonesia",
+    "sha256": "7ee5f587a4d872b1fc7eb253ea620241caa2bf74291d2c92c9f9e7da2fe1d68f",
+    "capturedAt": "2026-10-30T13:19:16.857175+00:00",
+    "kind": "story",
+    "review": "copied from live site, needs review"
+  },
+  {
+    "key": "story-8a80807a977158fa01977e6dd5380083",
+    "url": "https://sawso.org/sawso/story/fostering-hope-how-the-salvation-army-keeps-ukrainian-refugee-children-from-going-hungry",
+    "sha256": "c83d310a69b5151e78e9411293734430fa02ed3a794099eee555d5a65f7fb9a3",
+    "capturedAt": "2026-10-30T13:19:18.382678+00:00",
+    "kind": "story",
+    "review": "copied from live site, needs review"
+  },
+  {
+    "key": "our-team",
+    "url": "https://sawso.org/sawso/our-team",
+    "sha256": "4164accfe2340ab16a1fbb946287dec7ace38d4f965863a6c4e76035c829bcc7",
+    "capturedAt": "2026-10-30T13:19:19.840247+00:00",
+    "kind": "page",
+    "review": "copied from live site, needs review"
+  },
+  {
+    "key": "annual-reports",
+    "url": "https://sawso.org/sawso/newsroom#annualreports",
+    "sha256": "a80a50ff196640b3f5d6c9ccf59d428b837c7f5cf8835193e6caee6eba9ee78a",
+    "capturedAt": "2026-10-30T13:19:21.374470+00:00",
+    "kind": "page",
+    "review": "copied from live site, needs review"
+  },
+  {
+    "key": "financial-accountability",
+    "url": "https://sawso.org/sawso/ways-to-give2#accountability",
+    "sha256": "23ab4000011409129f5be49492816550ebce06c1c4e5c05632d368b44817e6e8",
+    "capturedAt": "2026-10-30T13:19:22.839705+00:00",
+    "kind": "page",
+    "review": "copied from live site, needs review"
+  },
+  {
+    "key": "homepage",
+    "url": "https://sawso.org/",
+    "sha256": "b7834e04648d450e5a0cc7704cf1395b8fe11dc0fd321a9ba5d502fb2b0e3ae3",
+    "capturedAt": "2026-10-30T13:19:24.317813+00:00",
+    "kind": "page",
+    "review": "copied from live site, needs review"
+  }
+]

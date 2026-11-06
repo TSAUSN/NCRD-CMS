@@ -1,0 +1,22 @@
+{
+  "projectId": "REPLACE_PROJECT_ID",
+  "projectNumber": "REPLACE_PROJECT_NUMBER",
+  "region": "us-east1",
+  "image": "REPLACE_ARTIFACT_REGISTRY_IMAGE_WITH_SHA256_DIGEST",
+  "adminOrigin": "https://cms.example.org",
+  "supabaseUrl": "https://REPLACE_AUTH_PROJECT.supabase.co",
+  "storageSupabaseUrl": "https://REPLACE_STORAGE_PROJECT.supabase.co",
+  "stagingBaseDomain": "preview.example.org",
+  "storageBucket": "cms-media",
+  "mailFrom": "CMS <cms@example.org>",
+  "secrets": {
+    "adminDatabase": { "name": "cms-admin-database", "version": "1" },
+    "publicDatabase": { "name": "cms-public-database", "version": "1" },
+    "workerDatabase": { "name": "cms-worker-database", "version": "1" },
+    "migrationDatabase": { "name": "cms-migration-database", "version": "1" },
+    "authPublishable": { "name": "cms-auth-publishable", "version": "1" },
+    "storage": { "name": "cms-storage", "version": "1" },
+    "mail": { "name": "cms-mail", "version": "1" },
+    "databaseCa": { "name": "cms-database-ca", "version": "1" }
+  }
+}

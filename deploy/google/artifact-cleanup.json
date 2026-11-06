@@ -1,0 +1,17 @@
+[
+  {
+    "name": "delete-older-staging-builds",
+    "action": { "type": "Delete" },
+    "condition": { "tagState": "any", "olderThan": "7d" }
+  },
+  {
+    "name": "keep-three-recovery-versions",
+    "action": { "type": "Keep" },
+    "mostRecentVersions": { "keepCount": 3 }
+  },
+  {
+    "name": "keep-deployed-images",
+    "action": { "type": "Keep" },
+    "condition": { "tagState": "tagged", "tagPrefixes": ["deployed-"] }
+  }
+]

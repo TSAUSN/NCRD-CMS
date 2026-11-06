@@ -1,0 +1,8 @@
+.gcloudignore
+.git
+#!include:.gitignore
+**/.env*
+**/node_modules
+**/.next
+work
+outputs

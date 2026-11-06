@@ -1,0 +1,226 @@
+-- Complete imported-site library previews without changing publication state.
+-- Replace the 0061 command here so applied migration checksums remain stable.
+CREATE OR REPLACE FUNCTION app.import_site_content(p_request_id uuid,p_bundle jsonb,p_source_heads jsonb) RETURNS uuid
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = pg_catalog, public AS $$
+#variable_conflict use_column
+DECLARE actor uuid; fingerprint text; existing RECORD; item jsonb; defect text; row_value jsonb; header_kind text; table_name text; reference text[];
+BEGIN
+ actor:=app.require_actor();
+ IF NOT app.is_super_admin() THEN RAISE EXCEPTION 'only a super admin may import a site' USING ERRCODE='CMS02'; END IF;
+ IF p_request_id IS NULL OR jsonb_typeof(p_bundle) IS DISTINCT FROM 'object'
+ OR octet_length(p_bundle::text)>67108864 OR octet_length(p_source_heads::text)>4194304 THEN
+ RAISE EXCEPTION 'invalid or oversized site import' USING ERRCODE='CMS04'; END IF;
+ FOREACH table_name IN ARRAY ARRAY['pages','page_versions','themes','theme_versions','site_settings','site_setting_versions','navigations','navigation_versions','global_elements','global_element_versions','section_defs','section_def_versions','collections','collection_schema_versions','collection_entries','collection_entry_versions','media','media_variants'] LOOP
+ IF jsonb_typeof(p_bundle->table_name) IS DISTINCT FROM 'array' OR jsonb_array_length(p_bundle->table_name)>20000 THEN
+ RAISE EXCEPTION 'site import is missing a bounded content list' USING ERRCODE='CMS04'; END IF;
+ END LOOP;
+ IF jsonb_array_length(p_bundle->'themes')<>1 OR jsonb_array_length(p_bundle->'navigations')<>1
+ OR jsonb_array_length(p_bundle->'site_settings')<>1 OR jsonb_array_length(p_bundle->'global_elements')<>2 THEN
+ RAISE EXCEPTION 'site import is missing shared workspaces' USING ERRCODE='CMS04'; END IF;
+ fingerprint:=encode(sha256(convert_to(p_bundle::text,'UTF8')),'hex');
+ PERFORM pg_advisory_xact_lock(hashtextextended(p_request_id::text,61));
+ SELECT * INTO existing FROM app.site_content_imports WHERE request_id=p_request_id;
+ IF existing.request_id IS NOT NULL THEN
+ IF existing.actor_id<>actor OR existing.fingerprint<>fingerprint THEN RAISE EXCEPTION 'this import request was used for different content' USING ERRCODE='CMS04'; END IF;
+ RETURN existing.site_id;
+ END IF;
+ IF COALESCE(p_bundle->'site'->>'slug','') !~ '^[a-z0-9]+(-[a-z0-9]+)*$' OR char_length(p_bundle->'site'->>'slug')>40
+ OR char_length(btrim(COALESCE(p_bundle->'site'->>'name',''))) NOT BETWEEN 1 AND 120 THEN
+ RAISE EXCEPTION 'invalid import destination' USING ERRCODE='CMS04'; END IF;
+ INSERT INTO public.sites(id,slug,name,kind,status,created_by)
+ VALUES(p_request_id,p_bundle->'site'->>'slug',p_bundle->'site'->>'name',(p_bundle->'site'->>'kind')::site_kind,'in_progress',actor);
+ -- The normal site-insert trigger seeds a frame. This new site's baseline is
+ -- replaced inside this transaction; no pre-existing site is touched.
+ UPDATE public.global_elements SET draft_version_id=NULL,published_version_id=NULL WHERE site_id=p_request_id;
+ DELETE FROM public.global_element_versions WHERE site_id=p_request_id;
+ DELETE FROM public.global_elements WHERE site_id=p_request_id;
+ FOR item IN SELECT value FROM jsonb_array_elements(p_bundle->'media') LOOP
+ IF COALESCE(item->>'object_key','') NOT LIKE 'site-imports/'||p_request_id::text||'/%'
+  OR item->>'object_key' ~ '(\.\.|[[:space:]\\])' THEN RAISE EXCEPTION 'invalid imported media key' USING ERRCODE='CMS04'; END IF;
+ row_value:=item||jsonb_build_object('site_id',p_request_id,'uploaded_by',actor,'revision',1,'status','ready','deleted_at',NULL);
+ INSERT INTO public.media("id","width","height","bytes","mime_type","content_hash","original_name","alt_text","decorative","focal","status","deleted_at","folder","attribution","source","tags","created_at","site_id","object_key","uploaded_by","revision")
+ SELECT r."id",r."width",r."height",r."bytes",r."mime_type",r."content_hash",r."original_name",r."alt_text",r."decorative",r."focal",r."status",r."deleted_at",r."folder",r."attribution",r."source",r."tags",r."created_at",r."site_id",r."object_key",r."uploaded_by",r."revision" FROM jsonb_populate_record(NULL::public.media,row_value) r;
+ END LOOP;
+ FOR item IN SELECT value FROM jsonb_array_elements(p_bundle->'media_variants') LOOP
+ IF COALESCE(item->>'object_key','') NOT LIKE 'site-imports/'||p_request_id::text||'/%'
+  OR item->>'object_key' ~ '(\.\.|[[:space:]\\])' THEN RAISE EXCEPTION 'invalid imported media key' USING ERRCODE='CMS04'; END IF;
+ row_value:=item||jsonb_build_object('site_id',p_request_id);
+ INSERT INTO public.media_variants("id","media_id","width","height","bytes","mime_type","content_hash","kind","object_key")
+ SELECT r."id",r."media_id",r."width",r."height",r."bytes",r."mime_type",r."content_hash",r."kind",r."object_key" FROM jsonb_populate_record(NULL::public.media_variants,row_value) r;
+ END LOOP;
+ FOR item IN SELECT value FROM jsonb_array_elements(p_bundle->'section_defs') LOOP
+ row_value:=item||jsonb_build_object('site_id',p_request_id,'created_by',actor,'scope','site');
+ INSERT INTO public.section_defs("id","slug","name","category","status","scope","site_id","created_by")
+ SELECT r."id",r."slug",r."name",r."category",r."status",r."scope",r."site_id",r."created_by" FROM jsonb_populate_record(NULL::public.section_defs,row_value) r;
+ END LOOP;
+ FOR item IN SELECT value FROM jsonb_array_elements(p_bundle->'section_def_versions') LOOP
+ SELECT slug INTO defect FROM public.section_defs WHERE id=(item->>'section_def_id')::uuid AND site_id=p_request_id;
+ IF defect IS NULL THEN RAISE EXCEPTION 'imported section version is foreign' USING ERRCODE='CMS04'; END IF;
+ defect:=COALESCE(app.structured_section_defect(item->>'definition_kind',item->'structured_doc',(item->>'structured_schema_version')::int),
+ app.render_ast_defect(item->'compiled_ast',(item->>'sanitizer_policy_version')::int),
+ app.compiled_css_defect(item->>'compiled_css',(item->>'css_policy_version')::int,'.cms-section--'||defect));
+ IF defect IS NOT NULL THEN RAISE EXCEPTION 'invalid imported section: %',defect USING ERRCODE='CMS04'; END IF;
+ row_value:=item||jsonb_build_object('site_id',p_request_id,'created_by',actor);
+ INSERT INTO public.section_def_versions("id","section_def_id","version","source_html","source_css","slots","definition_kind","structured_doc","structured_schema_version","changelog","created_at","created_by","compiled_css","compiled_ast","render_hash","sanitizer_policy_version","css_policy_version","carries_trusted_code")
+ SELECT r."id",r."section_def_id",r."version",r."source_html",r."source_css",r."slots",r."definition_kind",r."structured_doc",r."structured_schema_version",r."changelog",r."created_at",r."created_by",r."compiled_css",r."compiled_ast",r."render_hash",r."sanitizer_policy_version",r."css_policy_version",r."carries_trusted_code" FROM jsonb_populate_record(NULL::public.section_def_versions,row_value) r;
+ END LOOP;
+ FOR item IN SELECT value FROM jsonb_array_elements(p_bundle->'pages') LOOP
+ row_value:=item||jsonb_build_object('site_id',p_request_id,'draft_version_id',NULL,'published_version_id',NULL,'status',CASE WHEN item->>'status'='archived' THEN 'archived' ELSE 'draft' END);
+ INSERT INTO public.pages("id","revision","draft_version_id","published_version_id","slug","title","layout_mode","status","editor_label","sort_index","archived_at","site_id")
+ SELECT r."id",r."revision",r."draft_version_id",r."published_version_id",r."slug",r."title",r."layout_mode",r."status",r."editor_label",r."sort_index",r."archived_at",r."site_id" FROM jsonb_populate_record(NULL::public.pages,row_value) r;
+ END LOOP;
+ FOR item IN SELECT value FROM jsonb_array_elements(p_bundle->'themes') LOOP
+ row_value:=item||jsonb_build_object('site_id',p_request_id,'draft_version_id',NULL,'published_version_id',NULL);
+ INSERT INTO public.themes("id","revision","draft_version_id","published_version_id","site_id")
+ SELECT r."id",r."revision",r."draft_version_id",r."published_version_id",r."site_id" FROM jsonb_populate_record(NULL::public.themes,row_value) r;
+ END LOOP;
+ FOR item IN SELECT value FROM jsonb_array_elements(p_bundle->'navigations') LOOP
+ row_value:=item||jsonb_build_object('site_id',p_request_id,'draft_version_id',NULL,'published_version_id',NULL);
+ INSERT INTO public.navigations("id","revision","draft_version_id","published_version_id","mode","site_id")
+ SELECT r."id",r."revision",r."draft_version_id",r."published_version_id",r."mode",r."site_id" FROM jsonb_populate_record(NULL::public.navigations,row_value) r;
+ END LOOP;
+ FOR item IN SELECT value FROM jsonb_array_elements(p_bundle->'global_elements') LOOP
+ row_value:=item||jsonb_build_object('site_id',p_request_id,'draft_version_id',NULL,'published_version_id',NULL,'use_on_live',false);
+ INSERT INTO public.global_elements("id","revision","draft_version_id","published_version_id","kind","use_on_live","site_id")
+ SELECT r."id",r."revision",r."draft_version_id",r."published_version_id",r."kind",r."use_on_live",r."site_id" FROM jsonb_populate_record(NULL::public.global_elements,row_value) r;
+ END LOOP;
+ FOR item IN SELECT value FROM jsonb_array_elements(p_bundle->'collections') LOOP
+ row_value:=item||jsonb_build_object('site_id',p_request_id,'draft_schema_version_id',NULL,'published_schema_version_id',NULL,'published_entry_revision',0);
+ INSERT INTO public.collections("id","revision","slug","name","reader_key","source","draft_schema_version_id","published_schema_version_id","entry_revision","published_entry_revision","site_id")
+ SELECT r."id",r."revision",r."slug",r."name",r."reader_key",r."source",r."draft_schema_version_id",r."published_schema_version_id",r."entry_revision",r."published_entry_revision",r."site_id" FROM jsonb_populate_record(NULL::public.collections,row_value) r;
+ END LOOP;
+ FOR item IN SELECT value FROM jsonb_array_elements(p_bundle->'collection_entries') LOOP
+ row_value:=item||jsonb_build_object('site_id',p_request_id,'draft_version_id',NULL,'published_version_id',NULL,'published_sort_index',NULL,'published_archived_at',NULL);
+ INSERT INTO public.collection_entries("id","revision","draft_version_id","published_version_id","collection_id","stable_key","sort_index","published_sort_index","archived_at","published_archived_at","site_id")
+ SELECT r."id",r."revision",r."draft_version_id",r."published_version_id",r."collection_id",r."stable_key",r."sort_index",r."published_sort_index",r."archived_at",r."published_archived_at",r."site_id" FROM jsonb_populate_record(NULL::public.collection_entries,row_value) r;
+ END LOOP;
+ FOR item IN SELECT value FROM jsonb_array_elements(p_bundle->'page_versions') LOOP
+ defect:=app.page_meta_defect(item->'meta');
+ IF jsonb_typeof(item->'content') IS DISTINCT FROM 'array' THEN RAISE EXCEPTION 'imported page content must be a list' USING ERRCODE='CMS04'; END IF;
+ IF EXISTS(SELECT 1 FROM jsonb_array_elements(item->'content') section WHERE NOT EXISTS(
+ SELECT 1 FROM public.section_defs d JOIN public.section_def_versions v ON v.section_def_id=d.id
+ WHERE d.site_id=p_request_id AND d.id=(section->>'section_def_id')::uuid AND v.version=(section->>'section_def_version')::int)) THEN
+ RAISE EXCEPTION 'imported page names a foreign section' USING ERRCODE='CMS04'; END IF;
+ IF defect IS NOT NULL THEN RAISE EXCEPTION 'invalid imported content: %',defect USING ERRCODE='CMS04'; END IF;
+ row_value:=item||jsonb_build_object('site_id',p_request_id,'author_id',actor,'carries_trusted_code',app.content_carries_trusted_code(item->'content'));
+ INSERT INTO public.page_versions("id","revision","created_at","page_id","content","meta","kind","note","page_title","page_slug","site_id","author_id","carries_trusted_code")
+ SELECT r."id",r."revision",r."created_at",r."page_id",r."content",r."meta",r."kind",r."note",r."page_title",r."page_slug",r."site_id",r."author_id",r."carries_trusted_code" FROM jsonb_populate_record(NULL::public.page_versions,row_value) r;
+ END LOOP;
+ FOR item IN SELECT value FROM jsonb_array_elements(p_bundle->'theme_versions') LOOP
+ -- Historical themes may omit the defaults that the editor adds in memory.
+ -- Validate their merged shape but retain the original immutable JSON bytes.
+ defect:=app.theme_tokens_defect(
+ '{"radius":"0.5rem","spacing":"comfortable","buttons":{"style":"solid","color":"primary","radius":"0.25rem","weight":"bold","hover":"darken","speed":"normal"}}'::jsonb
+ || (item->'tokens') || jsonb_build_object('colors',
+ '{"accent":"#d22630","surfaceAlt":"#f4f6f8","muted":"#5f6b7a","primaryContrast":"#ffffff","accentContrast":"#ffffff"}'::jsonb || (item->'tokens'->'colors')));
+ IF defect IS NOT NULL THEN RAISE EXCEPTION 'invalid imported content: %',defect USING ERRCODE='CMS04'; END IF;
+ row_value:=item||jsonb_build_object('site_id',p_request_id,'author_id',actor);
+ INSERT INTO public.theme_versions("id","revision","created_at","theme_id","tokens","site_id","author_id")
+ SELECT r."id",r."revision",r."created_at",r."theme_id",r."tokens",r."site_id",r."author_id" FROM jsonb_populate_record(NULL::public.theme_versions,row_value) r;
+ END LOOP;
+ FOR item IN SELECT value FROM jsonb_array_elements(p_bundle->'navigation_versions') LOOP
+ defect:=app.navigation_tree_defect(item->'tree');
+ IF defect IS NOT NULL THEN RAISE EXCEPTION 'invalid imported content: %',defect USING ERRCODE='CMS04'; END IF;
+ row_value:=item||jsonb_build_object('site_id',p_request_id,'author_id',actor);
+ INSERT INTO public.navigation_versions("id","revision","created_at","navigation_id","tree","site_id","author_id")
+ SELECT r."id",r."revision",r."created_at",r."navigation_id",r."tree",r."site_id",r."author_id" FROM jsonb_populate_record(NULL::public.navigation_versions,row_value) r;
+ END LOOP;
+ FOR item IN SELECT value FROM jsonb_array_elements(p_bundle->'global_element_versions') LOOP
+ SELECT kind::text INTO header_kind FROM public.global_elements WHERE id=(item->>'global_element_id')::uuid AND site_id=p_request_id;
+ defect:=CASE WHEN header_kind='header' THEN app.global_header_defect(item->'content') ELSE app.global_footer_defect(item->'content') END;
+ IF defect IS NOT NULL THEN RAISE EXCEPTION 'invalid imported content: %',defect USING ERRCODE='CMS04'; END IF;
+ row_value:=item||jsonb_build_object('site_id',p_request_id,'author_id',actor);
+ INSERT INTO public.global_element_versions("id","revision","created_at","global_element_id","content","site_id","author_id")
+ SELECT r."id",r."revision",r."created_at",r."global_element_id",r."content",r."site_id",r."author_id" FROM jsonb_populate_record(NULL::public.global_element_versions,row_value) r;
+ END LOOP;
+ FOR item IN SELECT value FROM jsonb_array_elements(p_bundle->'collection_schema_versions') LOOP
+ row_value:=item||jsonb_build_object('site_id',p_request_id,'author_id',actor);
+ INSERT INTO public.collection_schema_versions("id","revision","created_at","collection_id","fields","sort","site_id","author_id")
+ SELECT r."id",r."revision",r."created_at",r."collection_id",r."fields",r."sort",r."site_id",r."author_id" FROM jsonb_populate_record(NULL::public.collection_schema_versions,row_value) r;
+ END LOOP;
+ FOR item IN SELECT value FROM jsonb_array_elements(p_bundle->'collection_entry_versions') LOOP
+ row_value:=item||jsonb_build_object('site_id',p_request_id,'author_id',actor);
+ INSERT INTO public.collection_entry_versions("id","revision","created_at","entry_id","collection_id","schema_version_id","values","site_id","author_id")
+ SELECT r."id",r."revision",r."created_at",r."entry_id",r."collection_id",r."schema_version_id",r."values",r."site_id",r."author_id" FROM jsonb_populate_record(NULL::public.collection_entry_versions,row_value) r;
+ END LOOP;
+ FOR item IN SELECT value FROM jsonb_array_elements(p_bundle->'site_settings') LOOP
+ row_value:=item||jsonb_build_object('site_id',p_request_id,'draft_version_id',NULL,'published_version_id',NULL);
+ INSERT INTO public.site_settings("id","revision","draft_version_id","published_version_id","site_id")
+ SELECT r."id",r."revision",r."draft_version_id",r."published_version_id",r."site_id" FROM jsonb_populate_record(NULL::public.site_settings,row_value) r;
+ END LOOP;
+ FOR item IN SELECT value FROM jsonb_array_elements(p_bundle->'site_setting_versions') LOOP
+ row_value:=item||jsonb_build_object('site_id',p_request_id,'author_id',actor);
+ INSERT INTO public.site_setting_versions("id","revision","created_at","site_settings_id","settings","site_id","author_id")
+ SELECT r."id",r."revision",r."created_at",r."site_settings_id",r."settings",r."site_id",r."author_id" FROM jsonb_populate_record(NULL::public.site_setting_versions,row_value) r;
+ END LOOP;
+ UPDATE public.pages head SET draft_version_id=COALESCE((item->>'draft_version_id')::uuid,(item->>'published_version_id')::uuid) FROM jsonb_array_elements(p_bundle->'pages') item WHERE head.site_id=p_request_id AND head.id=(item->>'id')::uuid;
+ UPDATE public.themes head SET draft_version_id=COALESCE((item->>'draft_version_id')::uuid,(item->>'published_version_id')::uuid) FROM jsonb_array_elements(p_bundle->'themes') item WHERE head.site_id=p_request_id AND head.id=(item->>'id')::uuid;
+ UPDATE public.navigations head SET draft_version_id=COALESCE((item->>'draft_version_id')::uuid,(item->>'published_version_id')::uuid) FROM jsonb_array_elements(p_bundle->'navigations') item WHERE head.site_id=p_request_id AND head.id=(item->>'id')::uuid;
+ UPDATE public.global_elements head SET draft_version_id=COALESCE((item->>'draft_version_id')::uuid,(item->>'published_version_id')::uuid) FROM jsonb_array_elements(p_bundle->'global_elements') item WHERE head.site_id=p_request_id AND head.id=(item->>'id')::uuid;
+ UPDATE public.site_settings head SET draft_version_id=COALESCE((item->>'draft_version_id')::uuid,(item->>'published_version_id')::uuid) FROM jsonb_array_elements(p_bundle->'site_settings') item WHERE head.site_id=p_request_id AND head.id=(item->>'id')::uuid;
+ UPDATE public.collection_entries head SET draft_version_id=COALESCE((item->>'draft_version_id')::uuid,(item->>'published_version_id')::uuid) FROM jsonb_array_elements(p_bundle->'collection_entries') item WHERE head.site_id=p_request_id AND head.id=(item->>'id')::uuid;
+ UPDATE public.collections head SET draft_schema_version_id=COALESCE((item->>'draft_schema_version_id')::uuid,(item->>'published_schema_version_id')::uuid) FROM jsonb_array_elements(p_bundle->'collections') item WHERE head.site_id=p_request_id AND head.id=(item->>'id')::uuid;
+ -- JSON references are not relational foreign keys. Enforce site ownership
+ -- here as well as in the strict archive parser, including HTML media URLs.
+ FOR row_value IN
+ WITH RECURSIVE nodes(value,depth) AS (
+ SELECT p_bundle,0 UNION ALL
+ SELECT child.value,n.depth+1 FROM nodes n CROSS JOIN LATERAL (
+ SELECT value FROM jsonb_array_elements(CASE WHEN jsonb_typeof(n.value)='array' THEN n.value ELSE '[]'::jsonb END)
+ UNION ALL SELECT value FROM jsonb_each(CASE WHEN jsonb_typeof(n.value)='object' THEN n.value ELSE '{}'::jsonb END)
+ ) child WHERE n.depth<80
+ ) SELECT value FROM nodes LOOP
+ IF jsonb_typeof(row_value)='object' THEN
+ FOREACH table_name IN ARRAY ARRAY['media_id','logoMediaId','compactLogoMediaId','social_image'] LOOP
+ IF jsonb_typeof(row_value->table_name)='string' AND row_value->>table_name ~* '^[0-9a-f-]{36}$'
+ AND NOT EXISTS(SELECT 1 FROM public.media WHERE id=(row_value->>table_name)::uuid AND site_id=p_request_id) THEN
+ RAISE EXCEPTION 'imported content references foreign media' USING ERRCODE='CMS04'; END IF;
+ END LOOP;
+ IF row_value->>'type'='page' AND NOT EXISTS(SELECT 1 FROM public.pages WHERE site_id=p_request_id AND id=(row_value->>'page_id')::uuid) THEN
+ RAISE EXCEPTION 'imported navigation references a foreign page' USING ERRCODE='CMS04'; END IF;
+ IF row_value ? 'readerKey' AND row_value ? 'selection' AND NOT EXISTS(SELECT 1 FROM public.collections WHERE site_id=p_request_id AND reader_key=row_value->>'readerKey') THEN
+ RAISE EXCEPTION 'imported content references a missing collection' USING ERRCODE='CMS04'; END IF;
+ ELSIF jsonb_typeof(row_value)='string' THEN
+ FOR reference IN SELECT regexp_matches(row_value #>> '{}','/media/([0-9a-f-]{36})/(original|thumbnail|card|wide)','gi') LOOP
+ IF NOT EXISTS(SELECT 1 FROM public.media WHERE site_id=p_request_id AND id=reference[1]::uuid)
+ OR (reference[2]<>'original' AND NOT EXISTS(SELECT 1 FROM public.media_variants WHERE media_id=reference[1]::uuid AND kind=reference[2])) THEN
+ RAISE EXCEPTION 'imported content references a foreign or missing media variant' USING ERRCODE='CMS04'; END IF;
+ END LOOP;
+ END IF;
+ END LOOP;
+ -- The export retains historical content; import intentionally creates no
+ -- public projections, domain bindings, schedules or inherited approvals.
+ UPDATE public.media m SET status=(item->>'status')::media_status,deleted_at=(item->>'deleted_at')::timestamptz FROM jsonb_array_elements(p_bundle->'media') item WHERE m.site_id=p_request_id AND m.id=(item->>'id')::uuid;
+ UPDATE public.site_settings SET published_version_id=NULL WHERE site_id=p_request_id;
+ DELETE FROM public.published_site_shells WHERE site_id=p_request_id;
+ PERFORM app.index_collection_entry_media(v.id,v.site_id,v.entry_id,s.fields,v."values")
+ FROM public.collection_entry_versions v JOIN public.collection_schema_versions s ON s.id=v.schema_version_id WHERE v.site_id=p_request_id;
+ INSERT INTO app.site_content_imports(request_id,site_id,actor_id,fingerprint,source_heads)
+ VALUES(p_request_id,p_request_id,actor,fingerprint,p_source_heads);
+ PERFORM app.write_audit(p_request_id,'user',actor,'site.import','site',p_request_id,NULL,NULL,
+ jsonb_build_object('format_version',1,'request_id',p_request_id,'fingerprint',fingerprint,
+ 'pages',jsonb_array_length(p_bundle->'pages'),'media',jsonb_array_length(p_bundle->'media'),'publication','draft-only'));
+ -- The site and its thumbnail work commit together. A repeated import returns
+ -- above and cannot enqueue duplicate pictures for existing imported versions.
+ PERFORM app.emit_outbox(p_request_id,'section_def.thumbnail_requested',
+ jsonb_build_object('section_def_id',d.id,'version',v.version,'slug',d.slug))
+ FROM public.section_defs d JOIN public.section_def_versions v ON v.section_def_id=d.id
+ WHERE d.site_id=p_request_id AND d.status='active';
+ RETURN p_request_id;
+END $$;
+
+-- A worker sweep may already have requested a previously imported thumbnail.
+-- Leave all existing requests intact; retries belong to the existing workflow.
+DO $$
+BEGIN
+ PERFORM app.emit_outbox(d.site_id,'section_def.thumbnail_requested',
+ jsonb_build_object('section_def_id',d.id,'version',v.version,'slug',d.slug))
+ FROM public.section_defs d JOIN public.section_def_versions v ON v.section_def_id=d.id
+ JOIN app.site_content_imports imported ON imported.site_id=d.site_id
+ WHERE d.status='active' AND v.thumbnail_path IS NULL
+ AND NOT EXISTS(SELECT 1 FROM public.outbox o WHERE o.event_type='section_def.thumbnail_requested'
+ AND o.payload->>'section_def_id'=d.id::text AND o.payload->>'version'=v.version::text);
+END $$;
+REVOKE ALL ON FUNCTION app.import_site_content(uuid,jsonb,jsonb) FROM PUBLIC;
+ALTER FUNCTION app.import_site_content(uuid,jsonb,jsonb) OWNER TO cms_migration_owner;
+GRANT EXECUTE ON FUNCTION app.import_site_content(uuid,jsonb,jsonb) TO cms_authenticated_user;

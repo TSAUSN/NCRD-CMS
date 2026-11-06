@@ -1,0 +1,45 @@
+.current {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  flex-wrap: wrap;
+}
+.body {
+  display: grid;
+  gap: var(--space-5);
+}
+.body label {
+  display: grid;
+  gap: var(--space-2);
+}
+.body h3 {
+  font-size: var(--text-emphasis);
+  margin: 0 0 var(--space-3);
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+.grid button {
+  min-width: 0;
+  min-height: calc(var(--space-6) * 2);
+  white-space: normal;
+  flex-direction: column;
+  text-align: center;
+}
+.grid button[aria-pressed='true'] {
+  border-color: var(--editor-select);
+  box-shadow: inset 0 0 0 var(--line-thin) var(--editor-select);
+  color: var(--editor-select);
+}
+.symbol {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+.symbol svg {
+  width: var(--space-5);
+  height: var(--space-5);
+}

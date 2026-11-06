@@ -1,0 +1,39 @@
+.state.state {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: var(--space-3);
+  padding: var(--space-7) var(--space-5);
+  text-align: center;
+  color: var(--text);
+}
+.state.state > span:first-child {
+  display: grid;
+  place-items: center;
+  width: var(--space-7);
+  height: var(--space-7);
+  border-radius: var(--radius-card);
+  color: var(--primary);
+  background: var(--brand-tint);
+}
+.state.state :is(h2, h3, strong) {
+  margin: 0;
+  font-size: var(--text-body);
+  font-weight: var(--weight-semibold);
+  color: var(--text);
+}
+.state.state > div,
+.state.state > p {
+  max-width: var(--size-340);
+  margin: 0;
+  color: var(--text-muted);
+  font-size: var(--text-body);
+  line-height: var(--line-body);
+}
+.state.state p {
+  margin: 0;
+}
+.skeleton.skeleton {
+  background: var(--surface-sunken);
+  border-radius: var(--radius-control);
+}

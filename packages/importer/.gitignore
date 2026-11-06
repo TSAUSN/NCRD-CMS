@@ -1,0 +1,4 @@
+# Importer output. The report files carry provenance only, but `--documents`
+# writes structured documents and compiled CSS derived from the licensed V1
+# catalogue, and nothing derived from that catalogue belongs in this repository.
+out/

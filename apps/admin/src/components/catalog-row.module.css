@@ -1,0 +1,88 @@
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.row {
+  display: grid;
+  grid-template-columns:
+    var(--space-2) minmax(var(--size-160), var(--size-240)) minmax(0, 1fr) var(--catalog-count-width)
+    max-content;
+  gap: var(--space-fact);
+  align-items: center;
+  padding: var(--space-2) var(--space-between-cards);
+  border-bottom: var(--line-thin) solid var(--line-soft);
+  font-size: var(--text-help);
+}
+.row:last-child {
+  border-bottom: 0;
+}
+.row[data-dragging='true'] {
+  opacity: var(--opacity-disabled);
+}
+.leading,
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+.title {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+}
+.leading > button {
+  transform: translateX(calc(var(--space-fact) * -1));
+}
+.title small {
+  color: var(--text-muted);
+  font-size: var(--catalog-id-text);
+  line-height: var(--catalog-id-line);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.title strong {
+  width: fit-content;
+  min-height: var(--catalog-tag-height);
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: var(--catalog-tag-height);
+  padding: 0 var(--space-fact);
+  border-radius: var(--radius-pill);
+  color: var(--text-on-dark);
+  background: var(--tag-main);
+  font-size: var(--catalog-tag-text);
+  font-weight: var(--weight-medium);
+}
+.row[data-group='secondary'] .title strong {
+  background: var(--status-review);
+}
+.description {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-muted);
+}
+.meta {
+  white-space: nowrap;
+}
+@media (max-width: 1199px) {
+  .row {
+    grid-template-columns:
+      var(--space-2) minmax(var(--size-160), 1.5fr) minmax(0, 1fr) var(--catalog-count-width)
+      max-content;
+    gap: var(--space-2);
+  }
+}
+
+.row[data-description='wrap'] .description {
+  overflow: visible;
+  white-space: normal;
+  overflow-wrap: break-word;
+  line-height: var(--line-meta);
+}

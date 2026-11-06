@@ -1,0 +1,20 @@
+-- The leased event's tenant is authoritative even if its payload is damaged.
+-- record_domain_result also uses this function, so a foreign receipt cannot
+-- update another site's domain after the external operation is skipped.
+CREATE OR REPLACE FUNCTION app.domain_job(p_event_id bigint,p_token uuid) RETURNS jsonb
+LANGUAGE plpgsql SECURITY DEFINER SET search_path=pg_catalog,public AS $$
+DECLARE event RECORD; d RECORD; staging text;
+BEGIN
+ PERFORM app.require_worker();
+ SELECT * INTO event FROM public.outbox WHERE id=p_event_id FOR UPDATE;
+ IF event IS NULL OR event.event_type<>'domain.sync' OR event.status<>'running'
+  OR NOT app.lease_matches(event.lease_token_hash,p_token)
+  OR event.leased_until IS NULL OR event.leased_until<statement_timestamp() THEN
+  RAISE EXCEPTION 'domain event is not held by this lease' USING ERRCODE='CMS04';
+ END IF;
+ SELECT * INTO d FROM public.domains WHERE id=(event.payload->>'domain_id')::uuid AND site_id=event.site_id;
+ IF d IS NULL OR d.removed_at IS NOT NULL THEN RETURN NULL; END IF;
+ SELECT staging_hostname INTO staging FROM public.sites WHERE id=d.site_id;
+ RETURN jsonb_build_object('id',d.id,'site_id',d.site_id,'hostname',d.hostname_normalized,'status',d.status,
+  'revision',d.revision,'verification_token',d.verify_token,'provider_ref',d.provider_ref,'staging_hostname',staging);
+END $$;

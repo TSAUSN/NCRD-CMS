@@ -1,0 +1,32 @@
+{
+  "projectId": "cms-example",
+  "projectNumber": "123456789012",
+  "operatorAccount": "owner@example.org",
+  "region": "us-central1",
+  "servicePrefix": "cms",
+  "sqlInstance": "cms-content",
+  "database": "cms_content",
+  "sqlTier": "db-f1-micro",
+  "proxyPort": 54332,
+  "privateDirectory": "/PRIVATE/cms-friday",
+  "cleanedDump": "/PRIVATE/friday-content/cleaned-copy.dump",
+  "cleanedDumpSha256": "REPLACE_WITH_REVIEWED_ARCHIVE_SHA256",
+  "cleanedFingerprints": "/PRIVATE/friday-content/database-fingerprints.json",
+  "mediaDirectory": "/PRIVATE/friday-content/media",
+  "mediaInventory": "/PRIVATE/friday-content/media-inventory.json",
+  "ownerEmail": "admin@example.org",
+  "ownerAuthSubject": null,
+  "supabaseUrl": "https://example-project.supabase.co",
+  "authPublishableKey": "REPLACE_WITH_EXISTING_PUBLIC_PUBLISHABLE_KEY",
+  "firebaseSitePrefix": "c123456789012",
+  "publicInvocation": "allUsers",
+  "revision": "REPLACE_WITH_FULL_FROZEN_TAG_COMMIT",
+  "notificationChannels": [
+    "projects/cms-example/notificationChannels/REPLACE_WITH_VERIFIED_CHANNEL"
+  ],
+  "licensedBrandFontsApproved": true,
+  "administratorPrerequisitesConfirmed": false,
+  "monitoringDeliveryConfirmed": false,
+  "expectedPublicPages": 75,
+  "publicAssetOracle": "/PRIVATE/friday-content/public-asset-oracle.json"
+}

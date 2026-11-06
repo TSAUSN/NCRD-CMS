@@ -1,0 +1,85 @@
+.entry {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100dvh;
+  padding: var(--space-6) var(--space-4);
+  background: var(--bg);
+  color: var(--text);
+}
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: 100%;
+  max-width: var(--entry-width);
+  padding: var(--space-6);
+  background: var(--surface);
+  border: var(--line-thin) solid var(--border);
+  border-radius: var(--entry-radius);
+  box-shadow: var(--shadow-2);
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.brand > span {
+  display: grid;
+  place-items: center;
+  width: var(--target-small);
+  height: var(--target-small);
+  border-radius: var(--radius-control);
+  background: var(--primary);
+  color: var(--text-on-dark);
+  font-size: var(--text-body);
+  font-weight: var(--weight-semibold);
+}
+.brand strong {
+  font-size: var(--text-emphasis);
+  font-weight: var(--weight-semibold);
+}
+.card h1 {
+  margin: 0;
+  font-size: var(--entry-title);
+  line-height: var(--line-section);
+  font-weight: var(--weight-semibold);
+}
+.card > p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: var(--text-meta);
+  line-height: var(--line-body);
+}
+.form {
+  min-width: 0;
+}
+.form label {
+  font-size: var(--text-meta);
+  font-weight: var(--weight-medium);
+}
+.form input {
+  min-height: var(--entry-control);
+  width: 100%;
+  border-radius: var(--radius-control);
+  font-size: var(--text-body);
+}
+.form button {
+  width: 100%;
+  min-height: var(--entry-control);
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--text-body);
+  font-weight: var(--weight-medium);
+  border-radius: var(--radius-control);
+  background: var(--primary);
+  color: var(--text-on-dark);
+  box-shadow: none;
+}
+.form :global(.entry-note) {
+  margin: var(--space-4) 0 0;
+  padding-top: var(--space-4);
+  color: var(--text-muted);
+  border-top: var(--line-thin) solid var(--border);
+  font-size: var(--text-meta);
+  line-height: var(--line-body);
+}

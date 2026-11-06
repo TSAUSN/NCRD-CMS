@@ -1,0 +1,126 @@
+.panel {
+  height: 100%;
+  box-sizing: border-box;
+  padding: var(--space-4);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.panel h2,
+.panel h3,
+.panel p {
+  margin: 0;
+}
+.panel label {
+  display: grid;
+  gap: var(--space-2);
+}
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-height: 0;
+  flex: 1;
+}
+.fields {
+  min-height: 0;
+  flex: 1;
+  overflow: auto;
+  display: grid;
+  align-content: start;
+  gap: var(--space-4);
+  padding: var(--space-2) var(--focus-offset);
+  scroll-padding-block: var(--space-2);
+}
+.banner {
+  padding: var(--space-3);
+  background: var(--status-review-bg);
+  color: var(--status-review);
+  border: var(--line-thin) solid currentColor;
+  border-radius: var(--radius-control);
+  display: grid;
+  gap: var(--space-2);
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+.menuList {
+  padding: 0;
+  margin-block: var(--space-4);
+  list-style: none;
+  display: grid;
+  gap: var(--space-3);
+}
+.menuItem {
+  min-width: 0;
+  padding: var(--space-3);
+  border: var(--line-thin) solid var(--border);
+  border-radius: var(--radius-control);
+  display: grid;
+  gap: var(--space-2);
+}
+.menuItem[data-nested] {
+  margin-inline-start: var(--space-4);
+}
+.save {
+  flex: none;
+  display: grid;
+  gap: var(--space-2);
+  padding-block: var(--space-3);
+  background: var(--surface);
+  border-block-start: var(--line-thin) solid var(--border);
+  z-index: var(--z-popover);
+}
+.save button {
+  width: 100%;
+}
+
+.fields :is(input, select, textarea) {
+  scroll-margin-block: var(--space-2);
+}
+.save [role='alert'] {
+  color: var(--danger);
+}
+
+.destination {
+  min-width: 0;
+}
+.destination summary {
+  min-height: var(--target-small);
+  cursor: pointer;
+  overflow-wrap: anywhere;
+  color: var(--primary);
+}
+.destination summary:focus-visible {
+  outline: var(--line-focus) solid var(--focus);
+  outline-offset: var(--focus-offset);
+}
+.destinationFields,
+.addMenu {
+  display: grid;
+  gap: var(--space-3);
+}
+.destinationFields {
+  padding-block: var(--space-3);
+}
+.menuItem[data-hidden] {
+  border-style: dashed;
+  background: var(--surface-sunken);
+}
+.hiddenHelp {
+  font-size: var(--text-body);
+  color: var(--text-muted);
+}
+.fieldError {
+  color: var(--danger);
+  font-size: var(--text-body);
+}
+.menuItem :is(input, select) {
+  min-height: var(--target-medium);
+  font-size: var(--text-body);
+  line-height: var(--line-body);
+}

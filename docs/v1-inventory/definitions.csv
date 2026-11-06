@@ -1,0 +1,119 @@
+id,category,family,classification,sites,slots,text,richtext,link,image,icon,has_form,has_iframe,has_svg,repeat_units,html_diverges,sanitizer_strips,dangling_hash_hrefs
+hero-split-v1,Hero,hero,shared-generic,3,4,1,1,1,1,0,False,False,False,0,True,,False
+stats-grid-v1,Stats,stat,shared-generic,3,1,1,0,0,0,0,False,False,False,1,False,,False
+text-image-v1,Content,media-text,shared-generic,3,4,1,1,1,1,0,False,False,False,0,True,,False
+feature-columns-v1,Content,card-grid,shared-generic,3,3,1,1,0,0,1,False,False,False,1,False,,False
+icon-card-grid-v1,CTA,card-grid,shared-generic,3,3,1,0,1,0,1,False,False,False,3,False,,False
+hero-centered-v1,Hero,hero,shared-generic,3,3,1,1,1,0,0,False,False,False,0,False,,False
+cta-band-v1,CTA,cta,shared-generic,3,3,1,1,1,0,0,False,False,False,0,False,,False
+quote-v1,Content,quote,shared-generic,3,2,1,1,0,0,0,False,False,False,0,False,,False
+faq-list-v1,Content,faq,shared-generic,3,2,1,1,0,0,0,False,False,False,2,False,,False
+gallery-grid-v1,Media,media,shared-generic,3,2,1,0,0,1,0,False,False,False,1,True,,False
+contact-cards-v1,Content,contact,shared-generic,3,2,1,1,0,0,0,False,False,False,1,False,,False
+logo-strip-v1,Media,logo,shared-generic,3,3,1,0,1,1,0,False,False,False,2,True,,False
+rich-columns-v1,Content,text,shared-generic,3,2,1,1,0,0,0,False,False,False,1,False,,False
+divider-v1,Layout,layout,shared-generic,3,0,0,0,0,0,0,False,False,False,0,False,,False
+proof-callout-v1,Proof,callout,shared-generic,3,3,1,1,1,0,0,False,False,False,0,False,,True
+program-cards-v1,Cards,card-grid,shared-generic,3,4,1,1,1,0,1,False,False,False,1,False,,False
+impact-story-v1,Content,quote,shared-generic,3,4,1,1,1,1,0,False,False,False,0,True,,False
+donation-ask-v1,CTA,donation,shared-generic,3,2,1,0,1,0,0,False,False,False,1,False,,False
+accreditation-strip-v1,Conversion,logo,shared-generic,3,3,1,0,1,1,0,False,False,False,1,True,,False
+alert-banner-v1,Bars & Alerts,bar,shared-generic,3,4,1,1,1,0,1,False,False,False,0,False,,False
+announcement-bar-v1,Bars & Alerts,bar,shared-generic,3,3,1,0,1,0,1,False,False,False,0,False,,False
+campaign-progress-v1,Conversion,donation,shared-generic,3,2,1,0,1,0,0,False,False,False,0,False,,False
+disaster-cta-v1,Conversion,cta,shared-generic,3,4,1,1,1,1,0,False,False,False,0,True,,False
+eligibility-checklist-v1,Content,steps,shared-generic,3,4,1,1,1,0,1,False,False,False,2,False,,False
+faq-accordion-v1,Content,faq,shared-generic,3,2,1,1,0,0,0,False,False,False,2,False,,False
+feature-grid-v1,Cards,card-grid,shared-generic,3,2,1,0,0,0,1,False,False,False,1,False,,False
+financial-transparency-v1,Content,stat,shared-generic,3,3,1,1,1,0,0,False,False,False,0,False,,False
+hero-appeal-v1,Hero,hero,shared-generic,3,4,1,1,1,1,0,False,False,False,0,True,,False
+hero-fullbleed-v1,Hero,hero,shared-generic,3,3,1,0,1,1,0,False,False,False,0,True,,False
+hero-search-v1,Hero,hero,shared-generic,3,3,1,0,1,1,0,True,False,False,0,True,"form,input",False
+hero-triage-v1,Hero,hero,shared-generic,3,4,1,1,1,0,1,False,False,False,1,False,,False
+location-directory-v1,Cards,card-grid,shared-generic,3,2,1,0,1,0,0,False,False,False,1,False,,False
+locator-form-v1,Conversion,form,shared-generic,3,2,1,0,1,0,0,True,False,False,0,False,"form,input",False
+media-text-row-v1,Content,media-text,shared-generic,3,5,1,1,1,1,1,False,False,False,0,True,,False
+mission-band-v1,Content,statement,shared-generic,3,3,0,1,1,0,1,False,False,False,0,False,,False
+monthly-giving-v1,Conversion,donation,shared-generic,3,4,1,1,1,1,0,False,False,False,0,True,,False
+newsletter-signup-v1,Conversion,form,shared-generic,3,4,1,1,1,0,1,True,False,False,0,False,"form,input",False
+process-steps-v1,Content,steps,shared-generic,3,4,1,1,1,0,1,False,False,False,1,False,,False
+pull-quote-v1,Content,quote,shared-generic,3,3,1,1,0,1,0,False,False,False,0,True,,False
+registration-cta-v1,Conversion,cta,shared-generic,3,2,1,0,1,0,0,False,False,False,0,True,,False
+resource-library-v1,Cards,card-grid,shared-generic,3,4,1,1,1,0,1,False,False,False,1,False,,False
+split-cta-v1,Conversion,cta,shared-generic,3,3,1,0,1,0,1,False,False,False,0,False,,False
+stats-band-v1,Stats,stat,shared-generic,3,3,1,0,1,0,1,False,False,False,1,False,,False
+story-grid-v1,Content,card-grid,shared-generic,3,3,1,0,1,1,0,False,False,False,1,True,,False
+testimonial-cards-v1,Content,quote,shared-generic,3,3,1,1,0,1,0,False,False,False,1,True,,False
+urgent-appeal-v1,Conversion,cta,shared-generic,3,2,1,0,1,0,0,False,False,False,0,False,,False
+utility-bar-v1,Bars & Alerts,bar,shared-generic,3,2,0,1,1,0,0,False,False,False,1,False,,False
+volunteer-opportunities-v1,Conversion,card-grid,shared-generic,3,3,1,0,1,0,1,False,False,False,1,False,,False
+ways-to-give-grid-v1,Conversion,card-grid,shared-generic,3,3,1,0,1,0,1,False,False,False,1,False,,False
+ways-to-help-grid-v1,Conversion,card-grid,shared-generic,3,3,1,0,1,0,1,False,False,False,1,False,,False
+team-grid-v1,Cards,person-grid,shared-generic,3,4,1,1,1,1,0,False,False,False,1,True,,False
+person-profile-v1,Content,person,shared-generic,3,4,1,1,1,1,0,False,False,False,0,True,,False
+article-header-v1,Hero,article,shared-generic,3,2,1,0,0,1,0,False,False,False,0,True,,False
+article-body-v1,Content,article,shared-generic,3,2,1,1,0,0,0,False,False,False,0,False,,False
+share-row-v1,Layout,social,shared-generic,3,3,1,0,1,0,1,False,False,False,1,False,,False
+event-schedule-v1,Events,agenda,shared-generic,3,2,1,1,0,0,0,False,False,False,1,False,,False
+event-speakers-v1,Events,person-grid,shared-generic,3,3,1,0,1,1,0,False,False,False,1,True,,False
+event-venue-v1,Events,venue,shared-generic,3,5,1,1,1,1,1,False,False,False,1,True,,False
+event-pricing-v1,Conversion,tiers,shared-generic,3,3,1,1,1,0,0,False,False,False,1,False,,False
+event-sponsors-v1,Media,logo,shared-generic,3,3,1,0,1,1,0,False,False,False,1,True,,False
+post-list-v1,Cards,card-grid,shared-generic,3,3,1,0,1,1,0,False,False,False,1,True,,False
+event-list-v1,Cards,card-grid,shared-generic,3,3,1,0,1,0,1,False,False,False,1,False,,False
+document-list-v1,Cards,card-grid,shared-generic,3,3,1,0,1,0,1,False,False,False,1,False,,False
+location-list-v1,Cards,contact,shared-generic,3,3,1,0,1,0,1,False,False,False,1,False,,False
+data-table-v1,Content,table,shared-generic,3,1,1,0,0,0,0,False,False,False,1,False,,False
+job-listings-v1,Cards,card-grid,shared-generic,3,3,1,0,1,0,1,False,False,False,1,False,,False
+page-header-v1,Hero,hero,shared-generic,3,2,1,0,0,1,0,False,False,False,0,True,,False
+breadcrumb-v1,Layout,nav,shared-generic,3,2,1,0,1,0,0,False,False,False,1,False,,False
+anchor-nav-v1,Layout,nav,shared-generic,3,2,1,0,1,0,0,False,False,False,1,False,,False
+related-links-v1,Layout,nav,shared-generic,3,2,1,0,1,0,0,False,False,False,1,False,,False
+spacer-v1,Layout,layout,shared-generic,3,1,1,0,0,0,0,False,False,False,0,False,,False
+tabs-v1,Content,faq,shared-generic,3,2,1,1,0,0,0,False,False,False,1,False,,False
+timeline-v1,Content,steps,shared-generic,3,2,1,1,0,0,0,False,False,False,1,False,,False
+social-links-v1,Layout,social,shared-generic,3,3,1,0,1,0,1,False,False,False,1,False,,False
+contact-form-v1,Conversion,form,shared-generic,3,3,1,0,1,0,1,True,False,False,1,False,"form,input",False
+map-embed-v1,Media,embed,shared-generic,3,2,1,0,1,0,0,False,False,False,0,False,iframe,False
+video-embed-v1,Media,embed,shared-generic,3,2,1,0,1,0,0,False,False,False,0,False,iframe,False
+form-embed-v1,Conversion,embed,shared-generic,3,2,1,0,1,0,0,False,False,False,0,False,iframe,False
+hni-header-v1,Site Chrome,,site-specific:humanneedsindex,1,3,1,0,1,1,0,False,False,False,0,False,,True
+hni-hero-v1,Hero,hero,site-specific:humanneedsindex,1,3,1,0,1,1,0,False,False,False,0,False,,True
+hni-overview-v1,Content,,site-specific:humanneedsindex,1,3,1,1,0,1,0,False,False,False,1,False,,False
+hni-measuring-poverty-v1,Content,,site-specific:humanneedsindex,1,3,1,1,0,0,1,False,False,False,0,False,,False
+hni-explore-resources-v1,CTA,,site-specific:humanneedsindex,1,3,1,0,1,0,1,False,False,False,2,False,,True
+hni-footer-v1,Site Chrome,,site-specific:humanneedsindex,1,3,1,1,1,0,0,False,False,False,1,False,,True
+hni-methodology-hero-v1,Existing page,,site-specific:humanneedsindex,1,1,1,0,0,0,0,False,False,False,0,False,,True
+hni-methodology-stats-v1,Existing page,,site-specific:humanneedsindex,1,1,0,1,0,0,0,False,False,False,0,False,,False
+hni-methodology-content-v1,Existing page,,site-specific:humanneedsindex,1,2,1,1,0,0,0,False,False,False,0,False,,False
+hni-methodology-explore-v1,Existing page,,site-specific:humanneedsindex,1,2,1,0,1,0,0,False,False,False,0,False,,False
+hni-resources-hero-v1,Existing page,,site-specific:humanneedsindex,1,1,1,0,0,0,0,False,False,False,0,False,,True
+hni-resources-divider-1-v1,Existing page,,site-specific:humanneedsindex,1,0,0,0,0,0,0,False,False,False,0,False,,False
+hni-resources-divider-2-v1,Existing page,,site-specific:humanneedsindex,1,0,0,0,0,0,0,False,False,False,0,False,,False
+hni-resources-about-orgs-v1,Existing page,,site-specific:humanneedsindex,1,2,1,1,0,0,0,False,False,False,0,False,,False
+hni-explore-hero-v1,Existing page,,site-specific:humanneedsindex,1,1,1,0,0,0,0,False,False,False,0,False,,True
+hni-explore-timeline-v1,Existing page,,site-specific:humanneedsindex,1,2,1,1,0,0,0,False,False,False,0,False,iframe,False
+hni-explore-map-v1,Existing page,,site-specific:humanneedsindex,1,2,1,1,0,0,0,False,False,False,0,False,iframe,False
+hni-explore-insights-v1,Existing page,,site-specific:humanneedsindex,1,3,1,1,0,1,0,False,False,False,0,False,,False
+hni-explore-explore-v1,Existing page,,site-specific:humanneedsindex,1,2,1,0,1,0,0,False,False,False,0,False,,False
+hni-home-hero-v1,Existing page,hero,site-specific:humanneedsindex,1,3,1,0,1,1,0,False,False,False,0,False,,True
+hni-home-divider-1-v1,Existing page,,site-specific:humanneedsindex,1,0,0,0,0,0,0,False,False,False,0,False,,False
+hni-home-overview-v1,Existing page,,site-specific:humanneedsindex,1,3,1,1,0,1,0,False,False,False,0,False,,False
+hni-home-divider-2-v1,Existing page,,site-specific:humanneedsindex,1,0,0,0,0,0,0,False,False,False,0,False,,False
+hni-home-measuring-v1,Existing page,,site-specific:humanneedsindex,1,3,1,1,0,0,1,False,False,False,0,False,,False
+hni-home-divider-3-v1,Existing page,,site-specific:humanneedsindex,1,0,0,0,0,0,0,False,False,False,0,False,,False
+hni-home-explore-v1,Existing page,,site-specific:humanneedsindex,1,3,1,0,1,0,1,False,False,False,2,False,,True
+hni-home-hero-fe-v1,Freeform,hero,site-specific:humanneedsindex,1,3,1,0,1,1,0,False,False,False,0,False,,True
+event-agenda-v1,Events,agenda,site-specific:echelonsymposium,1,3,1,1,1,0,0,False,False,False,1,False,,True
+hero-event-v1,Events,hero,site-specific:echelonsymposium,1,4,1,0,1,1,1,False,False,False,0,False,,True
+pricing-tiers-v1,Events,tiers,site-specific:echelonsymposium,1,3,1,1,1,0,0,False,False,False,1,False,,True
+speakers-grid-v1,Events,card-grid,site-specific:echelonsymposium,1,3,1,0,1,1,0,False,False,False,1,False,,True
+sponsors-tiered-v1,Events,logo,site-specific:echelonsymposium,1,3,1,0,1,1,0,False,False,False,1,False,,False
+venue-location-v1,Events,venue,site-specific:echelonsymposium,1,5,1,1,1,1,1,False,False,False,1,False,,True
+echelon-event-hero-v1,Hero,hero,site-specific:echelonsymposium,1,4,1,1,1,1,0,False,False,False,0,False,,True
+echelon-speakers-v1,Speakers,card-grid,site-specific:echelonsymposium,1,3,1,1,0,1,0,False,False,False,1,False,,False
+echelon-register-cta-v1,CTA,cta,site-specific:echelonsymposium,1,3,1,1,1,0,0,False,False,False,0,False,,True
+echelon-centered-media-hero-v1,Hero,hero,site-specific:echelonsymposium,1,4,1,1,1,1,0,False,False,False,0,False,,True
+echelon-impact-data-split-v1,Stats,stats,site-specific:echelonsymposium,1,3,1,0,1,1,0,False,False,False,1,False,,True
+echelon-collage-hero-v1,Hero,hero,site-specific:echelonsymposium,1,4,1,1,1,1,0,False,False,False,0,False,,True
+echelon-overlay-hero-v1,Hero,hero,site-specific:echelonsymposium,1,4,1,1,1,1,0,False,False,False,0,False,,True

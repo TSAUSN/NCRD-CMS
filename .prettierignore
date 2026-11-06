@@ -1,0 +1,15 @@
+# Formatting covers TypeScript, JavaScript and CSS source only.
+node_modules/
+.next/
+dist/
+coverage/
+.r8-progress/
+demo/
+**/*.sql
+**/*.md
+**/*.json
+**/*.yaml
+**/*.yml
+**/*.html
+pnpm-lock.yaml
+apps/site/public/

@@ -1,0 +1,41 @@
+.frame {
+  border: 0;
+  height: auto;
+  min-height: 0;
+  position: absolute;
+  inset: 0;
+  transform-origin: top left;
+}
+.stage {
+  position: relative;
+  margin-inline: auto;
+}
+
+.loading {
+  min-height: var(--size-240);
+  display: grid;
+  place-items: center;
+  background: var(--surface-sunken);
+  color: var(--text-muted);
+  border-radius: var(--radius-card);
+}
+
+.root {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-3);
+}
+.root p {
+  margin: 0;
+}
+.viewport.viewport {
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.bounded.bounded {
+  max-height: var(--section-preview-max-height);
+  overflow: auto;
+}

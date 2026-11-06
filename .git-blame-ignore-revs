@@ -1,0 +1,3 @@
+# Bulk formatting commits; git blame skips these with --ignore-revs-file.
+# Prettier formatting pass, November 4, 2026
+1d593ee80ff471eb3bf2836ab62ecd98744f651e

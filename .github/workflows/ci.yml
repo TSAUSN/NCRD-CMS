@@ -1,0 +1,144 @@
+name: CI
+
+# One run per change: a push to a branch with an open pull request used to run
+# the whole workflow twice (push and pull_request), and every push kept running
+# after a newer one superseded it. The Actions allowance is shared and capped.
+#
+# The quick checks (types, styles, formatting, unit, database, build) run on
+# every pull request. The browser suite takes much longer, so it runs on pushes
+# to main, on manual runs, and on pull requests labelled run-e2e. The reference
+# images build on main and on manual runs only.
+on:
+  push:
+    branches: [main]
+    paths-ignore: ['**/*.md', 'docs/**']
+  pull_request:
+    paths-ignore: ['**/*.md', 'docs/**']
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+# SPEC §9's stages: typecheck → unit/golden → database/policy → build/image.
+# The database stage is not optional: the tenancy, publication, and isolation
+# guarantees are database facts, and a green unit run proves none of them.
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    # A hung run would otherwise use GitHub's 6-hour default.
+    timeout-minutes: 180
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: cms
+          POSTGRES_PASSWORD: cms
+          POSTGRES_DB: cms_dev
+        ports:
+          - 54329:5432
+        options: >-
+          --health-cmd "pg_isready -U cms"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgres://cms:cms@127.0.0.1:54329/cms_dev
+      DATABASE_URL_AUTHENTICATED: postgres://cms_admin_app:devpassword@127.0.0.1:54329/cms_dev
+      DATABASE_URL_PUBLIC: postgres://cms_site_app:devpassword@127.0.0.1:54329/cms_dev
+      DATABASE_URL_WORKER: postgres://cms_worker_app:devpassword@127.0.0.1:54329/cms_dev
+      TEST_DATABASE_URL: postgres://cms:cms@127.0.0.1:54329/postgres
+      AUTH_SECRET: ci-secret-value-not-used-in-production
+      RUN_E2E: ${{ github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'run-e2e') }}
+
+    steps:
+      - uses: actions/checkout@v4
+      # pnpm version comes from package.json's packageManager field
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          # SPEC §2: development, CI, and the container share one Node major.
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+
+      - name: Node version
+        run: pnpm check:node
+
+      - name: Typecheck and style lint
+        run: pnpm typecheck
+        timeout-minutes: 15
+
+      - name: Formatting
+        run: pnpm format:check
+
+      - name: Unit and golden tests
+        run: pnpm -r test
+        timeout-minutes: 20
+
+      # Applies every migration to an empty database, exactly as a deploy does.
+      - name: Migrate a clean database
+        run: pnpm db:bootstrap
+
+      - name: Migrations are idempotent on a second run
+        run: pnpm db:migrate
+
+      - name: Seed through the real command surface
+        run: pnpm db:seed
+
+      - name: Database and policy tests
+        run: pnpm test:db
+        timeout-minutes: 20
+
+      - name: Build
+        run: pnpm -r build
+        timeout-minutes: 20
+
+      # The browser suite: Chromium, on main, on manual runs, or when a pull
+      # request carries the run-e2e label. Firefox and WebKit stay in the
+      # release gate (SPEC §9).
+      - name: Cache Playwright browsers
+        if: env.RUN_E2E == 'true'
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+
+      - name: Install Chromium
+        if: env.RUN_E2E == 'true'
+        run: pnpm --filter e2e exec playwright install --with-deps chromium
+
+      - name: Browser and public-contract specs
+        if: env.RUN_E2E == 'true'
+        run: pnpm --filter e2e test:e2e
+        timeout-minutes: 150
+
+      - name: Keep the trace of a failed browser run
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            e2e/playwright-report/
+            e2e/test-results/
+          retention-days: 7
+
+  image:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      # SPEC §3.4: portability is verified by building the reference image, not
+      # asserted. The five roles are commands on this one artifact.
+      - name: Build the reference image
+        run: docker build --build-arg APP_VERSION=${{ github.sha }} -t cms-v2:${{ github.sha }} .
+
+      - name: Build the recovery operator image
+        run: docker build --target recovery --build-arg APP_VERSION=${{ github.sha }} -t cms-v2-recovery:${{ github.sha }} .
+
+      - name: Offline runtime and recovery packaging smoke
+        run: sh scripts/smoke-images.sh cms-v2:${{ github.sha }} cms-v2-recovery:${{ github.sha }}

@@ -1,0 +1,35 @@
+{
+  "name": "@cms/importer",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --config vitest.config.ts",
+    "import": "node --env-file-if-exists=../../.env --experimental-strip-types src/cli.ts",
+    "inventory": "node --env-file-if-exists=../../.env --experimental-strip-types src/cli.ts inventory",
+    "migration": "node --env-file-if-exists=../../.env --experimental-strip-types src/migration-cli.ts",
+    "website": "node --env-file-if-exists=../../.env --experimental-strip-types src/website-cli.ts",
+    "bt-homepage": "node --experimental-strip-types src/better-together-cli.ts",
+    "bt-page": "node --experimental-strip-types src/better-together-cli.ts"
+  },
+  "dependencies": {
+    "@cms/renderer": "workspace:*",
+    "@cms/schema": "workspace:*",
+    "entities": "^8.0.0",
+    "parse5": "^8.0.1",
+    "pg": "^8.16.3",
+    "postcss": "^8.5.29",
+    "postcss-selector-parser": "^7.1.6",
+    "sharp": "^0.35.5"
+  },
+  "devDependencies": {
+    "@cms/seeds": "workspace:*",
+    "@types/node": "^26.2.0",
+    "@types/pg": "^8.15.5",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.11"
+  }
+}

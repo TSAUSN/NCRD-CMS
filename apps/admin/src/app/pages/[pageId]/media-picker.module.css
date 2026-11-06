@@ -1,0 +1,37 @@
+.picker {
+  display: grid;
+  gap: var(--space-4);
+  min-width: 0;
+}
+.introduction {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+.introduction p {
+  margin: 0;
+}
+.picker :global(.media-picker-body) {
+  min-height: 0;
+  max-height: 55dvh;
+}
+.picker :global(.media-picker-assets) {
+  border-radius: var(--radius-control);
+}
+.picker :global(.media-picker-choice) {
+  padding-block: 0;
+}
+@media (max-width: 48rem) {
+  .picker :global(.media-picker-body) {
+    max-height: none;
+  }
+}
+
+.picker :global(.media-empty) {
+  grid-column: 1 / -1;
+}
+
+.picker :global(.media-picker-preview .media-thumb img) {
+  object-fit: contain;
+}

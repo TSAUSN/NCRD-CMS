@@ -1,0 +1,130 @@
+.fields {
+  display: grid;
+  gap: var(--space-4);
+  min-width: 0;
+}
+.fields :global(.global-panel) {
+  margin: 0;
+  padding: var(--space-4);
+  min-width: 0;
+  border: var(--line-thin) solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+.fields summary {
+  cursor: pointer;
+  list-style: none;
+  min-height: var(--target-small);
+  display: flex;
+  gap: var(--space-3);
+  align-items: start;
+  margin: 0;
+}
+.fields summary::before {
+  content: '+';
+  color: var(--primary);
+  font-weight: var(--weight-semibold);
+}
+.fields details[open] > summary::before {
+  content: '−';
+}
+.fields summary::-webkit-details-marker {
+  display: none;
+}
+.fields :global(.global-panel-head h2) {
+  font-size: var(--text-emphasis);
+  margin: 0;
+}
+.fields :global(.global-panel-head p) {
+  font-size: var(--text-body);
+  line-height: var(--line-body);
+  margin-block-start: var(--space-1);
+}
+.fields :global(.global-panel-head .eyebrow) {
+  display: none;
+}
+.fields :global(.global-panel-head > span) {
+  display: none;
+}
+.fields details[open] > summary {
+  margin-block-end: var(--space-4);
+}
+.fields :global(.global-form-grid),
+.fields :global(.global-logo-grid),
+.fields :global(.global-link-fields) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+}
+.fields :global(.global-list) {
+  display: grid;
+  gap: var(--space-4);
+}
+.fields :global(.global-span-two) {
+  grid-column: auto;
+}
+.fields :global(.field) {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+}
+.fields :global(.field label) {
+  color: var(--text);
+  font-size: var(--text-body);
+}
+.fields :global(.global-link-row),
+.fields :global(.global-group) {
+  padding: var(--space-3);
+  border: var(--line-thin) solid var(--border);
+  border-radius: var(--radius-control);
+  min-width: 0;
+}
+.fields :global(.global-link-row-head),
+.fields :global(.global-group-head) {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-2);
+  margin-block-end: var(--space-3);
+}
+.fields :global(.global-social-row) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-3);
+}
+.fields :global(button) {
+  min-height: var(--target-small);
+  white-space: normal;
+}
+.fields :global(.global-add) {
+  min-height: var(--target-medium);
+  margin: 0;
+}
+.fields :global(.check-row) {
+  display: flex;
+  align-items: start;
+  gap: var(--space-2);
+  min-height: var(--target-small);
+}
+.fields :global(.check-row span) {
+  display: grid;
+  gap: var(--space-1);
+}
+.fields :global(.check-row small) {
+  color: var(--text-muted);
+}
+.fields summary:focus-visible {
+  outline: var(--line-focus) solid var(--focus);
+  outline-offset: var(--focus-offset);
+}
+
+.fields :is(input:not([type='checkbox']), textarea, select) {
+  font-size: var(--text-body);
+  line-height: var(--line-body);
+  min-height: var(--target-medium);
+}
+
+.iconAction {
+  justify-self: end;
+  flex: none;
+}

@@ -1,0 +1,23 @@
+node_modules
+**/node_modules
+.next
+**/.next
+.git
+.localpg
+*.tsbuildinfo
+**/*.tsbuildinfo
+.env
+.env.local
+coverage
+# Private runtime data, local outputs and alternate dotenv files never enter
+# the build context or the image, even when they are ignored only by Git.
+**/.env*
+**/.media
+**/.localpg
+**/coverage
+**/test-results
+**/playwright-report
+**/.playwright
+**/.DS_Store
+work
+outputs

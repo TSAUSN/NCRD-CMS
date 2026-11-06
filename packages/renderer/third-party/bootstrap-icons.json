@@ -1,0 +1,22 @@
+[
+  {
+    "path": "icons/facebook.svg",
+    "sha": "5fc7cec174878aa31148d379e836847efaba5b41",
+    "source": "https://github.com/twbs/icons/blob/main/icons/facebook.svg"
+  },
+  {
+    "path": "icons/instagram.svg",
+    "sha": "855e65377d74922f99b3d2f8409848cbda2136bb",
+    "source": "https://github.com/twbs/icons/blob/main/icons/instagram.svg"
+  },
+  {
+    "path": "icons/linkedin.svg",
+    "sha": "30fc0e34cb1966a33110db305cf1ce56fe599deb",
+    "source": "https://github.com/twbs/icons/blob/main/icons/linkedin.svg"
+  },
+  {
+    "path": "LICENSE",
+    "sha": "f95243911022df8e34bb8c73c87ef491ee1696cf",
+    "source": "https://github.com/twbs/icons/blob/main/LICENSE"
+  }
+]
