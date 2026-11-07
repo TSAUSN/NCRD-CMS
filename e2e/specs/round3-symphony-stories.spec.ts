@@ -141,7 +141,9 @@ test('Symphony Stories keeps tagging intact, features five private stories in or
     await capture('newsroom-order')
     const moving = featured.locator('[data-feature-id="' + chosen[4]!.id + '"]')
     if (info.project.name === 'chromium')
-      await moving.dragTo(featured.locator('[data-feature-id="' + chosen[0]!.id + '"]'))
+      await moving.dragTo(featured.locator('[data-feature-id="' + chosen[0]!.id + '"]'), {
+        targetPosition: { x: 12, y: 4 },
+      })
     else
       for (let n = 0; n < 4; n++) {
         await moving.getByRole('button', { name: 'Move ' + chosen[4]!.values.title + ' up', exact: true }).click()

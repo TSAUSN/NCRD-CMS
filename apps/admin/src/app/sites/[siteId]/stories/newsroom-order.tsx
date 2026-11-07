@@ -1,4 +1,8 @@
 'use client'
+import { DropIndicator, ReorderAnnouncement } from '../../../../components/ui/drop-indicator.tsx'
+import { flatReorderIntent } from '../../../../components/ui/flat-reorder.ts'
+import reorderStyles from '../../../../components/ui/reorderable-list.module.css'
+import { useReorderableList } from '../../../../components/ui/use-reorderable-list.ts'
 import { ContentOrderList, ContentOrderRow, ContentPreviewCards } from '../../../../components/content-order.tsx'
 import { useEffect, useRef, useState, useTransition } from 'react'
 import { orderedNewsroomStories, storyFeatureRank, storyAllowedInFeeds, storyDateInFeed } from '@cms/schema'
@@ -32,7 +36,9 @@ export function StoriesNewsroomOrder({
     [pending, start] = useTransition(),
     busy = useRef(false),
     intent = useRef<Intent | null>(null),
-    drag = useRef<string | null>(null),
+    featureDrag = useRef<string | null>(null),
+    [overFeatured, setOverFeatured] = useState(false),
+    refusedFeature = useRef(false),
     saved = useRef(initial)
   const ordered = orderedNewsroomStories(state.rows),
     featured = proposal
@@ -159,6 +165,20 @@ export function StoriesNewsroomOrder({
   }
   const title = (row: State['rows'][number]) => String(row.values.title ?? 'Untitled story'),
     date = (row: State['rows'][number]) => String(row.values.published_date ?? '')
+  const reorderDisabled = !editable || pending || Boolean(intent.current)
+  const reorder = useReorderableList({
+    mimeType: 'application/x-cms-featured-story',
+    decide: point =>
+      flatReorderIntent(
+        featured.map(row => row.id),
+        point,
+      ),
+    apply: ({ from, to }) => {
+      const row = featured[from]!
+      move(row.id, to)
+      return title(row) + ' moved to position ' + (to + 1) + '.'
+    },
+  })
   const live = state.rows.filter(row => storyListLive(row, state.publishedSettings)).length,
     needsReview = state.rows.filter(row => storyInSource(row.values) && row.values.reviewed !== true).length
   return (
@@ -247,14 +267,28 @@ export function StoriesNewsroomOrder({
             <p className={shared.meta}>These stay first in the Newsroom, in this order. Drag to change it.</p>
             <ContentOrderList
               aria-label="Featured stories"
+              className={reorderStyles.list}
+              data-reorder-list
               onDragOver={event => {
-                if (editable && !pending && !intent.current) event.preventDefault()
+                if (reorderDisabled || !featureDrag.current) return
+                event.preventDefault()
+                setOverFeatured(featured.length < 5)
+                refusedFeature.current = featured.length >= 5
+                event.dataTransfer.dropEffect = refusedFeature.current ? 'none' : 'copy'
+              }}
+              onDragLeave={event => {
+                if (event.relatedTarget instanceof Node && !event.currentTarget.contains(event.relatedTarget)) {
+                  refusedFeature.current = false
+                  setOverFeatured(false)
+                }
               }}
               onDrop={event => {
+                const id = featureDrag.current
+                if (!id) return
                 event.preventDefault()
-                const id = drag.current
-                drag.current = null
-                if (id && !featured.some(row => row.id === id)) feature(id, true)
+                featureDrag.current = null
+                setOverFeatured(false)
+                feature(id, true)
               }}
             >
               {featured.map((row, index) => (
@@ -265,28 +299,7 @@ export function StoriesNewsroomOrder({
                   photo={row.photoPreview}
                   position={index + 1}
                   data-feature-id={row.id}
-                  draggable={editable && !pending && !intent.current}
-                  onDragStart={event => {
-                    drag.current = row.id
-                    event.dataTransfer.effectAllowed = 'move'
-                    event.dataTransfer.setData('text/plain', row.id)
-                  }}
-                  onDragEnd={() => {
-                    drag.current = null
-                  }}
-                  onDragOver={event => {
-                    if (editable && !pending && !intent.current) event.preventDefault()
-                  }}
-                  onDrop={event => {
-                    event.preventDefault()
-                    event.stopPropagation()
-                    const id = drag.current
-                    drag.current = null
-                    if (id) {
-                      if (featured.some(item => item.id === id)) move(id, index)
-                      else feature(id, true)
-                    }
-                  }}
+                  {...reorder.row(row.id, reorderDisabled)}
                   actions={
                     editable ? (
                       <>
@@ -320,9 +333,17 @@ export function StoriesNewsroomOrder({
                       </>
                     ) : undefined
                   }
-                />
+                >
+                  <DropIndicator
+                    marker={
+                      overFeatured && index === featured.length - 1 ? { row: row.id, edge: 'after' } : reorder.marker
+                    }
+                    row={row.id}
+                  />
+                </ContentOrderRow>
               ))}
             </ContentOrderList>
+            <ReorderAnnouncement>{reorder.announcement}</ReorderAnnouncement>
             {!featured.length && (
               <EmptyState title="No featured stories">Click a story’s star to feature it.</EmptyState>
             )}
@@ -338,12 +359,17 @@ export function StoriesNewsroomOrder({
                   photo={row.photoPreview}
                   draggable={editable && !pending && !intent.current}
                   onDragStart={event => {
-                    drag.current = row.id
+                    featureDrag.current = row.id
+                    refusedFeature.current = false
                     event.dataTransfer.effectAllowed = 'copy'
                     event.dataTransfer.setData('text/plain', row.id)
                   }}
                   onDragEnd={() => {
-                    drag.current = null
+                    if (featureDrag.current && refusedFeature.current)
+                      setError('You can feature up to 5 stories. Remove one first.')
+                    refusedFeature.current = false
+                    featureDrag.current = null
+                    setOverFeatured(false)
                   }}
                   actions={
                     editable ? (
