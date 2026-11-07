@@ -27,7 +27,8 @@ import {
 import { queueFramePreview, requestFramePreview } from '../../../../lib/frame-preview-request.ts'
 import { useSiteLookCanvas } from './use-site-look-canvas.ts'
 import styles from './site-look.module.css'
-import workspace from '../../../../components/workspace.module.css'
+import workspaceFormsStyles from '../../../../components/workspace-styles/workspace-forms.module.css'
+import recordTableStyles from '../../../../components/workspace-styles/record-table.module.css'
 
 type SharedDraft = { header: HeaderConfig; footer: FooterConfig; menu: NavTree }
 type ChangedParts = { header: boolean; footer: boolean; menu: boolean }
@@ -199,12 +200,12 @@ export function SiteLookWorkspace({
   }
   return (
     <div
-      className={styles.workspace + ' ' + workspace.compactForm}
+      className={styles.workspace + ' ' + workspaceFormsStyles.compactForm}
       data-native={!original}
       style={{ '--site-look-top': canvasTop + 'px' } as CSSProperties}
     >
       <div className={styles.toolbar}>
-        <div className={workspace.toolbarField}>
+        <div className={workspaceFormsStyles.toolbarField}>
           <Field id="look-page" label="Preview page" density="compact">
             <select value={page} onChange={event => setPage(event.target.value)}>
               {choices.map(page => (
@@ -281,7 +282,7 @@ export function SiteLookWorkspace({
                         ))}
                       </select>
                     </Field>
-                    <p className={workspace.meta}>
+                    <p className={recordTableStyles.meta}>
                       Choose a starting look, then adjust this site’s own choices below. Your public site changes after
                       publication.
                     </p>
@@ -291,8 +292,8 @@ export function SiteLookWorkspace({
                 relatedControls={
                   canTheme ? (
                     <Card title="Logo and shared parts" density="editor">
-                      <p className={workspace.meta}>The logo, menu and footer have their own site screens.</p>
-                      <div className={workspace.actions}>
+                      <p className={recordTableStyles.meta}>The logo, menu and footer have their own site screens.</p>
+                      <div className={workspaceFormsStyles.actions}>
                         <ButtonLink variant="secondary" href={'/sites/' + siteId + '/header'}>
                           Header &amp; menu
                         </ButtonLink>

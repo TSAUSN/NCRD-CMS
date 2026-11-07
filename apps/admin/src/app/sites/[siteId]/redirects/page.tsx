@@ -8,6 +8,7 @@ import { getRedirectWorkspace } from '../../../../lib/redirects.ts'
 import { RedirectWorkspace } from './workspace.tsx'
 import { SettingsNavigation } from '../../../../components/settings-navigation.tsx'
 import workspace from '../../../../components/workspace.module.css'
+import workspaceFormsStyles from '../../../../components/workspace-styles/workspace-forms.module.css'
 export const dynamic = 'force-dynamic'
 export default async function Redirects({ params }: { params: Promise<{ siteId: string }> }) {
   const session = await currentSession()
@@ -27,7 +28,7 @@ export default async function Redirects({ params }: { params: Promise<{ siteId: 
   if (!site.original_design)
     return (
       <AppShell email={session.email} role={role} groups={navigationFor(site, session.principal)}>
-        <main id="main" className={'wrap wrap-wide ' + workspace.page + ' ' + workspace.compactForm}>
+        <main id="main" className={'wrap wrap-wide ' + workspace.page + ' ' + workspaceFormsStyles.compactForm}>
           <div className={workspace.denseStack} data-layout="compact">
             <PageHeader
               title="Settings"

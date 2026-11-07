@@ -4,7 +4,10 @@ import { NavTree, NavUrl, type NavNode } from '@cms/schema'
 import { canAppendMenuItem, dropMenuItem, editMenuItem, moveMenuItem } from '../lib/menu-editing.ts'
 import { Badge, Button, Card, Dialog, Field, Menu, SegmentedControl, SearchableSelect } from './ui/index.ts'
 import { IconDrag, IconMore, IconPlus } from './icons.tsx'
-import styles from './workspace.module.css'
+import recordTableStyles from './workspace-styles/record-table.module.css'
+import siteSummaryStyles from './workspace-styles/site-summary.module.css'
+import listInspectorStyles from './workspace-styles/list-inspector.module.css'
+import ownedStyles from './compact-menu-editor-styles.module.css'
 import reorderStyles from './ui/reorderable-list.module.css'
 import { useReorderableList } from './ui/use-reorderable-list.ts'
 import { DropIndicator, ReorderAnnouncement } from './ui/drop-indicator.tsx'
@@ -109,7 +112,7 @@ export function CompactMenuEditor({
     return (
       <li
         key={path}
-        className={styles.menuRow}
+        className={listInspectorStyles.menuRow}
         data-nested={nested || undefined}
         data-hidden={!item.visible || undefined}
         {...reorder.row(path, disabled)}
@@ -123,7 +126,7 @@ export function CompactMenuEditor({
         <IconDrag size={10} />
         <Button
           variant="tertiary"
-          className={styles.itemButton}
+          className={listInspectorStyles.itemButton}
           disabled={disabled}
           title={item.label}
           onClick={() => begin(path)}
@@ -133,7 +136,7 @@ export function CompactMenuEditor({
             {!item.visible && ' · Hidden'}
           </span>
         </Button>
-        <span className={styles.menuDestination} title={destination}>
+        <span className={ownedStyles.menuDestination} title={destination}>
           {destination}
         </span>
         <Badge tone={item.dropdownGroup ? 'neutral' : item.target.type === 'page' ? 'live' : 'info'}>
@@ -207,11 +210,11 @@ export function CompactMenuEditor({
         }
       >
         {!tree.length ? (
-          <p className={styles.emptyRow}>
+          <p className={recordTableStyles.emptyRow}>
             No menu items yet. Add a page, website or dropdown to help visitors find their way.
           </p>
         ) : (
-          <ul className={styles.rowList + ' ' + reorderStyles.list} data-reorder-list>
+          <ul className={siteSummaryStyles.rowList + ' ' + reorderStyles.list} data-reorder-list>
             {tree.flatMap((item, index) => [
               row(item, String(index), index, tree.length),
               ...(item.children ?? []).map((child, at) =>
@@ -239,7 +242,7 @@ export function CompactMenuEditor({
             </>
           }
         >
-          <div className={styles.formStack}>
+          <div className={listInspectorStyles.formStack}>
             {editing.fresh && (
               <SegmentedControl
                 appearance="pills"

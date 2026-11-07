@@ -3,7 +3,8 @@ import { SITE_SOCIAL_LABELS, type SiteSocialAccount } from '@cms/schema'
 import type { SiteSettingsWorkspace } from '../../../../../lib/site-settings.ts'
 import { Card } from '../../../../../components/ui/card.tsx'
 import { SettingsEditor, useSettingsDraft } from '../settings-editor.tsx'
-import shared from '../../../../../components/workspace.module.css'
+import recordTableStyles from '../../../../../components/workspace-styles/record-table.module.css'
+import selectionControlsStyles from '../../../../../components/workspace-styles/selection-controls.module.css'
 export function SocialAccountsWorkspace({
   siteId,
   siteName,
@@ -49,7 +50,7 @@ export function SocialAccountsWorkspace({
           One place for this site’s accounts. The footer and social sections read from here, so one change updates every
           page after Publish.
         </p>
-        <table className={shared.table} data-layout="fields">
+        <table className={recordTableStyles.table} data-layout="fields">
           <thead>
             <tr>
               <th scope="col">Account</th>
@@ -86,7 +87,7 @@ export function SocialAccountsWorkspace({
                   ) : null}
                 </td>
                 <td>
-                  <label className={shared.toggleRow}>
+                  <label className={selectionControlsStyles.toggleRow}>
                     <input
                       type="checkbox"
                       role="switch"

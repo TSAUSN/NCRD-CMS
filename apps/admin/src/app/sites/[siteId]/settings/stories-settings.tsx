@@ -4,7 +4,9 @@ import { useRouter } from 'next/navigation'
 import { Button, ButtonLink, Card } from '../../../../components/ui/index.ts'
 import { useNavigationGuard } from '../../../../components/navigation-guard.ts'
 import { changeTags } from '../stories/tags/actions.ts'
-import shared from '../../../../components/workspace.module.css'
+import workspaceFormsStyles from '../../../../components/workspace-styles/workspace-forms.module.css'
+import recordTableStyles from '../../../../components/workspace-styles/record-table.module.css'
+import selectionControlsStyles from '../../../../components/workspace-styles/selection-controls.module.css'
 export type StoriesPolicy = {
   collectionId: string
   revision: string
@@ -74,7 +76,7 @@ export function StoriesSettings({ siteId, policy }: { siteId: string; policy: St
   }
   return (
     <Card density="settings" title="Stories">
-      <div className={shared.compactFields}>
+      <div className={workspaceFormsStyles.compactFields}>
         {!policy ? (
           <>
             <p>
@@ -90,7 +92,7 @@ export function StoriesSettings({ siteId, policy }: { siteId: string; policy: St
         ) : (
           <>
             <p>Stories is on. Manage the words, photos and tags in Stories.</p>
-            <label className={shared.toggleRow}>
+            <label className={selectionControlsStyles.toggleRow}>
               <span>Include unreviewed stories in feeds</span>
               <input
                 type="checkbox"
@@ -99,11 +101,11 @@ export function StoriesSettings({ siteId, policy }: { siteId: string; policy: St
                 onChange={event => setValue(event.target.checked)}
               />
             </label>
-            <p className={shared.meta}>
+            <p className={recordTableStyles.meta}>
               When this is off, a story needs Reviewed before it appears in feeds. The setting changes the public site
               after publishing.
             </p>
-            <div className={shared.actions}>
+            <div className={workspaceFormsStyles.actions}>
               <Button
                 variant="secondary"
                 loading={pending}
@@ -126,7 +128,9 @@ export function StoriesSettings({ siteId, policy }: { siteId: string; policy: St
               )}
             </div>
             {!policy.configured && (
-              <p className={shared.meta}>Saving adopts the existing Stories library’s tag settings as a draft.</p>
+              <p className={recordTableStyles.meta}>
+                Saving adopts the existing Stories library’s tag settings as a draft.
+              </p>
             )}
           </>
         )}

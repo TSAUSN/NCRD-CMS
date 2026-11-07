@@ -6,6 +6,9 @@ import type { SiteRow } from '../lib/queries.ts'
 import type { WorkspacePage } from '../lib/workspace-queries.ts'
 import type { editorialStoryHome } from '../lib/editor-home.ts'
 import shared from './workspace.module.css'
+import workspaceFormsStyles from './workspace-styles/workspace-forms.module.css'
+import recordTableStyles from './workspace-styles/record-table.module.css'
+import siteSummaryStyles from './workspace-styles/site-summary.module.css'
 type StoryHome = Awaited<ReturnType<typeof editorialStoryHome>>
 export function EditorHome({
   email,
@@ -52,7 +55,7 @@ export function EditorHome({
     <AppShell email={email} role={role} groups={navigationFor(site, access)}>
       <main
         id="main"
-        className={'wrap wrap-wide ' + shared.page + ' ' + shared.compactForm + ' ' + shared.denseStack}
+        className={'wrap wrap-wide ' + shared.page + ' ' + workspaceFormsStyles.compactForm + ' ' + shared.denseStack}
         data-layout="compact"
       >
         <PageHeader
@@ -70,7 +73,7 @@ export function EditorHome({
         <div className={shared.threeColumns} aria-label="Your tasks">
           {full && site.has_stories && (
             <Link
-              className={shared.task}
+              className={siteSummaryStyles.task}
               data-density="compact"
               aria-label={canCreate ? 'Add a story' : 'Update stories'}
               href={base + (canCreate ? '/stories/new' : '/stories')}
@@ -82,13 +85,18 @@ export function EditorHome({
             </Link>
           )}
           {full && !site.has_stories && site.has_content_lists && (
-            <Link className={shared.task} data-density="compact" aria-label="Update lists" href={base + '/content'}>
+            <Link
+              className={siteSummaryStyles.task}
+              data-density="compact"
+              aria-label="Update lists"
+              href={base + '/content'}
+            >
               <strong>Update lists</strong>
               <span>Keep the lists you work on up to date.</span>
             </Link>
           )}
           <Link
-            className={shared.task}
+            className={siteSummaryStyles.task}
             data-density="compact"
             aria-label={pageTask ? 'Edit ' + pageTask.title : scoped ? 'Your assigned pages' : 'Edit a page'}
             href={pageTask ? '/pages/' + pageTask.id : base + '/pages'}
@@ -98,7 +106,7 @@ export function EditorHome({
           </Link>
           {full && site.has_stories && canSchedule && (
             <Link
-              className={shared.task}
+              className={siteSummaryStyles.task}
               data-density="compact"
               aria-label="See what’s coming up"
               href={base + '/stories?view=soon'}
@@ -115,25 +123,30 @@ export function EditorHome({
             </Link>
           )}
           {!canSchedule && (
-            <Link className={shared.task} data-density="compact" aria-label="Follow your requests" href="/inbox">
+            <Link
+              className={siteSummaryStyles.task}
+              data-density="compact"
+              aria-label="Follow your requests"
+              href="/inbox"
+            >
               <strong>Follow your requests</strong>
               <span>See the drafts you sent for approval.</span>
             </Link>
           )}
           {chapterSetup && (
-            <Link className={shared.task} data-density="compact" href={base + '/chapters'}>
+            <Link className={siteSummaryStyles.task} data-density="compact" href={base + '/chapters'}>
               <strong>Set up chapters</strong>
               <span>Choose page sections and invite chapter volunteers.</span>
             </Link>
           )}
         </div>
         <Card title="Needs attention" density="compact">
-          <ul className={shared.rowList}>
+          <ul className={siteSummaryStyles.rowList}>
             {storyError && (
               <li>
-                <div className={shared.rowCopy}>
+                <div className={recordTableStyles.rowCopy}>
                   <strong>Story tasks could not be loaded</strong>
-                  <span className={shared.meta}>
+                  <span className={recordTableStyles.meta}>
                     Your saved stories remain available. Try Home again or open Stories.
                   </span>
                 </div>
@@ -144,11 +157,11 @@ export function EditorHome({
             )}
             {stories && stories.missing > 0 && (
               <li>
-                <div className={shared.rowCopy}>
+                <div className={recordTableStyles.rowCopy}>
                   <strong>
                     {stories.missing} {stories.missing === 1 ? 'story needs' : 'stories need'} tags
                   </strong>
-                  <span className={shared.meta}>Tag them so they show on the right pages.</span>
+                  <span className={recordTableStyles.meta}>Tag them so they show on the right pages.</span>
                 </div>
                 <ButtonLink variant="secondary" size="s" href={base + '/stories?status=untagged'}>
                   Tag stories
@@ -157,9 +170,9 @@ export function EditorHome({
             )}
             {gap && (
               <li>
-                <div className={shared.rowCopy}>
+                <div className={recordTableStyles.rowCopy}>
                   <strong>{gap.label} has no stories in the last 13 months</strong>
-                  <span className={shared.meta}>The page shows its “no stories yet” line.</span>
+                  <span className={recordTableStyles.meta}>The page shows its “no stories yet” line.</span>
                 </div>
                 <ButtonLink
                   variant="secondary"
@@ -172,11 +185,11 @@ export function EditorHome({
             )}
             {reviewCount > 0 && (
               <li>
-                <div className={shared.rowCopy}>
+                <div className={recordTableStyles.rowCopy}>
                   <strong>
                     {reviewCount} {reviewCount === 1 ? 'submission needs' : 'submissions need'} your review
                   </strong>
-                  <span className={shared.meta}>Read the proposed changes and leave your decision.</span>
+                  <span className={recordTableStyles.meta}>Read the proposed changes and leave your decision.</span>
                 </div>
                 <ButtonLink variant="secondary" size="s" href="/inbox">
                   Review
@@ -185,11 +198,11 @@ export function EditorHome({
             )}
             {drafts.length > 0 && (
               <li>
-                <div className={shared.rowCopy}>
+                <div className={recordTableStyles.rowCopy}>
                   <strong>
                     {drafts.length} {drafts.length === 1 ? 'page has' : 'pages have'} saved work not live
                   </strong>
-                  <span className={shared.meta}>
+                  <span className={recordTableStyles.meta}>
                     {scoped ? 'Only your assigned pages are included.' : 'Open a page to continue its saved draft.'}
                   </span>
                 </div>
@@ -200,9 +213,9 @@ export function EditorHome({
             )}
             {!attention && (
               <li>
-                <div className={shared.rowCopy}>
+                <div className={recordTableStyles.rowCopy}>
                   <strong>Nothing needs your attention</strong>
-                  <span className={shared.meta}>Start with one of your tasks above.</span>
+                  <span className={recordTableStyles.meta}>Start with one of your tasks above.</span>
                 </div>
               </li>
             )}

@@ -1,0 +1,4 @@
+.wrapAnywhere {
+  overflow-wrap: anywhere;
+  min-width: 0;
+}

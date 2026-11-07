@@ -16,6 +16,12 @@ import { Field } from '../../../../components/ui/field.tsx'
 import { EmptyState, Note } from '../../../../components/ui/feedback.tsx'
 import { Badge } from '../../../../components/ui/status-pill.tsx'
 import shared from '../../../../components/workspace.module.css'
+import workspaceFormsStyles from '../../../../components/workspace-styles/workspace-forms.module.css'
+import recordTableStyles from '../../../../components/workspace-styles/record-table.module.css'
+import selectionControlsStyles from '../../../../components/workspace-styles/selection-controls.module.css'
+import listInspectorStyles from '../../../../components/workspace-styles/list-inspector.module.css'
+import reviewWorkbenchStyles from '../../../../components/workspace-styles/review-workbench.module.css'
+import ownedStyles from './workspace-styles.module.css'
 import ui from '../../../../components/ui/ui.module.css'
 type Usage = Record<string, { id: string; title: string }[]>
 export function DataValuesWorkspace({
@@ -214,7 +220,7 @@ export function DataValuesWorkspace({
           selected ? (
             <>
               <h2 title={selected.label || 'Add a number'}>{selected.label || 'Add a number'}</h2>
-              <div className={shared.actions}>
+              <div className={workspaceFormsStyles.actions}>
                 <Button variant="tertiary" onClick={() => select(null)}>
                   Back
                 </Button>
@@ -247,7 +253,7 @@ export function DataValuesWorkspace({
         }
         footer={
           selected && !archived ? (
-            <div className={shared.actions}>
+            <div className={workspaceFormsStyles.actions}>
               <Button variant="secondary" disabled={pending || !valid || !dirty} onClick={() => save('save')}>
                 Save draft
               </Button>
@@ -292,7 +298,7 @@ export function DataValuesWorkspace({
                   This number doesn’t change. Choose Needs checking or Matches report before editing its value.
                 </Note>
               )}
-              <div className={shared.formRow}>
+              <div className={workspaceFormsStyles.formRow}>
                 <Field density="compact" id="data-number" label="Value">
                   <input
                     value={selected.value}
@@ -335,7 +341,7 @@ export function DataValuesWorkspace({
                 />
               </Field>
               {selected.sourcePageId && <TextLink href={'/pages/' + selected.sourcePageId}>Open source page</TextLink>}
-              <label className={shared.toggleRow}>
+              <label className={selectionControlsStyles.toggleRow}>
                 <span>Show the source in small print</span>
                 <input
                   type="checkbox"
@@ -356,12 +362,17 @@ export function DataValuesWorkspace({
                   <option value="does-not-change">Doesn't change</option>
                 </select>
               </Field>
-              <div className={shared.formStack}>
+              <div className={listInspectorStyles.formStack}>
                 <p className={ui.help}>Shown on</p>
                 {pageLinks.length ? (
-                  <div className={shared.actions}>
+                  <div className={workspaceFormsStyles.actions}>
                     {pageLinks.map(page => (
-                      <TextLink key={page.id} href={'/pages/' + page.id} className={shared.linkChip} title={page.title}>
+                      <TextLink
+                        key={page.id}
+                        href={'/pages/' + page.id}
+                        className={ownedStyles.linkChip}
+                        title={page.title}
+                      >
                         {page.title}
                       </TextLink>
                     ))}
@@ -376,8 +387,8 @@ export function DataValuesWorkspace({
         }
       >
         <div className={shared.denseStack}>
-          <div className={shared.workbenchActions}>
-            <div className={shared.toolbarField}>
+          <div className={reviewWorkbenchStyles.workbenchActions}>
+            <div className={workspaceFormsStyles.toolbarField}>
               <Field density="compact" id="data-search" label="Search numbers">
                 <input type="search" value={search} onChange={event => setSearch(event.target.value)} />
               </Field>
@@ -396,8 +407,12 @@ export function DataValuesWorkspace({
               <TextLink href={'/sites/' + siteId + '/publishing'}>Review saved number changes in Publish</TextLink>
             </p>
           )}
-          <div className={shared.tableWrap} data-responsive="records">
-            <table data-density="content" data-layout="records" className={shared.table + ' ' + shared.compactTable}>
+          <div className={recordTableStyles.tableWrap} data-responsive="records">
+            <table
+              data-density="content"
+              data-layout="records"
+              className={recordTableStyles.table + ' ' + recordTableStyles.compactTable}
+            >
               <thead>
                 <tr>
                   <th>Number</th>
@@ -417,28 +432,31 @@ export function DataValuesWorkspace({
                     <td>
                       <Button
                         variant="tertiary"
-                        className={shared.tableTitle}
+                        className={recordTableStyles.tableTitle}
                         title={row.label}
                         onClick={() => select(row)}
                       >
-                        <span className={shared.truncateValue}>{row.label}</span>
+                        <span className={recordTableStyles.truncateValue}>{row.label}</span>
                       </Button>
-                      <p className={shared.meta}>
+                      <p className={recordTableStyles.meta}>
                         Used on {usage[row.id]?.length ?? 0} {(usage[row.id]?.length ?? 0) === 1 ? 'page' : 'pages'}
                       </p>
                     </td>
                     <td>
-                      <strong className={shared.numberValue + ' ' + shared.truncateValue} title={row.value}>
+                      <strong
+                        className={recordTableStyles.numberValue + ' ' + recordTableStyles.truncateValue}
+                        title={row.value}
+                      >
                         {row.value}
                       </strong>
                     </td>
                     <td data-secondary className={ui.help}>
-                      <span className={shared.truncateValue} title={row.source}>
+                      <span className={recordTableStyles.truncateValue} title={row.source}>
                         {row.source}
                       </span>
                     </td>
                     <td data-secondary data-col="date" className={ui.help}>
-                      <span className={shared.truncateValue} title={row.asOf || 'Unknown'}>
+                      <span className={recordTableStyles.truncateValue} title={row.asOf || 'Unknown'}>
                         {row.asOf || 'Unknown'}
                       </span>
                     </td>

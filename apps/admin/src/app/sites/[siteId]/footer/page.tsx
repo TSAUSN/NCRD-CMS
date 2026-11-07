@@ -14,6 +14,7 @@ import {
 import { publicSiteOrigin } from '../../../../lib/public-site-url.ts'
 import { FooterWorkspace } from './workspace.tsx'
 import styles from '../../../../components/workspace.module.css'
+import workspaceFormsStyles from '../../../../components/workspace-styles/workspace-forms.module.css'
 export const dynamic = 'force-dynamic'
 export default async function FooterPage({ params }: { params: Promise<{ siteId: string }> }) {
   const session = await currentSession()
@@ -33,7 +34,7 @@ export default async function FooterPage({ params }: { params: Promise<{ siteId:
   if (!frame || !menu || !theme || !allowed) notFound()
   return (
     <AppShell email={session.email} role={role} groups={navigationFor(site, session.principal)}>
-      <main id="main" className={'wrap wrap-wide ' + styles.page + ' ' + styles.compactForm}>
+      <main id="main" className={'wrap wrap-wide ' + styles.page + ' ' + workspaceFormsStyles.compactForm}>
         <FooterWorkspace
           key={siteId}
           siteId={siteId}

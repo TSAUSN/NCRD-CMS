@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react'
 import { heroPhotoContrast } from '../../../lib/hero-contrast.ts'
 import type { heroSlidePresentation } from '@cms/schema'
-import shared from '../../../components/workspace.module.css'
+import recordTableStyles from '../../../components/workspace-styles/record-table.module.css'
 export function HeroContrastCheck({
   photoUrl,
   shade,
@@ -58,7 +58,7 @@ export function HeroContrastCheck({
     }
   }, [photoUrl, shade])
   return (
-    <p className={shared.meta} role="status">
+    <p className={recordTableStyles.meta} role="status">
       {label}:{' '}
       {ratio === undefined
         ? 'Checking this photo…'

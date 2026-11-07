@@ -1,0 +1,8 @@
+.previewFrame {
+  display: block;
+  width: 100%;
+  height: var(--entry-width);
+  border: var(--line-thin) solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}

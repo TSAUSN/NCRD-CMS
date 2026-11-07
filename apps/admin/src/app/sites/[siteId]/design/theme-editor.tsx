@@ -1,7 +1,8 @@
 'use client'
 
 import { Badge, Button, Card, Disclosure, Field } from '../../../../components/ui/index.ts'
-import workspace from '../../../../components/workspace.module.css'
+import listInspectorStyles from '../../../../components/workspace-styles/list-inspector.module.css'
+import ownedStyles from './theme-editor-styles.module.css'
 import { NATIONAL_THEME } from '@cms/seeds/core-themes'
 import { ThemeFontPairings, ThemeButtonChoices } from '../../../../components/theme-choice-fields.tsx'
 import styles from './theme-editor.module.css'
@@ -394,7 +395,7 @@ export function ThemeEditor({
               ) : undefined
             }
           >
-            <div className={workspace.formStack}>
+            <div className={listInspectorStyles.formStack}>
               {COLOR_CONTROLS.map(control => {
                 const pair = controlsOnly
                   ? control.key === 'primary'
@@ -414,7 +415,7 @@ export function ThemeEditor({
                   approvedPair = approvedPrimary && ['primary', 'primaryContrast'].includes(control.key)
                 return (
                   <div
-                    className={workspace.colourRole}
+                    className={ownedStyles.colourRole}
                     data-compact={(controlsOnly && !advancedColours) || undefined}
                     key={control.key}
                     hidden={
@@ -422,7 +423,7 @@ export function ThemeEditor({
                     }
                   >
                     <label htmlFor={`theme-${control.key}`}>{label}</label>
-                    <div className={workspace.colourInputs}>
+                    <div className={ownedStyles.colourInputs}>
                       <input
                         type="color"
                         aria-label={`${label} colour picker`}
@@ -453,7 +454,7 @@ export function ThemeEditor({
                             : 'Available to sections that opt into this role.'}
                       </small>
                     )}
-                    <div className={workspace.colourMeta}>
+                    <div className={ownedStyles.colourMeta}>
                       {pair !== undefined && (
                         <Badge
                           tone={approvedPair ? 'neutral' : pair?.passesAA ? 'live' : 'error'}
@@ -491,7 +492,7 @@ export function ThemeEditor({
             <p className="hint">Choose a heading and body pairing. The specimens use fonts included with your site.</p>
             <ThemeFontPairings tokens={tokens} disabled={pending || !canManage} onChange={setTokens} />
             <Disclosure title="More font choices">
-              <div className={workspace.formStack}>
+              <div className={listInspectorStyles.formStack}>
                 <Field id="theme-heading-font" label="Headings">
                   <select
                     id="theme-heading-font"
@@ -538,7 +539,7 @@ export function ThemeEditor({
             <p className="hint">One button style for the whole site.</p>
             <ThemeButtonChoices tokens={tokens} disabled={pending || !canManage} onChange={setTokens} />
             <Disclosure title="More button options">
-              <div className={workspace.formStack}>
+              <div className={listInspectorStyles.formStack}>
                 <ThemeSelect
                   label="Colour"
                   value={tokens.buttons.color}
@@ -591,7 +592,7 @@ export function ThemeEditor({
 
           <Card title="Site density" id="theme-rhythm-title" density="editor">
             <p className="hint">How roomy sections feel across the whole site.</p>
-            <div className={workspace.formStack}>
+            <div className={listInspectorStyles.formStack}>
               <ThemeSelect
                 label="Spacing"
                 value={tokens.spacing}

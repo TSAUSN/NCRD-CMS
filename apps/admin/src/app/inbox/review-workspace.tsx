@@ -1,7 +1,12 @@
 'use client'
 
 import state from '../../components/state.module.css'
-import workspace from '../../components/workspace.module.css'
+import workspaceFormsStyles from '../../components/workspace-styles/workspace-forms.module.css'
+import recordTableStyles from '../../components/workspace-styles/record-table.module.css'
+import listInspectorStyles from '../../components/workspace-styles/list-inspector.module.css'
+import reviewWorkbenchStyles from '../../components/workspace-styles/review-workbench.module.css'
+import versionHistoryStyles from '../../components/workspace-styles/version-history.module.css'
+import ownedStyles from './review-workspace-styles.module.css'
 import { Dialog, Button } from '../../components/ui/index.ts'
 import { reviewTime as formatWhen } from '../../lib/review-time.ts'
 import { ScriptlessPreview } from '../../components/scriptless-preview.tsx'
@@ -327,7 +332,7 @@ export function ReviewWorkspace({
   const notes = comments.filter(comment => comment.resolvedAt === null).length
   const canDecide = selected?.status === 'open' && selected.isCurrent && selected.canReview
   const checks = (
-    <section className={workspace.workbenchChecks} aria-label="Checks">
+    <section className={reviewWorkbenchStyles.workbenchChecks} aria-label="Checks">
       <h3>Checks</h3>
       {!readiness ? (
         <p>Checks could not be completed. Refresh before publishing.</p>
@@ -361,7 +366,7 @@ export function ReviewWorkspace({
           queue={
             <>
               {queueHeader}
-              <div className={workspace.queueTools}>
+              <div className={reviewWorkbenchStyles.queueTools}>
                 <Field id="review-search" label="Search review requests">
                   <input
                     type="search"
@@ -386,7 +391,7 @@ export function ReviewWorkspace({
                 />
               </div>
               {visible.length ? (
-                <ol className={workspace.queueItems}>
+                <ol className={reviewWorkbenchStyles.queueItems}>
                   {visible.map(review => (
                     <li key={review.id}>
                       <Link
@@ -400,7 +405,7 @@ export function ReviewWorkspace({
                             {reviewAge(review.submittedAt)}
                           </time>
                         </small>
-                        <span className={workspace.queueTag}>{review.siteName}</span>
+                        <span className={reviewWorkbenchStyles.queueTag}>{review.siteName}</span>
                         {review.unresolvedCommentCount > 0 && (
                           <small>{review.unresolvedCommentCount} open comments</small>
                         )}
@@ -409,7 +414,7 @@ export function ReviewWorkspace({
                   ))}
                 </ol>
               ) : (
-                <p role="status" className={workspace.queueNote}>
+                <p role="status" className={reviewWorkbenchStyles.queueNote}>
                   {query
                     ? 'No matching requests. Try a page, site or person.'
                     : filter === 'waiting'
@@ -417,7 +422,7 @@ export function ReviewWorkspace({
                       : 'No requests in this view.'}
                 </p>
               )}
-              <p className={workspace.queueNote}>
+              <p className={reviewWorkbenchStyles.queueNote}>
                 Approving publishes the change. Asking for changes sends it back with your note.
               </p>
             </>
@@ -444,7 +449,7 @@ export function ReviewWorkspace({
             </EmptyState>
           ) : (
             <>
-              <header className={workspace.workbenchHeader}>
+              <header className={reviewWorkbenchStyles.workbenchHeader}>
                 <div>
                   <p>
                     {selected.siteName} · {selected.pageTitle}
@@ -458,7 +463,7 @@ export function ReviewWorkspace({
                   </p>
                   <span className="review-state">{reviewStatusLabel(selected.status)}</span>
                 </div>
-                <div className={workspace.workbenchActions} role="group" aria-label="Review decision">
+                <div className={reviewWorkbenchStyles.workbenchActions} role="group" aria-label="Review decision">
                   <ButtonLink
                     variant="secondary"
                     size="standard"
@@ -497,10 +502,10 @@ export function ReviewWorkspace({
                 <p role="alert">These saved changes were replaced by newer work. Ask the author to submit again.</p>
               )}
               {selected.requestNote && (
-                <blockquote className={workspace.workbenchQuote}>“{selected.requestNote}”</blockquote>
+                <blockquote className={reviewWorkbenchStyles.workbenchQuote}>“{selected.requestNote}”</blockquote>
               )}
               {selected.status === 'rejected' && selected.decisionNote && (
-                <section className={workspace.formPanel + ' ' + workspace.panel}>
+                <section className={workspaceFormsStyles.formPanel + ' ' + reviewWorkbenchStyles.panel}>
                   <h3>Feedback sent to the author</h3>
                   <p>{selected.decisionNote}</p>
                 </section>
@@ -545,31 +550,31 @@ export function ReviewWorkspace({
                 onChange={setTab}
               >
                 {tab === 'changes' ? (
-                  <div className={workspace.formStack}>
+                  <div className={listInspectorStyles.formStack}>
                     <section
-                      className={workspace.workbenchCompare}
+                      className={reviewWorkbenchStyles.workbenchCompare}
                       aria-label={selected.story ? 'Story changes' : 'Saved changes'}
                     >
                       <h3>{selected.story ? 'Story changes' : 'Saved changes'}</h3>
                       {presentation ? (
                         <>
-                          <p className={workspace.meta}>
+                          <p className={recordTableStyles.meta}>
                             {selected.status === 'approved' && !selected.story
                               ? 'These saved changes were approved and published.'
                               : presentation.summary}
                           </p>
                           {selected.story && (
-                            <p className={workspace.meta}>
+                            <p className={recordTableStyles.meta}>
                               Approval publishes this story and its article together. Other story drafts stay private.
                             </p>
                           )}
                           {presentation.cells.length > 0 && (
                             <>
-                              <div className={workspace.comparisonLabels}>
+                              <div className={versionHistoryStyles.comparisonLabels}>
                                 <span>{selected.story ? 'Live when sent' : 'Live now'}</span>
                                 <span>After approval</span>
                               </div>
-                              <dl className={workspace.comparisonRows}>
+                              <dl className={versionHistoryStyles.comparisonRows}>
                                 {presentation.cells.map((cell, index) => (
                                   <div key={index}>
                                     <dt>{cell.label}</dt>
@@ -593,28 +598,31 @@ export function ReviewWorkspace({
                     {checks}
                   </div>
                 ) : tab === 'preview' ? (
-                  <div className={workspace.formStack}>
-                    <div className={workspace.actions}>
+                  <div className={listInspectorStyles.formStack}>
+                    <div className={workspaceFormsStyles.actions}>
                       <p>Submitted page · read-only</p>
                       <Link href={`/preview/${selected.versionId}?readonly=1`} target="_blank">
                         Open preview
                       </Link>
                     </div>
                     <ScriptlessPreview
-                      className={workspace.workbenchPreview}
+                      className={ownedStyles.workbenchPreview}
                       title={`Submitted version of ${selected.pageTitle}`}
                       src={`/preview/${selected.versionId}?readonly=1`}
                     />
                   </div>
                 ) : (
-                  <section className={workspace.formStack} aria-label="Discussion">
+                  <section className={listInspectorStyles.formStack} aria-label="Discussion">
                     <h3>Discussion</h3>
                     {comments.length === 0 ? (
                       <p>No comments yet. Add a comment about anything that should change.</p>
                     ) : (
                       comments.map(comment => (
-                        <article className={workspace.formPanel + ' ' + workspace.panel} key={comment.id}>
-                          <div className={workspace.workbenchHeader}>
+                        <article
+                          className={workspaceFormsStyles.formPanel + ' ' + reviewWorkbenchStyles.panel}
+                          key={comment.id}
+                        >
+                          <div className={reviewWorkbenchStyles.workbenchHeader}>
                             <div>
                               <strong>{comment.authorName}</strong>
                               <p>
@@ -634,7 +642,7 @@ export function ReviewWorkspace({
                           </div>
                           <p>{comment.body}</p>
                           {comment.mentions.length > 0 && (
-                            <p className={workspace.meta}>
+                            <p className={recordTableStyles.meta}>
                               Mentioned{' '}
                               {comment.mentions
                                 .map(id => people.find(person => person.id === id)?.displayName ?? 'a teammate')
@@ -656,7 +664,7 @@ export function ReviewWorkspace({
                             onChange={event => setCommentBody(event.target.value)}
                           />
                         </Field>
-                        <div className={workspace.actions} role="group" aria-label="Mention a teammate">
+                        <div className={workspaceFormsStyles.actions} role="group" aria-label="Mention a teammate">
                           {people.map(person => (
                             <Button
                               key={person.id}
@@ -683,7 +691,7 @@ export function ReviewWorkspace({
                               : 'A private comment draft is saved in this browser. Add comment sends it to the review.'}
                           </p>
                         )}
-                        <div className={workspace.actions}>
+                        <div className={workspaceFormsStyles.actions}>
                           <Button
                             variant={selected.canApprove ? 'secondary' : 'primary'}
                             disabled={pending || !commentBody.trim()}
@@ -711,7 +719,7 @@ export function ReviewWorkspace({
                         </div>
                       </>
                     ) : commentBody ? (
-                      <section className={workspace.panel + ' ' + workspace.formPanel}>
+                      <section className={reviewWorkbenchStyles.panel + ' ' + workspaceFormsStyles.formPanel}>
                         <h3>Your unsent comment</h3>
                         <p>{commentBody}</p>
                         <p>This private draft has not been added to the review.</p>
@@ -730,8 +738,8 @@ export function ReviewWorkspace({
       </>
     )
   return (
-    <div className={'review-board ' + workspace.workbench}>
-      <aside className={'review-queue ' + workspace.workbenchRail} aria-label="Review requests">
+    <div className={'review-board ' + reviewWorkbenchStyles.workbench}>
+      <aside className={'review-queue ' + reviewWorkbenchStyles.workbenchRail} aria-label="Review requests">
         <div className="review-queue-tools">
           <label className="search review-search">
             <IconSearch size={16} />
@@ -772,7 +780,7 @@ export function ReviewWorkspace({
             <p>{query ? 'Try a page, site or person.' : 'There is no review work in this view.'}</p>
           </div>
         ) : (
-          <ol className={'review-list ' + workspace.workbenchList}>
+          <ol className={'review-list ' + reviewWorkbenchStyles.workbenchList}>
             {visible.map(review => (
               <li key={review.id}>
                 <Link
@@ -804,7 +812,7 @@ export function ReviewWorkspace({
         )}
       </aside>
 
-      <section className={'review-detail ' + workspace.workbenchBody} aria-live="polite">
+      <section className={'review-detail ' + reviewWorkbenchStyles.workbenchBody} aria-live="polite">
         {!selected ? (
           <div className={'review-detail-empty ' + state.state}>
             <span>
@@ -815,7 +823,7 @@ export function ReviewWorkspace({
           </div>
         ) : (
           <>
-            <header className={'review-detail-head ' + workspace.workbenchHeading}>
+            <header className={'review-detail-head ' + ownedStyles.workbenchHeading}>
               <div>
                 <p className="eyebrow">
                   {selected.siteName} · {selected.pagePath}
@@ -839,7 +847,7 @@ export function ReviewWorkspace({
               </div>
             )}
             {selected.requestNote && (
-              <blockquote className={'review-request-note ' + workspace.workbenchQuote}>
+              <blockquote className={'review-request-note ' + reviewWorkbenchStyles.workbenchQuote}>
                 “{selected.requestNote}”
               </blockquote>
             )}
@@ -851,7 +859,7 @@ export function ReviewWorkspace({
             )}
 
             {selected.story && (
-              <section className={workspace.panel} aria-label="Story changes">
+              <section className={reviewWorkbenchStyles.panel} aria-label="Story changes">
                 <h3>Story changes</h3>
                 <p>{selected.story.summary}</p>
                 <p>Approval publishes this story and its article together. Other story drafts stay private.</p>
@@ -881,8 +889,8 @@ export function ReviewWorkspace({
             </div>
 
             <div className="review-content-grid">
-              <section className={'review-preview-panel ' + workspace.panel}>
-                <div className={'review-panel-head ' + workspace.workbenchHeading}>
+              <section className={'review-preview-panel ' + reviewWorkbenchStyles.panel}>
+                <div className={'review-panel-head ' + ownedStyles.workbenchHeading}>
                   <div>
                     <p className="eyebrow">Exact evidence</p>
                     <h3>Submitted page</h3>
@@ -904,8 +912,8 @@ export function ReviewWorkspace({
                 </div>
               </section>
 
-              <aside className={'review-readiness ' + workspace.panel}>
-                <div className={'review-panel-head ' + workspace.workbenchHeading}>
+              <aside className={'review-readiness ' + reviewWorkbenchStyles.panel}>
+                <div className={'review-panel-head ' + ownedStyles.workbenchHeading}>
                   <div>
                     <p className="eyebrow">Publication checks</p>
                     <h3>Readiness</h3>
@@ -952,8 +960,8 @@ export function ReviewWorkspace({
               </aside>
             </div>
 
-            <section className={'review-discussion ' + workspace.panel}>
-              <div className={'review-panel-head ' + workspace.workbenchHeading}>
+            <section className={'review-discussion ' + reviewWorkbenchStyles.panel}>
+              <div className={'review-panel-head ' + ownedStyles.workbenchHeading}>
                 <div>
                   <p className="eyebrow">Team context</p>
                   <h3>Discussion</h3>
@@ -1037,7 +1045,7 @@ export function ReviewWorkspace({
                         : 'A private comment draft is saved in this browser. Add comment sends it to the review.'}
                     </p>
                   )}
-                  <div className={workspace.actions}>
+                  <div className={workspaceFormsStyles.actions}>
                     <button
                       type="button"
                       className="navy"
@@ -1066,7 +1074,7 @@ export function ReviewWorkspace({
                   </div>
                 </div>
               ) : actorId && commentBody ? (
-                <section className={workspace.formPanel + ' ' + workspace.panel}>
+                <section className={workspaceFormsStyles.formPanel + ' ' + reviewWorkbenchStyles.panel}>
                   <h4>Your unsent comment</h4>
                   <p>{commentBody}</p>
                   <p>This private draft has not been added to the review.</p>
@@ -1088,7 +1096,7 @@ export function ReviewWorkspace({
             )}
 
             {selected.status === 'open' && (
-              <footer className={'review-decision-bar ' + workspace.inlineReviewDecisions}>
+              <footer className={'review-decision-bar ' + ownedStyles.inlineReviewDecisions}>
                 <div>
                   <strong>
                     {selected.canReview

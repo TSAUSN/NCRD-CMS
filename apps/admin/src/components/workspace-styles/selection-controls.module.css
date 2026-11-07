@@ -1,0 +1,259 @@
+.visuallyHidden {
+  position: absolute;
+  width: var(--line-thin);
+  height: var(--line-thin);
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+.optionCard {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-2);
+  text-align: start;
+  padding: var(--space-2);
+  background: var(--surface);
+  color: var(--text);
+  border: var(--line-thin) solid var(--border-strong);
+  border-radius: var(--radius-card);
+  white-space: normal;
+  box-shadow: none;
+}
+.optionCard[aria-pressed='true'] {
+  border-color: var(--focus);
+  background: var(--brand-tint);
+  box-shadow: inset 0 0 0 var(--line-thin) var(--focus);
+}
+.optionCard strong {
+  font-size: var(--text-meta);
+}
+.optionCard small {
+  color: var(--text-muted);
+  font-weight: var(--weight-regular);
+}
+
+.choiceRows {
+  display: grid;
+  gap: var(--space-2);
+}
+.choiceRows label {
+  position: relative;
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  padding: var(--space-3);
+  border: var(--line-thin) solid var(--border);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+}
+.choiceRows label:has(input:checked) {
+  border-color: var(--focus);
+  background: var(--brand-tint);
+}
+.toggleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  font-size: var(--text-meta);
+}
+.toggleRow input {
+  flex: none;
+  width: auto;
+}
+.toggleRow {
+  min-height: var(--target-small);
+}
+.toggleRow input[type='checkbox'] {
+  appearance: none;
+  position: relative;
+  width: var(--toggle-width);
+  height: var(--toggle-height);
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--toggle-off);
+  cursor: pointer;
+}
+.toggleRow input[type='checkbox']::after {
+  content: '';
+  position: absolute;
+  top: var(--toggle-inset);
+  left: var(--toggle-inset);
+  width: var(--toggle-knob);
+  height: var(--toggle-knob);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+}
+.toggleRow input[type='checkbox']:checked {
+  background: var(--focus);
+}
+.toggleRow input[type='checkbox']:checked::after {
+  left: calc(var(--toggle-width) - var(--toggle-knob) - var(--toggle-inset));
+}
+
+.choiceRows label:has(input:focus-visible) {
+  outline: var(--line-focus) solid var(--focus);
+  outline-offset: var(--space-1);
+}
+.toggleRow[data-layout='inline'] {
+  justify-content: flex-start;
+  gap: var(--space-2);
+  white-space: nowrap;
+}
+
+.checkRow {
+  display: flex;
+  align-items: center;
+  gap: var(--control-icon-gap);
+  font-size: var(--text-help);
+  font-weight: var(--weight-regular);
+}
+.checkRow input[type='checkbox'] {
+  appearance: none;
+  flex: none;
+  width: var(--space-4);
+  height: var(--space-4);
+  min-height: 0;
+  padding: 0;
+  margin: 0;
+  border: var(--line-thin) solid var(--border-strong);
+  border-radius: var(--size-3);
+  background: var(--surface);
+  cursor: pointer;
+}
+.checkRow input[type='checkbox']:checked {
+  background: var(--focus) var(--checkbox-tick) center/contain no-repeat;
+  border-color: var(--focus);
+}
+.checkRow input[type='checkbox']:focus-visible {
+  outline: var(--line-focus) solid var(--focus);
+  outline-offset: var(--focus-offset);
+}
+.checkRow input[type='checkbox']:disabled {
+  cursor: default;
+  opacity: var(--opacity-disabled);
+}
+
+.tagChip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  height: auto;
+  min-height: var(--story-tag-height);
+  padding: 0 var(--space-fact);
+  border: var(--line-thin) solid var(--border-strong);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--text);
+  font: var(--weight-regular) var(--story-tag-text)/var(--line-meta) var(--font-ui);
+  cursor: pointer;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tagChip:is([aria-pressed='true'], [data-selected]) {
+  color: var(--text-on-dark);
+  background: var(--tag-main);
+  border-color: var(--tag-main);
+}
+.tagChip:is([aria-pressed='true'], [data-selected])[data-group='secondary'] {
+  background: var(--status-review);
+  border-color: var(--status-review);
+}
+.tagChip:focus-visible {
+  outline: var(--line-focus) solid var(--focus);
+  outline-offset: var(--focus-offset);
+}
+.tagChip:not([aria-pressed='true']):not([data-selected]):hover {
+  background: var(--surface);
+  color: var(--text);
+  border-color: var(--tag-main);
+}
+
+.optionCard[data-selected='true'] {
+  border-color: var(--focus);
+  background: var(--brand-tint);
+}
+.optionCard:has(input:focus-visible) {
+  outline: var(--line-focus) solid var(--focus);
+  outline-offset: var(--focus-offset);
+}
+.optionCard[data-layout='row'] {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  border-radius: var(--radius-control);
+  padding: var(--space-2) var(--space-3);
+}
+.optionCard[data-layout='row'] > :not(dialog) {
+  min-width: 0;
+  margin: 0;
+}
+.optionCard[data-layout='row'] > label {
+  align-self: stretch;
+  cursor: pointer;
+}
+.optionCard[data-layout='row'] > div {
+  gap: 0;
+}
+
+.optionCard[data-layout='row'] label:has(> span.visuallyHidden) {
+  height: 0;
+  margin: 0;
+}
+
+/* Shared record board,compact rows and bounded usage links. */
+
+/* Shared field attachment preview keeps controls within narrow drawers. */
+.checkRow.checkRow {
+  display: flex;
+  align-items: center;
+}
+
+.checkRow > span {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.optionCard[data-layout='record'] {
+  flex-direction: row;
+  align-items: center;
+  min-height: var(--record-row-height);
+  width: 100%;
+}
+.toggleRow.toggleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.choiceRows label > span {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.toggleRow small {
+  display: block;
+}
+
+/* Hidden choice controls must not inherit full-width text-field sizing. */
+.choiceRows input.visuallyHidden {
+  width: var(--line-thin);
+  height: var(--line-thin);
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  inset-inline-start: var(--space-3);
+}

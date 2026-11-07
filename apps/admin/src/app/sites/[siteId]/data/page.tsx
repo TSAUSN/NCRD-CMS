@@ -4,6 +4,7 @@ import { getSite } from '../../../../lib/queries.ts'
 import { getSiteSettingsWorkspace } from '../../../../lib/site-settings.ts'
 import { getDataValueUsage } from '../../../../lib/data-values.ts'
 import shared from '../../../../components/workspace.module.css'
+import workspaceFormsStyles from '../../../../components/workspace-styles/workspace-forms.module.css'
 import { DataValuesWorkspace } from './workspace.tsx'
 export const dynamic = 'force-dynamic'
 export default async function DataValuesPage({ params }: { params: Promise<{ siteId: string }> }) {
@@ -22,7 +23,7 @@ export default async function DataValuesPage({ params }: { params: Promise<{ sit
     getDataValueUsage(session.principal.userId, siteId),
   ])
   return (
-    <main id="main" className={'wrap wrap-wide ' + shared.page + ' ' + shared.compactForm}>
+    <main id="main" className={'wrap wrap-wide ' + shared.page + ' ' + workspaceFormsStyles.compactForm}>
       <DataValuesWorkspace siteId={siteId} archived={site.status === 'archived'} initial={initial} usage={usage} />
     </main>
   )

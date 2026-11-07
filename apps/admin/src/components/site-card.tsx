@@ -1,6 +1,8 @@
 import { contentCounts } from '../lib/content-counts.ts'
 import { SiteCardPreview } from './site-card-preview.tsx'
-import styles from './workspace.module.css'
+import recordTableStyles from './workspace-styles/record-table.module.css'
+import siteSummaryStyles from './workspace-styles/site-summary.module.css'
+import ownedStyles from './site-card-styles.module.css'
 import { GuardedLink as Link } from './guarded-link.tsx'
 import { publicSiteOrigin } from '../lib/public-site-url.ts'
 import type { SiteSummaryRow } from '../lib/queries.ts'
@@ -29,17 +31,17 @@ export function SiteCard({ site, compactHome = false }: { site: SiteSummaryRow; 
     (!!site.primary_hostname || !site.hosting_status || site.hosting_status === 'ready')
   if (compactHome)
     return (
-      <article className={'site-card ' + styles.siteCard + ' ' + styles.homeSiteCard}>
-        <Link className={styles.homeSitePreview} href={'/sites/' + site.id} aria-label={'Open ' + site.name}>
+      <article className={'site-card ' + siteSummaryStyles.siteCard + ' ' + siteSummaryStyles.homeSiteCard}>
+        <Link className={ownedStyles.homeSitePreview} href={'/sites/' + site.id} aria-label={'Open ' + site.name}>
           {site.preview_image ? (
             <SiteCardPreview key={site.preview_image} src={site.preview_image} name={site.name} />
           ) : (
             <span>No home-page preview</span>
           )}
         </Link>
-        <div className={styles.cardSummary}>
-          <div className={styles.cardTitleRow}>
-            <Link className={styles.cardTitle} href={'/sites/' + site.id} title={site.name}>
+        <div className={ownedStyles.cardSummary}>
+          <div className={ownedStyles.cardTitleRow}>
+            <Link className={siteSummaryStyles.cardTitle} href={'/sites/' + site.id} title={site.name}>
               {site.name}
             </Link>
             <Badge
@@ -56,20 +58,20 @@ export function SiteCard({ site, compactHome = false }: { site: SiteSummaryRow; 
                   {site.primary_hostname ? 'Visit site' : 'View site'}
                 </a>
               )}
-              <p className={styles.meta}>
+              <p className={recordTableStyles.meta}>
                 {contentCounts(pages, Number(site.story_count ?? 0))} · {published} published
                 {changed ? ' · ' + changed + ' ' + (changed === 1 ? 'change' : 'changes') + ' not live' : ''}
               </p>
             </Menu>
           </div>
-          <p className={styles.meta}>
+          <p className={recordTableStyles.meta}>
             {siteKindLabel(site.kind)} · {contentCounts(pages, Number(site.story_count ?? 0))}
           </p>
         </div>
       </article>
     )
   return (
-    <article className={'site-card ' + styles.siteCard}>
+    <article className={'site-card ' + siteSummaryStyles.siteCard}>
       <div className="site-card-top">
         <span className="site-card-mark" aria-hidden="true">
           {initials(site.name)}

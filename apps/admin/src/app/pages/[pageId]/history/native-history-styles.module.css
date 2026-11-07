@@ -1,0 +1,73 @@
+.historyFilters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--workbench-item-padding);
+  border-block-end: var(--line-thin) solid var(--border);
+  font-size: var(--text-help);
+}
+.historyFilters label {
+  flex: 1;
+  min-width: 0;
+}
+.historyFilters select {
+  width: 100%;
+  min-width: 0;
+}
+.historyFilters > a,
+.historyFilters > p {
+  flex-basis: 100%;
+  margin: 0;
+}
+.historyCompare {
+  font-size: var(--text-meta);
+}
+.historyCompare form {
+  padding-block: var(--space-3);
+}
+.historyCompare form > label {
+  flex-basis: 100%;
+}
+.historyCompare select {
+  max-width: 100%;
+  min-width: 0;
+  flex: 1 1 var(--size-240);
+}
+.historyPreviews {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--size-280)), 1fr));
+  gap: var(--space-4);
+}
+.historyPreviews {
+  min-width: 0;
+}
+.historyPreviews > * {
+  min-width: 0;
+}
+.historyPreviews[data-compare] {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.historyChanges {
+  table-layout: fixed;
+}
+.historyChanges :is(th, td) {
+  overflow-wrap: anywhere;
+  vertical-align: top;
+}
+.historyChanges pre {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.historyMessage {
+  padding: var(--space-4);
+  margin: 0;
+}
+.historyFilters > div {
+  flex: 1;
+  min-width: 0;
+}
+.historyCompare form > div {
+  flex: 1;
+  min-width: 0;
+}

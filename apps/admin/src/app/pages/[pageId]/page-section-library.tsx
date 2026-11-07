@@ -6,7 +6,9 @@ import { SectionLibraryCard } from '../../../components/section-library-card.tsx
 import { SectionFavourite } from '../../../components/section-favourite.tsx'
 import { SectionThumbnail } from '../../../components/section-thumbnail.tsx'
 import { matchesSectionSearch, symphonySectionNames } from '../../../lib/section-library-search.ts'
-import shared from '../../../components/workspace.module.css'
+import workspaceFormsStyles from '../../../components/workspace-styles/workspace-forms.module.css'
+import recordTableStyles from '../../../components/workspace-styles/record-table.module.css'
+import listInspectorStyles from '../../../components/workspace-styles/list-inspector.module.css'
 import styles from './library-overlay.module.css'
 export function PageSectionLibrary({
   siteId,
@@ -74,7 +76,7 @@ export function PageSectionLibrary({
       }}
     >
       <div className={styles.destination}>
-        <div className={shared.panelActions}>
+        <div className={workspaceFormsStyles.panelActions}>
           <Button
             tabIndex={0}
             variant="tertiary"
@@ -86,7 +88,7 @@ export function PageSectionLibrary({
         </div>
       </div>
       <div className={styles.browser}>
-        <div className={styles.destination + ' ' + shared.formStack}>
+        <div className={styles.destination + ' ' + listInspectorStyles.formStack}>
           <h2>Add a section</h2>
           <p>
             Adding <strong>{placement}</strong>{' '}
@@ -115,9 +117,9 @@ export function PageSectionLibrary({
                 ))}
               </select>
             </Field>
-            {!preview && <p className={shared.meta}>Choose one to see it on the page.</p>}
+            {!preview && <p className={recordTableStyles.meta}>Choose one to see it on the page.</p>}
             {recipeControl && (
-              <div className={shared.actions}>
+              <div className={workspaceFormsStyles.actions}>
                 <Button
                   tabIndex={0}
                   variant="tertiary"
@@ -212,10 +214,12 @@ export function PageSectionLibrary({
             )}
           </div>
         )}
-        {!preview && pasteControl && <div className={styles.destination + ' ' + shared.formStack}>{pasteControl}</div>}
+        {!preview && pasteControl && (
+          <div className={styles.destination + ' ' + listInspectorStyles.formStack}>{pasteControl}</div>
+        )}
       </div>
       {preview && view === 'sections' && (
-        <div className={shared.detailPanelFooter}>
+        <div className={listInspectorStyles.detailPanelFooter}>
           <ActionNote>Showing {preview.name} on the page with sample text. You replace it after adding.</ActionNote>
           {!ready && !error && (
             <p role="status">{preparing ? 'Preparing the section preview…' : 'Opening the section on the page…'}</p>
@@ -228,7 +232,7 @@ export function PageSectionLibrary({
               </Button>
             </div>
           )}
-          <div className={shared.actions}>
+          <div className={workspaceFormsStyles.actions}>
             <Button
               tabIndex={0}
               variant="secondary"

@@ -3,6 +3,8 @@ import type { FooterConfigV1, GlobalElementLink, NavTarget } from '@cms/schema'
 import type { FramePageChoice } from './preset-frame-fields.tsx'
 import { Button, Card, Disclosure, Field } from './ui/index.ts'
 import styles from './workspace.module.css'
+import selectionControlsStyles from './workspace-styles/selection-controls.module.css'
+import listInspectorStyles from './workspace-styles/list-inspector.module.css'
 
 /** The same preset footer data and commands,grouped like the national Footer. */
 export function PresetFooterCards({
@@ -41,8 +43,8 @@ export function PresetFooterCards({
           />
         </Field>
         <Disclosure title="Layout and visibility">
-          <div className={styles.formStack}>
-            <label className={styles.toggleRow}>
+          <div className={listInspectorStyles.formStack}>
+            <label className={selectionControlsStyles.toggleRow}>
               <span>Show the footer</span>
               <input
                 type="checkbox"
@@ -63,7 +65,7 @@ export function PresetFooterCards({
                 <option value="contact">Contact · local details</option>
               </select>
             </Field>
-            <label className={styles.checkRow}>
+            <label className={selectionControlsStyles.checkRow}>
               <input
                 type="checkbox"
                 checked={footer.brand.showFoundation}
@@ -87,7 +89,7 @@ export function PresetFooterCards({
           />
         </Field>
         <Disclosure title="Contact details">
-          <div className={styles.formStack}>
+          <div className={listInspectorStyles.formStack}>
             {footer.contact === null ? (
               <>
                 <p className="hint">No contact details.</p>
@@ -162,11 +164,11 @@ export function PresetFooterCards({
           {linkCount === 1 ? 'link' : 'links'}
         </p>
         <Disclosure title="Link groups">
-          <div className={styles.formStack}>
+          <div className={listInspectorStyles.formStack}>
             {footer.groups.length === 0 && <p className="hint">No footer groups yet.</p>}
             {footer.groups.map((group, groupIndex) => (
               <Disclosure key={groupIndex} title={group.heading || 'Untitled group'}>
-                <div className={styles.formStack}>
+                <div className={listInspectorStyles.formStack}>
                   <Field id={'preset-group-' + groupIndex} label="Group heading">
                     <input
                       aria-label={`Group ${groupIndex + 1} heading`}
@@ -248,7 +250,7 @@ export function PresetFooterCards({
           </div>
         </Disclosure>
         <Disclosure title="Legal and accessibility links">
-          <div className={styles.formStack}>
+          <div className={listInspectorStyles.formStack}>
             <Field id="preset-footer-copyright" label="Copyright line">
               <input
                 maxLength={200}
@@ -301,7 +303,7 @@ function PresetLink({
 }) {
   return (
     <Disclosure title={link.label || label}>
-      <div className={styles.formStack}>
+      <div className={listInspectorStyles.formStack}>
         <Field id={id + '-label'} label="Label">
           <input
             aria-label={label + ' label'}

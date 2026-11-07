@@ -5,6 +5,7 @@ import { GuardedLink as Link } from '../../components/guarded-link.tsx'
 import { LegacyReviewLink } from './legacy-review-link.tsx'
 import { Workbench, EmptyState } from '../../components/ui/index.ts'
 import workspace from '../../components/workspace.module.css'
+import reviewWorkbenchStyles from '../../components/workspace-styles/review-workbench.module.css'
 import {
   getReviewSubmission,
   listReviewComments,
@@ -94,7 +95,7 @@ export default async function ReviewInbox({
     </nav>
   )
   const queueHeader = (
-    <div className={workspace.queueHeading}>
+    <div className={reviewWorkbenchStyles.queueHeading}>
       <h1>Reviews</h1>
       <p>Changes people sent you to approve</p>
       {navigation}
@@ -141,7 +142,7 @@ export default async function ReviewInbox({
               <>
                 {queueHeader}
                 {canAdvanced && (
-                  <ul className={workspace.queueItems}>
+                  <ul className={reviewWorkbenchStyles.queueItems}>
                     <li>
                       <Link href="/inbox?area=advanced" aria-current={task !== 'background' ? 'true' : undefined}>
                         <strong>Section requests</strong>

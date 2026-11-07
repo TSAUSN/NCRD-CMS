@@ -1,6 +1,9 @@
 import { NativeHistory } from './native-history.tsx'
 import { historyPresentation } from '../../../../lib/history-presentation.ts'
 import shared from '../../../../components/workspace.module.css'
+import versionHistoryStyles from '../../../../components/workspace-styles/version-history.module.css'
+import workspacePreviewStyles from '../../../../components/workspace-styles/workspace-preview.module.css'
+import ownedStyles from './page-styles.module.css'
 import { ScriptlessPreview } from '../../../../components/scriptless-preview.tsx'
 import { GuardedLink as Link } from '../../../../components/guarded-link.tsx'
 import { notFound } from 'next/navigation'
@@ -234,8 +237,8 @@ export default async function PageHistory({
         </div>
 
         {selected ? (
-          <div className={'history-layout ' + shared.timelineLayout}>
-            <aside className={'history-list ' + shared.timelineRail} aria-label="Versions">
+          <div className={'history-layout ' + ownedStyles.timelineLayout}>
+            <aside className={'history-list ' + versionHistoryStyles.timelineRail} aria-label="Versions">
               {before !== null && (
                 <Link className="btn secondary small history-newer" href={historyHref(pageId, { includeAutosaves })}>
                   Newer versions
@@ -334,7 +337,7 @@ export default async function PageHistory({
               <div className={compared ? 'history-preview-pair' : undefined}>
                 {compared && (
                   <div className="history-preview-frame">
-                    <div className={'history-preview-bar ' + shared.previewCaption}>
+                    <div className={'history-preview-bar ' + workspacePreviewStyles.previewCaption}>
                       Comparison · Version {compared.revision}
                     </div>
                     <ScriptlessPreview
@@ -345,7 +348,7 @@ export default async function PageHistory({
                   </div>
                 )}
                 <div className="history-preview-frame">
-                  <div className={'history-preview-bar ' + shared.previewCaption}>
+                  <div className={'history-preview-bar ' + workspacePreviewStyles.previewCaption}>
                     Read-only preview{compared && ` · Version ${selected.revision}`}
                   </div>
                   <ScriptlessPreview

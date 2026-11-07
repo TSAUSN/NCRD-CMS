@@ -40,7 +40,9 @@ import {
   sendStorySubmission,
 } from '../actions.ts'
 import styles from '../stories.module.css'
-import shared from '../../../../../components/workspace.module.css'
+import workspaceFormsStyles from '../../../../../components/workspace-styles/workspace-forms.module.css'
+import recordTableStyles from '../../../../../components/workspace-styles/record-table.module.css'
+import selectionControlsStyles from '../../../../../components/workspace-styles/selection-controls.module.css'
 function input(
   values: Record<string, unknown>,
   catalog: StoriesSettings,
@@ -464,14 +466,14 @@ export function StoryEditor({
       </Card>
       <Card title="Details" density="editor">
         <div className={frame.fields}>
-          <fieldset className={shared.formChoices} disabled={disabled}>
+          <fieldset className={workspaceFormsStyles.formChoices} disabled={disabled}>
             <legend>{catalog.mainLabel}</legend>
             <div className={styles.chips}>
               {catalog.mainTags.map(sector => (
                 <button
                   key={sector.id}
                   type="button"
-                  className={shared.tagChip}
+                  className={selectionControlsStyles.tagChip}
                   data-group="main"
                   title={sector.label}
                   aria-pressed={value.tags.includes(sector.id)}
@@ -490,14 +492,14 @@ export function StoryEditor({
             </div>
           </fieldset>
           {configured ? (
-            <fieldset className={shared.formChoices} disabled={disabled}>
+            <fieldset className={workspaceFormsStyles.formChoices} disabled={disabled}>
               <legend>{catalog.secondaryLabel}</legend>
               <ChoiceGroup layout="balanced">
                 {catalog.secondaryTags.map(tag => (
                   <button
                     key={tag.id}
                     type="button"
-                    className={shared.tagChip}
+                    className={selectionControlsStyles.tagChip}
                     data-group="secondary"
                     title={tag.label}
                     aria-pressed={(value.regions ?? []).includes(tag.id)}
@@ -654,7 +656,7 @@ export function StoryEditor({
         {Boolean(entry.values.old_address) && (
           <div>
             <strong>Original story address</strong>
-            <p className={shared.truncateValue} title={String(entry.values.old_address)}>
+            <p className={recordTableStyles.truncateValue} title={String(entry.values.old_address)}>
               {String(entry.values.old_address)}
             </p>
           </div>
@@ -804,7 +806,7 @@ export function StoryEditor({
             sourceMode={false}
           />
           {(value.body_is_sample || entry.values.body_is_sample === true) && (
-            <label className={shared.checkRow}>
+            <label className={selectionControlsStyles.checkRow}>
               <input
                 type="checkbox"
                 checked={value.body_is_sample}
@@ -983,7 +985,7 @@ export function StoryEditor({
             <p>The saved changes affect different fields. You can keep both sets of changes.</p>
           ) : (
             recovery.conflicts.map(id => (
-              <fieldset key={id} className={shared.formChoices}>
+              <fieldset key={id} className={workspaceFormsStyles.formChoices}>
                 <legend>{STORY_DRAFT_GROUPS.find(group => group.id === id)!.label}: both versions changed</legend>
                 <label className={styles.check}>
                   <input

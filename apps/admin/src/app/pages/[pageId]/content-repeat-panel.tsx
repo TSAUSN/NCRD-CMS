@@ -27,6 +27,9 @@ import {
   IconPlus,
 } from '../../../components/icons.tsx'
 import shared from '../../../components/workspace.module.css'
+import workspaceFormsStyles from '../../../components/workspace-styles/workspace-forms.module.css'
+import recordTableStyles from '../../../components/workspace-styles/record-table.module.css'
+import listInspectorStyles from '../../../components/workspace-styles/list-inspector.module.css'
 export function ContentRepeatPanel({
   origin,
   slot,
@@ -161,7 +164,7 @@ export function ContentRepeatPanel({
     return (
       <div
         ref={boundary}
-        className={shared.denseStack + ' ' + shared.compactForm}
+        className={shared.denseStack + ' ' + workspaceFormsStyles.compactForm}
         onKeyDownCapture={event => {
           if (event.key === 'Escape' && !event.defaultPrevented && !(event.target as Element).closest('dialog')) {
             event.preventDefault()
@@ -193,7 +196,7 @@ export function ContentRepeatPanel({
         </EditorPanelActions>
         <div>
           <h3>{newKey ? 'New ' + noun : spec.unit + ' ' + (keys.indexOf(active) + 1)}</h3>
-          <p className={shared.meta}>
+          <p className={recordTableStyles.meta}>
             {newKey
               ? 'This ' + noun + ' appears on the page as you type. Nothing goes live until you publish.'
               : 'Part of this section. Your changes stay in the draft.'}
@@ -203,7 +206,12 @@ export function ContentRepeatPanel({
       </div>
     )
   return (
-    <div ref={boundary} className={shared.listGroup + ' ' + shared.compactForm} role="group" aria-label={slot.label}>
+    <div
+      ref={boundary}
+      className={listInspectorStyles.listGroup + ' ' + workspaceFormsStyles.compactForm}
+      role="group"
+      aria-label={slot.label}
+    >
       <div>
         <h3>{slot.label}</h3>
       </div>
@@ -213,7 +221,7 @@ export function ContentRepeatPanel({
         </EmptyState>
       ) : (
         <ol
-          className={shared.compactItemList + ' ' + reorderStyles.list}
+          className={listInspectorStyles.compactItemList + ' ' + reorderStyles.list}
           data-reorder-list
           aria-label={slot.label}
           aria-description={'Drag to reorder, or use the row actions. Choose ' + article + ' ' + noun + ' to edit it.'}
@@ -229,7 +237,7 @@ export function ContentRepeatPanel({
               <IconDrag size={10} />
               <Button
                 variant="tertiary"
-                className={shared.itemButton}
+                className={listInspectorStyles.itemButton}
                 title={summary(key)}
                 onClick={() => {
                   setActive(key)
@@ -238,7 +246,7 @@ export function ContentRepeatPanel({
               >
                 {iconField && (
                   <span
-                    className={shared.itemMark}
+                    className={listInspectorStyles.itemMark}
                     aria-hidden="true"
                     dangerouslySetInnerHTML={{
                       __html: renderCmsIcon(values[repeatItemSlotId(slot.id, key, iconField.id)]),

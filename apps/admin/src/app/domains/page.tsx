@@ -5,7 +5,8 @@ import { AppShell } from '../../components/app-shell.tsx'
 import { navigationFor } from '../../components/nav.ts'
 import { PageHeader } from '../../components/shell.tsx'
 import { Card, EmptyState } from '../../components/ui/index.ts'
-import styles from '../../components/workspace.module.css'
+import recordTableStyles from '../../components/workspace-styles/record-table.module.css'
+import ownedStyles from './page-styles.module.css'
 import { currentSession } from '../../lib/session.ts'
 import { domainStatusLabel, stagingAddressStatusLabel } from '../../lib/domains.ts'
 export const dynamic = 'force-dynamic'
@@ -36,10 +37,12 @@ export default async function Domains() {
         />
         <Card title="Web addresses" density="compact">
           {rows.length ? (
-            <div className={styles.tableWrap}>
-              <p className={styles.addressScrollHint}>Scroll sideways to see all address details.</p>
+            <div className={recordTableStyles.tableWrap}>
+              <p className={ownedStyles.addressScrollHint}>Scroll sideways to see all address details.</p>
               <table
-                className={styles.table + ' ' + styles.compactTable + ' ' + styles.addressTable}
+                className={
+                  recordTableStyles.table + ' ' + recordTableStyles.compactTable + ' ' + ownedStyles.addressTable
+                }
                 aria-label="Domains"
               >
                 <thead>

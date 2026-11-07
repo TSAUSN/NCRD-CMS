@@ -6,7 +6,12 @@ import { Button, Dialog, Field } from '../../../components/ui/index.ts'
 import { IconPlus } from '../../../components/icons.tsx'
 import { useNavigationGuard, requestClientNavigation } from '../../../components/navigation-guard.ts'
 import { createNativePage } from './page-list-actions.ts'
-import shared from '../../../components/workspace.module.css'
+import workspaceFormsStyles from '../../../components/workspace-styles/workspace-forms.module.css'
+import recordTableStyles from '../../../components/workspace-styles/record-table.module.css'
+import siteSummaryStyles from '../../../components/workspace-styles/site-summary.module.css'
+import selectionControlsStyles from '../../../components/workspace-styles/selection-controls.module.css'
+import listInspectorStyles from '../../../components/workspace-styles/list-inspector.module.css'
+import ownedStyles from './native-new-page-styles.module.css'
 import styles from './native-new-page.module.css'
 type PageChoice = { id: string; title: string; revision: string }
 export function NativeNewPage({
@@ -29,8 +34,8 @@ export function NativeNewPage({
   return (
     <>
       {asTask ? (
-        <button type="button" className={shared.task} onClick={openDialog}>
-          <span className={shared.taskIcon}>
+        <button type="button" className={siteSummaryStyles.task} onClick={openDialog}>
+          <span className={siteSummaryStyles.taskIcon}>
             <IconPlus size={18} />
           </span>
           <strong>Add a page</strong>
@@ -193,8 +198,8 @@ function NewPageDialog({
         </>
       }
     >
-      <div className={shared.formStack}>
-        <p className={shared.meta}>It starts as a private draft. Nobody sees it until you publish.</p>
+      <div className={listInspectorStyles.formStack}>
+        <p className={recordTableStyles.meta}>It starts as a private draft. Nobody sees it until you publish.</p>
         <div className={styles.identity}>
           <Field id="new-page-title" label="Page title" counter={title.length + ' of 90'}>
             <input
@@ -220,7 +225,7 @@ function NewPageDialog({
         </div>
         {start !== 'website' && (
           <>
-            <div className={shared.actions}>
+            <div className={workspaceFormsStyles.actions}>
               <span>Web address: /{slug}</span>
               <Button variant="tertiary" size="s" disabled={pending} onClick={() => setChangeAddress(value => !value)}>
                 Change
@@ -248,7 +253,7 @@ function NewPageDialog({
         )}
         <Field id="new-page-start" label="Start from">
           <div
-            className={shared.choiceRows + ' ' + styles.startChoices}
+            className={selectionControlsStyles.choiceRows + ' ' + styles.startChoices}
             role="radiogroup"
             aria-labelledby="new-page-start-label"
           >
@@ -260,9 +265,9 @@ function NewPageDialog({
                 ? [['website', 'A link to another website', 'Adds it to the menu. There is no page to edit.']]
                 : []),
             ].map(([value, label, hint]) => (
-              <label key={value} className={shared.rowActions}>
+              <label key={value} className={ownedStyles.rowActions}>
                 <input
-                  className={shared.visuallyHidden}
+                  className={selectionControlsStyles.visuallyHidden}
                   type="radio"
                   name="page-start"
                   value={value}
@@ -270,7 +275,7 @@ function NewPageDialog({
                   disabled={pending}
                   onChange={() => setStart(value as typeof start)}
                 />
-                <span className={shared.rowCopy}>
+                <span className={recordTableStyles.rowCopy}>
                   <strong>{label}</strong>
                   <small>{hint}</small>
                 </span>
@@ -372,8 +377,8 @@ function NewPageDialog({
           </Field>
         )}
         {canAdmin && start !== 'website' && (
-          <label className={shared.toggleRow}>
-            <span className={shared.rowCopy}>
+          <label className={selectionControlsStyles.toggleRow}>
+            <span className={recordTableStyles.rowCopy}>
               <strong>Add to the menu when it’s published</strong>
               <small>You can change this later.</small>
             </span>

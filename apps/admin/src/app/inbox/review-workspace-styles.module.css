@@ -1,0 +1,29 @@
+.workbenchHeading.workbenchHeading h2 {
+  font-size: var(--text-section);
+  color: var(--text);
+}
+.workbenchHeading.workbenchHeading h3 {
+  font-size: var(--text-body);
+  color: var(--text);
+}
+.workbenchPreview {
+  width: 100%;
+  height: var(--entry-width);
+  border: var(--line-thin) solid var(--border);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+}
+.inlineReviewDecisions.inlineReviewDecisions {
+  flex-wrap: wrap;
+}
+.inlineReviewDecisions.inlineReviewDecisions > div:first-child {
+  flex: 1 1 var(--size-240);
+  min-width: min(100%, var(--size-240));
+  max-width: 100%;
+}
+.inlineReviewDecisions.inlineReviewDecisions > div:last-child {
+  flex: 0 1 auto;
+  flex-wrap: wrap;
+  min-width: 0;
+  max-width: 100%;
+}

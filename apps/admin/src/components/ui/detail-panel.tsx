@@ -2,7 +2,7 @@
 import { useId, useLayoutEffect, useRef, type ComponentProps } from 'react'
 import { IconButton } from './button.tsx'
 import type { Drawer } from './dialog.tsx'
-import styles from '../workspace.module.css'
+import listInspectorStyles from '../workspace-styles/list-inspector.module.css'
 /** A nonmodal inspector keeps its list available; the caller owns leave/save decisions. */
 export function DetailPanel({ title, children, footer, onClose, pending }: ComponentProps<typeof Drawer>) {
   const id = useId(),
@@ -45,7 +45,7 @@ export function DetailPanel({ title, children, footer, onClose, pending }: Compo
       role="dialog"
       aria-modal="false"
       aria-labelledby={id}
-      className={styles.detailPanel}
+      className={listInspectorStyles.detailPanel}
       onKeyDown={event => {
         if (event.key === 'Escape' && !event.defaultPrevented && !(event.target as Element).closest('dialog')) {
           event.preventDefault()
@@ -54,14 +54,14 @@ export function DetailPanel({ title, children, footer, onClose, pending }: Compo
         }
       }}
     >
-      <div className={styles.detailPanelHead}>
+      <div className={listInspectorStyles.detailPanelHead}>
         <h2 id={id}>{title}</h2>
         <IconButton tooltip={'Close ' + title} variant="tertiary" disabled={pending} onClick={onClose}>
           ×
         </IconButton>
       </div>
-      <div className={styles.detailPanelBody}>{children}</div>
-      {footer && <div className={styles.detailPanelFooter}>{footer}</div>}
+      <div className={listInspectorStyles.detailPanelBody}>{children}</div>
+      {footer && <div className={listInspectorStyles.detailPanelFooter}>{footer}</div>}
     </section>
   )
 }

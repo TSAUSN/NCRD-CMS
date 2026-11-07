@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { storyFeatureRank, storyTagIds, type StoriesSettings, type StoryListPatch } from '@cms/schema'
 import { GuardedLink as Link } from './guarded-link.tsx'
-import shared from './workspace.module.css'
+import selectionControlsStyles from './workspace-styles/selection-controls.module.css'
 import { Badge, Button, ButtonLink } from './ui/index.ts'
 import { IconImage } from './icons.tsx'
 import type { StoryListRow } from '../lib/story-list.ts'
@@ -78,7 +78,7 @@ export function StoryListRowView({
                     key={tag.id}
                     type="button"
                     disabled={pending}
-                    className={shared.tagChip}
+                    className={selectionControlsStyles.tagChip}
                     title={tag.label}
                     data-group={group}
                     aria-pressed={storyTagIds(v, group).includes(tag.id)}
@@ -89,7 +89,13 @@ export function StoryListRowView({
                     {tag.label}
                   </button>
                 ) : storyTagIds(v, group).includes(tag.id) ? (
-                  <span key={tag.id} className={shared.tagChip} title={tag.label} data-group={group} data-selected>
+                  <span
+                    key={tag.id}
+                    className={selectionControlsStyles.tagChip}
+                    title={tag.label}
+                    data-group={group}
+                    data-selected
+                  >
                     {tag.label}
                   </span>
                 ) : null,
@@ -101,7 +107,7 @@ export function StoryListRowView({
       <div className={styles.actions}>
         {editable && (
           <>
-            <label className={shared.checkRow}>
+            <label className={selectionControlsStyles.checkRow}>
               <input
                 type="checkbox"
                 disabled={pending}
@@ -110,7 +116,7 @@ export function StoryListRowView({
               />
               Reviewed
             </label>
-            <label className={shared.checkRow}>
+            <label className={selectionControlsStyles.checkRow}>
               <input
                 type="checkbox"
                 disabled={pending}

@@ -16,6 +16,12 @@ import { RestoreButton } from './restore-button.tsx'
 import { comparisonText, type VersionChange } from '../../../../lib/version-comparison.ts'
 import type { ReleasePresentation } from '../../../../lib/release-copy.ts'
 import shared from '../../../../components/workspace.module.css'
+import workspaceFormsStyles from '../../../../components/workspace-styles/workspace-forms.module.css'
+import recordTableStyles from '../../../../components/workspace-styles/record-table.module.css'
+import selectionControlsStyles from '../../../../components/workspace-styles/selection-controls.module.css'
+import reviewWorkbenchStyles from '../../../../components/workspace-styles/review-workbench.module.css'
+import workspacePreviewStyles from '../../../../components/workspace-styles/workspace-preview.module.css'
+import ownedStyles from './native-history-styles.module.css'
 
 type Version = {
   id: string
@@ -67,7 +73,7 @@ export function NativeHistory(props: Props) {
     compared = props.compared
   const queue = (
     <>
-      <div className={shared.queueHeading}>
+      <div className={reviewWorkbenchStyles.queueHeading}>
         <h1>Page history</h1>
         <p>{props.pageTitle}</p>
         <nav data-appearance="segmented" className={shared.areaNav} aria-label="History scope">
@@ -75,7 +81,7 @@ export function NativeHistory(props: Props) {
           {props.wholeSiteHref && <Link href={props.wholeSiteHref}>Whole site</Link>}
         </nav>
       </div>
-      <div className={shared.historyFilters}>
+      <div className={ownedStyles.historyFilters}>
         <Field density="compact" labelHidden id="history-author" label="Filter versions by author">
           <select value={author} onChange={event => setAuthor(event.target.value)}>
             <option value="all">Everyone</option>
@@ -96,16 +102,16 @@ export function NativeHistory(props: Props) {
       </div>
       <aside aria-label="Versions">
         {props.newerHref && (
-          <div className={shared.historyFilters}>
+          <div className={ownedStyles.historyFilters}>
             <Link href={props.newerHref}>Newer versions</Link>
           </div>
         )}
-        <ol className={shared.queueItems}>
+        <ol className={reviewWorkbenchStyles.queueItems}>
           {rows.map(row => (
             <li key={row.id}>
               <Link href={row.href} aria-current={row.id === selected?.id ? 'true' : undefined}>
-                <span className={shared.summaryAction}>
-                  <strong className={shared.singleLine} title={row.note || 'Version ' + row.revision}>
+                <span className={recordTableStyles.summaryAction}>
+                  <strong className={recordTableStyles.singleLine} title={row.note || 'Version ' + row.revision}>
                     {row.note || 'Version ' + row.revision}
                   </strong>
                   <Badge tone={row.live ? 'live' : row.current ? 'pending' : 'neutral'}>{row.label}</Badge>
@@ -121,7 +127,7 @@ export function NativeHistory(props: Props) {
           ))}
         </ol>
         {!rows.length && (
-          <div className={shared.historyFilters}>
+          <div className={ownedStyles.historyFilters}>
             <p>{props.versions.length ? 'No loaded versions match these filters.' : 'No saved versions yet.'}</p>
             {props.versions.length > 0 && (
               <Button
@@ -137,7 +143,7 @@ export function NativeHistory(props: Props) {
           </div>
         )}
         {props.olderHref && (
-          <div className={shared.historyFilters}>
+          <div className={ownedStyles.historyFilters}>
             <Link href={props.olderHref}>Older versions</Link>
           </div>
         )}
@@ -146,9 +152,9 @@ export function NativeHistory(props: Props) {
   )
   return (
     <Workbench density="compact" storageKey="cms.history.queue-width" queueLabel="Version list" queue={queue}>
-      <div className={shared.workbenchHeader}>
+      <div className={reviewWorkbenchStyles.workbenchHeader}>
         <div>
-          <p className={shared.meta}>
+          <p className={recordTableStyles.meta}>
             {props.pageTitle} · {compared ? 'Comparing saved versions' : 'Saved version'}
           </p>
           <h2>
@@ -159,14 +165,17 @@ export function NativeHistory(props: Props) {
               : 'No saved versions yet'}
           </h2>
           {props.presentation && (
-            <p className={shared.meta + ' ' + shared.singleLine} title={props.presentation.summary}>
+            <p
+              className={recordTableStyles.meta + ' ' + recordTableStyles.singleLine}
+              title={props.presentation.summary}
+            >
               {props.presentation.summary === 'No page changes' && props.changes.length
                 ? 'Other saved details changed'
                 : props.presentation.summary}
             </p>
           )}
         </div>
-        <div className={shared.actions} role="group" aria-label="History actions">
+        <div className={workspaceFormsStyles.actions} role="group" aria-label="History actions">
           <ButtonLink variant="secondary" href={'/pages/' + props.pageId}>
             {props.archived ? 'Back to saved page' : 'Back to editor'}
           </ButtonLink>
@@ -190,8 +199,8 @@ export function NativeHistory(props: Props) {
       )}
       {selected ? (
         <>
-          <Disclosure className={shared.historyCompare} title="Compare with another version">
-            <form action={'/pages/' + props.pageId + '/history'} method="get" className={shared.actions}>
+          <Disclosure className={ownedStyles.historyCompare} title="Compare with another version">
+            <form action={'/pages/' + props.pageId + '/history'} method="get" className={workspaceFormsStyles.actions}>
               <input type="hidden" name="version" value={selected.id} />
               {props.automatic && <input type="hidden" name="automatic" value="1" />}
               {props.before && <input type="hidden" name="before" value={props.before} />}
@@ -214,16 +223,19 @@ export function NativeHistory(props: Props) {
             </form>
           </Disclosure>
           {(!onlyChanges || !compared) && props.usesResponsiveMenu && (
-            <p className={shared.meta}>
+            <p className={recordTableStyles.meta}>
               History shows a static version with the compact menu. To check how the current menu fits on desktop, open
               Preview from the page editor.
             </p>
           )}
           {(!onlyChanges || !compared) && (
-            <div data-compare={!!compared || undefined} className={shared.historyPreviews}>
-              <div className={shared.panel}>
-                <div className={shared.previewCaption + ' ' + shared.summaryAction}>
-                  <span className={shared.singleLine} title={'Version ' + selected.revision + ' · ' + selected.label}>
+            <div data-compare={!!compared || undefined} className={ownedStyles.historyPreviews}>
+              <div className={reviewWorkbenchStyles.panel}>
+                <div className={workspacePreviewStyles.previewCaption + ' ' + recordTableStyles.summaryAction}>
+                  <span
+                    className={recordTableStyles.singleLine}
+                    title={'Version ' + selected.revision + ' · ' + selected.label}
+                  >
                     Version {selected.revision} · {selected.label}
                   </span>
                   <Link href={'/preview/' + selected.id + '?readonly=1'} target="_blank" rel="noopener">
@@ -238,9 +250,9 @@ export function NativeHistory(props: Props) {
                 />
               </div>
               {compared && (
-                <div className={shared.panel}>
-                  <div className={shared.previewCaption + ' ' + shared.summaryAction}>
-                    <span className={shared.singleLine} title={compared.when}>
+                <div className={reviewWorkbenchStyles.panel}>
+                  <div className={workspacePreviewStyles.previewCaption + ' ' + recordTableStyles.summaryAction}>
+                    <span className={recordTableStyles.singleLine} title={compared.when}>
                       {compared.current ? 'Current draft' : 'Version ' + compared.revision} · {compared.when}
                     </span>
                     <Link href={'/preview/' + compared.id + '?readonly=1'} target="_blank" rel="noopener">
@@ -260,13 +272,15 @@ export function NativeHistory(props: Props) {
           {compared && (
             <Card title="What changed" density="compact">
               {props.presentation?.cells.length ? (
-                <div className={shared.tableWrap}>
+                <div className={recordTableStyles.tableWrap}>
                   <table
                     data-density="content"
                     data-layout="details"
-                    className={shared.table + ' ' + shared.historyChanges}
+                    className={recordTableStyles.table + ' ' + ownedStyles.historyChanges}
                   >
-                    <caption className={shared.visuallyHidden}>Saved field values in the two selected versions</caption>
+                    <caption className={selectionControlsStyles.visuallyHidden}>
+                      Saved field values in the two selected versions
+                    </caption>
                     <thead>
                       <tr>
                         <th>Field</th>
@@ -290,7 +304,7 @@ export function NativeHistory(props: Props) {
                   </table>
                 </div>
               ) : (
-                <p className={shared.historyMessage}>
+                <p className={ownedStyles.historyMessage}>
                   {props.changes.length
                     ? 'Other saved details changed. The page previews show the selected versions.'
                     : 'These versions have the same page details and section content.'}
@@ -299,13 +313,13 @@ export function NativeHistory(props: Props) {
             </Card>
           )}
           {props.canInspect && compared && props.changes.length > 0 && (
-            <Disclosure className={shared.historyCompare} title="All saved fields">
+            <Disclosure className={ownedStyles.historyCompare} title="All saved fields">
               <p>Sections are compared by position here. Moving one can also appear as field changes.</p>
-              <div data-scroll="bounded" className={shared.tableWrap}>
+              <div data-scroll="bounded" className={recordTableStyles.tableWrap}>
                 <table
                   data-density="content"
                   data-layout="stored"
-                  className={shared.table + ' ' + shared.historyChanges}
+                  className={recordTableStyles.table + ' ' + ownedStyles.historyChanges}
                 >
                   <thead>
                     <tr>
@@ -337,12 +351,12 @@ export function NativeHistory(props: Props) {
               </div>
             </Disclosure>
           )}
-          <p className={shared.meta}>
+          <p className={recordTableStyles.meta}>
             Restoring makes a new draft from the selected version. Nothing in history is deleted. Shared content keeps
             its own history.
           </p>
           {selected.current && (
-            <p className={shared.meta}>
+            <p className={recordTableStyles.meta}>
               This is already the current draft. Choose an earlier version to compare or restore.
             </p>
           )}

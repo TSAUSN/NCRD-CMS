@@ -1,0 +1,6 @@
+.panelFrame.panelFrame {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  top: var(--space-4);
+}

@@ -1,6 +1,7 @@
 'use client'
 import { Workbench, EmptyState, Button, ButtonLink } from '../../components/ui/index.ts'
-import styles from '../../components/workspace.module.css'
+import workspaceFormsStyles from '../../components/workspace-styles/workspace-forms.module.css'
+import reviewWorkbenchStyles from '../../components/workspace-styles/review-workbench.module.css'
 export default function ReviewsError({ retry }: { retry: () => void }) {
   return (
     <main id="main">
@@ -8,7 +9,7 @@ export default function ReviewsError({ retry }: { retry: () => void }) {
         queueLabel="Review requests"
         storageKey="cms.reviews.queue-width"
         queue={
-          <div className={styles.queueHeading}>
+          <div className={reviewWorkbenchStyles.queueHeading}>
             <h1>Reviews</h1>
             <p>Changes people sent you to approve</p>
           </div>
@@ -19,7 +20,7 @@ export default function ReviewsError({ retry }: { retry: () => void }) {
             The review list is unavailable. Try again, or return to your work. If you just made a decision, check its
             status before trying again.
           </p>
-          <div className={styles.actions}>
+          <div className={workspaceFormsStyles.actions}>
             <Button onClick={() => retry()}>Try again</Button>
             <ButtonLink variant="secondary" href="/">
               Back to your work

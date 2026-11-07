@@ -29,6 +29,8 @@ import { StoriesHeader } from './header.tsx'
 import { AddStory } from './add-story.tsx'
 import { prepareStoryCalendarSchedule } from './actions.ts'
 import shared from '../../../../components/workspace.module.css'
+import recordTableStyles from '../../../../components/workspace-styles/record-table.module.css'
+import ownedStyles from './coming-up-styles.module.css'
 type State = NonNullable<Awaited<ReturnType<typeof getStoryListState>>>
 export function StoriesComingUp({
   siteId,
@@ -154,7 +156,7 @@ export function StoriesComingUp({
           keep editing story drafts.
         </Note>
       )}
-      <div className={shared.calendarLayout}>
+      <div className={ownedStyles.calendarLayout}>
         <Card
           title={new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(
             new Date(month + '-01T12:00:00Z'),
@@ -171,7 +173,7 @@ export function StoriesComingUp({
             </>
           }
         >
-          <p className={shared.meta}>
+          <p className={recordTableStyles.meta}>
             Times use {zone}. Choose a ready story or drag it onto a day, then review its schedule.
           </p>
           <Calendar
@@ -183,7 +185,7 @@ export function StoriesComingUp({
                   .filter(job => calendarDay(new Date(job.runAt), zone) === date)
                   .map(job => (
                     <Link
-                      className={shared.calendarEvent}
+                      className={ownedStyles.calendarEvent}
                       key={job.id + job.entryId}
                       href={
                         job.status === 'needs_review'
@@ -213,7 +215,7 @@ export function StoriesComingUp({
           />
         </Card>
         <Card title="Ready, no date yet" density="summary">
-          <p className={shared.meta}>
+          <p className={recordTableStyles.meta}>
             Reviewed stories with text, a photo and description.{' '}
             {canSchedule ? 'Drag onto a day, or choose a story to pick its day.' : 'Open a story to keep editing.'}
           </p>
@@ -232,7 +234,7 @@ export function StoriesComingUp({
                   <Button
                     key={row.id}
                     variant="secondary"
-                    className={shared.calendarReady}
+                    className={ownedStyles.calendarReady}
                     aria-label={'Choose day for ' + String(row.values.title)}
                     draggable
                     onDragStart={event => {
@@ -245,7 +247,7 @@ export function StoriesComingUp({
                     <span>{String(row.values.title)}</span>
                   </Button>
                 ) : (
-                  <Link key={row.id} className={shared.calendarReady} href={base + '/' + row.id}>
+                  <Link key={row.id} className={ownedStyles.calendarReady} href={base + '/' + row.id}>
                     {String(row.values.title)}
                   </Link>
                 ),
@@ -258,9 +260,9 @@ export function StoriesComingUp({
               </EmptyState>
             )}
           </div>
-          <div className={shared.calendarSummary}>
+          <div className={ownedStyles.calendarSummary}>
             <strong>This month</strong>
-            <p className={shared.meta}>
+            <p className={recordTableStyles.meta}>
               {published} published ·{' '}
               {monthJobs.filter(job => job.status === 'pending' || job.status === 'running').length} scheduled ·{' '}
               {ready.length} ready

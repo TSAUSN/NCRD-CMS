@@ -1,0 +1,16 @@
+.choiceDetails {
+  border: var(--line-thin) solid var(--border);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  padding: var(--space-2) var(--space-3);
+}
+.choiceDetails summary {
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+.choiceDetails[open] > div {
+  padding-block-start: var(--space-3);
+}
+.choiceDetails input[type='checkbox'] {
+  width: auto;
+}

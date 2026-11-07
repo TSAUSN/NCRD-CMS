@@ -3,7 +3,8 @@
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react'
 import { framePreviewHeight } from '../lib/frame-preview-size.ts'
 import { Button, TextLink } from './ui/index.ts'
-import styles from './workspace.module.css'
+import workspaceFormsStyles from './workspace-styles/workspace-forms.module.css'
+import ownedStyles from './site-header-preview-styles.module.css'
 import frameStyles from './site-header-preview.module.css'
 
 export type FramePreviewTicket = { href: string; channel?: string }
@@ -88,7 +89,7 @@ export function SiteHeaderPreview({
     <>
       <div
         ref={host}
-        className={styles.previewStrip}
+        className={ownedStyles.previewStrip}
         aria-busy={!failed && (updating || pending)}
         style={
           {
@@ -100,7 +101,7 @@ export function SiteHeaderPreview({
         }
       >
         {!shown && !failed && (
-          <span className={styles.previewLoading} role="status">
+          <span className={ownedStyles.previewLoading} role="status">
             Opening preview…
           </span>
         )}
@@ -146,7 +147,7 @@ export function SiteHeaderPreview({
       {failed && href && (
         <div className={frameStyles.failure} role="status">
           <p>The inline preview hasn’t opened. Your changes are still here.</p>
-          <div className={styles.actions}>
+          <div className={workspaceFormsStyles.actions}>
             {retry && (
               <Button variant="secondary" onClick={retry}>
                 Try preview again

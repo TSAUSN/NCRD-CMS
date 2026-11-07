@@ -1,0 +1,13 @@
+.comparisonFrame {
+  width: 100%;
+  height: var(--size-240);
+  border: var(--line-thin) solid var(--border);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+}
+.plainFieldset {
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}

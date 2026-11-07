@@ -1,0 +1,35 @@
+.listFilters.listFilters {
+  display: grid;
+  grid-template-columns:
+    minmax(var(--size-220), 1fr) var(--filter-status-width) var(--filter-main-width) var(--filter-secondary-width)
+    max-content;
+  gap: var(--space-2);
+  align-items: center;
+  margin-block: 0 var(--space-4);
+}
+.listFilters :is(input, select) {
+  width: 100%;
+  min-width: 0;
+  height: var(--control-compact-height);
+  padding: 0 var(--space-fact);
+  border: var(--line-thin) solid var(--border-strong);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}
+@media (max-width: 1199px) {
+  .listFilters.listFilters {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .listFilters input {
+    grid-column: span 2;
+  }
+}
+.listFilters select {
+  appearance: none;
+  background-image: var(--select-chevron);
+  background-position: right var(--space-fact) center;
+  background-repeat: no-repeat;
+  padding-inline-end: var(--target-small);
+}

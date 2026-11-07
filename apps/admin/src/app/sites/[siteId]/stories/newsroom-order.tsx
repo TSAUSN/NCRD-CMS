@@ -16,6 +16,8 @@ import type { getStoryListState } from '../../../../lib/stories-workspace.ts'
 import type { CollectionRights } from '../../../../lib/collection-queries.ts'
 import { saveStoryNewsroomOrder, saveStoryListPatch, reloadStoryList } from './actions.ts'
 import shared from '../../../../components/workspace.module.css'
+import workspaceFormsStyles from '../../../../components/workspace-styles/workspace-forms.module.css'
+import recordTableStyles from '../../../../components/workspace-styles/record-table.module.css'
 type State = NonNullable<Awaited<ReturnType<typeof getStoryListState>>>
 type Intent = { kind: 'order'; ids: string[] } | { kind: 'feature'; id: string; value: boolean }
 export function StoriesNewsroomOrder({
@@ -231,7 +233,7 @@ export function StoriesNewsroomOrder({
         <Note tone="warning">
           <p role="alert">{error}</p>
           {intent.current && (
-            <div className={shared.actions}>
+            <div className={workspaceFormsStyles.actions}>
               <Button
                 variant="secondary"
                 disabled={pending}
@@ -262,9 +264,11 @@ export function StoriesNewsroomOrder({
           <Card
             density="editor"
             title="Featured"
-            headerActions={<span className={shared.meta}>{featured.length} of 5</span>}
+            headerActions={<span className={recordTableStyles.meta}>{featured.length} of 5</span>}
           >
-            <p className={shared.meta}>These stay first in the Newsroom, in this order. Drag to change it.</p>
+            <p className={recordTableStyles.meta}>
+              These stay first in the Newsroom, in this order. Drag to change it.
+            </p>
             <ContentOrderList
               aria-label="Featured stories"
               className={reorderStyles.list}
@@ -347,9 +351,13 @@ export function StoriesNewsroomOrder({
             {!featured.length && (
               <EmptyState title="No featured stories">Click a story’s star to feature it.</EmptyState>
             )}
-            {featured.length < 5 && <p className={shared.meta}>Drag a story here, or click its star, to feature it.</p>}
+            {featured.length < 5 && (
+              <p className={recordTableStyles.meta}>Drag a story here, or click its star, to feature it.</p>
+            )}
             <h2>Everything else</h2>
-            <p className={shared.meta}>Newest first, by story date. Change a story’s date to move it here.</p>
+            <p className={recordTableStyles.meta}>
+              Newest first, by story date. Change a story’s date to move it here.
+            </p>
             <ContentOrderList aria-label="Other stories">
               {other.map(row => (
                 <ContentOrderRow
@@ -391,7 +399,7 @@ export function StoriesNewsroomOrder({
           </Card>
         </div>
         <Card density="editor" title="What visitors see">
-          <p className={shared.meta}>
+          <p className={recordTableStyles.meta}>
             Newsroom, Recently Published · First 6 stories ·{' '}
             {proposal ? 'Proposed order, not saved yet' : 'Saved draft preview'}
           </p>
@@ -410,7 +418,7 @@ export function StoriesNewsroomOrder({
           <Note>
             Featured only changes the Newsroom and other news lists. Sector pages always show by tag, newest first.
           </Note>
-          <p className={shared.meta}>Order changes go live with Publish.</p>
+          <p className={recordTableStyles.meta}>Order changes go live with Publish.</p>
         </Card>
       </div>
     </>

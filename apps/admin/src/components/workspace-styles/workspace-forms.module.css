@@ -1,0 +1,109 @@
+.actions,
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+.filters {
+  margin-block: var(--space-4);
+}
+.filters > label {
+  flex: 1;
+  min-width: var(--size-220);
+}
+.filters input {
+  width: 100%;
+}
+.filters > :first-child {
+  flex: 1;
+  min-width: var(--size-220);
+}
+
+.compactForm {
+  font-size: var(--text-meta);
+}
+.compactForm label,
+.compactForm legend {
+  font-size: var(--text-meta);
+  font-weight: var(--weight-medium);
+}
+.compactForm textarea {
+  min-height: calc(var(--space-7) * 2);
+}
+.formRow {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+.formChoices {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+.formChoices legend {
+  margin-block-end: var(--space-2);
+}
+
+.formPanel.formPanel {
+  padding: var(--space-4);
+  box-shadow: none;
+}
+.formPanel.formPanel :is(h2, h3) {
+  margin: 0 0 var(--space-3);
+  font-size: var(--text-body);
+  font-weight: var(--weight-semibold);
+}
+.formPanel p {
+  font-size: var(--text-meta);
+  line-height: var(--line-body);
+}
+
+.readableForm {
+  max-width: var(--dialog-medium-width);
+}
+
+.panelActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--surface);
+  padding-block: var(--space-2);
+}
+
+.compactFields {
+  display: grid;
+  gap: var(--space-3);
+}
+.compactFields > :not(dialog) {
+  margin-block: 0;
+  min-width: 0;
+}
+
+.compactForm :global(.hint) {
+  font-size: var(--text-help);
+  line-height: var(--line-help);
+}
+
+/* Shared list toolbar and compact content rows. */
+.listToolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+.listToolbar > .actions {
+  flex: 1;
+}
+
+/* Shared compact preview toolbar and editable colour-role rows. */
+.toolbarField {
+  flex: 0 1 var(--size-240);
+  min-width: 0;
+}

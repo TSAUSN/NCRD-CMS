@@ -1,0 +1,15 @@
+.assetField {
+  min-width: 0;
+  flex-wrap: wrap;
+}
+.assetField .assetPreview {
+  flex: 1;
+  min-width: 0;
+}
+.assetPreview img,
+.assetPreview svg {
+  flex: none;
+}
+.assetField > :last-child {
+  flex: none;
+}

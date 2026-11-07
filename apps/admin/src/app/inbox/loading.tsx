@@ -1,5 +1,5 @@
 import { Workbench } from '../../components/ui/index.ts'
-import styles from '../../components/workspace.module.css'
+import reviewWorkbenchStyles from '../../components/workspace-styles/review-workbench.module.css'
 export default function LoadingReviews() {
   return (
     <main id="main">
@@ -7,7 +7,7 @@ export default function LoadingReviews() {
         queueLabel="Review requests"
         storageKey="cms.reviews.queue-width"
         queue={
-          <div className={styles.queueHeading}>
+          <div className={reviewWorkbenchStyles.queueHeading}>
             <h1>Reviews</h1>
             <p>Changes people sent you to approve</p>
           </div>

@@ -19,6 +19,8 @@ import {
 } from '../../../../components/ui/index.ts'
 import { PageHeader, siteAreaTabs } from '../../../../components/shell.tsx'
 import shared from '../../../../components/workspace.module.css'
+import selectionControlsStyles from '../../../../components/workspace-styles/selection-controls.module.css'
+import listInspectorStyles from '../../../../components/workspace-styles/list-inspector.module.css'
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { ConfirmDialog, ReasonDialog } from '../../../../components/confirm.tsx'
 import {
@@ -575,7 +577,10 @@ export function MediaWorkspace({
     </>
   )
   const workspace = (
-    <div className={styles.workspace + (native ? ' ' + shared.formStack : '')} data-native={native || undefined}>
+    <div
+      className={styles.workspace + (native ? ' ' + listInspectorStyles.formStack : '')}
+      data-native={native || undefined}
+    >
       {native ? (
         <>
           <PageHeader
@@ -763,7 +768,7 @@ export function MediaWorkspace({
         <div className={'media-library-head ' + mediaUi.toolbar}>
           <div>
             {!native && <p className="eyebrow">Browse and organize</p>}
-            <h2 id="media-library-title" className={native ? shared.visuallyHidden : undefined}>
+            <h2 id="media-library-title" className={native ? selectionControlsStyles.visuallyHidden : undefined}>
               Image library
             </h2>
           </div>
@@ -874,7 +879,7 @@ export function MediaWorkspace({
                 style={{ paddingInlineStart: `calc(var(--space-3) + var(--space-4) * ${folder.depth})` }}
                 onClick={() => changeQuery({ folder: folder.path })}
               >
-                <span className={shared.itemLabel} title={folder.path}>
+                <span className={listInspectorStyles.itemLabel} title={folder.path}>
                   {folder.label || 'Unfiled'}
                 </span>
                 <strong>{folder.count}</strong>
@@ -943,7 +948,7 @@ export function MediaWorkspace({
                     data-selected={selected?.id === asset.id ? 'true' : undefined}
                   >
                     {canEdit(asset) && (
-                      <label className={'media-asset-check ' + shared.checkRow}>
+                      <label className={'media-asset-check ' + selectionControlsStyles.checkRow}>
                         <input
                           type="checkbox"
                           checked={checkedIds.has(asset.id)}

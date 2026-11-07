@@ -9,7 +9,9 @@ import {
 import { listReviewPeople } from '../lib/review-queries.ts'
 import { CollectionReviewPanel } from './collection-review-panel.tsx'
 import styles from './collection-review.module.css'
-import workspace from './workspace.module.css'
+import recordTableStyles from './workspace-styles/record-table.module.css'
+import reviewWorkbenchStyles from './workspace-styles/review-workbench.module.css'
+import versionHistoryStyles from './workspace-styles/version-history.module.css'
 
 export async function CollectionReviewSection({
   userId,
@@ -69,9 +71,9 @@ export async function CollectionReviewSection({
       {selected &&
         comparison &&
         (fullScreen ? (
-          <section className={workspace.workbenchCompare} aria-label="Saved list changes">
+          <section className={reviewWorkbenchStyles.workbenchCompare} aria-label="Saved list changes">
             <h3>Saved list changes</h3>
-            <p className={workspace.meta}>{describeChanges(comparison, selected.submitted)}</p>
+            <p className={recordTableStyles.meta}>{describeChanges(comparison, selected.submitted)}</p>
             <ListChanges
               before={comparison}
               after={selected.submitted}
@@ -168,7 +170,7 @@ function ListChanges({
   })
   return (
     <>
-      <div className={workspace.comparisonLabels}>
+      <div className={versionHistoryStyles.comparisonLabels}>
         <span>{beforeLabel}</span>
         <span>{afterLabel}</span>
       </div>
@@ -176,7 +178,7 @@ function ListChanges({
         changed.map(({ id, oldItem, newItem, values, oldPosition, newPosition }) => (
           <section
             key={id}
-            className={workspace.workbenchCompare + ' ' + styles.changedValues}
+            className={reviewWorkbenchStyles.workbenchCompare + ' ' + styles.changedValues}
             aria-label={
               'Changes to ' +
               itemTitle(
@@ -193,7 +195,7 @@ function ListChanges({
                 Math.max(oldPosition, newPosition) + 1,
               )}
             </h4>
-            <dl className={workspace.comparisonRows}>
+            <dl className={versionHistoryStyles.comparisonRows}>
               {oldPosition !== newPosition && (
                 <div>
                   <dt>Position in the list</dt>

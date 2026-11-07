@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { compareVersions, comparisonText } from '../../../lib/version-comparison.ts'
 import type { RecoveryReview, usePageRecovery } from './use-page-recovery.ts'
-import shared from '../../../components/workspace.module.css'
+import shared from './page-recovery-panel-styles.module.css'
 import { IconLock } from '../../../components/icons.tsx'
 
 type Recovery = ReturnType<typeof usePageRecovery>

@@ -1,0 +1,13 @@
+.linkChip {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  min-height: var(--filter-pill-height);
+  padding: var(--space-1) var(--space-fact);
+  border: var(--line-thin) solid var(--border-strong);
+  border-radius: var(--radius-pill);
+  font-size: var(--text-help);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

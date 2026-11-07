@@ -1,0 +1,7 @@
+.itemThumb {
+  width: var(--target-medium);
+  height: var(--target-medium);
+  object-fit: cover;
+  border-radius: var(--radius-control);
+  flex: none;
+}

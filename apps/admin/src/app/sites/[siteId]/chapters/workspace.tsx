@@ -18,6 +18,11 @@ import { TextLink as Link, Badge, SearchField, ListDetail, Note, EmptyState } fr
 import type { ChapterEditor } from '../../../../lib/local-chapter-mail.ts'
 import { saveChapterAction, inviteChapterEditorAction, loadChapterEditorsAction } from './actions.ts'
 import workspace from '../../../../components/workspace.module.css'
+import workspaceFormsStyles from '../../../../components/workspace-styles/workspace-forms.module.css'
+import recordTableStyles from '../../../../components/workspace-styles/record-table.module.css'
+import siteSummaryStyles from '../../../../components/workspace-styles/site-summary.module.css'
+import selectionControlsStyles from '../../../../components/workspace-styles/selection-controls.module.css'
+import listInspectorStyles from '../../../../components/workspace-styles/list-inspector.module.css'
 const sectionLabels = {
   paragraph: 'Chapter paragraph',
   social: 'Social links',
@@ -89,9 +94,9 @@ export function ChaptersWorkspace({
   const details = native && inspected !== null ? (shown.find(row => row.id === inspected) ?? shown[0] ?? null) : null,
     add = canAdd && <Button onClick={() => setSelected(null)}>+ Add a chapter</Button>
   return (
-    <div className={workspace.denseStack + ' ' + workspace.compactForm}>
+    <div className={workspace.denseStack + ' ' + workspaceFormsStyles.compactForm}>
       {headerTarget && createPortal(add, headerTarget)}
-      <div className={workspace.listToolbar}>
+      <div className={workspaceFormsStyles.listToolbar}>
         <SearchField
           id="chapter-search"
           label="Find a chapter"
@@ -139,8 +144,13 @@ export function ChaptersWorkspace({
           ) : undefined
         }
       >
-        <Card density="compact" data-responsive="records" className={workspace.tableWrap}>
-          <table data-density="content" data-layout="directory" className={workspace.table} aria-label="Chapters">
+        <Card density="compact" data-responsive="records" className={recordTableStyles.tableWrap}>
+          <table
+            data-density="content"
+            data-layout="directory"
+            className={recordTableStyles.table}
+            aria-label="Chapters"
+          >
             <thead>
               <tr>
                 <th>Chapter</th>
@@ -151,7 +161,7 @@ export function ChaptersWorkspace({
                 <th data-priority="extra">{native ? 'Today it links to' : 'Find a chapter links to'}</th>
                 {!native && (
                   <th>
-                    <span className={workspace.meta}>Setup</span>
+                    <span className={recordTableStyles.meta}>Setup</span>
                   </th>
                 )}
               </tr>
@@ -168,14 +178,14 @@ export function ChaptersWorkspace({
                     <Button
                       variant="tertiary"
                       title={row.config.name}
-                      className={workspace.tableTitle + ' ' + workspace.singleLine}
+                      className={recordTableStyles.tableTitle + ' ' + recordTableStyles.singleLine}
                       onClick={() => (native ? setInspected(row.id) : setSelected(row))}
                     >
                       {row.config.name}
                     </Button>
                     {currentRows.filter(other => other.config.name === row.config.name).length > 1 && (
                       <span
-                        className={workspace.meta + ' ' + workspace.singleLine}
+                        className={recordTableStyles.meta + ' ' + recordTableStyles.singleLine}
                         title={row.config.externalUrl ?? '/chapters/' + row.slug}
                       >
                         {row.config.externalUrl ?? '/chapters/' + row.slug}
@@ -189,7 +199,7 @@ export function ChaptersWorkspace({
                     {row.config.updateMode === 'division' ? 'Division web team' : 'Chapter editors'}
                   </td>
                   <td data-priority="extra">
-                    <span className={workspace.singleLine} title={native ? publicDestination(row) : undefined}>
+                    <span className={recordTableStyles.singleLine} title={native ? publicDestination(row) : undefined}>
                       {native
                         ? publicDestination(row)
                         : row.config.destination === 'division'
@@ -205,7 +215,7 @@ export function ChaptersWorkspace({
                   </td>
                   {!native && (
                     <td>
-                      <div className={workspace.actions}>
+                      <div className={workspaceFormsStyles.actions}>
                         <Button variant="secondary" onClick={() => setSelected(row)}>
                           Set up
                         </Button>
@@ -330,9 +340,9 @@ function ChapterDetails({
         </>
       }
     >
-      <div className={workspace.formStack}>
+      <div className={listInspectorStyles.formStack}>
         <ChapterStatus row={row} />
-        <dl className={workspace.factList}>
+        <dl className={listInspectorStyles.factList}>
           <div>
             <dt>Today it links to</dt>
             <dd>{publicDestination(row)}</dd>
@@ -351,7 +361,10 @@ function ChapterDetails({
             <dt>Point of contact</dt>
             <dd>
               {row.config.contact.name} · {row.config.contact.role}
-              <span className={workspace.singleLine + ' ' + workspace.meta} title={row.config.contact.email}>
+              <span
+                className={recordTableStyles.singleLine + ' ' + recordTableStyles.meta}
+                title={row.config.contact.email}
+              >
                 {row.config.contact.email}
               </span>
             </dd>
@@ -360,23 +373,23 @@ function ChapterDetails({
             <dt>Changes approved by</dt>
             <dd>
               {division ? division.name + ' web team' : 'Site administrators'}
-              {division && <span className={workspace.meta}>Site administrators can approve as backup.</span>}
+              {division && <span className={recordTableStyles.meta}>Site administrators can approve as backup.</span>}
             </dd>
           </div>
         </dl>
         {chapterUsesLinkedPage(row.config.destination) && (
-          <p className={workspace.meta}>
+          <p className={recordTableStyles.meta}>
             Saved address:{' '}
-            <span className={workspace.singleLine} title={row.config.externalUrl ?? undefined}>
+            <span className={recordTableStyles.singleLine} title={row.config.externalUrl ?? undefined}>
               {row.config.externalUrl}
             </span>
             Address not checked automatically.
           </p>
         )}
         {!chapterUsesLinkedPage(row.config.destination) && (
-          <section className={workspace.formStack}>
+          <section className={listInspectorStyles.formStack}>
             <h3 className={workspace.sectionHeading}>Sections on the page</h3>
-            <div className={workspace.tagList}>
+            <div className={listInspectorStyles.tagList}>
               {Object.entries(sectionLabels)
                 .filter(([key]) => row.config.sections[key as keyof typeof row.config.sections])
                 .map(([key, label]) => (
@@ -385,7 +398,7 @@ function ChapterDetails({
             </div>
           </section>
         )}
-        <section className={workspace.formStack}>
+        <section className={listInspectorStyles.formStack}>
           <h3 className={workspace.sectionHeading}>Who can change this page</h3>
           {error ? (
             <>
@@ -397,14 +410,14 @@ function ChapterDetails({
           ) : people === null ? (
             <p role="status">Loading chapter editors…</p>
           ) : people.length ? (
-            <ul className={workspace.rowList}>
+            <ul className={siteSummaryStyles.rowList}>
               {people.map(person => (
                 <li key={person.id}>
-                  <div className={workspace.rowCopy}>
-                    <strong className={workspace.singleLine} title={person.name}>
+                  <div className={recordTableStyles.rowCopy}>
+                    <strong className={recordTableStyles.singleLine} title={person.name}>
                       {person.name}
                     </strong>
-                    <span className={workspace.singleLine + ' ' + workspace.meta} title={person.email}>
+                    <span className={recordTableStyles.singleLine + ' ' + recordTableStyles.meta} title={person.email}>
                       {person.email}
                     </span>
                   </div>
@@ -415,7 +428,7 @@ function ChapterDetails({
           ) : (
             <p>No chapter editors are assigned.</p>
           )}
-          <p className={workspace.meta}>
+          <p className={recordTableStyles.meta}>
             {division
               ? division.name + ' web staff and site administrators retain their existing access.'
               : 'Site administrators retain their existing access.'}
@@ -426,13 +439,13 @@ function ChapterDetails({
                 Invite a volunteer
               </Button>
             ) : (
-              <p className={workspace.meta}>
+              <p className={recordTableStyles.meta}>
                 Chapter invitations aren’t available on this installation. Ask a site administrator to arrange access
                 before assigning volunteers to update this page.
               </p>
             ))}
         </section>
-        <p className={workspace.meta}>
+        <p className={recordTableStyles.meta}>
           Saved setup can differ from what visitors see. Set up changes stay in draft until reviewed and published.
         </p>
       </div>
@@ -490,7 +503,7 @@ function ChapterForm({
   const contacts = (
     <>
       <h3 className={workspace.sectionHeading}>{divisionPage ? 'Who to ask about it' : 'Point of contact'}</h3>
-      <p className={workspace.meta}>
+      <p className={recordTableStyles.meta}>
         {divisionPage
           ? 'There’s no chapter page to edit on this site. January and July reminders go to the contact below, asking them to check the address still works.'
           : 'One contact receives the January and July checks. These details are private.'}
@@ -634,7 +647,7 @@ function ChapterForm({
       onClose={close}
       pending={pending}
       footer={
-        <div className={workspace.actions}>
+        <div className={workspaceFormsStyles.actions}>
           <Button variant="secondary" disabled={pending} onClick={close}>
             Cancel
           </Button>
@@ -672,11 +685,11 @@ function ChapterForm({
         </div>
       }
     >
-      <div className={workspace.formStack + ' ' + workspace.compactForm}>
+      <div className={listInspectorStyles.formStack + ' ' + workspaceFormsStyles.compactForm}>
         {!divisionPage && (
           <>
             <ProgressSteps steps={['Chapter', 'Sections', 'People']} current={step} label="Chapter setup steps" />
-            <p className={workspace.meta}>
+            <p className={recordTableStyles.meta}>
               Step {step + 1} of 3 · {['Chapter', 'Sections', 'People'][step]}
             </p>
           </>
@@ -693,7 +706,7 @@ function ChapterForm({
             </Field>
             <div role="radiogroup" aria-labelledby="chapter-destination-label" className={workspace.denseStack}>
               <strong id="chapter-destination-label">Where does this chapter send visitors?</strong>
-              <div className={workspace.choiceRows}>
+              <div className={selectionControlsStyles.choiceRows}>
                 {(['page', 'division', 'external', 'unlisted'] as const).map(destination => (
                   <label key={destination}>
                     <input
@@ -709,7 +722,7 @@ function ChapterForm({
                     <span>
                       <strong>{chapterDestinationLabel(destination)}</strong>
                       <br />
-                      <span className={workspace.meta}>
+                      <span className={recordTableStyles.meta}>
                         {destination === 'page'
                           ? 'A page on this site, from the chapter template.'
                           : destination === 'division'
@@ -740,14 +753,14 @@ function ChapterForm({
             )}
             {divisionPage && (
               <>
-                <p className={workspace.meta}>
+                <p className={recordTableStyles.meta}>
                   Address not checked automatically. Check the saved page address before publishing.
                 </p>
                 {divisionChoice}
                 {contacts}
               </>
             )}
-            <p className={workspace.meta}>
+            <p className={recordTableStyles.meta}>
               New chapter pages stay in draft until reviewed and published. Chapters with their own website need no CMS
               page.
             </p>
@@ -763,9 +776,9 @@ function ChapterForm({
             ) : (
               <>
                 <h3 className={workspace.sectionHeading}>Sections on this page</h3>
-                <div className={workspace.formStack}>
+                <div className={listInspectorStyles.formStack}>
                   {Object.entries(sectionLabels).map(([key, label]) => (
-                    <label className={workspace.checkRow} key={key}>
+                    <label className={selectionControlsStyles.checkRow} key={key}>
                       <input
                         type="checkbox"
                         checked={config.sections[key as keyof typeof config.sections]}
@@ -873,12 +886,12 @@ function ChapterInvite({
         </Button>
       }
     >
-      <div className={workspace.formStack}>
+      <div className={listInspectorStyles.formStack}>
         <p>
           They can edit only {row.config.name}, then send their changes to the division for approval. Shared sections
           stay with the site team.
         </p>
-        <p className={workspace.meta}>This local demo records the sign-in link. No email is sent. </p>
+        <p className={recordTableStyles.meta}>This local demo records the sign-in link. No email is sent. </p>
         {error && <p role="alert">{error}</p>}
         <Field density="compact" id="volunteer-name" label="Volunteer name" required>
           <input value={name} maxLength={120} autoComplete="name" onChange={event => setName(event.target.value)} />

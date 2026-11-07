@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { ResizablePanel } from './resizable-panel.tsx'
-import styles from '../workspace.module.css'
+import reviewWorkbenchStyles from '../workspace-styles/review-workbench.module.css'
 /** Shared list/detail frame for review queues and administrative task queues. */
 export function Workbench({
   queue,
@@ -18,7 +18,7 @@ export function Workbench({
   density?: 'compact'
 }) {
   return (
-    <div data-density={density} className={`${styles.workbenchFull} ${className}`}>
+    <div data-density={density} className={`${reviewWorkbenchStyles.workbenchFull} ${className}`}>
       <ResizablePanel
         label={queueLabel}
         storageKey={storageKey}
@@ -27,11 +27,11 @@ export function Workbench({
         min={240}
         max={360}
         initial={300}
-        className={styles.workbenchQueue + ' review-queue'}
+        className={reviewWorkbenchStyles.workbenchQueue + ' review-queue'}
       >
         {queue}
       </ResizablePanel>
-      <section className={styles.workbenchMain + ' review-detail'} aria-live="polite">
+      <section className={reviewWorkbenchStyles.workbenchMain + ' review-detail'} aria-live="polite">
         {children}
       </section>
     </div>

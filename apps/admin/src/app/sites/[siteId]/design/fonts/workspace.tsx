@@ -12,6 +12,9 @@ import { type ActionResult } from '../../../../../lib/action-result.ts'
 import { useSiteLookCanvas } from '../use-site-look-canvas.ts'
 import { FontPreviewStage } from './font-preview-stage.tsx'
 import styles from '../../../../../components/workspace.module.css'
+import workspaceFormsStyles from '../../../../../components/workspace-styles/workspace-forms.module.css'
+import recordTableStyles from '../../../../../components/workspace-styles/record-table.module.css'
+import listInspectorStyles from '../../../../../components/workspace-styles/list-inspector.module.css'
 const heading = THEME_FONT_OPTIONS.find(font => font.label === 'Trajan Pro 3 (Adobe)')!.value
 const body = THEME_FONT_OPTIONS.find(font => font.label === 'Proxima Nova (Adobe)')!.value
 export function FontLibrary({
@@ -231,8 +234,8 @@ export function FontLibrary({
       )}
       {!connected ? (
         <>
-          <Card className={styles.readableForm} density="editor" title="Connect an Adobe Fonts kit">
-            <div className={styles.formStack}>
+          <Card className={workspaceFormsStyles.readableForm} density="editor" title="Connect an Adobe Fonts kit">
+            <div className={listInspectorStyles.formStack}>
               <p className="muted">
                 Paste the kit’s stylesheet link. Fonts load from Adobe, and your licence covers them. Nothing is
                 uploaded here.
@@ -240,7 +243,7 @@ export function FontLibrary({
               <Field id="font-kit" label="Kit link" error={error}>
                 <input value={kit} onChange={event => setKit(event.target.value)} />
               </Field>
-              <div className={styles.actions}>
+              <div className={workspaceFormsStyles.actions}>
                 <Button onClick={check}>Check kit</Button>
               </div>
             </div>
@@ -266,7 +269,7 @@ export function FontLibrary({
           )}
           <div className={styles.equalColumns}>
             <Card density="editor" title="Which font goes where">
-              <div className={styles.formStack}>
+              <div className={listInspectorStyles.formStack}>
                 <Field id="font-heading" label="Headings">
                   <select
                     value={tokens.fonts.heading}
@@ -324,7 +327,7 @@ export function FontLibrary({
                     ? 'Echelon keeps its sans-serif headings. Trajan Pro 3 is not available for chapters.'
                     : 'Trajan Pro 3 has capitals only, so section titles appear as small capitals.'}
                 </p>
-                <div className={styles.actions}>
+                <div className={workspaceFormsStyles.actions}>
                   <Button
                     variant="secondary"
                     loading={pending}
@@ -342,14 +345,14 @@ export function FontLibrary({
             </Card>
             <div>
               {previewFrame}
-              <p className={styles.meta}>
+              <p className={recordTableStyles.meta}>
                 The saved page with these font choices. Preview changes stay private until published.
               </p>
               {canvas.error && <p role="alert">{canvas.error}</p>}
             </div>
           </div>
-          <div className={styles.tableWrap}>
-            <table className={styles.table + ' ' + styles.compactTable}>
+          <div className={recordTableStyles.tableWrap}>
+            <table className={recordTableStyles.table + ' ' + recordTableStyles.compactTable}>
               <thead>
                 <tr>
                   <th>Address</th>

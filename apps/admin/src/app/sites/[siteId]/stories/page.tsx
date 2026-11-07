@@ -17,6 +17,7 @@ import { StoriesWorld } from './world.tsx'
 import { worldChoice, splitChoice } from '../../../../lib/story-widget-choice.ts'
 import { StoriesOverview } from './overview.tsx'
 import shared from '../../../../components/workspace.module.css'
+import workspaceFormsStyles from '../../../../components/workspace-styles/workspace-forms.module.css'
 export const dynamic = 'force-dynamic'
 export default async function StoriesPage({
   params,
@@ -73,7 +74,7 @@ export default async function StoriesPage({
       : [[], false]
   return (
     <AppShell email={session.email} role={role} groups={navigationFor(site, session.principal)}>
-      <main id="main" className={'wrap wrap-wide ' + shared.page + ' ' + shared.compactForm}>
+      <main id="main" className={'wrap wrap-wide ' + shared.page + ' ' + workspaceFormsStyles.compactForm}>
         {query.view === 'order' ? (
           <StoriesNewsroomOrder siteId={siteId} initial={state} rights={rights} canCreate={canCreate} />
         ) : query.view === 'soon' ? (

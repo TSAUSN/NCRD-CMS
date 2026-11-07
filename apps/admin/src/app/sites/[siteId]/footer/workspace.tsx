@@ -42,6 +42,11 @@ import { useSiteLookCanvas } from '../design/use-site-look-canvas.ts'
 import { prepareNationalHeader } from '../header/actions.ts'
 import { saveFooter } from './actions.ts'
 import styles from '../../../../components/workspace.module.css'
+import workspaceFormsStyles from '../../../../components/workspace-styles/workspace-forms.module.css'
+import recordTableStyles from '../../../../components/workspace-styles/record-table.module.css'
+import siteSummaryStyles from '../../../../components/workspace-styles/site-summary.module.css'
+import listInspectorStyles from '../../../../components/workspace-styles/list-inspector.module.css'
+import workspacePreviewStyles from '../../../../components/workspace-styles/workspace-preview.module.css'
 const record = (value: unknown): Record<string, unknown> =>
   value && typeof value === 'object' && !Array.isArray(value) ? (value as Record<string, unknown>) : {}
 type LinkStep = { index: number; snapshot: Footer; fresh: boolean }
@@ -357,12 +362,12 @@ export function FooterWorkspace({
               <>
                 {!inherits && logo.src && (
                   <img
-                    className={styles.assetThumb}
+                    className={workspacePreviewStyles.assetThumb}
                     src={media.find(asset => asset.id === logo.media_id)?.previewUrl ?? String(logo.src)}
                     alt={String(logo.alt ?? '')}
                   />
                 )}
-                <div className={styles.actions}>
+                <div className={workspaceFormsStyles.actions}>
                   <Button variant="secondary" disabled={pending} onClick={() => setPicker(true)}>
                     {inherits ? 'Use a different logo' : 'Replace logo'}
                   </Button>
@@ -399,7 +404,7 @@ export function FooterWorkspace({
                 </Button>
               )}
             <Disclosure title="Words beside the logo">
-              <div className={styles.formStack}>
+              <div className={listInspectorStyles.formStack}>
                 {textField('name', 'Site name')}
                 {textField('tagline', 'Small line')}
               </div>
@@ -408,7 +413,7 @@ export function FooterWorkspace({
           <Card title="Text" density="editor">
             {textField('mission', 'Mission statement')}
             <Disclosure title="More footer text">
-              <div className={styles.formStack}>
+              <div className={listInspectorStyles.formStack}>
                 {textField('mission_heading', 'Mission heading')}
                 {textField('address', 'Address')}
                 {textField('disclaimer', 'Disclaimer')}
@@ -431,16 +436,16 @@ export function FooterWorkspace({
             }
           >
             {links === null ? (
-              <div className={styles.formStack}>
+              <div className={listInspectorStyles.formStack}>
                 <Note>
                   These links include extra formatting. Edit the existing text here to keep every word and link.
                 </Note>
                 {textField('links', 'Footer links')}
               </div>
             ) : links.length ? (
-              <ul className={styles.rowList + ' ' + reorderStyles.list} data-reorder-list>
+              <ul className={siteSummaryStyles.rowList + ' ' + reorderStyles.list} data-reorder-list>
                 {links.map((link, index) => (
-                  <li key={index} className={styles.menuRow} {...reorder.row(String(index), pending)}>
+                  <li key={index} className={listInspectorStyles.menuRow} {...reorder.row(String(index), pending)}>
                     <DropIndicator marker={reorder.marker} row={String(index)} />
                     {(reorder.blocked ?? reorder.rejection)?.row === String(index) && (
                       <span className={reorderStyles.reason} aria-hidden="true">
@@ -448,7 +453,7 @@ export function FooterWorkspace({
                       </span>
                     )}
                     <IconDrag size={10} />
-                    <span className={styles.itemLabel} title={link.label}>
+                    <span className={listInspectorStyles.itemLabel} title={link.label}>
                       {link.label}
                     </span>
                     <Menu label={<IconMore size={16} />} accessibleLabel={'Actions for ' + link.label}>
@@ -477,7 +482,7 @@ export function FooterWorkspace({
                 ))}
               </ul>
             ) : (
-              <p className={styles.emptyRow}>No footer links yet. Add a page or website.</p>
+              <p className={recordTableStyles.emptyRow}>No footer links yet. Add a page or website.</p>
             )}
             <ReorderAnnouncement>{reorder.announcement}</ReorderAnnouncement>
           </Card>
@@ -537,7 +542,7 @@ export function FooterWorkspace({
             </>
           }
         >
-          <div className={styles.formStack}>
+          <div className={listInspectorStyles.formStack}>
             <SegmentedControl
               label="What would you like to add?"
               appearance="pills"

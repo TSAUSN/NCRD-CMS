@@ -7,6 +7,11 @@ import { createPortal } from 'react-dom'
 import { listItemUnit } from '../../../../lib/list-items.ts'
 import styles from './lists.module.css'
 import shared from '../../../../components/workspace.module.css'
+import workspaceFormsStyles from '../../../../components/workspace-styles/workspace-forms.module.css'
+import recordTableStyles from '../../../../components/workspace-styles/record-table.module.css'
+import selectionControlsStyles from '../../../../components/workspace-styles/selection-controls.module.css'
+import listInspectorStyles from '../../../../components/workspace-styles/list-inspector.module.css'
+import ownedStyles from './collections-workspace-styles.module.css'
 import { MediaPicker } from '../../../pages/[pageId]/media-picker.tsx'
 import {
   Badge,
@@ -768,7 +773,7 @@ export function CollectionsWorkspace({
             <div className={styles.tiles}>
               {initial.collections.map(list => (
                 <Link
-                  className={shared.optionCard + ' ' + shared.workspaceTile}
+                  className={selectionControlsStyles.optionCard + ' ' + ownedStyles.workspaceTile}
                   key={list.id}
                   href={'?collection=' + list.id}
                 >
@@ -811,9 +816,9 @@ export function CollectionsWorkspace({
                 }}
               >
                 <IconCollection size={18} />
-                <span className={shared.rowCopy}>
+                <span className={recordTableStyles.rowCopy}>
                   <strong>{list.name}</strong>
-                  <span className={shared.meta}>
+                  <span className={recordTableStyles.meta}>
                     {list.totalEntries} {list.totalEntries === 1 ? 'item' : 'items'}
                   </span>
                 </span>
@@ -849,7 +854,7 @@ export function CollectionsWorkspace({
                   />
                 </p>
               </div>
-              <div className={shared.actions}>
+              <div className={workspaceFormsStyles.actions}>
                 {' '}
                 {rights.editEntries && (
                   <Button disabled={pending} onClick={addEntry}>
@@ -941,7 +946,7 @@ export function CollectionsWorkspace({
                 <Disclosure
                   title={`Used on ${selected.usedOn.length} ${selected.usedOn.length === 1 ? 'page' : 'pages'}`}
                 >
-                  <ul className={shared.usageLinks}>
+                  <ul className={ownedStyles.usageLinks}>
                     {selected.usedOn.map(page => (
                       <li key={page.id}>
                         <TextLink title={page.title} href={'/pages/' + page.id}>
@@ -953,7 +958,7 @@ export function CollectionsWorkspace({
                   <p className="hint">Save a draft, then publish this list to update those pages.</p>
                 </Disclosure>
               ) : (
-                <p className={shared.meta}>Used on: No pages yet.</p>
+                <p className={recordTableStyles.meta}>Used on: No pages yet.</p>
               )}
               {lastReview && (
                 <p className="notice">
@@ -1113,7 +1118,7 @@ export function CollectionsWorkspace({
               >
                 <div className={styles.recordTable} data-view={view}>
                   {view === 'table' && visible.length > 0 && (
-                    <div className={shared.recordHeader} aria-hidden="true" data-editable={rights.editEntries}>
+                    <div className={ownedStyles.recordHeader} aria-hidden="true" data-editable={rights.editEntries}>
                       {rights.editEntries && <span />}
                       <span>
                         {model.fields.find(field => field.key === model.presentation.titleField)?.label ?? 'Name'}
@@ -1133,7 +1138,7 @@ export function CollectionsWorkspace({
                     </EmptyState>
                   ) : (
                     <div
-                      className={styles.results + ' ' + shared.recordRows + ' ' + reorderStyles.list}
+                      className={styles.results + ' ' + ownedStyles.recordRows + ' ' + reorderStyles.list}
                       data-reorder-list
                       data-view={view}
                       role="list"
@@ -1151,7 +1156,7 @@ export function CollectionsWorkspace({
                           <article
                             key={key}
                             role="listitem"
-                            className={styles.item + ' ' + shared.recordRow}
+                            className={styles.item + ' ' + ownedStyles.recordRow}
                             data-selected={checked.includes(key)}
                             {...dragRow}
                             onDragStart={event => {
@@ -1169,7 +1174,7 @@ export function CollectionsWorkspace({
                               </span>
                             )}
                             {rights.editEntries && (
-                              <label className={styles.select + ' ' + shared.checkRow}>
+                              <label className={styles.select + ' ' + selectionControlsStyles.checkRow}>
                                 <input
                                   type="checkbox"
                                   aria-label={'Select ' + title}
@@ -1184,23 +1189,23 @@ export function CollectionsWorkspace({
                             )}
                             <button
                               type="button"
-                              className={styles.open + ' ' + shared.recordOpen}
+                              className={styles.open + ' ' + ownedStyles.recordOpen}
                               onClick={() => openEntry(entry)}
                               aria-label={'Edit ' + title}
                             >
                               <span className={styles.entryName}>
                                 {model.presentation.imageField && (
-                                  <span className={styles.photo + ' ' + shared.recordPhoto}>
+                                  <span className={styles.photo + ' ' + ownedStyles.recordPhoto}>
                                     {photo ? <img src={photo} alt="" /> : <IconImage size={20} />}
                                   </span>
                                 )}
                                 <span className={styles.identity}>
-                                  <strong className={shared.recordName} title={title}>
+                                  <strong className={ownedStyles.recordName} title={title}>
                                     {title}
                                   </strong>
                                 </span>
                               </span>
-                              <span className={shared.recordValue} title={recordSubtitle(entry, model)}>
+                              <span className={ownedStyles.recordValue} title={recordSubtitle(entry, model)}>
                                 {recordSubtitle(entry, model)}
                               </span>
                               <Badge tone={entry.archived ? 'neutral' : entryChanged(entry) ? 'pending' : 'live'}>
@@ -1214,7 +1219,7 @@ export function CollectionsWorkspace({
                               </Badge>
                               <small
                                 data-secondary
-                                className={shared.recordValue}
+                                className={ownedStyles.recordValue}
                                 title={
                                   (entry.editedBy ?? 'Not saved yet') +
                                   (entry.editedAt ? ' · ' + new Date(entry.editedAt).toLocaleString('en-US') : '')
@@ -1230,7 +1235,7 @@ export function CollectionsWorkspace({
                               </small>
                             </button>
                             {rights.editEntries && (
-                              <span className={shared.recordAction}>
+                              <span className={ownedStyles.recordAction}>
                                 {!entry.archived && (
                                   <Menu label={<IconMore size={16} />} accessibleLabel={'Actions for ' + title}>
                                     <Button
@@ -1287,15 +1292,15 @@ export function CollectionsWorkspace({
             </>
           }
         >
-          <p className={shared.meta}>Save keeps this item private until you publish the list.</p>
+          <p className={recordTableStyles.meta}>Save keeps this item private until you publish the list.</p>
           {opened.editedAt && (
-            <p className={shared.meta}>
+            <p className={recordTableStyles.meta}>
               Updated {new Date(opened.editedAt).toLocaleString('en-US')} ·{' '}
               <span title={opened.editedBy ?? undefined}>{opened.editedBy ?? 'Not saved yet'}</span>
             </p>
           )}
           {notice && !notice.ok && <p role="alert">{notice.message}</p>}
-          <div className={shared.formStack}>
+          <div className={listInspectorStyles.formStack}>
             {model.fields.map(field => (
               <CollectionFieldControl
                 key={field.key}

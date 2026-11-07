@@ -17,7 +17,9 @@ import {
 import { Button, ButtonLink, StatusPill, Workbench, Field, Tabs, EmptyState, type StatusLabel } from './ui/index.ts'
 import { ConfirmDialog, ReasonDialog } from './confirm.tsx'
 import styles from './collection-review.module.css'
-import workspace from './workspace.module.css'
+import workspaceFormsStyles from './workspace-styles/workspace-forms.module.css'
+import listInspectorStyles from './workspace-styles/list-inspector.module.css'
+import reviewWorkbenchStyles from './workspace-styles/review-workbench.module.css'
 
 export function CollectionReviewPanel({
   reviews,
@@ -160,7 +162,7 @@ export function CollectionReviewPanel({
       </>
     ) : null
   const discussion = selected && (
-    <section className={fullScreen ? workspace.formStack : 'review-discussion'} aria-label="Discussion">
+    <section className={fullScreen ? listInspectorStyles.formStack : 'review-discussion'} aria-label="Discussion">
       <h3>Discussion</h3>
       {!comments.length && <p className="muted">No comments yet. Add context or ask about a specific field.</p>}
       <div className="review-comments">
@@ -209,7 +211,7 @@ export function CollectionReviewPanel({
               onChange={event => setBody(event.target.value)}
             />
           </Field>
-          <div className={workspace.actions} role="group" aria-label="Mention a teammate">
+          <div className={workspaceFormsStyles.actions} role="group" aria-label="Mention a teammate">
             {people.map(person => (
               <Button
                 key={person.id}
@@ -234,7 +236,7 @@ export function CollectionReviewPanel({
                 : 'A private comment draft is saved in this browser. Add comment sends it to the review.'}
             </p>
           )}
-          <div className={workspace.actions}>
+          <div className={workspaceFormsStyles.actions}>
             <Button
               disabled={pending || !body.trim()}
               onClick={() =>
@@ -283,7 +285,7 @@ export function CollectionReviewPanel({
           queue={
             <>
               {queueHeader}
-              <div className={workspace.queueTools}>
+              <div className={reviewWorkbenchStyles.queueTools}>
                 <Field id="list-review-search" label="Search list review requests">
                   <input
                     type="search"
@@ -303,7 +305,7 @@ export function CollectionReviewPanel({
                 </label>
               </div>
               {visible.length ? (
-                <ol className={workspace.queueItems}>
+                <ol className={reviewWorkbenchStyles.queueItems}>
                   {visible.map(item => (
                     <li key={item.id}>
                       <Link
@@ -315,7 +317,7 @@ export function CollectionReviewPanel({
                           {item.submittedByName} ·{' '}
                           <time dateTime={item.submittedAt}>{reviewTime(item.submittedAt)}</time>
                         </small>
-                        <span className={workspace.queueTag}>
+                        <span className={reviewWorkbenchStyles.queueTag}>
                           {item.siteName} · {reviewStatusLabel(item.status)}
                         </span>
                       </Link>
@@ -323,11 +325,11 @@ export function CollectionReviewPanel({
                   ))}
                 </ol>
               ) : (
-                <p className={workspace.queueNote} role="status">
+                <p className={reviewWorkbenchStyles.queueNote} role="status">
                   {query ? 'No matching requests. Try a list, site or person.' : 'No list requests in this view.'}
                 </p>
               )}
-              <p className={workspace.queueNote}>
+              <p className={reviewWorkbenchStyles.queueNote}>
                 Approving publishes the submitted list everywhere pages use it. Returning sends your note to the author.
               </p>
             </>
@@ -352,7 +354,7 @@ export function CollectionReviewPanel({
             </EmptyState>
           ) : (
             <>
-              <header className={workspace.workbenchHeader}>
+              <header className={reviewWorkbenchStyles.workbenchHeader}>
                 <div>
                   <p>{selected.siteName} · List</p>
                   <h2>{selected.submitted.name}</h2>
@@ -362,7 +364,7 @@ export function CollectionReviewPanel({
                   </p>
                   <StatusPill status={reviewPill(selected.status)} title={reviewStatusLabel(selected.status)} />
                 </div>
-                <div className={workspace.workbenchActions} role="group" aria-label="List review decision">
+                <div className={reviewWorkbenchStyles.workbenchActions} role="group" aria-label="List review decision">
                   <ButtonLink
                     variant="secondary"
                     href={`/sites/${selected.siteId}/content?collection=${selected.collectionId}`}
@@ -372,9 +374,11 @@ export function CollectionReviewPanel({
                   {decision}
                 </div>
               </header>
-              {selected.note && <blockquote className={workspace.workbenchQuote}>“{selected.note}”</blockquote>}
+              {selected.note && (
+                <blockquote className={reviewWorkbenchStyles.workbenchQuote}>“{selected.note}”</blockquote>
+              )}
               {selected.decisionNote && (
-                <section className={workspace.panel + ' ' + workspace.formPanel}>
+                <section className={reviewWorkbenchStyles.panel + ' ' + workspaceFormsStyles.formPanel}>
                   <h3>Reviewer feedback</h3>
                   <p>{selected.decisionNote}</p>
                 </section>
@@ -416,9 +420,9 @@ export function CollectionReviewPanel({
                 ]}
               >
                 {tab === 'changes' ? (
-                  <div className={workspace.formStack}>
+                  <div className={listInspectorStyles.formStack}>
                     {children}
-                    <section className={workspace.workbenchChecks} aria-label="Checks">
+                    <section className={reviewWorkbenchStyles.workbenchChecks} aria-label="Checks">
                       <h3>Checks</h3>
                       <ul>
                         <li>
@@ -448,8 +452,8 @@ export function CollectionReviewPanel({
       </>
     )
   return (
-    <div className={`review-board ${styles.board} ${workspace.workbench}`}>
-      <aside className={'review-queue ' + workspace.workbenchRail} aria-label="List review requests">
+    <div className={`review-board ${styles.board} ${reviewWorkbenchStyles.workbench}`}>
+      <aside className={'review-queue ' + reviewWorkbenchStyles.workbenchRail} aria-label="List review requests">
         <label className={styles.history}>
           <input type="checkbox" checked={includeHistory} onChange={event => setIncludeHistory(event.target.checked)} />{' '}
           Include decided requests
@@ -473,7 +477,7 @@ export function CollectionReviewPanel({
           ))}
         </ol>
       </aside>
-      <section className={'review-detail ' + workspace.workbenchBody}>
+      <section className={'review-detail ' + reviewWorkbenchStyles.workbenchBody}>
         {!selected ? (
           <p>Select a list request to inspect the submitted content.</p>
         ) : (

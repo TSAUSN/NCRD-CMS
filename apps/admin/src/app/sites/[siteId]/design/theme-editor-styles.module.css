@@ -1,0 +1,55 @@
+.colourRole {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  font-size: var(--text-meta);
+}
+.colourRole > label {
+  margin: 0;
+  font-size: var(--text-help);
+  font-weight: var(--weight-medium);
+}
+.colourInputs {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+.colourInputs input[type='color'] {
+  appearance: none;
+  border: var(--line-thin) solid var(--border-strong);
+  border-radius: var(--radius-control);
+  overflow: hidden;
+  flex: none;
+  width: var(--control-compact-height);
+  height: var(--control-compact-height);
+  min-height: var(--control-compact-height);
+  padding: 0;
+}
+.colourInputs input:not([type='color']) {
+  width: 100%;
+  min-width: 0;
+  height: var(--control-compact-height);
+  min-height: var(--control-compact-height);
+  font-size: var(--text-meta);
+}
+.colourRole > :is(p, small),
+.colourMeta {
+  grid-column: 1/-1;
+  margin: 0;
+}
+.colourMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.colourInputs input[type='color']::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+.colourInputs input[type='color']::-webkit-color-swatch {
+  border: 0;
+}

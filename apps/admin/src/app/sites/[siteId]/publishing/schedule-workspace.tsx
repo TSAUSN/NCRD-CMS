@@ -3,6 +3,12 @@ import { TextLink as Link, Button, Disclosure, Field, Badge } from '../../../../
 import { useNavigationGuard, requestLocalDraftNavigation } from '../../../../components/navigation-guard.ts'
 import { localScheduleTime as resolveScheduleTime, localScheduleHint } from '../../../../lib/local-schedule-time.ts'
 import shared from '../../../../components/workspace.module.css'
+import workspaceFormsStyles from '../../../../components/workspace-styles/workspace-forms.module.css'
+import recordTableStyles from '../../../../components/workspace-styles/record-table.module.css'
+import siteSummaryStyles from '../../../../components/workspace-styles/site-summary.module.css'
+import selectionControlsStyles from '../../../../components/workspace-styles/selection-controls.module.css'
+import listInspectorStyles from '../../../../components/workspace-styles/list-inspector.module.css'
+import reviewWorkbenchStyles from '../../../../components/workspace-styles/review-workbench.module.css'
 
 import { useEffect, useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
@@ -351,7 +357,7 @@ export function ScheduleWorkspace({
   }
   return (
     <section
-      className={shared.workspaceContent + ' ' + shared.compactForm + ' ' + shared.denseStack}
+      className={shared.workspaceContent + ' ' + workspaceFormsStyles.compactForm + ' ' + shared.denseStack}
       aria-labelledby="schedules-title"
     >
       <h2 id="schedules-title">Scheduled publishing</h2>
@@ -374,7 +380,7 @@ export function ScheduleWorkspace({
           }}
         >
           <form
-            className={shared.formStack}
+            className={listInspectorStyles.formStack}
             onSubmit={event => {
               event.preventDefault()
               if (!selected || !versionId || !time || !scheduleTime) return
@@ -514,7 +520,7 @@ export function ScheduleWorkspace({
                 </Field>
               </div>
             )}
-            <div className={shared.actions}>
+            <div className={workspaceFormsStyles.actions}>
               <Button type="submit" disabled={pending || !versionId || !time || !scheduleTime || changed}>
                 {pending ? 'Saving…' : 'Save schedule'}
               </Button>
@@ -530,11 +536,11 @@ export function ScheduleWorkspace({
       {schedules.length === 0 ? (
         <p className="muted">No scheduled actions for this site yet.</p>
       ) : (
-        <ul className={shared.rowList + ' ' + shared.panel}>
+        <ul className={siteSummaryStyles.rowList + ' ' + reviewWorkbenchStyles.panel}>
           {schedules.map(job => (
             <li key={job.id} id={`schedule-${job.id}`} aria-label={`Scheduled action ${job.title}`}>
               <div>
-                <strong className={shared.singleLine} title={job.title}>
+                <strong className={recordTableStyles.singleLine} title={job.title}>
                   {job.title}
                 </strong>
                 <p>
@@ -544,7 +550,7 @@ export function ScheduleWorkspace({
                   </time>
                 </p>
                 <p>
-                  <span className={shared.visuallyHidden}>Status: </span>
+                  <span className={selectionControlsStyles.visuallyHidden}>Status: </span>
                   <Badge tone={job.status === 'failed' ? 'error' : job.status === 'succeeded' ? 'live' : 'neutral'}>
                     {job.status}
                   </Badge>

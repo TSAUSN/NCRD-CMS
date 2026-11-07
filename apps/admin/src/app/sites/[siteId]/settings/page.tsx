@@ -3,6 +3,7 @@ import { getSiteSettingsWorkspace } from '../../../../lib/site-settings.ts'
 import { SettingsNavigation } from '../../../../components/settings-navigation.tsx'
 import { StoriesSettings, type StoriesPolicy } from './stories-settings.tsx'
 import workspace from '../../../../components/workspace.module.css'
+import workspaceFormsStyles from '../../../../components/workspace-styles/workspace-forms.module.css'
 import { localChapterMailOrigin } from '../../../../lib/local-chapter-mail.ts'
 import { ChapterChecks } from './chapter-checks.tsx'
 import { chapterWorkspaceOptions, chapterTeams } from '../../../../lib/chapters.ts'
@@ -53,7 +54,7 @@ export default async function SiteSettings({
     const initial = await getSiteSettingsWorkspace(session.principal.userId, siteId)
     return (
       <AppShell email={session.email} role={role} groups={navigationFor(site, session.principal)}>
-        <main id="main" className={'wrap wrap-wide ' + workspace.page + ' ' + workspace.compactForm}>
+        <main id="main" className={'wrap wrap-wide ' + workspace.page + ' ' + workspaceFormsStyles.compactForm}>
           <GeneralSettingsWorkspace
             key={siteId}
             siteId={siteId}
@@ -93,7 +94,7 @@ export default async function SiteSettings({
   if (native)
     return (
       <AppShell email={session.email} role={role} groups={navigationFor(site, session.principal)}>
-        <main id="main" className={'wrap wrap-wide ' + workspace.page + ' ' + workspace.compactForm}>
+        <main id="main" className={'wrap wrap-wide ' + workspace.page + ' ' + workspaceFormsStyles.compactForm}>
           <div className={workspace.denseStack} data-layout="compact">
             <PageHeader
               title="Settings"
@@ -213,7 +214,7 @@ export default async function SiteSettings({
     )
   return (
     <AppShell email={session.email} role={role} groups={navigationFor(site, session.principal)}>
-      <main id="main" className={'wrap ' + workspace.compactForm}>
+      <main id="main" className={'wrap ' + workspaceFormsStyles.compactForm}>
         <PageHeader
           title="Settings"
           crumbs={[

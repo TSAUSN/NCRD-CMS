@@ -11,7 +11,11 @@ import {
   saveSectionCopy,
   type saveSectionLink,
 } from './section-tools-actions.ts'
-import shared from '../../../components/workspace.module.css'
+import workspaceFormsStyles from '../../../components/workspace-styles/workspace-forms.module.css'
+import recordTableStyles from '../../../components/workspace-styles/record-table.module.css'
+import siteSummaryStyles from '../../../components/workspace-styles/site-summary.module.css'
+import listInspectorStyles from '../../../components/workspace-styles/list-inspector.module.css'
+import reviewWorkbenchStyles from '../../../components/workspace-styles/review-workbench.module.css'
 import styles from './inspector.module.css'
 type CopyPage = { id: string; title: string; revision: string; sections: { label: string }[] }
 export function SectionToolsPanel({
@@ -205,7 +209,7 @@ export function SectionToolsPanel({
         }
       }}
     >
-      <div className={shared.panelActions}>
+      <div className={workspaceFormsStyles.panelActions}>
         <Button variant="tertiary" disabled={pending} onClick={close}>
           <IconChevronLeft size={16} />
           Back to section
@@ -214,10 +218,10 @@ export function SectionToolsPanel({
           Done
         </Button>
       </div>
-      <div className={shared.formStack}>
+      <div className={listInspectorStyles.formStack}>
         <h2>{kind === 'link' ? 'Link to this section' : 'Copy this section to another page'}</h2>
-        <p className={shared.meta}>Finish this step before using page actions. Nothing is published here.</p>
-        <p className={shared.meta}>
+        <p className={recordTableStyles.meta}>Finish this step before using page actions. Nothing is published here.</p>
+        <p className={recordTableStyles.meta}>
           {kind === 'link'
             ? 'Use this link in a button, an email or a menu. It opens this page and scrolls here.'
             : 'It copies the text and settings onto that page’s draft. Story tags stay the same.'}
@@ -266,7 +270,7 @@ export function SectionToolsPanel({
               </p>
             )}
             {!review.name && !done && (
-              <p className={shared.meta}>
+              <p className={recordTableStyles.meta}>
                 Save the link name before copying it. It works for visitors after this page is published.
               </p>
             )}
@@ -320,7 +324,10 @@ export function SectionToolsPanel({
                   </select>
                 </Field>
                 {at !== '' && (
-                  <ol className={shared.rowList + ' ' + shared.panel} aria-label="Copy placement">
+                  <ol
+                    className={siteSummaryStyles.rowList + ' ' + reviewWorkbenchStyles.panel}
+                    aria-label="Copy placement"
+                  >
                     {target.sections.map((section, index) => (
                       <li key={index}>
                         {Number(at) === index && <strong>This section goes here: </strong>}
@@ -373,7 +380,7 @@ export function SectionToolsPanel({
       </div>
       {!done && (
         <div className={styles.addBelow}>
-          <div className={shared.actions}>
+          <div className={workspaceFormsStyles.actions}>
             <Button variant="secondary" disabled={pending} onClick={() => onClose(reloadSource.current)}>
               Cancel
             </Button>

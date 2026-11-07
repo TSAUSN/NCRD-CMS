@@ -8,6 +8,8 @@
 // the consequence is still cheap to understand.
 import styles from './new-page.module.css'
 import shared from '../../../components/workspace.module.css'
+import selectionControlsStyles from '../../../components/workspace-styles/selection-controls.module.css'
+import ownedStyles from './new-page-styles.module.css'
 import { useRouter } from 'next/navigation'
 import { Button, Field, SegmentedControl } from '../../../components/ui/index.ts'
 import { duplicatePageAction } from '../../pages/[pageId]/page-copy-actions.ts'
@@ -233,12 +235,12 @@ export function NewPageForm({
         >
           <div
             ref={dialog}
-            className={`page-creator ${styles.creator} ${shared.planner}`}
+            className={`page-creator ${styles.creator} ${ownedStyles.planner}`}
             role="dialog"
             aria-modal="true"
             aria-labelledby="page-creator-title"
           >
-            <header className={'page-creator-head ' + shared.plannerHead}>
+            <header className={'page-creator-head ' + ownedStyles.plannerHead}>
               <div>
                 <p className="eyebrow">{siteName}</p>
                 <h2 id="page-creator-title">Create a page</h2>
@@ -275,9 +277,9 @@ export function NewPageForm({
                 <input key={id} type="hidden" name="sectionDefId" value={id} />
               ))}
 
-              <div className={'page-creator-body ' + shared.plannerBody}>
-                <div className={'page-creator-main ' + shared.plannerMain}>
-                  <section className={'creator-block ' + shared.plannerBlock} aria-labelledby="page-details-title">
+              <div className={'page-creator-body ' + ownedStyles.plannerBody}>
+                <div className={'page-creator-main ' + ownedStyles.plannerMain}>
+                  <section className={'creator-block ' + ownedStyles.plannerBlock} aria-labelledby="page-details-title">
                     <div className="creator-block-head">
                       <span className="creator-step">1</span>
                       <div>
@@ -328,7 +330,7 @@ export function NewPageForm({
                     </div>
                   </section>
 
-                  <section className={'creator-block ' + shared.plannerBlock} aria-labelledby="page-start-title">
+                  <section className={'creator-block ' + ownedStyles.plannerBlock} aria-labelledby="page-start-title">
                     <div className="creator-block-head">
                       <span className="creator-step">2</span>
                       <div>
@@ -371,14 +373,14 @@ export function NewPageForm({
                       </div>
                     ) : designs.length > 0 && mode !== 'blank' && mode !== 'custom' ? (
                       <>
-                        <div className={shared.optionGrid} aria-label="SAWSO page designs">
+                        <div className={ownedStyles.optionGrid} aria-label="SAWSO page designs">
                           {designs.map(design => {
                             const preview = library.find(entry => entry.slug === 'core-page-header')
                             return (
                               <button
                                 type="button"
                                 key={design.id}
-                                className={shared.optionCard}
+                                className={selectionControlsStyles.optionCard}
                                 aria-pressed={designId === design.id}
                                 onClick={() => setDesignId(design.id)}
                               >
@@ -422,7 +424,7 @@ export function NewPageForm({
                             ))}
                           </select>
                         </div>
-                        <div className={shared.optionGrid} aria-label="Template previews">
+                        <div className={ownedStyles.optionGrid} aria-label="Template previews">
                           {CORE_PAGE_TEMPLATES.filter(template =>
                             ['landing', 'resources', 'event-home'].includes(template.id),
                           ).map(template => {
@@ -431,7 +433,7 @@ export function NewPageForm({
                               <button
                                 key={template.id}
                                 type="button"
-                                className={shared.optionCard}
+                                className={selectionControlsStyles.optionCard}
                                 aria-pressed={pageTemplate === template.id}
                                 onClick={() => {
                                   setPageTemplate(template.id)
@@ -490,7 +492,7 @@ export function NewPageForm({
                             </div>
                           </div>
                         ) : (
-                          <details className={shared.plannerDisclosure} open={mode === 'custom'}>
+                          <details className={ownedStyles.plannerDisclosure} open={mode === 'custom'}>
                             <summary>Choose and arrange starting sections</summary>
                             <div className="creator-library">
                               <div className="creator-library-tools">
@@ -586,9 +588,9 @@ export function NewPageForm({
                 </div>
 
                 {!copyMode && !designId && (
-                  <details className={shared.plannerDisclosure} open={mode === 'custom'}>
+                  <details className={ownedStyles.plannerDisclosure} open={mode === 'custom'}>
                     <summary>Starting structure</summary>
-                    <aside className={'page-outline ' + shared.plannerAside} aria-labelledby="page-outline-title">
+                    <aside className={'page-outline ' + ownedStyles.plannerAside} aria-labelledby="page-outline-title">
                       <div className="page-outline-head">
                         <div>
                           <p className="eyebrow">Starting structure</p>
@@ -659,7 +661,7 @@ export function NewPageForm({
                 )}
               </div>
 
-              <footer className={'page-creator-foot ' + shared.plannerFoot}>
+              <footer className={'page-creator-foot ' + ownedStyles.plannerFoot}>
                 <button type="button" className="ghost" onClick={close}>
                   Cancel
                 </button>

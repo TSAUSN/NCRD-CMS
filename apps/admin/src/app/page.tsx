@@ -13,6 +13,8 @@ import { listWorkspacePages } from '../lib/workspace-queries.ts'
 import { homeReviewCounts } from '../lib/home-review-counts.ts'
 import { Card, Disclosure } from '../components/ui/index.ts'
 import styles from '../components/workspace.module.css'
+import recordTableStyles from '../components/workspace-styles/record-table.module.css'
+import siteSummaryStyles from '../components/workspace-styles/site-summary.module.css'
 import { SiteCard } from '../components/site-card.tsx'
 import { IconSite, IconPage, IconCollection, IconCheck } from '../components/icons.tsx'
 
@@ -173,11 +175,15 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
                     const home = pages.find(page => page.site_id === site.id && (scoped || page.slug === ''))
                     const role = session.principal.memberships.get(site.id)
                     return (
-                      <a key={site.id} className={styles.task} href={home ? '/pages/' + home.id : '/sites/' + site.id}>
-                        <span className={styles.taskIcon}>
+                      <a
+                        key={site.id}
+                        className={siteSummaryStyles.task}
+                        href={home ? '/pages/' + home.id : '/sites/' + site.id}
+                      >
+                        <span className={siteSummaryStyles.taskIcon}>
                           <IconPage size={18} />
                         </span>
-                        <span className={styles.meta}>
+                        <span className={recordTableStyles.meta}>
                           {site.name} ·{' '}
                           {scoped
                             ? 'Your assigned pages'
@@ -200,13 +206,13 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
                   .map(site => (
                     <a
                       key={'list' + site.id}
-                      className={styles.task}
+                      className={siteSummaryStyles.task}
                       href={'/sites/' + site.id + (site.has_stories ? '/stories' : '/content')}
                     >
-                      <span className={styles.taskIcon}>
+                      <span className={siteSummaryStyles.taskIcon}>
                         <IconCollection size={18} />
                       </span>
-                      <span className={styles.meta}>{site.name}</span>
+                      <span className={recordTableStyles.meta}>{site.name}</span>
                       <strong>{site.has_stories ? 'Update stories' : 'Update lists'}</strong>
                       <span>
                         {site.has_stories
@@ -228,14 +234,18 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
                         )),
                   )
                   .map(site => (
-                    <a key={'chapters' + site.id} className={styles.task} href={'/sites/' + site.id + '/chapters'}>
-                      <span className={styles.meta}>{site.name}</span>
+                    <a
+                      key={'chapters' + site.id}
+                      className={siteSummaryStyles.task}
+                      href={'/sites/' + site.id + '/chapters'}
+                    >
+                      <span className={recordTableStyles.meta}>{site.name}</span>
                       <strong>Set up chapters</strong>
                       <span>Choose page sections and invite chapter volunteers.</span>
                     </a>
                   ))}
                 {reviewCount > 0 && (
-                  <a className={styles.task} href="/inbox">
+                  <a className={siteSummaryStyles.task} href="/inbox">
                     <strong>
                       Review {reviewCount} {reviewCount === 1 ? 'submission' : 'submissions'}
                     </strong>
@@ -245,12 +255,12 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
               </div>
             </section>
             <Card title="Needs attention" density="compact">
-              <ul className={styles.rowList}>
+              <ul className={siteSummaryStyles.rowList}>
                 {attention.map(({ site, changed, samples, reviews }) => (
                   <li key={site.id} data-attention-site={site.id}>
-                    <div className={styles.rowCopy}>
+                    <div className={recordTableStyles.rowCopy}>
                       <strong>{site.name}</strong>
-                      <span className={styles.meta}>
+                      <span className={recordTableStyles.meta}>
                         {[
                           changed ? `${changed} ${changed === 1 ? 'change' : 'changes'} not live` : null,
                           samples
@@ -271,12 +281,14 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
                 ))}
                 {!attention.length && (
                   <li>
-                    <span className={styles.taskIcon}>
+                    <span className={siteSummaryStyles.taskIcon}>
                       <IconCheck size={18} />
                     </span>
-                    <div className={styles.rowCopy}>
+                    <div className={recordTableStyles.rowCopy}>
                       <strong>Nothing needs your attention</strong>
-                      <span className={styles.meta}>Your visible pages and lists have no waiting changes.</span>
+                      <span className={recordTableStyles.meta}>
+                        Your visible pages and lists have no waiting changes.
+                      </span>
                     </div>
                   </li>
                 )}
@@ -313,14 +325,14 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
 
         {recent.length > 0 && (
           <Card title="Recent work" density="compact">
-            <ul className={styles.rowList}>
+            <ul className={siteSummaryStyles.rowList}>
               {recent.map(page => (
                 <li key={page.id}>
-                  <div className={styles.rowCopy}>
+                  <div className={recordTableStyles.rowCopy}>
                     <Link href={'/pages/' + page.id}>{page.title}</Link>
-                    <span className={styles.meta}>{page.site_name}</span>
+                    <span className={recordTableStyles.meta}>{page.site_name}</span>
                   </div>
-                  <span className={styles.meta}>
+                  <span className={recordTableStyles.meta}>
                     {page.edited_by} ·{' '}
                     {new Date(page.edited_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                   </span>

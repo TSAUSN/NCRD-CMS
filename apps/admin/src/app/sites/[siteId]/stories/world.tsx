@@ -11,7 +11,10 @@ import { Button, ButtonLink, Card, Dialog, Field, Note } from '../../../../compo
 import { StoriesHeader } from './header.tsx'
 import { AddStory } from './add-story.tsx'
 import { addWorld, loadWorldPages } from './actions.ts'
-import shared from '../../../../components/workspace.module.css'
+import workspaceFormsStyles from '../../../../components/workspace-styles/workspace-forms.module.css'
+import recordTableStyles from '../../../../components/workspace-styles/record-table.module.css'
+import workspacePreviewStyles from '../../../../components/workspace-styles/workspace-preview.module.css'
+import ownedStyles from './world-styles.module.css'
 type State = NonNullable<Awaited<ReturnType<typeof getStoryListState>>>
 type Page = { id: string; title: string; slug: string; revision: string }
 export function StoriesWorld({
@@ -134,10 +137,10 @@ export function StoriesWorld({
           and publish.
         </Note>
       )}
-      <div className={shared.settingsPreview}>
+      <div className={workspacePreviewStyles.settingsPreview}>
         <Card title="World View section" density="summary">
-          <div className={shared.compactFields}>
-            <p className={shared.meta}>Add this section to any page from the library. No code to copy.</p>
+          <div className={workspaceFormsStyles.compactFields}>
+            <p className={recordTableStyles.meta}>Add this section to any page from the library. No code to copy.</p>
             <Field id="world-heading" label="Heading above the map">
               <input
                 id="world-heading"
@@ -158,12 +161,12 @@ export function StoriesWorld({
             </Field>
             <div>
               <label id="world-main-label">{mainLabel}</label>
-              <details className={shared.choiceDetails}>
+              <details className={ownedStyles.choiceDetails}>
                 <summary aria-labelledby="world-main-label">{mainSummary}</summary>
-                <div className={shared.compactFields}>
+                <div className={workspaceFormsStyles.compactFields}>
                   {state.settings.mainTags.length ? (
                     state.settings.mainTags.map(tag => (
-                      <label key={tag.id} className={shared.actions}>
+                      <label key={tag.id} className={workspaceFormsStyles.actions}>
                         <input
                           type="checkbox"
                           checked={choice.main.includes(tag.id)}
@@ -178,7 +181,7 @@ export function StoriesWorld({
                       </label>
                     ))
                   ) : (
-                    <p className={shared.meta}>A Site admin can add main tags in Manage tags.</p>
+                    <p className={recordTableStyles.meta}>A Site admin can add main tags in Manage tags.</p>
                   )}
                   {choice.main.length > 0 && (
                     <Button variant="tertiary" onClick={() => value('main', [])}>
@@ -201,9 +204,11 @@ export function StoriesWorld({
                 ))}
               </select>
             </Field>
-            <p className={shared.meta}>Regions with no live stories stay grey. Map areas are set in Manage tags.</p>
+            <p className={recordTableStyles.meta}>
+              Regions with no live stories stay grey. Map areas are set in Manage tags.
+            </p>
             {rights.manageSchema && state.ready && (
-              <div className={shared.actions}>
+              <div className={workspaceFormsStyles.actions}>
                 <Button
                   variant="secondary"
                   onClick={() => {
@@ -216,19 +221,21 @@ export function StoriesWorld({
                 </Button>
               </div>
             )}
-            {!rights.manageSchema && <p className={shared.meta}>A Site admin can add this section to a page.</p>}
+            {!rights.manageSchema && (
+              <p className={recordTableStyles.meta}>A Site admin can add this section to a page.</p>
+            )}
             {!state.ready && (
               <Note tone="warning">A Site admin must save the Story tags before this section can be added.</Note>
             )}
           </div>
         </Card>
-        <div className={shared.previewPanel}>
+        <div className={workspacePreviewStyles.previewPanel}>
           <ScaledPreview
             src={'/preview/stories/' + siteId + '?' + worldChoiceQuery(preview)}
             title="World View draft preview"
             readySelector="[data-cms-stories-widget]"
           />
-          <p className={shared.meta}>
+          <p className={recordTableStyles.meta}>
             Saved draft stories · Preview choices are kept in this address. Nothing is published.
           </p>
         </div>
@@ -252,7 +259,7 @@ export function StoriesWorld({
             </>
           }
         >
-          <div className={shared.compactFields}>
+          <div className={workspaceFormsStyles.compactFields}>
             <p>The section will be added at the end of the page as a private draft. Existing content stays in place.</p>
             {error && (
               <Note tone="warning">

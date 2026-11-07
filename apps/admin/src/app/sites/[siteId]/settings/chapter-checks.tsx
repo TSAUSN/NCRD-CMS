@@ -8,6 +8,10 @@ import { Field } from '../../../../components/ui/field.tsx'
 import { TextLink as Link, TestTools, Badge } from '../../../../components/ui/index.ts'
 import { saveChapterChecks, recordChapterMessages } from './chapter-actions.ts'
 import shared from '../../../../components/workspace.module.css'
+import recordTableStyles from '../../../../components/workspace-styles/record-table.module.css'
+import selectionControlsStyles from '../../../../components/workspace-styles/selection-controls.module.css'
+import listInspectorStyles from '../../../../components/workspace-styles/list-inspector.module.css'
+import ownedStyles from './chapter-checks-styles.module.css'
 import { useBrowserSetup } from '../../../../components/use-browser-setup.ts'
 export function ChapterChecks({
   siteId,
@@ -85,27 +89,27 @@ export function ChapterChecks({
   return (
     <Card density="settings" title="Review reminders" aria-label="Chapter checks">
       <div className={shared.denseStack}>
-        <div className={shared.formSection}>
+        <div className={ownedStyles.formSection}>
           <p>
             {checksEnabled
               ? 'Each chapter’s point of contact receives one combined January or July check, even when they look after several chapters.'
               : 'January and July contact checks are off. Turn them on below.'}
           </p>
           <h3 className={shared.sectionHeading}>Ask in</h3>
-          <div className={shared.tagList}>
+          <div className={listInspectorStyles.tagList}>
             <Badge tone="info">January</Badge>
             <Badge tone="info">July</Badge>
           </div>
         </div>
-        <div className={shared.formSection}>
+        <div className={ownedStyles.formSection}>
           <h3 className={shared.sectionHeading}>What we ask them to check</h3>
-          <div className={shared.tagList}>
+          <div className={listInspectorStyles.tagList}>
             {['Chapter contact', 'Board members', 'This year’s events', 'Photos', 'Social links'].map(label => (
               <Badge key={label}>{label}</Badge>
             ))}
           </div>
         </div>
-        <div className={shared.formSection}>
+        <div className={ownedStyles.formSection}>
           <h3 className={shared.sectionHeading}>Email preview</h3>
           <Tabs
             appearance="segmented"
@@ -118,7 +122,7 @@ export function ChapterChecks({
               { value: 'division', label: 'Division makes changes' },
             ]}
           >
-            <div className={shared.messagePreview}>
+            <div className={ownedStyles.messagePreview}>
               <strong>Time to check your Echelon chapter page</strong>
               {preview === 'editors' ? (
                 <p>
@@ -135,11 +139,13 @@ export function ChapterChecks({
               )}
             </div>
           </Tabs>
-          <p className={shared.meta}>Chapters that do not respond show Review overdue on the Chapters screen.</p>
+          <p className={recordTableStyles.meta}>
+            Chapters that do not respond show Review overdue on the Chapters screen.
+          </p>
         </div>
-        <div className={shared.formSection}>
+        <div className={ownedStyles.formSection}>
           <h3 className={shared.sectionHeading}>Check settings</h3>
-          <label className={shared.toggleRow}>
+          <label className={selectionControlsStyles.toggleRow}>
             <span>January and July contact checks</span>
             <input
               type="checkbox"
@@ -149,7 +155,7 @@ export function ChapterChecks({
               onChange={event => setup.setValue(value => ({ ...value, checks: event.target.checked }))}
             />
           </label>
-          <label className={shared.toggleRow}>
+          <label className={selectionControlsStyles.toggleRow}>
             <span>Remind the division and national team after five working days</span>
             <input
               type="checkbox"
@@ -159,11 +165,11 @@ export function ChapterChecks({
               onChange={event => setup.setValue(value => ({ ...value, reminders: event.target.checked }))}
             />
           </label>
-          <p className={shared.meta}>
+          <p className={recordTableStyles.meta}>
             Working days are Monday to Friday, using Eastern time. Nothing is published automatically. Contact checks
             and review reminders take effect as soon as you save.
           </p>
-          <p className={shared.meta}>
+          <p className={recordTableStyles.meta}>
             Save draft and leave keeps check settings only in this browser. Use Save check settings to apply them. No
             messages are recorded on leave.
           </p>

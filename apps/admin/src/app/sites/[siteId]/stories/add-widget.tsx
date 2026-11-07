@@ -3,7 +3,7 @@ import { useState } from 'react'
 import type { WorldChoice, SplitChoice } from '../../../../lib/story-widget-choice.ts'
 import { Button, Dialog, Field, Note } from '../../../../components/ui/index.ts'
 import { addWorld, addSplit, loadWorldPages } from './actions.ts'
-import shared from '../../../../components/workspace.module.css'
+import workspaceFormsStyles from '../../../../components/workspace-styles/workspace-forms.module.css'
 type Page = { id: string; title: string; slug: string; revision: string }
 export function AddStoryWidget({
   siteId,
@@ -60,7 +60,7 @@ export function AddStoryWidget({
   }
   return (
     <>
-      <div className={shared.actions}>
+      <div className={workspaceFormsStyles.actions}>
         <Button
           variant="secondary"
           onClick={() => {
@@ -91,7 +91,7 @@ export function AddStoryWidget({
             </>
           }
         >
-          <div className={shared.compactFields}>
+          <div className={workspaceFormsStyles.compactFields}>
             <p>The section will be added at the end of the page as a private draft. Existing content stays in place.</p>
             {error && (
               <Note tone="warning">

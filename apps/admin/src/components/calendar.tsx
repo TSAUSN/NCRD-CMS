@@ -1,7 +1,7 @@
 'use client'
 import type { ReactNode } from 'react'
 import { calendarMonth } from '../lib/story-calendar.ts'
-import styles from './workspace.module.css'
+import styles from './calendar-styles.module.css'
 /** Shared month grid: all seven days remain visible and keyboard reachable. */
 export function Calendar({
   month,

@@ -7,7 +7,7 @@ import { Button, Dialog, EmptyState, SegmentedControl, TextLink } from '../../..
 import { PageComparison } from '../../../../components/page-comparison.tsx'
 import { readReleaseComparison } from './release-actions.ts'
 import styles from './publish.module.css'
-import shared from '../../../../components/workspace.module.css'
+import listInspectorStyles from '../../../../components/workspace-styles/list-inspector.module.css'
 export function ReleaseComparisonDialog({
   siteId,
   item,
@@ -85,7 +85,7 @@ export function ReleaseComparisonDialog({
         </EmptyState>
       )}
       {data && (
-        <div className={shared.formStack}>
+        <div className={listInspectorStyles.formStack}>
           <p>{data?.summary ?? 'Review the saved changes.'}</p>
           {data?.preview && <p>{data!.preview!.note}</p>}
           {(item.type === 'page' || data?.preview) && (

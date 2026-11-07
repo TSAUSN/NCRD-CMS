@@ -1,4 +1,5 @@
 import shared from '../../../../components/workspace.module.css'
+import workspaceFormsStyles from '../../../../components/workspace-styles/workspace-forms.module.css'
 import { listCollectionReviews } from '../../../../lib/collection-review.ts'
 import { notFound } from 'next/navigation'
 import { AppShell } from '../../../../components/app-shell.tsx'
@@ -41,7 +42,11 @@ export default async function ContentPage({
   const totalItems = workspace.collections.reduce((sum, item) => sum + item.totalEntries, 0)
   return (
     <AppShell email={session.email} role={role} groups={navigationFor(site, session.principal)}>
-      <main id="main" className={'wrap wrap-wide ' + shared.page + ' ' + shared.compactForm} data-layout="compact">
+      <main
+        id="main"
+        className={'wrap wrap-wide ' + shared.page + ' ' + workspaceFormsStyles.compactForm}
+        data-layout="compact"
+      >
         <PageHeader
           density="compact"
           showWayfinding={false}

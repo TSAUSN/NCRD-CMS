@@ -6,7 +6,9 @@ import state from '../../../../components/state.module.css'
 import mediaUi from '../../../../components/media-ui.module.css'
 import { MediaThumbnail as MediaThumb } from '../../../../components/media-thumbnail.tsx'
 import { Button, Disclosure, Field, Badge, Tabs, TextLink } from '../../../../components/ui/index.ts'
-import shared from '../../../../components/workspace.module.css'
+import recordTableStyles from '../../../../components/workspace-styles/record-table.module.css'
+import selectionControlsStyles from '../../../../components/workspace-styles/selection-controls.module.css'
+import listInspectorStyles from '../../../../components/workspace-styles/list-inspector.module.css'
 import { useEffect, useRef, useState } from 'react'
 import { IconAlert, IconInfo, IconRevert, IconTrash } from '../../../../components/icons.tsx'
 import {
@@ -71,7 +73,7 @@ export function MediaDetail({
       <div className={'media-detail-head ' + mediaUi.detailHeading}>
         <div>
           <p className="eyebrow">Selected image</p>
-          <h3 className={shared.truncateValue} title={asset.name}>
+          <h3 className={recordTableStyles.truncateValue} title={asset.name}>
             {asset.name}
           </h3>
           <small className={styles.scope}>{asset.scope === 'shared' ? 'Shared' : 'This site'}</small>
@@ -269,7 +271,7 @@ function MetadataForm({
             onChange={event => setValue({ ...value, altText: event.target.value })}
           />
         </Field>
-        <label className={shared.checkRow}>
+        <label className={selectionControlsStyles.checkRow}>
           <input
             type="checkbox"
             checked={value.decorative}
@@ -301,7 +303,7 @@ function MetadataForm({
           onChange={focal => setValue({ ...value, focal })}
         />
         <Disclosure title="More details">
-          <div className={shared.formStack}>
+          <div className={listInspectorStyles.formStack}>
             <dl className="media-facts">
               <div>
                 <dt>Dimensions</dt>

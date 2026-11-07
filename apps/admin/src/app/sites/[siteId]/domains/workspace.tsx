@@ -4,6 +4,8 @@ import { useRouter } from 'next/navigation'
 import { ConfirmDialog } from '../../../../components/confirm.tsx'
 import { domainStatusLabel, recordsText, type DomainRow } from '../../../../lib/domains.ts'
 import workspace from '../../../../components/workspace.module.css'
+import workspaceFormsStyles from '../../../../components/workspace-styles/workspace-forms.module.css'
+import recordTableStyles from '../../../../components/workspace-styles/record-table.module.css'
 import { changeDomain } from './actions.ts'
 
 export function DomainWorkspace({
@@ -49,7 +51,7 @@ export function DomainWorkspace({
     })
   }
   return (
-    <div className={workspace.compactForm + ' ' + workspace.denseStack}>
+    <div className={workspaceFormsStyles.compactForm + ' ' + workspace.denseStack}>
       {notice && (
         <p className="notice" role="status">
           {notice}
@@ -62,7 +64,7 @@ export function DomainWorkspace({
       )}
       {canManage && canConnect && !archived && (
         <form
-          className={'card stack ' + workspace.formPanel}
+          className={'card stack ' + workspaceFormsStyles.formPanel}
           onSubmit={e => {
             e.preventDefault()
             run({ action: 'add', siteId, hostname, withWww })
@@ -109,7 +111,7 @@ export function DomainWorkspace({
       {rows.length === 0 && <p className="card">No custom domains are connected yet.</p>}
       {rows.map(row => (
         <section
-          className={'card stack ' + workspace.formPanel}
+          className={'card stack ' + workspaceFormsStyles.formPanel}
           key={row.id}
           aria-label={`Domain ${row.hostname_normalized}`}
         >
@@ -138,7 +140,7 @@ export function DomainWorkspace({
                 verification records.
               </p>
               <div className="domain-records-scroll">
-                <table className={'domain-records ' + workspace.table + ' ' + workspace.compactTable}>
+                <table className={'domain-records ' + recordTableStyles.table + ' ' + recordTableStyles.compactTable}>
                   <caption>Records for {row.hostname_normalized}</caption>
                   <thead>
                     <tr>

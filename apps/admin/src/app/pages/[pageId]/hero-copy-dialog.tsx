@@ -4,6 +4,7 @@ import { Button, ButtonLink, Dialog, EmptyState, Field } from '../../../componen
 import { useNavigationGuard } from '../../../components/navigation-guard.ts'
 import { copyHeroSlide, loadHeroCopyTargets } from './hero-copy-actions.ts'
 import shared from '../../../components/workspace.module.css'
+import recordTableStyles from '../../../components/workspace-styles/record-table.module.css'
 export function HeroCopyDialog({
   sourcePageId,
   definitionId,
@@ -101,7 +102,7 @@ export function HeroCopyDialog({
             <ButtonLink variant="secondary" href={'/pages/' + result.pageId} target="_blank" rel="noopener noreferrer">
               Open {result.title}
             </ButtonLink>
-            <p className={shared.meta}>Opens in a new tab so your current page edits stay here.</p>
+            <p className={recordTableStyles.meta}>Opens in a new tab so your current page edits stay here.</p>
           </>
         ) : (
           <>
@@ -118,7 +119,7 @@ export function HeroCopyDialog({
                     </option>
                   ))}
                 </select>
-                <p className={shared.meta}>
+                <p className={recordTableStyles.meta}>
                   If needed, the page gets the shared Hero slider and its approved controls as a draft. Existing slide
                   words and photos are kept.
                 </p>

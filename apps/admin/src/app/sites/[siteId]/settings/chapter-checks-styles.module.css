@@ -1,0 +1,23 @@
+.formSection {
+  display: grid;
+  gap: var(--space-3);
+  min-width: 0;
+}
+.formSection > :not(dialog) {
+  margin-block: 0;
+}
+.formSection + .formSection {
+  padding-block-start: var(--space-4);
+  border-block-start: var(--line-thin) solid var(--border);
+}
+.messagePreview {
+  padding: var(--space-3);
+  background: var(--surface-sunken);
+  border: var(--line-thin) solid var(--border);
+  border-radius: var(--radius-card);
+  font-size: var(--text-meta);
+  line-height: var(--line-body);
+}
+.messagePreview p {
+  margin-block: var(--space-2) 0;
+}

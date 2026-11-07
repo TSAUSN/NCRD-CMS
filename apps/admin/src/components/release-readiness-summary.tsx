@@ -1,6 +1,8 @@
 import type { ReleaseCheck } from '../lib/releases.ts'
 import { Badge, Card, Disclosure, TextLink } from './ui/index.ts'
 import shared from './workspace.module.css'
+import recordTableStyles from './workspace-styles/record-table.module.css'
+import siteSummaryStyles from './workspace-styles/site-summary.module.css'
 
 /** The same compact review is used before publishing now or later. */
 export function ReleaseReadinessSummary({
@@ -22,7 +24,7 @@ export function ReleaseReadinessSummary({
     planned && canPreview ? `/releases/${releaseId}/preview/${check.pageId}` : `/preview/${check.versionId}?readonly=1`
   return (
     <div className={shared.stack}>
-      <div className={shared.summaryAction}>
+      <div className={recordTableStyles.summaryAction}>
         <p role="status">
           {checks.length} {checks.length === 1 ? 'page' : 'pages'} checked
           {findings.length
@@ -39,7 +41,7 @@ export function ReleaseReadinessSummary({
       </div>
       {checks.length > 0 && (
         <Disclosure title={`Checked pages (${checks.length})`}>
-          <ul className={shared.rowList}>
+          <ul className={siteSummaryStyles.rowList}>
             {checks.map(check => (
               <li key={check.pageId}>
                 <TextLink href={preview(check)} target="_blank" rel="noopener">

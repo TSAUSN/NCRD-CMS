@@ -1,7 +1,8 @@
 'use client'
 import { useLayoutEffect, useRef, type ReactNode } from 'react'
 import { ResizablePanel } from './resizable-panel.tsx'
-import shared from '../workspace.module.css'
+import listInspectorStyles from '../workspace-styles/list-inspector.module.css'
+import ownedStyles from './list-detail-styles.module.css'
 /** Shared full-width list with a remembered,non-overlapping detail panel. */
 export function ListDetail({
   children,
@@ -54,7 +55,7 @@ export function ListDetail({
   return (
     <div
       ref={root}
-      className={shared.listDetail}
+      className={listInspectorStyles.listDetail}
       onKeyDown={event => {
         if (
           event.key === 'Escape' &&
@@ -67,7 +68,7 @@ export function ListDetail({
         }
       }}
     >
-      <div className={shared.listDetailMain}>{children}</div>
+      <div className={listInspectorStyles.listDetailMain}>{children}</div>
       {panel && (
         <ResizablePanel
           label={label}
@@ -76,15 +77,19 @@ export function ListDetail({
           max={480}
           initial={360}
           reserveSpace={336}
-          className={shared.listDetailPanel + ' ' + (panelFrame ? shared.panelFrame : shared.detailPanel)}
+          className={
+            listInspectorStyles.listDetailPanel +
+            ' ' +
+            (panelFrame ? ownedStyles.panelFrame : listInspectorStyles.detailPanel)
+          }
         >
           {panelFrame ? (
             panel
           ) : (
             <>
-              {header && <div className={shared.detailPanelHead}>{header}</div>}
-              <div className={shared.detailPanelBody}>{panel}</div>
-              {footer && <div className={shared.detailPanelFooter}>{footer}</div>}
+              {header && <div className={listInspectorStyles.detailPanelHead}>{header}</div>}
+              <div className={listInspectorStyles.detailPanelBody}>{panel}</div>
+              {footer && <div className={listInspectorStyles.detailPanelFooter}>{footer}</div>}
             </>
           )}
         </ResizablePanel>

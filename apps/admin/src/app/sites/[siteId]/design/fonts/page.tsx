@@ -12,6 +12,7 @@ import {
 } from '../../../../../lib/queries.ts'
 import { publicSiteOrigin } from '../../../../../lib/public-site-url.ts'
 import styles from '../../../../../components/workspace.module.css'
+import workspaceFormsStyles from '../../../../../components/workspace-styles/workspace-forms.module.css'
 import { FontLibrary } from './workspace.tsx'
 export const dynamic = 'force-dynamic'
 export default async function FontsPage({ params }: { params: Promise<{ siteId: string }> }) {
@@ -31,7 +32,7 @@ export default async function FontsPage({ params }: { params: Promise<{ siteId: 
   if (!theme || !frame || !menu || !allowed) notFound()
   return (
     <AppShell email={session.email} role={role} groups={navigationFor(site, session.principal)}>
-      <main id="main" className={'wrap wrap-wide ' + styles.page + ' ' + styles.compactForm}>
+      <main id="main" className={'wrap wrap-wide ' + styles.page + ' ' + workspaceFormsStyles.compactForm}>
         <FontLibrary
           siteId={siteId}
           theme={theme}

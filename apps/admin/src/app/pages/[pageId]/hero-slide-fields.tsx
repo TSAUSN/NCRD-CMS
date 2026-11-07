@@ -7,6 +7,10 @@ import { Card, Field, SegmentedControl, Disclosure } from '../../../components/u
 import { LinkSettings } from '../../../components/link-settings.tsx'
 import type { LinkTarget } from '../../../lib/queries.ts'
 import shared from '../../../components/workspace.module.css'
+import workspaceFormsStyles from '../../../components/workspace-styles/workspace-forms.module.css'
+import recordTableStyles from '../../../components/workspace-styles/record-table.module.css'
+import selectionControlsStyles from '../../../components/workspace-styles/selection-controls.module.css'
+import workspacePreviewStyles from '../../../components/workspace-styles/workspace-preview.module.css'
 import ui from '../../../components/ui/ui.module.css'
 /** The miniature button is a noninteractive preview; actual page links remain in the canvas. */
 export function HeroSlideFields({
@@ -67,17 +71,17 @@ export function HeroSlideFields({
       {counter('title', 'Title', 100)}
       {counter('intro', 'Introduction', 200, true)}
       {String(field('intro') ?? '').length > 200 && field('intro') === publishedIntro && (
-        <p className={shared.meta}>
+        <p className={recordTableStyles.meta}>
           Existing published wording is kept. Shorten it to 200 characters before changing this introduction.
         </p>
       )}
       <Disclosure title="Photo and crop" open={photoOpen} onToggle={event => setPhotoOpen(event.currentTarget.open)}>
         <div className={shared.denseStack}>
           {renderField('photo')}
-          <label className={shared.toggleRow}>
+          <label className={selectionControlsStyles.toggleRow}>
             <span>
               Different picture on phones
-              <small className={shared.meta}>Off: phones use this picture and its dot.</small>
+              <small className={recordTableStyles.meta}>Off: phones use this picture and its dot.</small>
             </span>
             <input
               type="checkbox"
@@ -136,8 +140,8 @@ export function HeroSlideFields({
             cursor: 'default',
           }
         return (
-          <Card key={id} density="editor" className={shared.compactForm} aria-label={label}>
-            <label className={shared.toggleRow}>
+          <Card key={id} density="editor" className={workspaceFormsStyles.compactForm} aria-label={label}>
+            <label className={selectionControlsStyles.toggleRow}>
               <strong>{label}</strong>
               <span>
                 Show{' '}
@@ -152,7 +156,7 @@ export function HeroSlideFields({
             {shown && (
               <>
                 <div
-                  className={shared.previewPanel}
+                  className={workspacePreviewStyles.previewPanel}
                   style={color === 'outline' && p.shade !== 'white' ? { background: 'var(--primary)' } : undefined}
                 >
                   <span

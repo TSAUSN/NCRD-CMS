@@ -32,6 +32,12 @@ import { NativeNewPage } from './native-new-page.tsx'
 import { PagesTable } from './pages-table.tsx'
 import { PageManagement } from './page-management.tsx'
 import shared from '../../../components/workspace.module.css'
+import workspaceFormsStyles from '../../../components/workspace-styles/workspace-forms.module.css'
+import recordTableStyles from '../../../components/workspace-styles/record-table.module.css'
+import siteSummaryStyles from '../../../components/workspace-styles/site-summary.module.css'
+import selectionControlsStyles from '../../../components/workspace-styles/selection-controls.module.css'
+import versionHistoryStyles from '../../../components/workspace-styles/version-history.module.css'
+import ownedStyles from './native-site-overview-styles.module.css'
 
 type Props = {
   site: SiteRow
@@ -144,7 +150,9 @@ export async function NativeSiteOverview({
     <AppShell email={email} role={role} groups={navigationFor(site, principal)}>
       <main
         id="main"
-        className={'wrap ' + shared.page + ' ' + shared.compactForm + ' ' + shared.documentStack}
+        className={
+          'wrap ' + shared.page + ' ' + workspaceFormsStyles.compactForm + ' ' + versionHistoryStyles.documentStack
+        }
         data-layout="compact"
       >
         <PageHeader
@@ -163,7 +171,7 @@ export async function NativeSiteOverview({
               ) : (
                 <span className="chip chip-neutral">Archived</span>
               )}
-              <span className={shared.meta}>
+              <span className={recordTableStyles.meta}>
                 {site.primary_hostname ?? site.staging_hostname ?? 'No public address'}
               </span>
               <span aria-hidden="true">·</span>
@@ -219,36 +227,40 @@ export async function NativeSiteOverview({
         )}
         {active && (
           <section aria-label="Quick actions">
-            <h2 className={shared.visuallyHidden}>Quick actions</h2>
-            <div className={shared.quickActions}>
+            <h2 className={selectionControlsStyles.visuallyHidden}>Quick actions</h2>
+            <div className={siteSummaryStyles.quickActions}>
               {canManagePages && <NativeNewPage siteId={site.id} canAdmin={canAdmin} pages={pages} asTask />}
               {canManagePages && (
-                <Link className={shared.task} href={base + '/pages'}>
-                  <span className={shared.taskIcon}>
+                <Link className={siteSummaryStyles.task} href={base + '/pages'}>
+                  <span className={siteSummaryStyles.taskIcon}>
                     <IconPage size={18} />
                   </span>
                   <strong>Manage pages</strong>
                 </Link>
               )}
               {!scoped && (
-                <Link className={shared.task} href={base + '/content'}>
-                  <span className={shared.taskIcon} data-tone="live">
+                <Link className={siteSummaryStyles.task} href={base + '/content'}>
+                  <span className={siteSummaryStyles.taskIcon} data-tone="live">
                     <IconCollection size={18} />
                   </span>
                   <strong>Update lists</strong>
                 </Link>
               )}
               {canAdmin && (
-                <Link className={shared.task} href={base + '/design'}>
-                  <span className={shared.taskIcon} data-tone="review">
+                <Link className={siteSummaryStyles.task} href={base + '/design'}>
+                  <span className={siteSummaryStyles.taskIcon} data-tone="review">
                     <IconBrush size={18} />
                   </span>
                   <strong>Change site look</strong>
                 </Link>
               )}
               {scoped && first && (
-                <Link className={shared.task} editorCanvasOrigin={editorCanvasOrigin} href={'/pages/' + first.id}>
-                  <span className={shared.taskIcon}>
+                <Link
+                  className={siteSummaryStyles.task}
+                  editorCanvasOrigin={editorCanvasOrigin}
+                  href={'/pages/' + first.id}
+                >
+                  <span className={siteSummaryStyles.taskIcon}>
                     <IconPage size={18} />
                   </span>
                   <strong>Edit {first.title}</strong>
@@ -257,24 +269,24 @@ export async function NativeSiteOverview({
             </div>
           </section>
         )}
-        <div className={shared.summaryColumns}>
+        <div className={ownedStyles.summaryColumns}>
           <div className={shared.denseStack}>
             <Card
               title="Needs attention"
               density="compact"
               headerActions={
-                <span className={shared.meta}>
+                <span className={recordTableStyles.meta}>
                   {attention.length} {attention.length === 1 ? 'item' : 'items'}
                 </span>
               }
             >
-              <ul className={shared.rowList}>
+              <ul className={siteSummaryStyles.rowList}>
                 {!attention.length && (
                   <li>
-                    <span className={shared.taskIcon}>
+                    <span className={siteSummaryStyles.taskIcon}>
                       <IconCheck size={18} />
                     </span>
-                    <div className={shared.rowCopy}>
+                    <div className={recordTableStyles.rowCopy}>
                       {active
                         ? 'No saved page or list changes need attention.'
                         : 'This site is archived. Its saved history is retained.'}
@@ -284,7 +296,7 @@ export async function NativeSiteOverview({
                 {attention.map(item => (
                   <li key={item.key}>
                     <span
-                      className={shared.taskIcon}
+                      className={siteSummaryStyles.taskIcon}
                       data-tone={item.key === 'reviews' ? 'review' : item.key === 'samples' ? 'pending' : undefined}
                     >
                       {item.key === 'reviews' ? (
@@ -295,9 +307,9 @@ export async function NativeSiteOverview({
                         <IconAlert size={18} />
                       )}
                     </span>
-                    <div className={shared.rowCopy}>
+                    <div className={recordTableStyles.rowCopy}>
                       <strong>{item.title}</strong>
-                      <span className={shared.meta}>{item.detail}</span>
+                      <span className={recordTableStyles.meta}>{item.detail}</span>
                     </div>
                     <ButtonLink variant="secondary" href={item.href}>
                       {item.action}
@@ -311,16 +323,16 @@ export async function NativeSiteOverview({
               density="compact"
               headerActions={<Link href={'/activity?site=' + site.id}>Site activity</Link>}
             >
-              <ul className={shared.rowList}>
+              <ul className={siteSummaryStyles.rowList}>
                 {[...pages]
                   .sort((a, b) => Date.parse(b.edited_at) - Date.parse(a.edited_at))
                   .slice(0, 4)
                   .map(page => (
                     <li key={page.id}>
-                      <span className={shared.taskIcon}>
+                      <span className={siteSummaryStyles.taskIcon}>
                         <IconPage size={18} />
                       </span>
-                      <div className={shared.rowCopy}>
+                      <div className={recordTableStyles.rowCopy}>
                         <Link
                           editorCanvasOrigin={editorCanvasOrigin}
                           href={'/pages/' + page.id}
@@ -328,7 +340,7 @@ export async function NativeSiteOverview({
                         >
                           {page.title}
                         </Link>
-                        <time className={shared.meta} dateTime={page.edited_at}>
+                        <time className={recordTableStyles.meta} dateTime={page.edited_at}>
                           {page.edited_by} · {reviewDate(page.edited_at)}
                         </time>
                       </div>
@@ -337,7 +349,7 @@ export async function NativeSiteOverview({
                   ))}
                 {!pages.length && (
                   <li>
-                    <div className={shared.rowCopy}>
+                    <div className={recordTableStyles.rowCopy}>
                       No page changes to show.<Link href={base + '/pages'}>Open Pages</Link>
                     </div>
                   </li>
@@ -348,10 +360,10 @@ export async function NativeSiteOverview({
           <div className={shared.denseStack}>
             {!scoped && (
               <Card title="Lists" density="compact" headerActions={<Link href={base + '/content'}>Open Lists</Link>}>
-                <ul className={shared.rowList}>
+                <ul className={siteSummaryStyles.rowList}>
                   {lists?.collections.map(list => (
                     <li key={list.id}>
-                      <div className={shared.rowCopy}>
+                      <div className={recordTableStyles.rowCopy}>
                         <Link
                           href={
                             list.readerKey === 'stories' ? base + '/stories' : base + '/content?collection=' + list.id
@@ -359,7 +371,7 @@ export async function NativeSiteOverview({
                         >
                           <strong>{list.name}</strong>
                         </Link>
-                        <span className={shared.meta}>
+                        <span className={recordTableStyles.meta}>
                           {list.totalEntries} {list.totalEntries === 1 ? 'item' : 'items'} · {list.changedEntries} with
                           changes not live
                         </span>
@@ -368,7 +380,7 @@ export async function NativeSiteOverview({
                   ))}
                   {!lists?.collections.length && (
                     <li>
-                      <div className={shared.rowCopy}>
+                      <div className={recordTableStyles.rowCopy}>
                         No lists yet.<Link href={base + '/content'}>Open Lists to get started</Link>
                       </div>
                     </li>
@@ -381,21 +393,21 @@ export async function NativeSiteOverview({
               density="compact"
               headerActions={principal.isSuperAdmin ? <Link href="/people">Manage</Link> : undefined}
             >
-              <ul className={shared.rowList}>
+              <ul className={siteSummaryStyles.rowList}>
                 {principal.isSuperAdmin ? (
                   people.slice(0, 4).map(person => (
                     <li key={person.id}>
-                      <span className={shared.taskIcon} data-tone="review">
+                      <span className={siteSummaryStyles.taskIcon} data-tone="review">
                         <IconPeople size={18} />
                       </span>
-                      <div className={shared.rowCopy}>
+                      <div className={recordTableStyles.rowCopy}>
                         <strong
-                          className={shared.singleLine}
+                          className={recordTableStyles.singleLine}
                           title={person.id === principal.userId ? 'You' : person.display_name}
                         >
                           {person.id === principal.userId ? 'You' : person.display_name}
                         </strong>
-                        <span className={shared.meta}>
+                        <span className={recordTableStyles.meta}>
                           {personRoles({
                             ...person,
                             memberships: person.memberships.filter(m => m.siteId === site.id),
@@ -408,7 +420,7 @@ export async function NativeSiteOverview({
                   ))
                 ) : (
                   <li>
-                    <div className={shared.rowCopy}>
+                    <div className={recordTableStyles.rowCopy}>
                       <strong>
                         {roleDisplayName(accessRole)}
                         {scoped ? (accessRole === 'editor' ? ' · division' : ' · assigned pages') : ''}

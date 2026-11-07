@@ -1,0 +1,32 @@
+.recordBoard {
+  display: flex;
+  flex-direction: column;
+  max-height: var(--record-board-available);
+  min-height: 0;
+  min-width: 0;
+}
+.recordBoardBody {
+  min-height: 0;
+  min-width: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+.recordCommands {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding-block-start: var(--space-3);
+  border-block-start: var(--line-thin) solid var(--border);
+}
+.recordCommands > span {
+  display: grid;
+  gap: var(--space-1);
+  font-size: var(--text-meta);
+}
+.recordCommands small {
+  color: var(--text-muted);
+  font-size: var(--text-help);
+}

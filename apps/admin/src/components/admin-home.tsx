@@ -11,6 +11,11 @@ import { IconAlert, IconCheck, IconClock, IconMail, IconPage, IconPlus } from '.
 import type { SiteSummaryRow } from '../lib/queries.ts'
 import type { WorkspacePage } from '../lib/workspace-queries.ts'
 import shared from './workspace.module.css'
+import workspaceFormsStyles from './workspace-styles/workspace-forms.module.css'
+import recordTableStyles from './workspace-styles/record-table.module.css'
+import siteSummaryStyles from './workspace-styles/site-summary.module.css'
+import versionHistoryStyles from './workspace-styles/version-history.module.css'
+import ownedStyles from './admin-home-styles.module.css'
 
 type Props = {
   email: string
@@ -91,7 +96,14 @@ export function AdminHome({ email, role, access, sites, pages, reviewCounts, ope
     <AppShell email={email} role={role} groups={navigationFor(undefined, access)}>
       <main
         id="main"
-        className={'wrap wrap-wide ' + shared.page + ' ' + shared.compactForm + ' ' + shared.documentStack}
+        className={
+          'wrap wrap-wide ' +
+          shared.page +
+          ' ' +
+          workspaceFormsStyles.compactForm +
+          ' ' +
+          versionHistoryStyles.documentStack
+        }
         data-layout="compact"
       >
         <PageHeader
@@ -119,15 +131,15 @@ export function AdminHome({ email, role, access, sites, pages, reviewCounts, ope
           title="Needs you"
           density="compact"
           headerActions={
-            <span className={shared.meta}>
+            <span className={recordTableStyles.meta}>
               {attention.length} {attention.length === 1 ? 'item' : 'items'}
             </span>
           }
         >
-          <ul className={shared.rowList}>
+          <ul className={siteSummaryStyles.rowList}>
             {attention.map(item => (
-              <li key={item.key} data-attention-site={item.site.id} className={shared.attentionRow}>
-                <span className={shared.taskIcon} data-tone={item.tone}>
+              <li key={item.key} data-attention-site={item.site.id} className={siteSummaryStyles.attentionRow}>
+                <span className={siteSummaryStyles.taskIcon} data-tone={item.tone}>
                   {item.tone === 'review' ? (
                     <IconMail size={18} />
                   ) : item.tone === 'scheduled' ? (
@@ -136,12 +148,12 @@ export function AdminHome({ email, role, access, sites, pages, reviewCounts, ope
                     <IconAlert size={18} />
                   )}
                 </span>
-                <div className={shared.rowCopy}>
+                <div className={recordTableStyles.rowCopy}>
                   <strong>{item.title}</strong>
-                  <span className={shared.meta}>{item.detail}</span>
+                  <span className={recordTableStyles.meta}>{item.detail}</span>
                 </div>
-                <div className={shared.attentionActions}>
-                  <span className={shared.homeSiteTag}>{item.site.name}</span>
+                <div className={ownedStyles.attentionActions}>
+                  <span className={ownedStyles.homeSiteTag}>{item.site.name}</span>
                   <ButtonLink variant="secondary" href={item.href}>
                     {item.action}
                   </ButtonLink>
@@ -150,12 +162,12 @@ export function AdminHome({ email, role, access, sites, pages, reviewCounts, ope
             ))}
             {!attention.length && (
               <li>
-                <span className={shared.taskIcon}>
+                <span className={siteSummaryStyles.taskIcon}>
                   <IconCheck size={18} />
                 </span>
-                <div className={shared.rowCopy}>
+                <div className={recordTableStyles.rowCopy}>
                   <strong>Nothing needs your attention</strong>
-                  <span className={shared.meta}>
+                  <span className={recordTableStyles.meta}>
                     {active.length
                       ? 'Open a site or return to recent work below.'
                       : access.isSuperAdmin
@@ -170,16 +182,16 @@ export function AdminHome({ email, role, access, sites, pages, reviewCounts, ope
         <section aria-labelledby="your-sites">
           <div className={shared.sectionHeading}>
             <h2 id="your-sites">Your sites</h2>
-            <span className={shared.meta}>
+            <span className={recordTableStyles.meta}>
               {active.length} {active.length === 1 ? 'site' : 'sites'}
             </span>
           </div>
-          <div className={shared.homeSites}>
+          <div className={ownedStyles.homeSites}>
             {active.map(site => (
               <SiteCard key={site.id} site={site} compactHome />
             ))}
             {access.isSuperAdmin && (
-              <Link href="/sites/new" className={shared.homeNewSite}>
+              <Link href="/sites/new" className={ownedStyles.homeNewSite}>
                 <IconPlus size={22} />
                 <strong>Start a new site</strong>
                 <span>Event, organization or chapter network</span>
@@ -191,15 +203,15 @@ export function AdminHome({ email, role, access, sites, pages, reviewCounts, ope
           )}
         </section>
         <Card title="Jump back in" density="compact">
-          <ul className={shared.rowList}>
+          <ul className={siteSummaryStyles.rowList}>
             {recent.map(page => (
               <li key={page.id}>
-                <span className={shared.taskIcon}>
+                <span className={siteSummaryStyles.taskIcon}>
                   <IconPage size={18} />
                 </span>
-                <div className={shared.rowCopy}>
+                <div className={recordTableStyles.rowCopy}>
                   <Link href={'/pages/' + page.id}>{page.title}</Link>
-                  <time className={shared.meta} dateTime={page.edited_at}>
+                  <time className={recordTableStyles.meta} dateTime={page.edited_at}>
                     {page.site_name} · {page.edited_by} · {reviewDate(page.edited_at)}
                   </time>
                 </div>
@@ -217,7 +229,11 @@ export function AdminHome({ email, role, access, sites, pages, reviewCounts, ope
                 {active.slice(0, 4).map(site => {
                   const home = pages.find(page => page.site_id === site.id && page.slug === '')
                   return (
-                    <Link key={site.id} className={shared.task} href={home ? '/pages/' + home.id : '/sites/' + site.id}>
+                    <Link
+                      key={site.id}
+                      className={siteSummaryStyles.task}
+                      href={home ? '/pages/' + home.id : '/sites/' + site.id}
+                    >
                       <strong>{home ? 'Edit ' + site.name + ' home page' : 'Open ' + site.name}</strong>
                       <span>Open the real page and click what you want to change.</span>
                     </Link>
@@ -229,7 +245,7 @@ export function AdminHome({ email, role, access, sites, pages, reviewCounts, ope
                   .map(site => (
                     <Link
                       key={site.id + '-lists'}
-                      className={shared.task}
+                      className={siteSummaryStyles.task}
                       href={'/sites/' + site.id + (site.has_stories ? '/stories' : '/content')}
                     >
                       <strong>

@@ -5,6 +5,9 @@ import { dataValueBindings, numberChoiceValues } from '@cms/schema'
 import { usesSiteSocialAccounts, siteSocialGroup } from '@cms/schema'
 import { LinkSettings } from '../../../components/link-settings.tsx'
 import shared from '../../../components/workspace.module.css'
+import workspaceFormsStyles from '../../../components/workspace-styles/workspace-forms.module.css'
+import recordTableStyles from '../../../components/workspace-styles/record-table.module.css'
+import ownedStyles from './inspector-styles.module.css'
 import { ContentRepeatPanel } from './content-repeat-panel.tsx'
 import { HeroSlidesPanel } from './hero-slides-panel.tsx'
 import { PageDetailsFields } from './page-details-fields.tsx'
@@ -234,7 +237,7 @@ export function Inspector(props: Props) {
         ) : (
           <>
             <h3>Sections</h3>
-            <ul className={shared.actionList} aria-label="Page outline">
+            <ul className={ownedStyles.actionList} aria-label="Page outline">
               {props.sectionOutline?.map(item => (
                 <li key={item.index}>
                   <Button
@@ -460,7 +463,7 @@ export function Inspector(props: Props) {
         ref={inspector}
         id="editor-panel-inspector"
         data-selected-section
-        className={`pane inspector ${styles.inspector} ${shared.compactForm}`}
+        className={`pane inspector ${styles.inspector} ${workspaceFormsStyles.compactForm}`}
         aria-label="Inspector"
         onKeyDown={event => {
           if (event.key === 'Escape' && !event.defaultPrevented && !(event.target as Element).closest('dialog')) {
@@ -470,7 +473,7 @@ export function Inspector(props: Props) {
         }}
       >
         <div className={shared.denseStack}>
-          <div className={shared.panelActions}>
+          <div className={workspaceFormsStyles.panelActions}>
             <Button variant="tertiary" onClick={() => props.onSelectSlot(null)}>
               <IconChevronLeft size={16} />
               Back
@@ -478,7 +481,7 @@ export function Inspector(props: Props) {
             <Button onClick={props.onDone}>Done</Button>
           </div>
           <h2>Section title</h2>
-          <p className={shared.meta}>Part of the {name} section. It moves with the section.</p>
+          <p className={recordTableStyles.meta}>Part of the {name} section. It moves with the section.</p>
           <div className="field" data-inspector-slot={focusedTitle.id} data-selected="true">
             <div className="field-head">
               <label htmlFor={'slot-' + index + '-' + focusedTitle.id}>Title</label>

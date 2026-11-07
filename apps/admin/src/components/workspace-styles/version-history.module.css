@@ -1,0 +1,93 @@
+.timelineRail.timelineRail {
+  border: var(--line-thin) solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: none;
+}
+.timelineRail li > a {
+  padding: var(--space-3) var(--space-4);
+  border-inline-start: var(--line-focus) solid transparent;
+  gap: var(--space-1);
+}
+.timelineRail li > a:global(.is-active) {
+  background: var(--brand-tint);
+  border-inline-start-color: var(--focus);
+}
+.timelineRail :global(.history-version-head) {
+  flex-wrap: wrap;
+}
+.timelineRail :global(.history-version-head strong) {
+  font-size: var(--text-meta);
+  color: var(--text);
+  font-weight: var(--weight-semibold);
+}
+.comparisonRows {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+}
+.comparisonRows > div {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+  align-items: start;
+}
+.comparisonRows dt {
+  grid-column: 1 / -1;
+  font-size: var(--text-meta);
+  font-weight: var(--weight-medium);
+}
+.comparisonRows dd {
+  margin: 0;
+  padding: var(--space-2);
+  border: var(--line-thin) solid var(--border);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  font-size: var(--text-help);
+  line-height: var(--line-meta);
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+.comparisonRows dd[data-changed='before'] {
+  background: var(--danger-bg);
+  border-color: var(--danger-border);
+}
+.comparisonRows dd[data-changed='after'] {
+  background: var(--status-live-bg);
+  border-color: var(--status-live);
+}
+.comparisonLabels {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+  color: var(--text-muted);
+  font-size: var(--text-help);
+}
+.historyHeading {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-3);
+  align-items: start;
+}
+.historyHeading h2 {
+  margin: 0;
+  font-size: var(--text-dialog);
+  line-height: var(--line-emphasis);
+  font-weight: var(--weight-semibold);
+}
+.historyHeading p {
+  margin: 0 0 var(--space-1);
+}
+
+/* A semantic disabled group keeps the existing form layout. */
+
+.documentStack {
+  display: grid;
+  gap: var(--workspace-section-gap);
+  max-width: calc(var(--workspace-content-max) + var(--page-inline) * 2);
+}
+.documentStack > :not(dialog) {
+  margin-block: 0;
+  min-width: 0;
+}

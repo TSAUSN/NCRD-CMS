@@ -8,6 +8,7 @@ import { getStoriesWorkspace } from '../../../../../lib/stories-workspace.ts'
 import { storiesCatalog, storyTagAssignments } from '../../../../../lib/stories-catalog.ts'
 import { TagManager } from './workspace.tsx'
 import shared from '../../../../../components/workspace.module.css'
+import workspaceFormsStyles from '../../../../../components/workspace-styles/workspace-forms.module.css'
 export const dynamic = 'force-dynamic'
 export default async function TagsPage({ params }: { params: Promise<{ siteId: string }> }) {
   const session = await currentSession()
@@ -23,7 +24,7 @@ export default async function TagsPage({ params }: { params: Promise<{ siteId: s
   if (!list || !rights.manageSchema) notFound()
   return (
     <AppShell email={session.email} role={role} groups={navigationFor(site, session.principal)}>
-      <main id="main" className={'wrap wrap-wide ' + shared.page + ' ' + shared.compactForm}>
+      <main id="main" className={'wrap wrap-wide ' + shared.page + ' ' + workspaceFormsStyles.compactForm}>
         <TagManager
           siteId={siteId}
           collectionId={list.id}

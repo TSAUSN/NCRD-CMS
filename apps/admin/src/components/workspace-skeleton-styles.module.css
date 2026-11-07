@@ -1,0 +1,7 @@
+.skeletonRows {
+  display: grid;
+  gap: var(--space-3);
+}
+.skeletonRows > div {
+  min-height: var(--target-medium);
+}

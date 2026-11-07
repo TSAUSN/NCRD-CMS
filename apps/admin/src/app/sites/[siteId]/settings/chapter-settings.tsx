@@ -6,6 +6,10 @@ import { Card } from '../../../../components/ui/card.tsx'
 import { Button } from '../../../../components/ui/button.tsx'
 import { TextLink as Link, Disclosure } from '../../../../components/ui/index.ts'
 import shared from '../../../../components/workspace.module.css'
+import workspaceFormsStyles from '../../../../components/workspace-styles/workspace-forms.module.css'
+import recordTableStyles from '../../../../components/workspace-styles/record-table.module.css'
+import siteSummaryStyles from '../../../../components/workspace-styles/site-summary.module.css'
+import selectionControlsStyles from '../../../../components/workspace-styles/selection-controls.module.css'
 import { Field } from '../../../../components/ui/field.tsx'
 import { saveChapterSettings, saveChapterTeam } from './chapter-actions.ts'
 import { useBrowserSetup } from '../../../../components/use-browser-setup.ts'
@@ -100,7 +104,7 @@ function ChapterDefaults({
   return (
     <Card density="settings" title="Publishing and approval" aria-label="Chapter defaults">
       <div className={shared.denseStack}>
-        <p className={shared.meta}>
+        <p className={recordTableStyles.meta}>
           Save draft and leave keeps these choices only in this browser. Chapter defaults change only when you choose
           Save chapter defaults.
         </p>
@@ -135,9 +139,9 @@ function ChapterDefaults({
             division staff below.
           </p>
         </div>
-        <fieldset className={shared.formChoices}>
+        <fieldset className={workspaceFormsStyles.formChoices}>
           <legend>New chapters start with</legend>
-          <div className={shared.choiceRows}>
+          <div className={selectionControlsStyles.choiceRows}>
             <label>
               <input
                 type="radio"
@@ -148,7 +152,7 @@ function ChapterDefaults({
               />
               <span>
                 <strong>Division web team makes changes</strong>
-                <span className={shared.meta}>
+                <span className={recordTableStyles.meta}>
                   The chapter’s point of contact sends changes to the division. Nobody from the chapter needs to sign
                   in.
                 </span>
@@ -164,7 +168,7 @@ function ChapterDefaults({
               />
               <span>
                 <strong>Chapter editors sign in</strong>
-                <span className={shared.meta}>
+                <span className={recordTableStyles.meta}>
                   Named chapter editors change their own page and send it for approval.
                 </span>
               </span>
@@ -237,7 +241,7 @@ function NewDivision({ siteId, actorId }: { actorId: string; siteId: string }) {
         save()
       }}
     >
-      <p className={shared.meta}>
+      <p className={recordTableStyles.meta}>
         Save draft and leave keeps the division name only in this browser. Use Add division team to create it.
       </p>
       {setup.saved && (
@@ -337,7 +341,7 @@ function DivisionTeam({ team, siteId, actorId }: { actorId: string; team: Chapte
           Staff receive division access. This does not give them site settings, lists or another division’s pages. No
           email is sent.
         </p>
-        <p className={shared.meta}>
+        <p className={recordTableStyles.meta}>
           Save draft and leave keeps staff choices only in this browser. Use Add division staff to grant access.
         </p>
         {setup.saved && (
@@ -356,14 +360,14 @@ function DivisionTeam({ team, siteId, actorId }: { actorId: string; team: Chapte
         )}
         {setup.error && <p role="alert">{setup.error}</p>}
         {team.people.length ? (
-          <ul className={shared.rowList}>
+          <ul className={siteSummaryStyles.rowList}>
             {team.people.map(person => (
               <li key={person.id}>
-                <span className={shared.rowCopy}>
-                  <strong className={shared.singleLine} title={person.name}>
+                <span className={recordTableStyles.rowCopy}>
+                  <strong className={recordTableStyles.singleLine} title={person.name}>
                     {person.name}
                   </strong>
-                  <span className={shared.singleLine + ' ' + shared.meta} title={person.email}>
+                  <span className={recordTableStyles.singleLine + ' ' + recordTableStyles.meta} title={person.email}>
                     {person.email}
                     {!person.active ? ' · Access paused' : ''}
                   </span>

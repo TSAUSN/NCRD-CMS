@@ -1,0 +1,26 @@
+.previewStrip {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: var(--radius-card);
+  background: var(--surface-sunken);
+}
+.previewStrip iframe {
+  display: block;
+  width: var(--preview-width);
+  height: var(--preview-height);
+  max-width: none;
+  border: 0;
+  transform: scale(var(--preview-scale));
+  transform-origin: top left;
+}
+.previewLoading {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: var(--surface-sunken);
+  color: var(--text-muted);
+  font-size: var(--text-meta);
+  z-index: 1;
+}

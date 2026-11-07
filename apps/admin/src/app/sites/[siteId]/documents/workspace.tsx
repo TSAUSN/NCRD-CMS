@@ -2,7 +2,13 @@
 import { useEffect, useRef, useState } from 'react'
 import { Button, Card, CardContent, Disclosure, Field, TextLink, EmptyState } from '../../../../components/ui/index.ts'
 import mediaUi from '../../../../components/media-ui.module.css'
-import shared from '../../../../components/workspace.module.css'
+import workspaceFormsStyles from '../../../../components/workspace-styles/workspace-forms.module.css'
+import recordTableStyles from '../../../../components/workspace-styles/record-table.module.css'
+import siteSummaryStyles from '../../../../components/workspace-styles/site-summary.module.css'
+import selectionControlsStyles from '../../../../components/workspace-styles/selection-controls.module.css'
+import listInspectorStyles from '../../../../components/workspace-styles/list-inspector.module.css'
+import reviewWorkbenchStyles from '../../../../components/workspace-styles/review-workbench.module.css'
+import ownedStyles from './workspace-styles.module.css'
 import { ConfirmDialog } from '../../../../components/confirm.tsx'
 import { requestLocalDraftNavigation, useNavigationGuard } from '../../../../components/navigation-guard.ts'
 import {
@@ -186,10 +192,10 @@ export function DocumentsWorkspace({
     </p>
   )
   return (
-    <div className={shared.formStack + ' ' + shared.compactForm}>
-      <div className={shared.workbenchActions}>
+    <div className={listInspectorStyles.formStack + ' ' + workspaceFormsStyles.compactForm}>
+      <div className={reviewWorkbenchStyles.workbenchActions}>
         <form
-          className={shared.toolbarField}
+          className={workspaceFormsStyles.toolbarField}
           onSubmit={event => {
             event.preventDefault()
             navigate(() => {
@@ -199,7 +205,7 @@ export function DocumentsWorkspace({
           }}
         >
           <Field id="document-search" label="Search documents" density="compact">
-            <div className={shared.inputActions}>
+            <div className={ownedStyles.inputActions}>
               <input
                 id="document-search"
                 type="search"
@@ -305,12 +311,12 @@ export function DocumentsWorkspace({
                   : 'Upload a PDF to make it available in your content editor.'}
             </EmptyState>
           ) : (
-            <ul className={shared.listRows}>
+            <ul className={listInspectorStyles.listRows}>
               {result.documents.map(document => (
                 <li key={document.id}>
                   <button
                     type="button"
-                    className={shared.optionCard + ' ' + shared.actions}
+                    className={selectionControlsStyles.optionCard + ' ' + workspaceFormsStyles.actions}
                     data-layout="record"
                     data-selected={selected?.id === document.id}
                     disabled={working || loading}
@@ -318,8 +324,8 @@ export function DocumentsWorkspace({
                     onClick={() => navigate(() => selectNow(document))}
                   >
                     <span className="document-mark">PDF</span>
-                    <span className={shared.rowCopy}>
-                      <strong className={shared.truncateValue} title={document.originalName}>
+                    <span className={recordTableStyles.rowCopy}>
+                      <strong className={recordTableStyles.truncateValue} title={document.originalName}>
                         {document.originalName}
                       </strong>
                       <small>
@@ -331,7 +337,7 @@ export function DocumentsWorkspace({
               ))}
             </ul>
           )}
-          <div className={shared.workbenchActions}>
+          <div className={reviewWorkbenchStyles.workbenchActions}>
             <Button
               variant="secondary"
               type="button"
@@ -363,12 +369,15 @@ export function DocumentsWorkspace({
             </Button>
           </div>
         </section>
-        <aside className={shared.detailPanel} data-empty={!selected} aria-label="Document details">
-          <div className={shared.detailPanelBody + ' ' + shared.formStack}>
+        <aside className={listInspectorStyles.detailPanel} data-empty={!selected} aria-label="Document details">
+          <div className={listInspectorStyles.detailPanelBody + ' ' + listInspectorStyles.formStack}>
             {selected ? (
               <>
                 <p className="eyebrow">{selected.archived ? 'Archived PDF' : 'Selected PDF'}</p>
-                <h2 className={shared.truncateValue + ' ' + shared.cardTitle} title={selected.originalName}>
+                <h2
+                  className={recordTableStyles.truncateValue + ' ' + siteSummaryStyles.cardTitle}
+                  title={selected.originalName}
+                >
                   {selected.originalName}
                 </h2>
                 <p>{formatBytes(selected.bytes)} · PDF document</p>
@@ -392,7 +401,7 @@ export function DocumentsWorkspace({
                 {canEdit && (
                   <>
                     <form
-                      className={shared.formStack}
+                      className={listInspectorStyles.formStack}
                       onSubmit={event => {
                         event.preventDefault()
                         void mutate(selected.archived)
@@ -408,7 +417,7 @@ export function DocumentsWorkspace({
                           onChange={event => setCategory(event.target.value)}
                         />
                       </Field>
-                      <div className={shared.actions}>
+                      <div className={workspaceFormsStyles.actions}>
                         <Button variant="primary" type="submit" disabled={working || !dirty}>
                           Save category
                         </Button>
@@ -456,8 +465,8 @@ export function DocumentsWorkspace({
                 )}
               </>
             ) : (
-              <div className={shared.formStack}>
-                <h2 className={shared.cardTitle}>Choose a document</h2>
+              <div className={listInspectorStyles.formStack}>
+                <h2 className={siteSummaryStyles.cardTitle}>Choose a document</h2>
                 <p>
                   Review its file details, category and link. Archived documents remain available to existing content.
                 </p>

@@ -1,4 +1,5 @@
 import workspace from '../../components/workspace.module.css'
+import workspaceFormsStyles from '../../components/workspace-styles/workspace-forms.module.css'
 import { TextLink as Link } from '../../components/ui/text-link.tsx'
 import { Card } from '../../components/ui/card.tsx'
 import { listWorkspacePages } from '../../lib/workspace-queries.ts'
@@ -26,7 +27,7 @@ export default async function PeoplePage() {
     <AppShell email={session.email} role={role} groups={navigationFor(undefined, session.principal)}>
       <main
         id="main"
-        className={'wrap wrap-wide ' + workspace.page + ' ' + workspace.compactForm}
+        className={'wrap wrap-wide ' + workspace.page + ' ' + workspaceFormsStyles.compactForm}
         data-layout="compact"
       >
         <PageHeader

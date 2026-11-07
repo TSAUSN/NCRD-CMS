@@ -1,7 +1,9 @@
 'use client'
 import { Disclosure } from './ui/index.ts'
 import type { NationalSiteReview } from '../lib/national-template.ts'
-import shared from './workspace.module.css'
+import recordTableStyles from './workspace-styles/record-table.module.css'
+import siteSummaryStyles from './workspace-styles/site-summary.module.css'
+import selectionControlsStyles from './workspace-styles/selection-controls.module.css'
 /** Compact review scope; expanding retains every affected page name and count. */
 export function TemplateUpdateSites({
   sites,
@@ -15,14 +17,14 @@ export function TemplateUpdateSites({
   onSelect: (id: string, checked: boolean) => void
 }) {
   return (
-    <ul className={shared.rowList} aria-label="Sites in this update">
+    <ul className={siteSummaryStyles.rowList} aria-label="Sites in this update">
       {sites.map(site => {
         const counts = new Map<string, number>()
         for (const title of site.changedPages) counts.set(title, (counts.get(title) ?? 0) + 1)
         return (
           <li key={site.id}>
-            <div className={shared.rowCopy}>
-              <label className={shared.checkRow}>
+            <div className={recordTableStyles.rowCopy}>
+              <label className={selectionControlsStyles.checkRow}>
                 <input
                   type="checkbox"
                   checked={selected.includes(site.id)}
@@ -31,7 +33,7 @@ export function TemplateUpdateSites({
                 />
                 <strong>{site.name}</strong>
               </label>
-              <span className={shared.meta}>
+              <span className={recordTableStyles.meta}>
                 {!site.connected
                   ? 'Connect to the national template'
                   : site.themeChanged
@@ -44,7 +46,7 @@ export function TemplateUpdateSites({
                 title={`${site.changedPages.length} ${site.changedPages.length === 1 ? 'page' : 'pages'} with section updates`}
               >
                 {site.changedPages.length ? (
-                  <ul className={shared.rowList} aria-label={'Pages updated on ' + site.name}>
+                  <ul className={siteSummaryStyles.rowList} aria-label={'Pages updated on ' + site.name}>
                     {[...counts].map(([title, count]) => (
                       <li key={title}>
                         {title}

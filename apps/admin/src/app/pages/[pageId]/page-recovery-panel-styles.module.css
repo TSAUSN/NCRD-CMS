@@ -1,0 +1,25 @@
+.reviewDialog.reviewDialog {
+  width: min(var(--size-900), calc(100% - var(--space-6)));
+  max-height: calc(100dvh - var(--space-6));
+  margin: auto;
+  padding: var(--space-5);
+  background: var(--surface);
+  color: var(--text);
+  border: var(--line-thin) solid var(--border);
+  border-radius: var(--radius-sheet);
+  box-shadow: var(--shadow-3);
+}
+.reviewDialog h2 {
+  font-size: var(--text-dialog);
+  font-weight: var(--weight-semibold);
+}
+.reviewDialog button {
+  min-height: var(--target-small);
+  font-size: var(--text-meta);
+  padding-block: var(--space-1);
+}
+.recoveryStrip {
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg);
+  border-block-end: var(--line-thin) solid var(--border);
+}

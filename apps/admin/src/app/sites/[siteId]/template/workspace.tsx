@@ -11,6 +11,10 @@ import { previewTemplateSite, reviewTemplateUpdate, createTemplateDrafts, create
 import { ScriptlessPreview } from '../../../../components/scriptless-preview.tsx'
 import { IconLock, IconCheck } from '../../../../components/icons.tsx'
 import styles from '../../../../components/workspace.module.css'
+import recordTableStyles from '../../../../components/workspace-styles/record-table.module.css'
+import siteSummaryStyles from '../../../../components/workspace-styles/site-summary.module.css'
+import listInspectorStyles from '../../../../components/workspace-styles/list-inspector.module.css'
+import ownedStyles from './workspace-styles.module.css'
 const shared = [
   ['Colours and buttons', 'National red, navy and button styles'],
   ['Approved fonts', 'Fonts from the Adobe Fonts kit'],
@@ -287,10 +291,10 @@ export function NationalTemplateWorkspace({
       <div className={styles.threeColumns}>
         <Card density="summary" title="Sites using it">
           {!sites.length && <p>No sites use this template yet. Start a site from this to add one.</p>}
-          <ul className={styles.rowList}>
+          <ul className={siteSummaryStyles.rowList}>
             {sites.map(site => (
               <li key={site.id}>
-                <div className={styles.rowCopy}>
+                <div className={recordTableStyles.rowCopy}>
                   <Link href={'/sites/' + site.id}>{site.name}</Link>
                 </div>
                 <span className="muted">
@@ -309,11 +313,11 @@ export function NationalTemplateWorkspace({
         </Card>
         <Card density="summary" title="Comes from the template">
           <p className="muted">The same on every site.</p>
-          <ul className={styles.rowList}>
+          <ul className={siteSummaryStyles.rowList}>
             {shared.map(([title, text]) => (
               <li key={title}>
                 <IconLock size={14} />
-                <div className={styles.rowCopy}>
+                <div className={recordTableStyles.rowCopy}>
                   <strong>
                     {title === 'Shared sections' ? <Link href={'/sites/' + siteId + '/sections'}>{title}</Link> : title}
                   </strong>
@@ -325,11 +329,11 @@ export function NationalTemplateWorkspace({
         </Card>
         <Card density="summary" title="Each site sets its own">
           <p className="muted">Editors with the right role can change these.</p>
-          <ul className={styles.rowList}>
+          <ul className={siteSummaryStyles.rowList}>
             {own.map(([title, text]) => (
               <li key={title}>
                 <IconCheck size={14} />
-                <div className={styles.rowCopy}>
+                <div className={recordTableStyles.rowCopy}>
                   <strong>{title}</strong>
                   <span className="muted">{text}</span>
                 </div>
@@ -399,7 +403,7 @@ export function NationalTemplateWorkspace({
                 <div>
                   <strong>Before</strong>
                   <ScriptlessPreview
-                    className={styles.comparisonFrame}
+                    className={ownedStyles.comparisonFrame}
                     title="Before national template update"
                     srcDoc={preview.beforeHtml}
                   />
@@ -407,7 +411,7 @@ export function NationalTemplateWorkspace({
                 <div>
                   <strong>After</strong>
                   <ScriptlessPreview
-                    className={styles.comparisonFrame}
+                    className={ownedStyles.comparisonFrame}
                     title="After national template update"
                     srcDoc={preview.html}
                   />
@@ -452,7 +456,7 @@ export function NationalTemplateWorkspace({
             </>
           }
         >
-          <fieldset disabled={pending} className={styles.formStack + ' ' + styles.plainFieldset}>
+          <fieldset disabled={pending} className={listInspectorStyles.formStack + ' ' + ownedStyles.plainFieldset}>
             {restored && (
               <p role="status">Setup restored from this browser. Check its source and choices before creating.</p>
             )}

@@ -1,4 +1,5 @@
 import shared from '../../../../components/workspace.module.css'
+import workspaceFormsStyles from '../../../../components/workspace-styles/workspace-forms.module.css'
 import { notFound } from 'next/navigation'
 import { AppShell } from '../../../../components/app-shell.tsx'
 import { navigationFor } from '../../../../components/nav.ts'
@@ -27,7 +28,11 @@ export default async function DocumentsPage({ params }: { params: Promise<{ site
     <AppShell email={session.email} role={role} groups={navigationFor(site, session.principal)}>
       <main
         id="main"
-        className={site.original_design ? 'wrap wrap-wide' : 'wrap wrap-wide ' + shared.page + ' ' + shared.compactForm}
+        className={
+          site.original_design
+            ? 'wrap wrap-wide'
+            : 'wrap wrap-wide ' + shared.page + ' ' + workspaceFormsStyles.compactForm
+        }
       >
         <PageHeader
           density="compact"

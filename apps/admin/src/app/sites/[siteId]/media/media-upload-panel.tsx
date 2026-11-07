@@ -1,7 +1,7 @@
 'use client'
 
 import { Button, Card, CardHeading, CardContent, Field, IconButton } from '../../../../components/ui/index.ts'
-import shared from '../../../../components/workspace.module.css'
+import listInspectorStyles from '../../../../components/workspace-styles/list-inspector.module.css'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useNavigationGuard, requestLocalDraftNavigation } from '../../../../components/navigation-guard.ts'
 import type { NavigationGuardState } from '../../../../lib/navigation-guard.ts'
@@ -204,7 +204,7 @@ export function MediaUploadPanel({
               />
             </div>
           ) : (
-            <div className={shared.formStack}>
+            <div className={listInspectorStyles.formStack}>
               <div className="media-file">
                 <span className="media-file-icon">
                   <IconImage size={20} />

@@ -5,7 +5,7 @@ import { Card } from '../../../../components/ui/card.tsx'
 import { TextLink } from '../../../../components/ui/text-link.tsx'
 import { Field } from '../../../../components/ui/field.tsx'
 import { SettingsEditor, useSettingsDraft } from './settings-editor.tsx'
-import shared from '../../../../components/workspace.module.css'
+import workspaceFormsStyles from '../../../../components/workspace-styles/workspace-forms.module.css'
 type GeneralInput = { name: string; general: NonNullable<SitePublicSettings['general']> }
 function input(payload: unknown): GeneralInput {
   const settings = payload as SitePublicSettings
@@ -91,7 +91,7 @@ export function GeneralSettingsWorkspace({
             onChange={event => change('description', event.target.value)}
           />
         </Field>
-        <div className={shared.formRow}>
+        <div className={workspaceFormsStyles.formRow}>
           <Field id="site-general-country" label="Country">
             <input
               value={value.general.country}

@@ -29,6 +29,11 @@ import type { LinkTarget } from '../../../lib/queries.ts'
 import { heroEasternInput, heroEasternValue } from '../../../lib/hero-eastern-time.ts'
 import { storyPhotoInput } from '../../../lib/story-photo-input.ts'
 import shared from '../../../components/workspace.module.css'
+import workspaceFormsStyles from '../../../components/workspace-styles/workspace-forms.module.css'
+import recordTableStyles from '../../../components/workspace-styles/record-table.module.css'
+import selectionControlsStyles from '../../../components/workspace-styles/selection-controls.module.css'
+import listInspectorStyles from '../../../components/workspace-styles/list-inspector.module.css'
+import ownedStyles from './hero-slides-panel-styles.module.css'
 type Choice = { id: string; title: string; description: string; photo: unknown; photoIsSample: boolean; url: string }
 
 export function HeroSlidesPanel({
@@ -210,7 +215,7 @@ export function HeroSlidesPanel({
   }
   if (choosing)
     return (
-      <div ref={boundary} onKeyDownCapture={escape} className={shared.stack + ' ' + shared.compactForm}>
+      <div ref={boundary} onKeyDownCapture={escape} className={shared.stack + ' ' + workspaceFormsStyles.compactForm}>
         <EditorPanelActions>
           <Button variant="tertiary" title="Back to all slides" onClick={back}>
             <IconChevronLeft size={16} />
@@ -222,7 +227,7 @@ export function HeroSlidesPanel({
         </EditorPanelActions>
         <div>
           <h3>New slide</h3>
-          <p className={shared.meta}>Start from a story, or fill it in yourself.</p>
+          <p className={recordTableStyles.meta}>Start from a story, or fill it in yourself.</p>
         </div>
         <Field id="hero-find-story" label="Find a story">
           <input
@@ -244,17 +249,17 @@ export function HeroSlidesPanel({
         ) : !choices.length ? (
           <EmptyState title="No stories found">Try another search, or start empty.</EmptyState>
         ) : (
-          <ul className={shared.compactItemList}>
+          <ul className={listInspectorStyles.compactItemList}>
             {choices.map(choice => (
               <li key={choice.id}>
                 <Button
-                  className={shared.itemButton}
+                  className={listInspectorStyles.itemButton}
                   title={choice.title}
                   variant="tertiary"
                   onClick={() => add(choice)}
                 >
                   {photoThumbnail(choice.photo) && (
-                    <img src={photoThumbnail(choice.photo)!} alt="" className={shared.itemThumb} />
+                    <img src={photoThumbnail(choice.photo)!} alt="" className={ownedStyles.itemThumb} />
                   )}
                   <span>{choice.title}</span>
                 </Button>
@@ -277,7 +282,7 @@ export function HeroSlidesPanel({
           ? heroSlideParityProblem(values, slot.id, active, publishedValues?.[field(active, 'intro')])
           : null)
     return (
-      <div ref={boundary} onKeyDownCapture={escape} className={shared.stack + ' ' + shared.compactForm}>
+      <div ref={boundary} onKeyDownCapture={escape} className={shared.stack + ' ' + workspaceFormsStyles.compactForm}>
         <EditorPanelActions>
           <Button variant="tertiary" title="Back to all slides" onClick={back}>
             <IconChevronLeft size={16} />
@@ -300,9 +305,11 @@ export function HeroSlidesPanel({
         </EditorPanelActions>
         <div>
           <h3>{newKey ? 'New slide' : `Slide ${keys.indexOf(active) + 1} of ${keys.length}`}</h3>
-          <p className={shared.meta}>{contentProblem ?? 'The page changes as you type. Cancel removes a new slide.'}</p>
+          <p className={recordTableStyles.meta}>
+            {contentProblem ?? 'The page changes as you type. Cancel removes a new slide.'}
+          </p>
         </div>
-        <label className={shared.toggleRow}>
+        <label className={selectionControlsStyles.toggleRow}>
           <span>Show this slide</span>
           <input
             type="checkbox"
@@ -328,7 +335,7 @@ export function HeroSlidesPanel({
         ) : (
           renderItem(active)
         )}
-        <label className={shared.toggleRow}>
+        <label className={selectionControlsStyles.toggleRow}>
           <span>Schedule this slide</span>
           <input
             type="checkbox"
@@ -353,14 +360,16 @@ export function HeroSlidesPanel({
             }}
           />
         </label>
-        {!hasDates && <p className={shared.meta}>Off: it shows whenever its switch is on and the page is published.</p>}
+        {!hasDates && (
+          <p className={recordTableStyles.meta}>Off: it shows whenever its switch is on and the page is published.</p>
+        )}
         {hasDates && (
           <>
-            <p className={shared.meta}>
+            <p className={recordTableStyles.meta}>
               Eastern time. The end minute is included. Other slides keep showing afterward. The repeated autumn hour
               uses its first occurrence.
             </p>
-            <div className={shared.formStack}>
+            <div className={listInspectorStyles.formStack}>
               {[
                 ['starts_at', 'Show from'],
                 ['ends_at', 'Show until'],
@@ -381,7 +390,11 @@ export function HeroSlidesPanel({
     )
   }
   return (
-    <div ref={boundary} onKeyDownCapture={escape} className={shared.listGroup + ' ' + shared.compactForm}>
+    <div
+      ref={boundary}
+      onKeyDownCapture={escape}
+      className={listInspectorStyles.listGroup + ' ' + workspaceFormsStyles.compactForm}
+    >
       {copying && pageId && definitionId && definitionVersion && (
         <HeroCopyDialog
           sourcePageId={pageId}
@@ -395,12 +408,12 @@ export function HeroSlidesPanel({
       )}
       <div>
         <h3>Hero slides</h3>
-        <p className={shared.meta}>Drag to reorder. Choose a slide to edit its words, photo and buttons.</p>
+        <p className={recordTableStyles.meta}>Drag to reorder. Choose a slide to edit its words, photo and buttons.</p>
       </div>
       {!keys.length ? (
         <EmptyState title="No slides yet">Add a slide to put a feature on the page.</EmptyState>
       ) : (
-        <ol className={shared.compactItemList + ' ' + reorderStyles.list} data-reorder-list>
+        <ol className={listInspectorStyles.compactItemList + ' ' + reorderStyles.list} data-reorder-list>
           {keys.map((key, at) => {
             const thumbnail = photoThumbnail(values[field(key, 'photo')])
             return (
@@ -412,7 +425,7 @@ export function HeroSlidesPanel({
                   </span>
                 )}
                 <Button
-                  className={shared.itemButton}
+                  className={listInspectorStyles.itemButton}
                   title={title(key)}
                   variant="tertiary"
                   onClick={() => {
@@ -420,12 +433,12 @@ export function HeroSlidesPanel({
                     onValuesChange(values, field(key, 'title'))
                   }}
                 >
-                  {thumbnail && <img src={thumbnail} alt="" className={shared.itemThumb} />}
+                  {thumbnail && <img src={thumbnail} alt="" className={ownedStyles.itemThumb} />}
                   <span>
                     {at + 1}. {title(key)}
                   </span>
                 </Button>
-                <label className={shared.toggleRow} data-layout="inline">
+                <label className={selectionControlsStyles.toggleRow} data-layout="inline">
                   <input
                     type="checkbox"
                     role="switch"
@@ -507,7 +520,7 @@ export function HeroSlidesPanel({
       </Button>
       {slot.constraints?.heroEditingParity === true && canStyle && (
         <>
-          <label className={shared.toggleRow}>
+          <label className={selectionControlsStyles.toggleRow}>
             <span>Change slides automatically</span>
             <input
               type="checkbox"
@@ -532,7 +545,7 @@ export function HeroSlidesPanel({
         </>
       )}
       <Disclosure title="How the slider works">
-        <p className={shared.meta}>
+        <p className={recordTableStyles.meta}>
           The next chevron and dots work here and on the live page. On the live page, slides change at the chosen
           interval (6 seconds by default) and pause on hover or focus. Editing stays on the slide you choose.
         </p>

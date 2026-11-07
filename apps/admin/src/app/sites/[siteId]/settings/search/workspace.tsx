@@ -5,7 +5,8 @@ import { Card } from '../../../../../components/ui/card.tsx'
 import { Field } from '../../../../../components/ui/field.tsx'
 import { ButtonLink } from '../../../../../components/ui/button-link.tsx'
 import { SettingsEditor, useSettingsDraft } from '../settings-editor.tsx'
-import shared from '../../../../../components/workspace.module.css'
+import workspaceFormsStyles from '../../../../../components/workspace-styles/workspace-forms.module.css'
+import recordTableStyles from '../../../../../components/workspace-styles/record-table.module.css'
 type SearchInput = { tags: string; hints: string }
 function input(payload: unknown): SearchInput {
   const search = payload as SitePublicSettings['search']
@@ -77,8 +78,8 @@ export function SearchSharingWorkspace({
             onChange={event => draft.change(current => ({ ...current, hints: event.target.value }))}
           />
         </Field>
-        <div className={shared.actions}>
-          <div className={shared.rowCopy}>
+        <div className={workspaceFormsStyles.actions}>
+          <div className={recordTableStyles.rowCopy}>
             <span>Sitemap</span>
             <span className="hint">Updates by itself each time you publish.</span>
           </div>

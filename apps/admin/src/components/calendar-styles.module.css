@@ -1,0 +1,22 @@
+.calendar {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: var(--calendar-gap);
+}
+.calendarWeekday {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: var(--text-meta);
+}
+.calendarDay {
+  min-width: 0;
+  min-height: var(--calendar-day-height);
+  padding: var(--calendar-cell-padding);
+  border: var(--line-thin) solid var(--line-soft);
+  border-radius: var(--radius-control);
+  font-size: var(--text-meta);
+}
+.calendarDay time {
+  color: var(--text-muted);
+  font-size: var(--text-tag);
+}

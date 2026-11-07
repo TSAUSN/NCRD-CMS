@@ -7,7 +7,8 @@ import { readPublicNumberFile } from './import-actions.ts'
 import { Dialog } from '../../../../components/ui/dialog.tsx'
 import { Button } from '../../../../components/ui/button.tsx'
 import { Field } from '../../../../components/ui/field.tsx'
-import shared from '../../../../components/workspace.module.css'
+import recordTableStyles from '../../../../components/workspace-styles/record-table.module.css'
+import listInspectorStyles from '../../../../components/workspace-styles/list-inspector.module.css'
 export function NumberImportDialog({
   siteId,
   current,
@@ -113,7 +114,7 @@ export function NumberImportDialog({
         </>
       }
     >
-      <div className={shared.formStack}>
+      <div className={listInspectorStyles.formStack}>
         <p>Point to a JSON file or a published sheet exported as CSV. Nothing changes until you review it.</p>
         {rows.length === 0 ? (
           <>
@@ -144,8 +145,8 @@ export function NumberImportDialog({
             </Field>
           </>
         ) : (
-          <div className={shared.tableWrap}>
-            <table data-density="content" className={shared.table + ' ' + shared.compactTable}>
+          <div className={recordTableStyles.tableWrap}>
+            <table data-density="content" className={recordTableStyles.table + ' ' + recordTableStyles.compactTable}>
               <thead>
                 <tr>
                   <th>Number</th>

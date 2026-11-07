@@ -41,6 +41,11 @@ import { DEFAULT_FOOTER_CONFIG } from '@cms/schema'
 import { useSiteLookCanvas } from '../design/use-site-look-canvas.ts'
 import { prepareNationalHeader, saveHeaderMenu } from './actions.ts'
 import styles from '../../../../components/workspace.module.css'
+import workspaceFormsStyles from '../../../../components/workspace-styles/workspace-forms.module.css'
+import selectionControlsStyles from '../../../../components/workspace-styles/selection-controls.module.css'
+import listInspectorStyles from '../../../../components/workspace-styles/list-inspector.module.css'
+import workspacePreviewStyles from '../../../../components/workspace-styles/workspace-preview.module.css'
+import ownedStyles from './workspace-styles.module.css'
 import buttonStyles from './header-buttons.module.css'
 const record = (value: unknown): Record<string, unknown> =>
   value && typeof value === 'object' && !Array.isArray(value) ? (value as Record<string, unknown>) : {}
@@ -312,7 +317,7 @@ export function HeaderMenuWorkspace({
           { value: 'buttons', label: 'Header buttons' },
         ]}
       >
-        <div className={styles.formStack + ' ' + styles.singleColumn}>
+        <div className={listInspectorStyles.formStack + ' ' + styles.singleColumn}>
           {preview}
 
           {!valid && previewTicket && <p role="status">Complete the fields to show your changes in the preview.</p>}
@@ -326,7 +331,7 @@ export function HeaderMenuWorkspace({
                 onEditing={setItemEditing}
               />
               <Card density="editor">
-                <div className={styles.betweenRow}>
+                <div className={ownedStyles.betweenRow}>
                   <div>
                     <strong>When a new page goes live</strong>
                     <p className="muted">Hiding or removing a menu item never deletes its page.</p>
@@ -350,10 +355,10 @@ export function HeaderMenuWorkspace({
               <Card title="Logo" density="editor">
                 {logoSlot ? (
                   <>
-                    <div className={styles.assetChoice}>
+                    <div className={ownedStyles.assetChoice}>
                       {logo.src && logoFailed !== logoUrl ? (
                         <img
-                          className={styles.assetThumb}
+                          className={workspacePreviewStyles.assetThumb}
                           src={logoUrl}
                           alt={String(logo.alt ?? '')}
                           onError={() => setLogoFailed(logoUrl)}
@@ -363,9 +368,9 @@ export function HeaderMenuWorkspace({
                           Logo preview unavailable. Use Replace to choose an image.
                         </p>
                       )}
-                      <div className={styles.formStack}>
+                      <div className={listInspectorStyles.formStack}>
                         <p className="muted">PNG at least 400px wide. Transparent background works best.</p>
-                        <div className={styles.actions}>
+                        <div className={workspaceFormsStyles.actions}>
                           <Button variant="secondary" disabled={pending} onClick={() => setPicker(true)}>
                             Replace
                           </Button>
@@ -397,7 +402,7 @@ export function HeaderMenuWorkspace({
                     {logoProblem && <p role="alert">{logoProblem}</p>}
                   </>
                 ) : header.schemaVersion === 1 ? (
-                  <div className={styles.formStack}>
+                  <div className={listInspectorStyles.formStack}>
                     <SiteLogoField
                       siteId={siteId}
                       siteName={header.brand.siteName}
@@ -495,7 +500,7 @@ export function HeaderMenuWorkspace({
                       </Field>
                     ))
                 ) : header.schemaVersion === 1 ? (
-                  <div className={styles.formStack}>
+                  <div className={listInspectorStyles.formStack}>
                     <Field id="header-site-name" label="Site name" required>
                       <input
                         value={header.brand.siteName}
@@ -510,7 +515,7 @@ export function HeaderMenuWorkspace({
                         }
                       />
                     </Field>
-                    <label className={styles.toggleRow}>
+                    <label className={selectionControlsStyles.toggleRow}>
                       <span>Show site name beside the logo</span>
                       <input
                         type="checkbox"
@@ -559,8 +564,8 @@ export function HeaderMenuWorkspace({
                         density="editor"
                         headerActions={
                           optional ? (
-                            <label className={styles.toggleRow}>
-                              <span className={styles.visuallyHidden}>Show second button</span>
+                            <label className={selectionControlsStyles.toggleRow}>
+                              <span className={selectionControlsStyles.visuallyHidden}>Show second button</span>
                               <input
                                 type="checkbox"
                                 checked={enabled}

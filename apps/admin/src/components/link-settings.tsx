@@ -4,6 +4,12 @@ import { safeUrl } from '@cms/renderer'
 import { Button, Dialog, Disclosure, Field, SegmentedControl } from './ui/index.ts'
 import type { LinkTarget } from '../lib/queries.ts'
 import shared from './workspace.module.css'
+import workspaceFormsStyles from './workspace-styles/workspace-forms.module.css'
+import recordTableStyles from './workspace-styles/record-table.module.css'
+import siteSummaryStyles from './workspace-styles/site-summary.module.css'
+import selectionControlsStyles from './workspace-styles/selection-controls.module.css'
+import reviewWorkbenchStyles from './workspace-styles/review-workbench.module.css'
+import ownedStyles from './link-settings-styles.module.css'
 
 type Kind = 'page' | 'website' | 'email' | 'phone'
 function refusedLinkUrl(url: string, allowedKinds?: readonly Kind[]) {
@@ -114,7 +120,7 @@ export function LinkDestinationPicker({
               </option>
             ))}
           </select>
-          <p className={shared.meta}>
+          <p className={recordTableStyles.meta}>
             {targets.length
               ? 'Only published pages are listed. The existing destination stays until you choose one.'
               : 'No published pages are available yet. Publish a page, or choose another kind of link.'}
@@ -140,7 +146,7 @@ export function LinkDestinationPicker({
                   This section is no longer on the published page. Choose another section or the top of the page.
                 </p>
               ) : (
-                <p className={shared.meta}>
+                <p className={recordTableStyles.meta}>
                   {url.includes('#')
                     ? 'The page scrolls to this section when someone clicks.'
                     : 'Choose a section, or keep the link to the top of the page.'}
@@ -165,7 +171,7 @@ export function LinkDestinationPicker({
             aria-invalid={refused || undefined}
             onChange={event => address(event.target.value)}
           />
-          <p className={shared.meta}>
+          <p className={recordTableStyles.meta}>
             {kind === 'email'
               ? 'Enter an email address.'
               : kind === 'phone'
@@ -236,12 +242,12 @@ export function LinkSettings({
   }
   return (
     <>
-      <ul className={shared.panel + ' ' + shared.rowList}>
+      <ul className={reviewWorkbenchStyles.panel + ' ' + siteSummaryStyles.rowList}>
         <li>
-          <div className={shared.rowCopy}>
+          <div className={recordTableStyles.rowCopy}>
             {summaryLabel && <strong>{summaryLabel}</strong>}
             {!destinationOnly && label && <span>{label}</span>}
-            <span className={shared.meta + ' ' + shared.wrapAnywhere}>
+            <span className={recordTableStyles.meta + ' ' + ownedStyles.wrapAnywhere}>
               {destinationLabel ?? (url ? (target ? target.title + ' · ' + url : url) : 'Not linked yet')}
             </span>
           </div>
@@ -269,7 +275,7 @@ export function LinkSettings({
             </>
           }
         >
-          <div className={shared.denseStack + ' ' + shared.compactForm}>
+          <div className={shared.denseStack + ' ' + workspaceFormsStyles.compactForm}>
             {!destinationOnly && (
               <Field id={id + '-label'} label="Words people click">
                 <input value={label} onChange={event => onChange({ ...current, label: event.target.value })} />
@@ -285,7 +291,7 @@ export function LinkSettings({
             />
             {(!destinationOnly || showLinkOptions) && (
               <>
-                <label className={shared.checkRow}>
+                <label className={selectionControlsStyles.checkRow}>
                   <input
                     type="checkbox"
                     checked={current.newTab === true}
@@ -293,7 +299,7 @@ export function LinkSettings({
                   />
                   Open in a new tab
                 </label>
-                <label className={shared.checkRow}>
+                <label className={selectionControlsStyles.checkRow}>
                   <input
                     type="checkbox"
                     checked={current.nofollow === true}

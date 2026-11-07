@@ -25,7 +25,9 @@ import { ConfirmDialog } from '../../../../../components/confirm.tsx'
 import { useNavigationGuard } from '../../../../../components/navigation-guard.ts'
 import type { StoriesTagOperation } from '../../../../../lib/stories-tags.ts'
 import { changeTags } from './actions.ts'
-import shared from '../../../../../components/workspace.module.css'
+import workspaceFormsStyles from '../../../../../components/workspace-styles/workspace-forms.module.css'
+import recordTableStyles from '../../../../../components/workspace-styles/record-table.module.css'
+import selectionControlsStyles from '../../../../../components/workspace-styles/selection-controls.module.css'
 type Entry = { id: string; values: Record<string, unknown> }
 type Edit = {
   group: StoryTagGroup
@@ -288,7 +290,7 @@ export function TagManager({
           key={group}
           density="catalog"
           title={
-            <span className={shared.actions}>
+            <span className={workspaceFormsStyles.actions}>
               {group === 'main' ? settings.mainLabel : settings.secondaryLabel}
               <Badge>{group === 'main' ? 'Main tag' : 'Secondary tag'}</Badge>
             </span>
@@ -424,11 +426,13 @@ export function TagManager({
           )}
         </Card>
       ))}
-      <div className={shared.actions}>
+      <div className={workspaceFormsStyles.actions}>
         <ButtonLink variant="secondary" href={'/sites/' + siteId + '/stories'}>
           Done
         </ButtonLink>
-        <span className={shared.meta}>Drag the grip to reorder. With the grip focused, use Alt + Up or Down.</span>
+        <span className={recordTableStyles.meta}>
+          Drag the grip to reorder. With the grip focused, use Alt + Up or Down.
+        </span>
       </div>
       <ReorderAnnouncement>{reorder.announcement}</ReorderAnnouncement>
       {edit && (
@@ -458,7 +462,7 @@ export function TagManager({
             </>
           }
         >
-          <div className={shared.compactFields}>
+          <div className={workspaceFormsStyles.compactFields}>
             <Field id="tag-name" label="Name">
               <input
                 autoFocus
@@ -475,21 +479,21 @@ export function TagManager({
                 onChange={event => setEdit({ ...edit, keywords: event.target.value })}
               />
             </Field>
-            <p className={shared.meta}>
+            <p className={recordTableStyles.meta}>
               New stories are tagged from these words, then wait for review. Existing stories are only changed if you
               press Re-suggest.
             </p>
             {edit.id && (
-              <p className={shared.meta}>
+              <p className={recordTableStyles.meta}>
                 Renaming keeps this tag's identity, so existing stories and page filters stay connected.
               </p>
             )}
             {edit.group === 'secondary' && (
-              <fieldset className={shared.formChoices} disabled={pending}>
+              <fieldset className={workspaceFormsStyles.formChoices} disabled={pending}>
                 <legend>World View map area</legend>
-                <div className={shared.compactFields}>
+                <div className={workspaceFormsStyles.compactFields}>
                   {STORY_MAP_AREAS.map(area => (
-                    <label key={area} className={shared.checkRow}>
+                    <label key={area} className={selectionControlsStyles.checkRow}>
                       <input
                         type="checkbox"
                         checked={edit.areas.includes(area)}
@@ -504,7 +508,7 @@ export function TagManager({
                     </label>
                   ))}
                 </div>
-                <p className={shared.meta}>
+                <p className={recordTableStyles.meta}>
                   If regions share an area, the first region in this list is used on the map.
                 </p>
               </fieldset>
@@ -578,16 +582,20 @@ export function TagManager({
             </>
           }
         >
-          <div className={shared.compactFields}>
+          <div className={workspaceFormsStyles.compactFields}>
             <p>
               {count(deleting.group, deleting.id)}{' '}
               {count(deleting.group, deleting.id) === 1 ? 'story uses' : 'stories use'} this tag.
             </p>
             {tags(deleting.group).some(t => t.id !== deleting.id) && (
-              <div className={shared.optionCard} data-layout="row" data-selected={deleting.replacement !== null}>
-                <label className={shared.checkRow}>
+              <div
+                className={selectionControlsStyles.optionCard}
+                data-layout="row"
+                data-selected={deleting.replacement !== null}
+              >
+                <label className={selectionControlsStyles.checkRow}>
                   <input
-                    className={shared.visuallyHidden}
+                    className={selectionControlsStyles.visuallyHidden}
                     type="radio"
                     name="delete-tag-choice"
                     checked={deleting.replacement !== null}
@@ -602,7 +610,10 @@ export function TagManager({
                   Move its stories to another tag
                 </label>
                 {deleting.replacement !== null && (
-                  <Field id="delete-tag-move" label={<span className={shared.visuallyHidden}>Move stories to</span>}>
+                  <Field
+                    id="delete-tag-move"
+                    label={<span className={selectionControlsStyles.visuallyHidden}>Move stories to</span>}
+                  >
                     <select
                       value={deleting.replacement}
                       disabled={pending}
@@ -620,10 +631,14 @@ export function TagManager({
                 )}
               </div>
             )}
-            <div className={shared.optionCard} data-layout="row" data-selected={deleting.replacement === null}>
-              <label className={shared.checkRow}>
+            <div
+              className={selectionControlsStyles.optionCard}
+              data-layout="row"
+              data-selected={deleting.replacement === null}
+            >
+              <label className={selectionControlsStyles.checkRow}>
                 <input
-                  className={shared.visuallyHidden}
+                  className={selectionControlsStyles.visuallyHidden}
                   type="radio"
                   name="delete-tag-choice"
                   checked={deleting.replacement === null}
@@ -637,7 +652,7 @@ export function TagManager({
             <Note tone="warning">
               Pages filtering by it will show their “no stories yet” line until you choose another tag for them.
             </Note>
-            <p className={shared.meta}>This deletion is saved as a draft.</p>
+            <p className={recordTableStyles.meta}>This deletion is saved as a draft.</p>
             {error && <p role="alert">{message}</p>}
           </div>
         </Dialog>

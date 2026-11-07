@@ -12,7 +12,7 @@ import {
 import { createPortal } from 'react-dom'
 import { Button } from '../../../components/ui/button.tsx'
 import { IconChevronLeft } from '../../../components/icons.tsx'
-import shared from '../../../components/workspace.module.css'
+import workspaceFormsStyles from '../../../components/workspace-styles/workspace-forms.module.css'
 type Navigation = { target: HTMLDivElement | null; register: (id: string, active: boolean) => void }
 const Context = createContext<Navigation | null>(null)
 /** A fixed place for section or nested item controls, without a second set of buttons. */
@@ -44,7 +44,7 @@ export function EditorPanelNavigation({
   if (!enabled) return children
   return (
     <Context.Provider value={context}>
-      <div className={shared.panelActions} ref={setTarget} data-editor-panel-navigation>
+      <div className={workspaceFormsStyles.panelActions} ref={setTarget} data-editor-panel-navigation>
         {!nested.size && (
           <>
             <Button variant="tertiary" onClick={onBack}>
@@ -73,6 +73,6 @@ export function EditorPanelActions({ children }: { children: ReactNode }) {
       createPortal(children, navigation.target)
     ) : null
   ) : (
-    <div className={shared.panelActions}>{children}</div>
+    <div className={workspaceFormsStyles.panelActions}>{children}</div>
   )
 }

@@ -1,0 +1,20 @@
+.betweenRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+.betweenRow p {
+  margin: var(--space-1) 0 0;
+}
+.assetChoice {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+.assetChoice > div {
+  flex: 1 1 var(--size-220);
+  min-width: 0;
+}

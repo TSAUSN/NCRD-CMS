@@ -1,0 +1,15 @@
+.summaryColumns {
+  display: grid;
+  grid-template-columns: minmax(0, 1.85fr) minmax(var(--size-240), 1fr);
+  gap: var(--space-4);
+  align-items: start;
+}
+.summaryColumns > * {
+  margin-block: 0;
+  min-width: 0;
+}
+@media (max-width: 1023px) {
+  .summaryColumns {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

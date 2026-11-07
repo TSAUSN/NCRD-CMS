@@ -1,6 +1,6 @@
 'use client'
 import { useLayoutEffect, useRef, type ReactNode } from 'react'
-import styles from '../workspace.module.css'
+import styles from './record-board-styles.module.css'
 /** A list scrolls in its own space;its commands never cover the last record. */
 export function RecordBoard({
   label,

@@ -4,6 +4,7 @@ import type { StoryTagFilter } from '@cms/schema'
 import { Button } from '../../../components/ui/index.ts'
 import { GuardedLink as Link } from '../../../components/guarded-link.tsx'
 import shared from '../../../components/workspace.module.css'
+import workspaceFormsStyles from '../../../components/workspace-styles/workspace-forms.module.css'
 import chips from '../../../components/story-list-row.module.css'
 import type { CollectionBindingOption, StoryFeedTags } from '../../../lib/collection-binding.ts'
 import { storyFeedBinding, storyFeedChoice, storyFeedMaximum } from '../../../lib/story-feed-choice.ts'
@@ -247,7 +248,7 @@ export function StoriesFeedField({
         return (
           <div key={group} role="group" aria-label={label} className={shared.denseStack}>
             <strong>{label}</strong>
-            <div className={shared.actions}>
+            <div className={workspaceFormsStyles.actions}>
               {tags.map(tag => (
                 <button
                   type="button"

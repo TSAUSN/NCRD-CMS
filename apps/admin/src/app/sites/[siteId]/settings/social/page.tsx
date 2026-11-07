@@ -6,6 +6,7 @@ import { currentSession } from '../../../../../lib/session.ts'
 import { getSiteSettingsWorkspace } from '../../../../../lib/site-settings.ts'
 import { SocialAccountsWorkspace } from './workspace.tsx'
 import shared from '../../../../../components/workspace.module.css'
+import workspaceFormsStyles from '../../../../../components/workspace-styles/workspace-forms.module.css'
 export const dynamic = 'force-dynamic'
 export default async function SocialAccounts({ params }: { params: Promise<{ siteId: string }> }) {
   const session = await currentSession()
@@ -24,7 +25,7 @@ export default async function SocialAccounts({ params }: { params: Promise<{ sit
   ])
   return (
     <AppShell email={session.email} role={role} groups={navigationFor(site, session.principal)}>
-      <main id="main" className={'wrap wrap-wide ' + shared.page + ' ' + shared.compactForm}>
+      <main id="main" className={'wrap wrap-wide ' + shared.page + ' ' + workspaceFormsStyles.compactForm}>
         <SocialAccountsWorkspace
           key={siteId}
           siteId={siteId}

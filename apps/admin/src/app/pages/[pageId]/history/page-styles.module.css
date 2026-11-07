@@ -1,0 +1,11 @@
+.timelineLayout.timelineLayout {
+  display: grid;
+  grid-template-columns: var(--size-280) minmax(0, 1fr);
+  gap: var(--space-4);
+  align-items: start;
+}
+@media (max-width: 1023px) {
+  .timelineLayout.timelineLayout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

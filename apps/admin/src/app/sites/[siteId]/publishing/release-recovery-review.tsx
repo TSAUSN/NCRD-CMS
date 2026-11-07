@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigationGuard } from '../../../../components/navigation-guard.ts'
 import { Button, Disclosure, TextLink } from '../../../../components/ui/index.ts'
-import shared from '../../../../components/workspace.module.css'
+import listInspectorStyles from '../../../../components/workspace-styles/list-inspector.module.css'
 import { ConfirmDialog } from '../../../../components/confirm.tsx'
 import type { PreparedRecovery, RecoveryReview } from '../../../../lib/release-recovery.ts'
 import { releaseLabel } from '../../../../lib/release-copy.ts'
@@ -90,7 +90,7 @@ export function ReleaseRecoveryReview({
         item.type === 'site_files',
     )
   return (
-    <div className={shared.formStack} aria-label="Recover a release">
+    <div className={listInspectorStyles.formStack} aria-label="Recover a release">
       <h3>Recover the state before this release</h3>
       <p>
         Review the items this release changed. Recovery first prepares private drafts and preserves later work in

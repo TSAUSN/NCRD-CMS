@@ -1,4 +1,4 @@
-import workspace from '../../../../components/workspace.module.css'
+import workspaceFormsStyles from '../../../../components/workspace-styles/workspace-forms.module.css'
 import { notFound } from 'next/navigation'
 import { asUser } from '@cms/platform'
 import { AppShell } from '../../../../components/app-shell.tsx'
@@ -25,7 +25,7 @@ export default async function Domains({ params }: { params: Promise<{ siteId: st
   ])
   return (
     <AppShell email={session.email} role={role} groups={navigationFor(site, session.principal)}>
-      <main id="main" className={'wrap ' + workspace.compactForm}>
+      <main id="main" className={'wrap ' + workspaceFormsStyles.compactForm}>
         <PageHeader
           title="Settings"
           crumbs={[
@@ -46,12 +46,12 @@ export default async function Domains({ params }: { params: Promise<{ siteId: st
           </p>
         )}
         {localDomainsUnavailable() && (
-          <section className={'card stack ' + workspace.formPanel} aria-label="Domain setup">
+          <section className={'card stack ' + workspaceFormsStyles.formPanel} aria-label="Domain setup">
             <h2>Local preview only</h2>
             <p>{LOCAL_DOMAIN_GUIDANCE}</p>
           </section>
         )}
-        <section className={'card stack ' + workspace.formPanel} aria-label="Connection checklist">
+        <section className={'card stack ' + workspaceFormsStyles.formPanel} aria-label="Connection checklist">
           <h2>What you need to connect</h2>
           <ol>
             <li>

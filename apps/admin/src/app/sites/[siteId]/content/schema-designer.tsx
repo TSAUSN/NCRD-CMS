@@ -1,5 +1,5 @@
 'use client'
-import shared from '../../../../components/workspace.module.css'
+import selectionControlsStyles from '../../../../components/workspace-styles/selection-controls.module.css'
 import { Button, Disclosure, Menu, Field } from '../../../../components/ui/index.ts'
 import { useNavigationGuard, requestClientNavigation } from '../../../../components/navigation-guard.ts'
 import { useEffect, useState } from 'react'
@@ -274,7 +274,7 @@ export function SchemaDesigner({
                     </select>
                   </label>
                 </div>
-                <label className={shared.checkRow}>
+                <label className={selectionControlsStyles.checkRow}>
                   <input
                     type="checkbox"
                     checked={field.required}

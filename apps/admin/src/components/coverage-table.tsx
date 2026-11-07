@@ -2,7 +2,8 @@
 import { Fragment, useState } from 'react'
 import { GuardedLink as Link } from './guarded-link.tsx'
 import { Badge } from './ui/status-pill.tsx'
-import shared from './workspace.module.css'
+import recordTableStyles from './workspace-styles/record-table.module.css'
+import selectionControlsStyles from './workspace-styles/selection-controls.module.css'
 import styles from './coverage-table.module.css'
 export type CoverageRow = {
   id: string
@@ -29,15 +30,15 @@ export function CoverageTable({
   const [open, setOpen] = useState(initialOpen ?? ''),
     maximum = Math.max(1, ...rows.map(row => row.count))
   return (
-    <div className={shared.tableWrap}>
-      <table className={shared.table + ' ' + styles.table} aria-label={label}>
+    <div className={recordTableStyles.tableWrap}>
+      <table className={recordTableStyles.table + ' ' + styles.table} aria-label={label}>
         <thead>
           <tr>
             <th>{groupLabel}</th>
             <th>Stories</th>
             <th>Live</th>
             <th>
-              <span className={shared.visuallyHidden}>Coverage</span>
+              <span className={selectionControlsStyles.visuallyHidden}>Coverage</span>
             </th>
             <th>Shows on</th>
           </tr>

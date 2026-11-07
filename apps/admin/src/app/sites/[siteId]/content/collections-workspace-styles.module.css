@@ -1,0 +1,104 @@
+.workspaceTile {
+  padding: var(--space-4);
+  text-decoration: none;
+}
+.workspaceTile > svg {
+  color: var(--status-scheduled);
+}
+.workspaceTile strong {
+  font-size: var(--text-body);
+}
+.recordHeader {
+  display: grid;
+  grid-template-columns:
+    var(--target-small) minmax(0, 2.4fr) minmax(0, 1.2fr) var(--record-status-width) var(--record-updated-width)
+    var(--target-small);
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background: var(--table-header);
+  border-block-end: var(--line-thin) solid var(--border);
+  font-size: var(--text-help);
+  color: var(--text-muted);
+}
+.recordHeader[data-editable='false'] {
+  grid-template-columns: minmax(0, 2.4fr) minmax(0, 1.2fr) var(--record-status-width) var(--record-updated-width);
+}
+.recordRows[data-view='table'] {
+  display: block;
+  border: 0;
+  border-radius: 0;
+}
+.recordRows[data-view='table'] .recordRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--content-table-cell-block) var(--space-3);
+  min-height: var(--record-row-height);
+  font-size: var(--text-meta);
+}
+.recordRows[data-view='table'] .recordOpen {
+  display: grid;
+  grid-template-columns: minmax(0, 2.4fr) minmax(0, 1.2fr) var(--record-status-width) var(--record-updated-width);
+  gap: var(--space-2);
+  align-items: center;
+  padding: 0;
+}
+.recordRows[data-view='table'] .recordPhoto {
+  width: var(--target-small);
+  height: var(--target-small);
+}
+.recordName {
+  overflow-wrap: normal;
+}
+.recordRows[data-view='table'] .recordName,
+.recordValue {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow-wrap: normal;
+  min-width: 0;
+}
+.recordRow .recordValue {
+  font-size: var(--text-help);
+}
+.usageLinks {
+  display: grid;
+  gap: var(--space-2);
+  max-height: var(--size-240);
+  overflow: auto;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.usageLinks li {
+  min-width: 0;
+}
+.usageLinks a {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@media (max-width: 1199px) {
+  .recordRows[data-view='table'] [data-secondary],
+  .recordHeader [data-secondary] {
+    display: none;
+  }
+  .recordRows[data-view='table'] .recordOpen {
+    grid-template-columns: minmax(0, 2.4fr) minmax(0, 1.2fr) var(--record-status-width);
+  }
+  .recordHeader {
+    grid-template-columns: var(--target-small) minmax(0, 2.4fr) minmax(0, 1.2fr) var(--record-status-width) var(
+        --target-small
+      );
+  }
+  .recordHeader[data-editable='false'] {
+    grid-template-columns: minmax(0, 2.4fr) minmax(0, 1.2fr) var(--record-status-width);
+  }
+}
+.recordAction {
+  display: flex;
+  flex: none;
+  width: var(--target-small);
+}

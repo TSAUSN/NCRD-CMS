@@ -21,7 +21,11 @@ import { AddStory } from './add-story.tsx'
 import { storySourceStatusLine, storySourceResult } from '../../../../lib/story-source-status.ts'
 import type { StorySourceCheck } from '../../../../lib/story-source-check.ts'
 import { StoriesHeader } from './header.tsx'
-import shared from '../../../../components/workspace.module.css'
+import workspaceFormsStyles from '../../../../components/workspace-styles/workspace-forms.module.css'
+import recordTableStyles from '../../../../components/workspace-styles/record-table.module.css'
+import selectionControlsStyles from '../../../../components/workspace-styles/selection-controls.module.css'
+import listInspectorStyles from '../../../../components/workspace-styles/list-inspector.module.css'
+import ownedStyles from './list-workspace-styles.module.css'
 type Snapshot = NonNullable<Awaited<ReturnType<typeof getStoryListState>>>
 type Job = { entryId: string; patch: StoryListPatch }
 export function StoriesList({
@@ -346,7 +350,7 @@ export function StoriesList({
         }
       />
       {checkMessage && (
-        <p className={shared.meta} role={checkFailed ? 'alert' : 'status'}>
+        <p className={recordTableStyles.meta} role={checkFailed ? 'alert' : 'status'}>
           {checkMessage}
           {newStories > 0 && (
             <Button
@@ -408,7 +412,7 @@ export function StoriesList({
         </Note>
       )}
       {notice && (
-        <p className={shared.meta} role={failure ? 'alert' : 'status'}>
+        <p className={recordTableStyles.meta} role={failure ? 'alert' : 'status'}>
           {notice} {queued > 0 && !failure && `(${queued} queued)`}
           {failure && (
             <Button variant="tertiary" size="s" onClick={() => setErrorOpen(true)}>
@@ -417,8 +421,8 @@ export function StoriesList({
           )}
         </p>
       )}
-      <div className={shared.filters + ' ' + shared.listFilters} aria-label="Filter stories">
-        <label className={shared.visuallyHidden} htmlFor="story-search">
+      <div className={workspaceFormsStyles.filters + ' ' + ownedStyles.listFilters} aria-label="Filter stories">
+        <label className={selectionControlsStyles.visuallyHidden} htmlFor="story-search">
           Search titles and descriptions
         </label>
         <input
@@ -430,7 +434,7 @@ export function StoriesList({
           placeholder="Search titles and descriptions"
           onChange={event => setFilters({ ...filters, q: event.target.value })}
         />
-        <label className={shared.visuallyHidden} htmlFor="story-status">
+        <label className={selectionControlsStyles.visuallyHidden} htmlFor="story-status">
           Story status
         </label>
         <select
@@ -456,7 +460,7 @@ export function StoriesList({
             </option>
           ))}
         </select>
-        <label className={shared.visuallyHidden} htmlFor="story-main">
+        <label className={selectionControlsStyles.visuallyHidden} htmlFor="story-main">
           {settings.mainLabel}
         </label>
         <select
@@ -474,7 +478,7 @@ export function StoriesList({
             </option>
           ))}
         </select>
-        <label className={shared.visuallyHidden} htmlFor="story-secondary">
+        <label className={selectionControlsStyles.visuallyHidden} htmlFor="story-secondary">
           {settings.secondaryLabel}
         </label>
         <select
@@ -492,11 +496,11 @@ export function StoriesList({
             </option>
           ))}
         </select>
-        <span className={shared.meta} role="status">
+        <span className={recordTableStyles.meta} role="status">
           {visible.length} of {rows.length}
         </span>
       </div>
-      <div className={shared.listRows} aria-label="Stories">
+      <div className={listInspectorStyles.listRows} aria-label="Stories">
         {visible.map(row => (
           <StoryListRowView
             key={row.id}
@@ -549,7 +553,7 @@ export function StoriesList({
             </>
           }
         >
-          <div className={shared.compactFields}>
+          <div className={workspaceFormsStyles.compactFields}>
             <p>{failure}</p>
             <p>
               {jobs.current.length} queued {jobs.current.length === 1 ? 'change is' : 'changes are'} still here. Saved

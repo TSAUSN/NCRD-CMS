@@ -1,5 +1,6 @@
 import { releaseStamps } from '../../../../lib/release-stamps.ts'
 import shared from '../../../../components/workspace.module.css'
+import workspaceFormsStyles from '../../../../components/workspace-styles/workspace-forms.module.css'
 import { validStoryDay } from '../../../../lib/story-calendar.ts'
 import { initialReleasePick } from '../../../../lib/release-selection.ts'
 import { CollectionReviewSection } from '../../../../components/collection-review-section.tsx'
@@ -142,7 +143,7 @@ export default async function PublishingWorkspace({
     <AppShell email={session.email} role={role} groups={navigationFor(site, session.principal)}>
       <main
         id="main"
-        className={native ? 'wrap wrap-wide ' + shared.page + ' ' + shared.compactForm : 'wrap wrap-wide'}
+        className={native ? 'wrap wrap-wide ' + shared.page + ' ' + workspaceFormsStyles.compactForm : 'wrap wrap-wide'}
       >
         <PageHeader
           density={native ? 'compact' : undefined}

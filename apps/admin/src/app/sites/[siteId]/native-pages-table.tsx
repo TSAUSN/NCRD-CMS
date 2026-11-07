@@ -16,6 +16,10 @@ import { changePageList } from './page-list-actions.ts'
 import { movePageInOrder } from './page-order.ts'
 import { PageManagement } from './page-management.tsx'
 import styles from '../../../components/workspace.module.css'
+import workspaceFormsStyles from '../../../components/workspace-styles/workspace-forms.module.css'
+import recordTableStyles from '../../../components/workspace-styles/record-table.module.css'
+import selectionControlsStyles from '../../../components/workspace-styles/selection-controls.module.css'
+import ownedStyles from './native-pages-table-styles.module.css'
 export function NativePagesTable({
   siteId,
   pages,
@@ -114,8 +118,8 @@ export function NativePagesTable({
   return (
     <div className={styles.denseStack}>
       <ReorderAnnouncement>{reorder.announcement}</ReorderAnnouncement>
-      <div className={styles.listToolbar}>
-        <div className={styles.actions}>
+      <div className={workspaceFormsStyles.listToolbar}>
+        <div className={workspaceFormsStyles.actions}>
           <SegmentedControl
             label="Page groups"
             appearance="pills"
@@ -129,7 +133,7 @@ export function NativePagesTable({
             ]}
           />
           {controls?.stories.length ? (
-            <Link className={styles.countLink} href={'/sites/' + siteId + '/stories'}>
+            <Link className={ownedStyles.countLink} href={'/sites/' + siteId + '/stories'}>
               Stories {controls.stories.length}
               <IconChevronRight size={12} />
             </Link>
@@ -161,9 +165,11 @@ export function NativePagesTable({
               : 'An editor can add the first page.'}
         </EmptyState>
       ) : (
-        <div className={styles.tableWrap}>
+        <div className={recordTableStyles.tableWrap}>
           <table
-            className={styles.table + ' ' + styles.compactTable + ' ' + styles.denseTable}
+            className={
+              recordTableStyles.table + ' ' + recordTableStyles.compactTable + ' ' + recordTableStyles.denseTable
+            }
             aria-label="Pages"
             data-density="content"
           >
@@ -191,7 +197,7 @@ export function NativePagesTable({
                   <tr key={page.id} {...reorder.row(page.id, !canReorder || pending, false)}>
                     <td>
                       <DropIndicator marker={reorder.marker} row={page.id} />
-                      <div className={styles.title}>
+                      <div className={recordTableStyles.title}>
                         {canReorder && (
                           <span
                             {...reorder.grip(page.id, pending)}
@@ -214,11 +220,11 @@ export function NativePagesTable({
                             <IconDrag size={14} />
                           </span>
                         )}
-                        <div className={styles.rowCopy}>
+                        <div className={recordTableStyles.rowCopy}>
                           <Link editorCanvasOrigin={editorCanvasOrigin} href={'/pages/' + page.id}>
                             {page.title}
                           </Link>
-                          <span className={styles.meta} title={'/' + page.slug}>
+                          <span className={recordTableStyles.meta} title={'/' + page.slug}>
                             /{page.slug}
                           </span>
                         </div>
@@ -230,7 +236,7 @@ export function NativePagesTable({
                     {canAdmin && controls && (
                       <>
                         <td>
-                          <div className={styles.toggleRow} data-layout="inline">
+                          <div className={selectionControlsStyles.toggleRow} data-layout="inline">
                             <input
                               type="checkbox"
                               role="switch"
@@ -239,11 +245,11 @@ export function NativePagesTable({
                               checked={pageInMenu(controls.menu, page.id)}
                               onChange={event => void save(page.id, 'menu', { on: event.target.checked })}
                             />
-                            {under && <small className={styles.meta}>Under {under}</small>}
+                            {under && <small className={recordTableStyles.meta}>Under {under}</small>}
                           </div>
                         </td>
                         <td>
-                          <div className={styles.toggleRow} data-layout="inline">
+                          <div className={selectionControlsStyles.toggleRow} data-layout="inline">
                             {controls.inFooter[page.id] === null ? (
                               <Link href={'/sites/' + siteId + '/footer'}>Open Footer</Link>
                             ) : (
@@ -261,12 +267,12 @@ export function NativePagesTable({
                       </>
                     )}
                     <td>
-                      <time className={styles.meta} dateTime={page.edited_at}>
+                      <time className={recordTableStyles.meta} dateTime={page.edited_at}>
                         {new Date(page.edited_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                       </time>
                     </td>
                     <td>
-                      <div className={styles.tableActions}>
+                      <div className={recordTableStyles.tableActions}>
                         {canManage ? (
                           <PageManagement
                             pageId={page.id}
@@ -299,9 +305,9 @@ export function NativePagesTable({
               {stories.map(story => (
                 <tr key={'story-' + story.id}>
                   <td>
-                    <div className={styles.rowCopy}>
+                    <div className={recordTableStyles.rowCopy}>
                       <Link href={'/sites/' + siteId + '/stories/' + story.id}>{story.title}</Link>
-                      <span className={styles.meta}>Story · {story.path}</span>
+                      <span className={recordTableStyles.meta}>Story · {story.path}</span>
                     </div>
                   </td>
                   <td colSpan={canAdmin ? 5 : 3}>

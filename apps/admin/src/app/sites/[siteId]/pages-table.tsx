@@ -9,7 +9,9 @@ import { StatusChip, pageStatus } from '../../../components/status.tsx'
 import { Field, EmptyState, Menu, SegmentedControl } from '../../../components/ui/index.ts'
 import { PageManagement } from './page-management.tsx'
 import { IconMore } from '../../../components/icons.tsx'
-import styles from '../../../components/workspace.module.css'
+import workspaceFormsStyles from '../../../components/workspace-styles/workspace-forms.module.css'
+import recordTableStyles from '../../../components/workspace-styles/record-table.module.css'
+import ownedStyles from './pages-table-styles.module.css'
 export function PagesTable({
   pages,
   canManage,
@@ -45,7 +47,7 @@ export function PagesTable({
   )
   return (
     <>
-      <div className={styles.filters + ' ' + styles.compactFilters}>
+      <div className={workspaceFormsStyles.filters + ' ' + ownedStyles.compactFilters}>
         <Field id="pages-search" label="Search pages">
           <input
             type="search"
@@ -79,9 +81,11 @@ export function PagesTable({
           }
         />
       ) : (
-        <div className={styles.tableWrap}>
+        <div className={recordTableStyles.tableWrap}>
           <table
-            className={styles.table + ' ' + styles.compactTable + ' ' + styles.denseTable}
+            className={
+              recordTableStyles.table + ' ' + recordTableStyles.compactTable + ' ' + recordTableStyles.denseTable
+            }
             aria-label="Pages"
             data-density={compactActions ? 'summary' : undefined}
           >
@@ -102,7 +106,7 @@ export function PagesTable({
                 <tr key={page.id}>
                   <td>
                     <div
-                      className={styles.title}
+                      className={recordTableStyles.title}
                       style={{ paddingInlineStart: `calc(var(--space-5) * ${depth})` } as CSSProperties}
                     >
                       {depth > 0 && <span aria-hidden="true">↳</span>}
@@ -119,7 +123,7 @@ export function PagesTable({
                   </td>
                   <td>{page.in_menu ? 'Yes' : 'No'}</td>
                   <td>
-                    <span className={styles.meta} title={page.edited_by}>
+                    <span className={recordTableStyles.meta} title={page.edited_by}>
                       {page.edited_by}
                       <br />
                       <time dateTime={page.edited_at}>
@@ -128,7 +132,7 @@ export function PagesTable({
                     </span>
                   </td>
                   <td>
-                    <div className={styles.tableActions}>
+                    <div className={recordTableStyles.tableActions}>
                       {compactActions ? (
                         canManage ? (
                           <PageManagement
@@ -165,7 +169,7 @@ export function PagesTable({
                       ) : (
                         <>
                           <Link
-                            className={`btn secondary small ${styles.edit}`}
+                            className={`btn secondary small ${recordTableStyles.edit}`}
                             editorCanvasOrigin={editorCanvasOrigin}
                             href={'/pages/' + page.id}
                             aria-label={'Edit ' + page.title}

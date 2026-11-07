@@ -30,6 +30,13 @@ import {
 } from './release-actions.ts'
 import styles from './publish.module.css'
 import shared from '../../../../components/workspace.module.css'
+import workspaceFormsStyles from '../../../../components/workspace-styles/workspace-forms.module.css'
+import recordTableStyles from '../../../../components/workspace-styles/record-table.module.css'
+import siteSummaryStyles from '../../../../components/workspace-styles/site-summary.module.css'
+import selectionControlsStyles from '../../../../components/workspace-styles/selection-controls.module.css'
+import listInspectorStyles from '../../../../components/workspace-styles/list-inspector.module.css'
+import reviewWorkbenchStyles from '../../../../components/workspace-styles/review-workbench.module.css'
+import ownedStyles from './release-workspace-styles.module.css'
 import { ReleaseComparisonDialog } from './release-comparison-dialog.tsx'
 
 type ListedRelease = Omit<ReleaseRow, 'created_at' | 'finished_at'> & {
@@ -303,16 +310,19 @@ export function ReleaseWorkspace({
     scheduleRequestId.current = null
   }
   const selectedChanges = current && (
-    <ul className={shared.rowList + ' ' + shared.panel}>
+    <ul className={siteSummaryStyles.rowList + ' ' + reviewWorkbenchStyles.panel}>
       {current.snapshot.map(item => (
         <li key={item.key}>
-          <div className={shared.rowCopy}>
-            <strong className={shared.singleLine} title={releaseLabel(item)}>
+          <div className={recordTableStyles.rowCopy}>
+            <strong className={recordTableStyles.singleLine} title={releaseLabel(item)}>
               {releaseLabel(item)}
               {item.action === 'unpublish' ? ' · will leave the live site' : ''}
             </strong>
             {descriptions.releaseId === current.id && descriptions.values[item.key] && (
-              <p className={shared.singleLine + ' ' + shared.meta} title={descriptions.values[item.key]!.summary}>
+              <p
+                className={recordTableStyles.singleLine + ' ' + recordTableStyles.meta}
+                title={descriptions.values[item.key]!.summary}
+              >
                 {descriptions.values[item.key]!.summary}
               </p>
             )}
@@ -357,7 +367,7 @@ export function ReleaseWorkspace({
       {current.status === 'planned' && (
         <>
           {hasSamples && (
-            <label className={shared.checkRow}>
+            <label className={selectionControlsStyles.checkRow}>
               <input
                 type="checkbox"
                 checked={samplesConfirmed}
@@ -469,12 +479,12 @@ export function ReleaseWorkspace({
         !archived &&
         items.length > 0 &&
         !current &&
-        createPortal(<div className={shared.actions}>{publishActions}</div>, headerTarget)}
+        createPortal(<div className={workspaceFormsStyles.actions}>{publishActions}</div>, headerTarget)}
       {view === 'changes' && !(current?.status === 'planned' && current.snapshot.some(item => item.entryIds)) && (
         <>
           <div className={styles.heading}>
             <div>
-              <h2 className={native && !initialRelease ? shared.visuallyHidden : undefined}>
+              <h2 className={native && !initialRelease ? selectionControlsStyles.visuallyHidden : undefined}>
                 {initialRelease ? 'Publish your site for the first time' : 'Changes ready to publish'}
               </h2>
               <p className={styles.muted}>
@@ -509,13 +519,13 @@ export function ReleaseWorkspace({
             </p>
           )}
           {native && items.length > 0 ? (
-            <div className={shared.tableWrap}>
-              <table data-density="content" className={shared.table + ' ' + shared.publishTable}>
-                <caption className={shared.visuallyHidden}>Saved changes ready to publish</caption>
+            <div className={recordTableStyles.tableWrap}>
+              <table data-density="content" className={recordTableStyles.table + ' ' + ownedStyles.publishTable}>
+                <caption className={selectionControlsStyles.visuallyHidden}>Saved changes ready to publish</caption>
                 <thead>
                   <tr>
                     <th>
-                      <span className={shared.visuallyHidden}>Select</span>
+                      <span className={selectionControlsStyles.visuallyHidden}>Select</span>
                     </th>
                     <th>What</th>
                     <th>What changed</th>
@@ -528,7 +538,7 @@ export function ReleaseWorkspace({
                     <tr key={item.key}>
                       <td>
                         {canPublish && (!item.requiresAdmin || canAdminister) && (
-                          <label className={shared.checkRow}>
+                          <label className={selectionControlsStyles.checkRow}>
                             <input
                               type="checkbox"
                               aria-label={releaseLabel(item)}
@@ -549,18 +559,18 @@ export function ReleaseWorkspace({
                         )}
                       </td>
                       <th scope="row">
-                        <strong className={shared.singleLine} title={releaseLabel(item)}>
+                        <strong className={recordTableStyles.singleLine} title={releaseLabel(item)}>
                           {releaseLabel(item)}
                         </strong>
-                        <small className={shared.meta}>
+                        <small className={recordTableStyles.meta}>
                           {releaseGroup(item) === 'Pages' ? 'Page' : releaseGroup(item)}
                           {item.requiresAdmin && !canAdminister ? ' · needs an Admin' : ''}
                         </small>
                       </th>
                       <td>
-                        <div className={shared.summaryAction}>
+                        <div className={recordTableStyles.summaryAction}>
                           <p
-                            className={shared.singleLine}
+                            className={recordTableStyles.singleLine}
                             title={
                               presentations[item.key]?.summary ??
                               (item.unpublished ? 'New page · not live yet' : 'Saved changes')
@@ -575,7 +585,10 @@ export function ReleaseWorkspace({
                         </div>
                       </td>
                       <td>
-                        <span className={shared.singleLine} title={stamps[item.key]?.actor ?? 'Not recorded'}>
+                        <span
+                          className={recordTableStyles.singleLine}
+                          title={stamps[item.key]?.actor ?? 'Not recorded'}
+                        >
                           {stamps[item.key]?.actor ?? 'Not recorded'}
                         </span>
                       </td>
@@ -619,10 +632,10 @@ export function ReleaseWorkspace({
               return (
                 grouped.length > 0 && (
                   <Card title={group} density="compact" key={group}>
-                    <ul className={shared.rowList}>
+                    <ul className={siteSummaryStyles.rowList}>
                       {grouped.map(item => (
                         <li key={item.key}>
-                          <label className={shared.checkRow}>
+                          <label className={selectionControlsStyles.checkRow}>
                             {canPublish && (
                               <input
                                 type="checkbox"
@@ -690,7 +703,7 @@ export function ReleaseWorkspace({
             </div>
           )}
           {native && items.length > 0 && (
-            <p className={shared.publishNote}>
+            <p className={ownedStyles.publishNote}>
               Selected items go live together. Pages that show a changed list update after it is published.{' '}
               <Link href={'/sites/' + siteId + '/publishing?tab=scheduled'}>View scheduled publishing</Link>
             </p>
@@ -706,11 +719,11 @@ export function ReleaseWorkspace({
         <>
           <h2>History</h2>
           {releases.length ? (
-            <ul className={shared.rowList + ' ' + shared.panel}>
+            <ul className={siteSummaryStyles.rowList + ' ' + reviewWorkbenchStyles.panel}>
               {releases.map(release => (
                 <li key={release.id}>
-                  <div className={shared.rowCopy}>
-                    <div className={shared.summaryAction}>
+                  <div className={recordTableStyles.rowCopy}>
+                    <div className={recordTableStyles.summaryAction}>
                       <Badge
                         tone={
                           release.status === 'applied' ? 'live' : release.status === 'cancelled' ? 'neutral' : 'pending'
@@ -724,7 +737,7 @@ export function ReleaseWorkspace({
                               ? 'Review out of date'
                               : 'Reviewed draft'}
                       </Badge>
-                      <p className={shared.singleLine} title={release.snapshot.map(releaseLabel).join(', ')}>
+                      <p className={recordTableStyles.singleLine} title={release.snapshot.map(releaseLabel).join(', ')}>
                         {release.snapshot.map(releaseLabel).join(', ')}
                       </p>
                     </div>
@@ -809,7 +822,7 @@ export function ReleaseWorkspace({
             </>
           }
         >
-          <div className={shared.formStack}>
+          <div className={listInspectorStyles.formStack}>
             {intentSaved && (
               <p role="status">
                 Choices restored or saved in this browser. Review this exact set of changes and confirm any required

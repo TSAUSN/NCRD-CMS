@@ -3,7 +3,8 @@ import dynamic from 'next/dynamic'
 import { parseCollectionEntryValues, type CollectionField } from '@cms/schema'
 import type { MediaAsset } from '../lib/media-library.ts'
 import { Button, Field } from './ui/index.ts'
-import shared from './workspace.module.css'
+import selectionControlsStyles from './workspace-styles/selection-controls.module.css'
+import ownedStyles from './collection-field-control-styles.module.css'
 import { IconImage } from './icons.tsx'
 const entryIdentity = (entry: { id: string | null; clientId?: string; stableKey: string }) =>
   entry.id ?? entry.clientId ?? entry.stableKey
@@ -42,7 +43,7 @@ export function CollectionFieldControl({
   const help = !problem.ok ? problem.problems[0] : field.help
   if (field.type === 'boolean')
     return (
-      <label className={shared.checkRow} htmlFor={id}>
+      <label className={selectionControlsStyles.checkRow} htmlFor={id}>
         <input
           id={id}
           type="checkbox"
@@ -148,9 +149,9 @@ function ImageField({
 }) {
   const image = value && typeof value === 'object' ? (value as { src?: string; alt?: string }) : null
   return (
-    <div id={id} className={'collection-image-field ' + shared.assetField}>
+    <div id={id} className={'collection-image-field ' + ownedStyles.assetField}>
       {image?.src ? (
-        <span className={'collection-image-thumb ' + shared.assetPreview}>
+        <span className={'collection-image-thumb ' + ownedStyles.assetPreview}>
           {preview ? <img src={preview} alt="" /> : <IconImage size={19} />}
           <span title={image.alt || 'Decorative image'}>{image.alt || 'Decorative image'}</span>
         </span>

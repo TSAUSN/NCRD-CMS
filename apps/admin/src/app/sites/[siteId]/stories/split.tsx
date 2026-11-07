@@ -11,7 +11,9 @@ import { Button, ButtonLink, Card, Dialog, Field, Note } from '../../../../compo
 import { StoriesHeader } from './header.tsx'
 import { AddStory } from './add-story.tsx'
 import { AddStoryWidget } from './add-widget.tsx'
-import shared from '../../../../components/workspace.module.css'
+import workspaceFormsStyles from '../../../../components/workspace-styles/workspace-forms.module.css'
+import recordTableStyles from '../../../../components/workspace-styles/record-table.module.css'
+import workspacePreviewStyles from '../../../../components/workspace-styles/workspace-preview.module.css'
 type State = NonNullable<Awaited<ReturnType<typeof getStoryListState>>>
 export function StoriesSplit({
   siteId,
@@ -85,10 +87,10 @@ export function StoriesSplit({
           and publish.
         </Note>
       )}
-      <div className={shared.settingsPreview}>
+      <div className={workspacePreviewStyles.settingsPreview}>
         <Card title="Split View section" density="summary">
-          <div className={shared.compactFields}>
-            <p className={shared.meta}>
+          <div className={workspaceFormsStyles.compactFields}>
+            <p className={recordTableStyles.meta}>
               A full news page with three ways to browse, all from tags. Add it to the Newsroom or any page.
             </p>
             <Field id="split-heading" label="Heading">
@@ -135,13 +137,15 @@ export function StoriesSplit({
             {rights.manageSchema && state.ready && (
               <AddStoryWidget siteId={siteId} kind="split" choice={choice} onSaved={setSaved} />
             )}{' '}
-            {!rights.manageSchema && <p className={shared.meta}>A Site admin can add this section to a page.</p>}
+            {!rights.manageSchema && (
+              <p className={recordTableStyles.meta}>A Site admin can add this section to a page.</p>
+            )}
             {!state.ready && (
               <Note tone="warning">A Site admin must save the Story tags before this section can be added.</Note>
             )}
           </div>
         </Card>
-        <div className={shared.previewPanel}>
+        <div className={workspacePreviewStyles.previewPanel}>
           <ScaledPreview
             width={1280}
             src={url(preview)}
@@ -150,7 +154,7 @@ export function StoriesSplit({
             readySelector="[data-cms-story-kind=split]"
             backLabel="Back to Split View preview"
           />
-          <p className={shared.meta}>
+          <p className={recordTableStyles.meta}>
             Saved draft stories · Preview choices are kept in this address. Nothing is published.
           </p>
         </div>

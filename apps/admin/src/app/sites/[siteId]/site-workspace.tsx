@@ -9,6 +9,10 @@ import { NativePagesTable } from './native-pages-table.tsx'
 import { NativeNewPage } from './native-new-page.tsx'
 import { PagesTable } from './pages-table.tsx'
 import styles from '../../../components/workspace.module.css'
+import workspaceFormsStyles from '../../../components/workspace-styles/workspace-forms.module.css'
+import recordTableStyles from '../../../components/workspace-styles/record-table.module.css'
+import siteSummaryStyles from '../../../components/workspace-styles/site-summary.module.css'
+import selectionControlsStyles from '../../../components/workspace-styles/selection-controls.module.css'
 import { publicSiteOrigin } from '../../../lib/public-site-url.ts'
 import { notFound } from 'next/navigation'
 import { currentSession } from '../../../lib/session.ts'
@@ -116,7 +120,9 @@ export async function SiteWorkspace({
     <AppShell email={session.email} role={role} groups={navigationFor(site, session.principal)}>
       <main
         id="main"
-        className={'wrap ' + (nativePages ? styles.page + ' ' + styles.compactForm + ' ' + styles.denseStack : '')}
+        className={
+          'wrap ' + (nativePages ? styles.page + ' ' + workspaceFormsStyles.compactForm + ' ' + styles.denseStack : '')
+        }
         data-layout={nativePages ? 'compact' : undefined}
       >
         <PageHeader
@@ -248,15 +254,15 @@ export async function SiteWorkspace({
           {area === 'overview' && (
             <>
               <section aria-label="Quick actions" className={styles.stack}>
-                <h2 className={styles.visuallyHidden}>Quick actions</h2>
+                <h2 className={selectionControlsStyles.visuallyHidden}>Quick actions</h2>
                 <div className={styles.grid}>
                   {scopedOnly && pages[0] && (
                     <Link
-                      className={styles.task}
+                      className={siteSummaryStyles.task}
                       editorCanvasOrigin={editorCanvasOrigin}
                       href={'/pages/' + pages[0].id}
                     >
-                      <span className={styles.taskIcon}>
+                      <span className={siteSummaryStyles.taskIcon}>
                         <IconPage size={18} />
                       </span>
                       <strong>Edit {pages[0].title}</strong>
@@ -264,35 +270,35 @@ export async function SiteWorkspace({
                   )}
                   {pages.find(page => page.slug === '') && (
                     <Link
-                      className={styles.task}
+                      className={siteSummaryStyles.task}
                       editorCanvasOrigin={editorCanvasOrigin}
                       href={'/pages/' + pages.find(page => page.slug === '')!.id}
                     >
-                      <span className={styles.taskIcon}>
+                      <span className={siteSummaryStyles.taskIcon}>
                         <IconPage size={18} />
                       </span>
                       <strong>Edit home page</strong>
                     </Link>
                   )}
                   {canManagePages && (
-                    <Link className={styles.task} href={`/sites/${siteId}/pages`}>
-                      <span className={styles.taskIcon}>
+                    <Link className={siteSummaryStyles.task} href={`/sites/${siteId}/pages`}>
+                      <span className={siteSummaryStyles.taskIcon}>
                         <IconPage size={18} />
                       </span>
                       <strong>Manage pages</strong>
                     </Link>
                   )}
                   {!scopedOnly && (
-                    <Link className={styles.task} href={`/sites/${siteId}/content`}>
-                      <span className={styles.taskIcon}>
+                    <Link className={siteSummaryStyles.task} href={`/sites/${siteId}/content`}>
+                      <span className={siteSummaryStyles.taskIcon}>
                         <IconCollection size={18} />
                       </span>
                       <strong>Update lists</strong>
                     </Link>
                   )}
                   {!scopedOnly && (
-                    <Link className={styles.task} href={`/sites/${siteId}/design`}>
-                      <span className={styles.taskIcon}>
+                    <Link className={siteSummaryStyles.task} href={`/sites/${siteId}/design`}>
+                      <span className={siteSummaryStyles.taskIcon}>
                         <IconSettings size={18} />
                       </span>
                       <strong>{site.original_design ? 'Edit menu & footer' : 'Change site look'}</strong>
@@ -303,13 +309,13 @@ export async function SiteWorkspace({
               <div className={styles.twoColumns}>
                 <div className={styles.stack}>
                   <Card title="Needs attention" density="compact">
-                    <ul className={styles.rowList}>
+                    <ul className={siteSummaryStyles.rowList}>
                       {changed === 0 && reviews.length === 0 && !pages.some(page => page.live_samples) && (
                         <li>
-                          <span className={styles.taskIcon}>
+                          <span className={siteSummaryStyles.taskIcon}>
                             <IconCheck size={18} />
                           </span>
-                          <div className={styles.rowCopy}>
+                          <div className={recordTableStyles.rowCopy}>
                             Everything saved is live. There is nothing waiting for attention.
                           </div>
                         </li>
@@ -318,9 +324,9 @@ export async function SiteWorkspace({
                         .filter(page => editorialPosture(page).hasUnpublishedChanges)
                         .map(page => (
                           <li key={page.id}>
-                            <div className={styles.rowCopy}>
+                            <div className={recordTableStyles.rowCopy}>
                               <strong>{page.title}</strong>
-                              <span className={styles.meta}>
+                              <span className={recordTableStyles.meta}>
                                 {page.published_version_id ? 'Changes not live' : 'Draft'}
                               </span>
                             </div>
@@ -335,7 +341,7 @@ export async function SiteWorkspace({
                         ))}
                       {reviews.length > 0 && (
                         <li>
-                          <div className={styles.rowCopy}>
+                          <div className={recordTableStyles.rowCopy}>
                             <strong>
                               {reviews.length} {reviews.length === 1 ? 'page is' : 'pages are'} in review
                             </strong>
@@ -349,9 +355,9 @@ export async function SiteWorkspace({
                         .filter(page => page.live_samples)
                         .map(page => (
                           <li key={'sample' + page.id}>
-                            <div className={styles.rowCopy}>
+                            <div className={recordTableStyles.rowCopy}>
                               <strong>{page.title}</strong>
-                              <span className={styles.meta}>Sample content is live</span>
+                              <span className={recordTableStyles.meta}>Sample content is live</span>
                             </div>
                             <Link
                               className="btn secondary"
@@ -365,16 +371,16 @@ export async function SiteWorkspace({
                     </ul>
                   </Card>
                   <Card title="Recent changes" density="compact">
-                    <ul className={styles.rowList}>
+                    <ul className={siteSummaryStyles.rowList}>
                       {[...pages]
                         .sort((a, b) => Date.parse(b.edited_at) - Date.parse(a.edited_at))
                         .slice(0, 4)
                         .map(page => (
                           <li key={page.id}>
-                            <span className={styles.taskIcon}>
+                            <span className={siteSummaryStyles.taskIcon}>
                               <IconPage size={18} />
                             </span>
-                            <div className={styles.rowCopy}>
+                            <div className={recordTableStyles.rowCopy}>
                               <Link
                                 editorCanvasOrigin={editorCanvasOrigin}
                                 href={'/pages/' + page.id}
@@ -382,7 +388,7 @@ export async function SiteWorkspace({
                               >
                                 {page.title}
                               </Link>
-                              <span className={styles.meta}>
+                              <span className={recordTableStyles.meta}>
                                 {page.edited_by} ·{' '}
                                 {new Date(page.edited_at).toLocaleDateString('en-US', {
                                   month: 'short',
@@ -398,10 +404,10 @@ export async function SiteWorkspace({
                 </div>
                 {!scopedOnly && (
                   <Card title="Lists" density="compact">
-                    <ul className={styles.rowList}>
+                    <ul className={siteSummaryStyles.rowList}>
                       {lists?.collections.map(list => (
                         <li key={list.id}>
-                          <div className={styles.rowCopy}>
+                          <div className={recordTableStyles.rowCopy}>
                             <Link
                               href={
                                 list.readerKey === 'stories'
@@ -411,7 +417,7 @@ export async function SiteWorkspace({
                             >
                               <strong>{list.name}</strong>
                             </Link>
-                            <span className={styles.meta}>
+                            <span className={recordTableStyles.meta}>
                               {list.totalEntries} {list.totalEntries === 1 ? 'item' : 'items'} · {list.changedEntries}{' '}
                               with changes not live
                             </span>
@@ -420,7 +426,7 @@ export async function SiteWorkspace({
                       ))}
                       {!lists?.collections.length && (
                         <li>
-                          <div className={styles.rowCopy}>
+                          <div className={recordTableStyles.rowCopy}>
                             No lists yet.<Link href={`/sites/${siteId}/content`}>Open Lists to get started</Link>
                           </div>
                         </li>

@@ -1,0 +1,40 @@
+.previewCaption.previewCaption {
+  background: var(--surface);
+  color: var(--text-muted);
+  font-size: var(--text-meta);
+  text-transform: none;
+  letter-spacing: normal;
+  padding: var(--space-2) var(--space-3);
+}
+.assetThumb {
+  width: var(--asset-thumb);
+  height: var(--asset-thumb);
+  object-fit: contain;
+  border: var(--line-thin) dashed var(--border-strong);
+  border-radius: var(--radius-card);
+  padding: var(--space-2);
+  flex: none;
+}
+
+.settingsPreview {
+  display: grid;
+  grid-template-columns: var(--settings-panel-width) minmax(0, 1fr);
+  gap: var(--space-5);
+  align-items: start;
+}
+.settingsPreview > * {
+  min-width: 0;
+  margin-block: 0;
+}
+.previewPanel {
+  padding: var(--space-5);
+  border: var(--line-thin) solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--surface-sunken);
+  min-width: 0;
+}
+@media (max-width: 1199px) {
+  .settingsPreview {
+    grid-template-columns: 1fr;
+  }
+}

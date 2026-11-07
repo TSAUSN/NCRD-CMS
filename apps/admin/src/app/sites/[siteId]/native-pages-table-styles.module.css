@@ -1,0 +1,14 @@
+.countLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: var(--filter-pill-height);
+  padding: 0 var(--space-fact);
+  border: var(--line-thin) dashed var(--border-strong);
+  border-radius: var(--radius-pill);
+  color: var(--text);
+  background: var(--surface);
+  font-size: var(--text-help);
+  text-decoration: none;
+  white-space: nowrap;
+}

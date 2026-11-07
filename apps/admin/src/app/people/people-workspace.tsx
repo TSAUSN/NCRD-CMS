@@ -21,6 +21,10 @@ import { useBrowserSetup } from '../../components/use-browser-setup.ts'
 import type { NavigationGuardState } from '../../lib/navigation-guard.ts'
 import { personAccessSummary, personRoles } from '../../lib/people-access.ts'
 import workspace from '../../components/workspace.module.css'
+import workspaceFormsStyles from '../../components/workspace-styles/workspace-forms.module.css'
+import recordTableStyles from '../../components/workspace-styles/record-table.module.css'
+import listInspectorStyles from '../../components/workspace-styles/list-inspector.module.css'
+import ownedStyles from './people-workspace-styles.module.css'
 import { useRouter } from 'next/navigation'
 import { ConfirmDialog } from '../../components/confirm.tsx'
 import type { PersonRow, SiteAssignment } from '../../lib/people.ts'
@@ -90,7 +94,7 @@ export function PeopleWorkspace({
     </Button>
   )
   return (
-    <div className={workspace.denseStack + ' ' + workspace.compactForm}>
+    <div className={workspace.denseStack + ' ' + workspaceFormsStyles.compactForm}>
       {headerTarget && createPortal(invite, headerTarget)}
       {notice && (
         <p className="notice notice-ok" role="status">
@@ -103,7 +107,7 @@ export function PeopleWorkspace({
           the normal sign-in email; ask the operator to confirm sign-in delivery before adding real editors.
         </p>
       )}
-      <div className={workspace.listToolbar}>
+      <div className={workspaceFormsStyles.listToolbar}>
         <SearchField
           id="people-search"
           label="Find a person"
@@ -112,7 +116,7 @@ export function PeopleWorkspace({
           onChange={event => setSearch(event.target.value)}
           placeholder="Name, email, chapter or division"
         />
-        <div className={workspace.actions}>
+        <div className={workspaceFormsStyles.actions}>
           <Field density="compact" labelHidden id="people-site" label="Showing people for">
             <select value={siteFilter} disabled={busy} onChange={event => setSiteFilter(event.target.value)}>
               <option value="">All sites</option>
@@ -126,7 +130,7 @@ export function PeopleWorkspace({
             </select>
           </Field>
           {!headerActionsId && invite}
-          <span className={workspace.meta} role="status">
+          <span className={recordTableStyles.meta} role="status">
             {filtered.length
               ? `${filtered.length} ${filtered.length === 1 ? 'person' : 'people'}`
               : 'No people match your search.'}
@@ -158,13 +162,13 @@ export function PeopleWorkspace({
         }
       >
         <div className={workspace.denseStack}>
-          <section aria-label="People" data-responsive="records" className={workspace.tableWrap}>
+          <section aria-label="People" data-responsive="records" className={recordTableStyles.tableWrap}>
             {filtered.length === 0 ? (
               <EmptyState title="No people match">Try another name or choose All sites.</EmptyState>
             ) : (
               <table
                 aria-label="People and access"
-                className={workspace.table}
+                className={recordTableStyles.table}
                 data-density="content"
                 data-layout="directory"
                 data-status-width="wide"
@@ -184,9 +188,9 @@ export function PeopleWorkspace({
                       data-selected={selection !== null && selection !== 'invite' && selection.id === person.id}
                     >
                       <td>
-                        <div className={workspace.rowCopy}>
+                        <div className={recordTableStyles.rowCopy}>
                           <Button
-                            className={workspace.tableTitle}
+                            className={recordTableStyles.tableTitle}
                             variant="tertiary"
                             size="s"
                             disabled={busy}
@@ -194,9 +198,12 @@ export function PeopleWorkspace({
                             title={person.display_name || person.email}
                             onClick={() => select(person)}
                           >
-                            <span className={workspace.itemLabel}>{person.display_name || person.email}</span>
+                            <span className={listInspectorStyles.itemLabel}>{person.display_name || person.email}</span>
                           </Button>
-                          <span className={workspace.singleLine + ' ' + workspace.meta} title={person.email}>
+                          <span
+                            className={recordTableStyles.singleLine + ' ' + recordTableStyles.meta}
+                            title={person.email}
+                          >
                             {person.email}
                           </span>
                         </div>
@@ -207,17 +214,20 @@ export function PeopleWorkspace({
                         </Badge>
                       </td>
                       <td data-priority="extra">
-                        <span className={workspace.singleLine} title={personAccessSummary(person)}>
+                        <span className={recordTableStyles.singleLine} title={personAccessSummary(person)}>
                           {personAccessSummary(person)}
                         </span>
                         {person.pageAssignments.some(item => !item.enabled) && (
-                          <span className={workspace.singleLine + ' ' + workspace.meta} title="Chapter access paused">
+                          <span
+                            className={recordTableStyles.singleLine + ' ' + recordTableStyles.meta}
+                            title="Chapter access paused"
+                          >
                             Chapter access paused
                           </span>
                         )}
                       </td>
                       <td data-col="status">
-                        <div className={workspace.rowCopy}>
+                        <div className={recordTableStyles.rowCopy}>
                           <Badge tone={person.status === 'disabled' ? 'neutral' : person.accepted ? 'live' : 'pending'}>
                             {person.status === 'disabled'
                               ? 'Deactivated'
@@ -227,7 +237,7 @@ export function PeopleWorkspace({
                           </Badge>
                           {person.invitation_status && (
                             <span
-                              className={workspace.singleLine + ' ' + workspace.meta}
+                              className={recordTableStyles.singleLine + ' ' + recordTableStyles.meta}
                               role="status"
                               title={invitationMessage(person, localMail)}
                             >
@@ -251,9 +261,9 @@ export function PeopleWorkspace({
                   ['Site editor', 'Edits and publishes the pages their access allows.'],
                   ['Content creator', 'Prepares drafts and submits changes for approval.'],
                 ].map(([name, description]) => (
-                  <div key={name} className={workspace.rowCopy}>
+                  <div key={name} className={recordTableStyles.rowCopy}>
                     <strong>{name}</strong>
-                    <p className={workspace.meta}>{description}</p>
+                    <p className={recordTableStyles.meta}>{description}</p>
                   </div>
                 ))}
               </div>
@@ -395,7 +405,7 @@ function PersonEditor({
   }
   const title = person ? 'Edit account access' : invitationsEnabled ? 'Invite a person' : 'Add a person'
   return (
-    <section aria-label={title} className={workspace.panelRegion}>
+    <section aria-label={title} className={ownedStyles.panelRegion}>
       <DetailPanel
         title={title}
         pending={busy}
@@ -433,7 +443,7 @@ function PersonEditor({
           </>
         }
       >
-        <div className={workspace.denseStack + ' ' + workspace.compactForm}>
+        <div className={workspace.denseStack + ' ' + workspaceFormsStyles.compactForm}>
           {!person && !invitationsEnabled && (
             <p>
               No invitation will be sent. Share the CMS sign-in address with this person through your usual channel;
@@ -441,7 +451,7 @@ function PersonEditor({
             </p>
           )}
           {person && (
-            <dl className={workspace.factList}>
+            <dl className={listInspectorStyles.factList}>
               <div>
                 <dt>Role</dt>
                 <dd>
@@ -494,7 +504,7 @@ function PersonEditor({
               else save()
             }}
           >
-            <fieldset disabled={busy} className={workspace.formChoices + ' ' + workspace.denseStack}>
+            <fieldset disabled={busy} className={workspaceFormsStyles.formChoices + ' ' + workspace.denseStack}>
               <Field density="compact" id="person-name" label="Name">
                 <input
                   id="person-name"
@@ -567,7 +577,10 @@ function PersonEditor({
                 title="Whole-site access"
                 open={!person || person.pageAssignments.length + person.divisionAssignments.length === 0}
               >
-                <fieldset className={workspace.formChoices + ' ' + workspace.denseStack} aria-label="Whole-site access">
+                <fieldset
+                  className={workspaceFormsStyles.formChoices + ' ' + workspace.denseStack}
+                  aria-label="Whole-site access"
+                >
                   <p className="hint">
                     This applies to every page on a site. Chapter and division assignments are managed separately.
                   </p>

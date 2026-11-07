@@ -1,0 +1,17 @@
+.menuDestination {
+  flex: 0 1 38%;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 767px) {
+  .menuDestination {
+    grid-column: 2 / -1;
+    grid-row: 2;
+    overflow: visible;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+}

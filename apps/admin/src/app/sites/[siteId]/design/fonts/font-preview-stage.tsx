@@ -1,7 +1,7 @@
 import type { RefObject } from 'react'
 import { EmptyState } from '../../../../../components/ui/index.ts'
 import { usePreviewLayers } from '../../../../../components/use-preview-layers.ts'
-import styles from '../../../../../components/workspace.module.css'
+import styles from './font-preview-stage-styles.module.css'
 import design from '../site-look.module.css'
 
 export function FontPreviewStage({

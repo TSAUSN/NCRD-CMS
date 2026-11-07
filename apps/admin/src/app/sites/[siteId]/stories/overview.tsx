@@ -10,6 +10,8 @@ import { storySourceStatusLine } from '../../../../lib/story-source-status.ts'
 import { StoriesHeader } from './header.tsx'
 import { AddStory } from './add-story.tsx'
 import shared from '../../../../components/workspace.module.css'
+import recordTableStyles from '../../../../components/workspace-styles/record-table.module.css'
+import ownedStyles from './overview-styles.module.css'
 type State = NonNullable<Awaited<ReturnType<typeof getStoryListState>>>
 export function StoriesOverview({
   siteId,
@@ -96,7 +98,7 @@ export function StoriesOverview({
           {rights.publish && <Link href={'/sites/' + siteId + '/publishing?lists=1'}>Review and publish</Link>}
         </Note>
       )}
-      <p className={shared.meta}>
+      <p className={recordTableStyles.meta}>
         Every main tag, with how many current stories carry it. Use it to decide what to write next.
       </p>
       <CoverageTable
@@ -107,28 +109,28 @@ export function StoriesOverview({
       />
       <div className={shared.grid}>
         <Card title="Leaving feeds soon" density="summary">
-          <p className={shared.meta}>
+          <p className={recordTableStyles.meta}>
             {coverage.leaving.length} {coverage.leaving.length === 1 ? 'story reaches' : 'stories reach'} 13 months
             within 30 days.
           </p>
           <details open={leavingOpen || undefined}>
             <summary>Leaving soon</summary>
             {coverage.leaving.length ? (
-              <ul className={shared.attention}>
+              <ul className={ownedStyles.attention}>
                 {coverage.leaving.map(item => (
                   <li key={item.row.id}>
                     <Link href={base + '/' + item.row.id}>{String(item.row.values.title || '[Untitled story]')}</Link>
-                    <span className={shared.meta}>Last day in feeds: {storyDate(item.leavesOn)}</span>
+                    <span className={recordTableStyles.meta}>Last day in feeds: {storyDate(item.leavesOn)}</span>
                   </li>
                 ))}
               </ul>
             ) : (
-              <p className={shared.meta}>No stories reach the feed cutoff in the next 30 days.</p>
+              <p className={recordTableStyles.meta}>No stories reach the feed cutoff in the next 30 days.</p>
             )}
           </details>
         </Card>
         <Card title="Missing a tag" density="summary">
-          <p className={shared.meta}>
+          <p className={recordTableStyles.meta}>
             {coverage.missing.length} {coverage.missing.length === 1 ? 'story has' : 'stories have'} no{' '}
             {settings.mainLabel === 'Project Sectors' && settings.secondaryLabel === 'Regions'
               ? 'sector or region'
@@ -138,7 +140,7 @@ export function StoriesOverview({
           {coverage.missing.length > 0 && <Link href={base + '?status=untagged'}>Review missing tags</Link>}
         </Card>
       </div>
-      <p className={shared.meta}>
+      <p className={recordTableStyles.meta}>
         Current stories are dated within the last 13 months. Live counts use published dates, tags and review settings.
         Choose a tag to see its story titles. A story with several main tags counts in each.
       </p>

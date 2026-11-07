@@ -1,0 +1,341 @@
+.formStack {
+  display: grid;
+  gap: var(--space-4);
+}
+.formStack {
+  display: grid;
+  gap: var(--space-3);
+}
+.formStack fieldset {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  margin: 0;
+  border: var(--line-thin) solid var(--border);
+  border-radius: var(--radius-control);
+}
+.formStack fieldset label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.formStack > :not(dialog) {
+  margin-block: 0;
+}
+
+.itemButton {
+  flex: 1;
+  min-width: 0;
+  justify-content: flex-start;
+  text-align: start;
+  white-space: normal;
+}
+
+.itemButton > span {
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+
+.menuRow.menuRow {
+  flex-wrap: nowrap;
+  gap: var(--space-1);
+  padding-block: var(--space-1);
+  font-size: var(--text-meta);
+}
+.menuRow[data-nested] {
+  padding-inline-start: var(--space-7);
+}
+.menuRow[data-hidden] {
+  opacity: var(--opacity-disabled);
+}
+.menuRow[data-drop-inside] {
+  background: var(--brand-tint);
+  box-shadow: inset var(--space-1) 0 var(--focus);
+}
+.menuRow > svg {
+  color: var(--text-muted);
+  flex: none;
+}
+.menuRow strong {
+  font-size: var(--text-meta);
+  font-weight: var(--weight-semibold);
+}
+.menuKind {
+  display: inline-block;
+  background: var(--surface-sunken);
+  color: var(--text-muted);
+  font-size: var(--text-tag);
+  font-weight: var(--weight-medium);
+  border-radius: var(--radius-pill);
+  padding: var(--space-1) var(--space-2);
+  white-space: nowrap;
+}
+.menuKind[data-kind='page'] {
+  background: var(--status-live-bg);
+  color: var(--status-live-text);
+}
+.menuKind[data-kind='url'] {
+  background: var(--status-scheduled-bg);
+  color: var(--status-scheduled);
+}
+
+.menuRow .itemButton {
+  padding-inline: 0;
+}
+.menuKind[data-tone='pending'] {
+  background: var(--status-pending-bg);
+  color: var(--status-pending);
+}
+.menuKind[data-tone='live'] {
+  background: var(--status-live-bg);
+  color: var(--status-live-text);
+}
+
+.listRows {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.listDetail {
+  display: flex;
+  gap: var(--space-4);
+  align-items: flex-start;
+  min-width: 0;
+}
+.listDetailMain {
+  flex: 1;
+  min-width: 0;
+}
+.listDetailPanel {
+  padding: var(--space-4);
+  border: var(--line-thin) solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+@media (max-width: 1023px) {
+  .listDetail {
+    flex-direction: column;
+  }
+  .listDetailMain {
+    width: 100%;
+  }
+  .listDetailPanel {
+    max-width: 100%;
+  }
+}
+
+.listDetailPanel h2 {
+  margin: 0;
+  font-size: var(--text-body);
+  line-height: var(--line-body);
+  font-weight: var(--weight-semibold);
+}
+
+.detailPanel {
+  position: sticky;
+  top: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  height: min(calc(100dvh - var(--space-6)), calc(var(--detail-panel-available, 100dvh) - var(--space-4)));
+  max-height: calc(100dvh - var(--space-6));
+  border: var(--line-thin) solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+.detailPanelHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-block-end: var(--line-thin) solid var(--line-soft);
+}
+.detailPanelHead h2 {
+  margin: 0;
+  font-size: var(--text-body);
+  font-weight: var(--weight-semibold);
+}
+.detailPanelBody {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: var(--space-4);
+}
+.detailPanelFooter {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border-block-start: var(--line-thin) solid var(--line-soft);
+}
+
+.compactItemList {
+  display: grid;
+  gap: var(--space-2);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+.compactItemList > li {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: var(--space-2);
+  min-width: 0;
+  padding: var(--space-1) var(--space-2);
+  border: var(--line-thin) solid var(--border);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+}
+.compactItemList .itemButton {
+  padding-inline: var(--space-1);
+  font-size: var(--text-meta);
+}
+.compactItemList .itemButton > span:not(.itemMark) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.compactItemList .itemButton > img,
+.compactItemList > li > details,
+.compactItemList > li > label {
+  flex: none;
+}
+.itemMark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-5);
+  height: var(--space-5);
+  flex: none;
+  border-radius: var(--radius-pill);
+  background: var(--primary);
+  color: var(--text-on-dark);
+}
+.itemMark svg {
+  width: var(--space-4);
+  height: var(--space-4);
+}
+
+.listGroup {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+}
+.listGroup > div > :is(h3, p) {
+  margin: 0;
+}
+
+.menuRow .itemButton > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow-wrap: normal;
+}
+
+.itemLabel {
+  flex: 1;
+  min-width: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  white-space: normal;
+  overflow-wrap: normal;
+}
+.detailPanel[data-empty='true'] {
+  height: auto;
+}
+
+.detailPanelBody {
+  align-content: start;
+}
+.detailPanelBody > .formStack {
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr);
+}
+.listRows:is(ul, ol) {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Shared bounded record inspector and responsive factual columns. */
+.listDetailPanel.listDetailPanel {
+  position: sticky;
+  padding: 0;
+}
+.listDetailPanel .detailPanelHead h2 {
+  flex: 1;
+  min-width: 0;
+}
+.factList {
+  margin: 0;
+  display: grid;
+  gap: var(--space-3);
+  font-size: var(--text-meta);
+}
+.factList > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  gap: var(--space-2);
+  padding-block-end: var(--space-3);
+  border-block-end: var(--line-thin) solid var(--border);
+}
+.factList dt {
+  color: var(--text-muted);
+}
+.factList dd {
+  margin: 0;
+  min-width: 0;
+  text-align: end;
+  overflow-wrap: normal;
+}
+.factList dd > span {
+  display: block;
+}
+.tagList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+/* Stacked details need a full scrollable panel even when they start below the fold. */
+@media (max-width: 1023px) {
+  .detailPanel.detailPanel {
+    position: static;
+    height: calc(100dvh - var(--space-6));
+  }
+}
+
+@media (max-width: 767px) {
+  .menuRow.menuRow {
+    display: grid;
+    grid-template-columns: var(--space-3) minmax(0, 1fr) auto var(--target-small);
+    padding-block: var(--space-2);
+  }
+  .menuRow[data-nested] {
+    padding-inline-start: var(--space-5);
+  }
+  .menuRow .itemButton {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .menuRow .itemButton > span {
+    overflow: visible;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  .menuRow > :nth-child(4) {
+    grid-column: 3;
+    grid-row: 1;
+  }
+  .menuRow > :last-child {
+    grid-column: 4;
+    grid-row: 1;
+  }
+}

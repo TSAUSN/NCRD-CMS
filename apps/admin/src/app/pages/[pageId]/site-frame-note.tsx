@@ -4,6 +4,8 @@ import { Button, ButtonLink, Note } from '../../../components/ui/index.ts'
 import { IconChevronLeft } from '../../../components/icons.tsx'
 import { loadPageFrameNote } from './site-look-actions.ts'
 import shared from '../../../components/workspace.module.css'
+import workspaceFormsStyles from '../../../components/workspace-styles/workspace-forms.module.css'
+import recordTableStyles from '../../../components/workspace-styles/record-table.module.css'
 export function SiteFrameNote({
   pageId,
   part,
@@ -52,8 +54,8 @@ export function SiteFrameNote({
         }
       }}
     >
-      <div className={shared.denseStack + ' ' + shared.compactForm}>
-        <div className={shared.panelActions}>
+      <div className={shared.denseStack + ' ' + workspaceFormsStyles.compactForm}>
+        <div className={workspaceFormsStyles.panelActions}>
           <Button ref={back} variant="tertiary" onClick={onDone}>
             <IconChevronLeft size={16} />
             Back
@@ -88,7 +90,7 @@ export function SiteFrameNote({
                 >
                   {part === 'header' ? 'Open Header & menu' : 'Open Footer'}
                 </ButtonLink>
-                <p className={shared.meta}>
+                <p className={recordTableStyles.meta}>
                   {part === 'header'
                     ? 'Menu, logo and the Donate button are all there.'
                     : 'Footer text, links and logo are all there.'}{' '}
@@ -96,7 +98,7 @@ export function SiteFrameNote({
                 </p>
               </>
             ) : (
-              <p className={shared.meta}>A Site admin can change this shared area.</p>
+              <p className={recordTableStyles.meta}>A Site admin can change this shared area.</p>
             )}
           </>
         )}

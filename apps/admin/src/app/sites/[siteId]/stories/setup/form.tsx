@@ -4,7 +4,9 @@ import { useRouter } from 'next/navigation'
 import { Button, ButtonLink, Card, Field, Note } from '../../../../../components/ui/index.ts'
 import { useNavigationGuard } from '../../../../../components/navigation-guard.ts'
 import { turnOnStories } from './actions.ts'
-import shared from '../../../../../components/workspace.module.css'
+import workspaceFormsStyles from '../../../../../components/workspace-styles/workspace-forms.module.css'
+import recordTableStyles from '../../../../../components/workspace-styles/record-table.module.css'
+import selectionControlsStyles from '../../../../../components/workspace-styles/selection-controls.module.css'
 export function StoriesSetup({ siteId }: { siteId: string }) {
   const router = useRouter(),
     [mainLabel, setMain] = useState('Main tags'),
@@ -67,7 +69,7 @@ export function StoriesSetup({ siteId }: { siteId: string }) {
   return (
     <Card title="Start with an empty Stories library" density="settings">
       <form
-        className={shared.compactFields}
+        className={workspaceFormsStyles.compactFields}
         onSubmit={event => {
           event.preventDefault()
           start(async () => {
@@ -99,7 +101,7 @@ export function StoriesSetup({ siteId }: { siteId: string }) {
             onChange={event => setSecondary(event.target.value)}
           />
         </Field>
-        <label className={shared.toggleRow}>
+        <label className={selectionControlsStyles.toggleRow}>
           <span>Include unreviewed stories in feeds</span>
           <input
             type="checkbox"
@@ -108,13 +110,13 @@ export function StoriesSetup({ siteId }: { siteId: string }) {
             onChange={event => setReview(event.target.checked)}
           />
         </label>
-        <p className={shared.meta}>
+        <p className={recordTableStyles.meta}>
           When this is off, a story needs Reviewed before it appears in feeds. Either way, saved drafts wait for
           publishing.
         </p>
         <Note>The library starts empty. Stories and tag changes stay private until published.</Note>
         {error && <p role="alert">{error}</p>}
-        <div className={shared.actions}>
+        <div className={workspaceFormsStyles.actions}>
           <ButtonLink variant="secondary" href={'/sites/' + siteId + '/settings?tab=publishing'}>
             Cancel
           </ButtonLink>
