@@ -93,15 +93,12 @@ import { type ActionResult } from '../../../lib/action-result.ts'
 import { ButtonLink, Dialog, Button, IconButton, Menu } from '../../../components/ui/index.ts'
 import { ConfirmDialog, ReasonDialog } from '../../../components/confirm.tsx'
 import {
-  IconAlert,
-  IconCheck,
   IconChevronLeft,
   IconClock,
   IconDesktop,
   IconExternal,
   IconMobile,
   IconPlus,
-  IconMail,
   IconMore,
   IconRedo,
   IconSections,
@@ -174,7 +171,7 @@ export type { LibraryEntry } from '../../../lib/queries.ts'
 import type { LibraryEntry, LinkTarget } from '../../../lib/queries.ts'
 import type { MediaAsset } from '../../../lib/media-library.ts'
 import { sitePreviewContext, type SitePreviewContext } from '../../../lib/preview-context.ts'
-import { publishTogetherReviewHref } from '../../../lib/publish-together-copy.ts'
+import { EditorNotices } from './editor-notices.tsx'
 import { EditorToolbar } from './editor-toolbar.tsx'
 
 type Props = {
@@ -3001,124 +2998,35 @@ export function PageEditor(props: Props) {
         <PageRecoveryPanel recovery={recovery} />
       </LargeScreenEditing>
 
-      {(result || (needsReview && !approved) || reviewFeedback) && (
-        <div className="editor-notices">
-          {result && (
-            <div
-              className={`notice notice-${result.ok ? 'ok' : result.kind === 'blocked' ? 'warn' : 'error'}`}
-              role={result.ok ? 'status' : 'alert'}
-            >
-              {result.ok ? <IconCheck size={16} /> : <IconAlert size={16} />}
-              <div className="notice-body">
-                {result.message}
-                {scheduleFirstReview && (
-                  <div>
-                    <Link className="btn small" href={'/sites/' + props.siteId + '/publishing'}>
-                      Review first site publication
-                    </Link>
-                  </div>
-                )}
-                {!result.ok && result.kind === 'conflict' && (
-                  <>
-                    {' '}
-                    Your work is still on screen.{' '}
-                    <button type="button" className="link" onClick={() => window.location.reload()}>
-                      Reload to see their version
-                    </button>
-                    .
-                  </>
-                )}
-                {!result.ok && result.kind === 'blocked' && result.together && (
-                  <div className="together">
-                    {result.together.pages.length > 0 && (
-                      <ul className="together-pages" aria-label="Pages that go live with this one">
-                        {result.together.pages.map(page => (
-                          <li key={page.id}>
-                            {page.title} <span>{page.path}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                    <div className="cluster">
-                      <Link className="btn small" href={publishTogetherReviewHref(props.pageId, result.together)}>
-                        Review related changes in Publish
-                      </Link>
-                      <button type="button" className="ghost small" onClick={() => setResult(null)}>
-                        Not now
-                      </button>
-                    </div>
-                  </div>
-                )}
-                {!result.ok && result.kind === 'blocked' && !result.together && (
-                  <>
-                    {result.report.findings.filter(f => f.severity === 'blocking').length > 0 && (
-                      <ul>
-                        {result.report.findings
-                          .filter(f => f.severity === 'blocking')
-                          .map((finding, i) => (
-                            <li key={`${finding.rule}-${i}`}>{finding.message}</li>
-                          ))}
-                      </ul>
-                    )}
-                    {props.canPublish && (
-                      <button type="button" className="link" onClick={() => setOverrideOpen(true)}>
-                        Publish anyway…
-                      </button>
-                    )}
-                  </>
-                )}
-              </div>
-            </div>
-          )}
-
-          {needsReview && !approved && (
-            <div className="notice notice-warn" role="alert">
-              <IconAlert size={16} />
-              <div className="notice-body">
-                This page has custom code on it, so a super admin has to look at it before the page can go live.
-                Everything else about the page works as usual.
-                {props.canApproveTrustedCode && (
-                  <>
-                    {' '}
-                    <button
-                      type="button"
-                      className="link"
-                      onClick={() => {
-                        // Approval is of a *stored* version, so anything unsaved is
-                        // saved first — approving a version that does not yet
-                        // contain the code somebody is looking at is exactly the
-                        // review that means nothing.
-                        startTransition(async () => {
-                          if (isDirty(state)) {
-                            if (!(await save('checkpoint'))) return
-                          }
-                          const id = savedVersionId.current
-                          if (!id) return
-                          const outcome = await approveTrustedCode(id)
-                          setResult(outcome)
-                          if (outcome.ok) setApprovedVersionId(id)
-                        })
-                      }}
-                    >
-                      Approve this code…
-                    </button>
-                  </>
-                )}
-              </div>
-            </div>
-          )}
-
-          {reviewFeedback && (
-            <div className="notice notice-warn" role="status">
-              <IconMail size={16} />
-              <div className="notice-body">
-                <strong>Changes requested.</strong> {reviewFeedback} Make the update, then submit this page again when
-                it is ready.
-              </div>
-            </div>
-          )}
-        </div>
-      )}
+      <EditorNotices
+        result={result}
+        needsReview={needsReview}
+        approved={approved}
+        reviewFeedback={reviewFeedback}
+        scheduleFirstReview={scheduleFirstReview}
+        siteId={props.siteId}
+        pageId={props.pageId}
+        canPublish={props.canPublish}
+        canApproveTrustedCode={props.canApproveTrustedCode}
+        dismissResult={() => setResult(null)}
+        confirmOverride={() => setOverrideOpen(true)}
+        approveCode={() => {
+          // Approval is of a *stored* version, so anything unsaved is
+          // saved first — approving a version that does not yet
+          // contain the code somebody is looking at is exactly the
+          // review that means nothing.
+          startTransition(async () => {
+            if (isDirty(state)) {
+              if (!(await save('checkpoint'))) return
+            }
+            const id = savedVersionId.current
+            if (!id) return
+            const outcome = await approveTrustedCode(id)
+            setResult(outcome)
+            if (outcome.ok) setApprovedVersionId(id)
+          })
+        }}
+      />
 
       <LargeScreenEditing notice>
         {siteWide?.editing && (
