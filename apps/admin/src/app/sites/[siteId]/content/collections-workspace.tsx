@@ -299,8 +299,14 @@ export function CollectionsWorkspace({
     [entries, model],
   )
 
+  // A saved confirmation belongs to the previous edit, not the new draft.
+  function clearEntrySuccess() {
+    setNotice(previous => (previous?.ok ? null : previous))
+  }
+
   function updateEntry(key: string, update: (entry: EntryState) => EntryState) {
     if (busy() || !rights.editEntries) return
+    clearEntrySuccess()
     setEntries(current => current.map(entry => (entryIdentity(entry) === key ? update(entry) : entry)))
   }
 
@@ -310,6 +316,7 @@ export function CollectionsWorkspace({
 
   function addEntry() {
     if (!model || busy() || !rights.editEntries) return
+    clearEntrySuccess()
     const used = new Set(entries.map(entry => entry.stableKey))
     const stableKey = slugifyStableKey('new-item', used)
     const next: EntryState = {
@@ -332,6 +339,7 @@ export function CollectionsWorkspace({
 
   function duplicateEntry(source: EntryState) {
     if (busy() || !rights.editEntries) return
+    clearEntrySuccess()
     const used = new Set(entries.map(entry => entry.stableKey))
     const stableKey = slugifyStableKey(`${source.stableKey}-copy`, used)
     const next = {
@@ -351,8 +359,10 @@ export function CollectionsWorkspace({
 
   function applyEntryMove({ from, to }: FlatMove) {
     if (busy() || !rights.editEntries || from === to) return
-    const source = entries.filter(entry => !entry.archived)[from]
-    if (!source || !model) return
+    const active = entries.filter(entry => !entry.archived)
+    const source = active[from]
+    if (!source || !active[to] || !model) return
+    clearEntrySuccess()
     const key = entryIdentity(source)
     setEntries(current => {
       const active = current.filter(entry => !entry.archived)
@@ -615,6 +625,7 @@ export function CollectionsWorkspace({
   }
   function bulk(hidden: boolean) {
     if (busy() || !rights.editEntries) return
+    clearEntrySuccess()
     setEntries(current =>
       current.map(entry => (checked.includes(entryIdentity(entry)) ? { ...entry, archived: hidden } : entry)),
     )
