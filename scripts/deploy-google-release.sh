@@ -65,7 +65,9 @@ health() {
     "${services[2]}") role=admin; origin="${CMS_DEPLOY_ADMIN_ORIGIN:-}" ;;
     *) return 0 ;; # Worker health is private; Ready is checked, never open it to the public.
   esac
-  if [[ -z "$origin" ]]; then origin="https://$service-$project_number.$region.run.app"; fi
+  if [[ -z "$origin" ]]; then
+    origin="$(service_json "$service" | jq -er --arg scope "$project_number" 'select(.metadata.namespace==$scope)|.status.url')"
+  fi
   [[ "$origin" =~ ^https://[a-zA-Z0-9.-]+$ ]] || die 'Health origins must be HTTPS origins without paths or credentials.'
   curl --fail --silent --show-error --max-time 45 --retry 2 "$origin/health" |
     jq -e --arg role "$role" --arg version "$version" '.status=="ok" and .role==$role and .version==$version' >/dev/null
