@@ -79,6 +79,9 @@ jobs:
         run: pnpm -r test
         timeout-minutes: 20
 
+      - name: Script tests
+        run: node --test scripts/*.test.mjs scripts/golden/*.test.mjs
+
       # Applies every migration to an empty database, exactly as a deploy does.
       - name: Migrate a clean database
         run: pnpm db:bootstrap
@@ -115,6 +118,11 @@ jobs:
         if: env.RUN_E2E == 'true'
         run: pnpm --filter e2e test:e2e
         timeout-minutes: 150
+
+      - name: No-mail browser specs
+        if: env.RUN_E2E == 'true'
+        run: pnpm --filter e2e exec playwright test --config playwright.no-mail.config.ts
+        timeout-minutes: 20
 
       - name: Keep the trace of a failed browser run
         if: failure()
