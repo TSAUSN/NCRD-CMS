@@ -14,3 +14,8 @@
   font-size: var(--text-meta);
   pointer-events: none;
 }
+
+.failure {
+  padding-block: var(--space-2);
+  color: var(--text-muted);
+}

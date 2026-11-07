@@ -290,6 +290,7 @@ export function FooterWorkspace({
         loading={canvas.loading}
         error={canvas.error}
         pageAvailable={Boolean(page)}
+        previewAvailable={Boolean(origin)}
         previouslyOpened={Boolean(previewTicket)}
         retry={() => setRetry(value => value + 1)}
       />

@@ -9,6 +9,7 @@ export function SiteFramePreview({
   loading,
   valid,
   pageAvailable,
+  previewAvailable,
   previouslyOpened,
   retry,
 }: {
@@ -18,10 +19,17 @@ export function SiteFramePreview({
   loading: boolean
   valid: boolean
   pageAvailable: boolean
+  previewAvailable: boolean
   previouslyOpened: boolean
   retry: () => void
 }) {
-  if (!error && pageAvailable && (valid || previouslyOpened)) {
+  if (pageAvailable && !previewAvailable)
+    return (
+      <EmptyState title="No preview address">
+        Save changes here. This site needs a preview address before you can open a visitor preview.
+      </EmptyState>
+    )
+  if ((!error || previouslyOpened) && pageAvailable && (valid || previouslyOpened)) {
     return (
       <div aria-busy={valid && loading}>
         <SiteHeaderPreview
@@ -29,7 +37,16 @@ export function SiteFramePreview({
           channel={ticket?.channel}
           part={part}
           pending={valid && loading}
+          retry={retry}
         />
+        {error && (
+          <div role="status">
+            <p>{error}</p>
+            <Button variant="secondary" onClick={retry}>
+              Try preview again
+            </Button>
+          </div>
+        )}
       </div>
     )
   }

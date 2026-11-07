@@ -35,6 +35,10 @@ export function useSiteLookCanvas(input: {
     if (!canvasDocumentReady(input.origin)) return
     const controller = new AbortController(),
       channel = crypto.randomUUID()
+    const deadline = window.setTimeout(() => {
+      controller.abort()
+      fail('The preview request timed out. Your changes are still here. Try the preview again.')
+    }, 15000)
     const timer = window.setTimeout(() => {
       void (async () => {
         try {
@@ -57,11 +61,14 @@ export function useSiteLookCanvas(input: {
         } catch {
           if (!controller.signal.aborted)
             fail('The site preview could not be opened. Your choices are still here. Try the preview again.')
+        } finally {
+          window.clearTimeout(deadline)
         }
       })()
     }, 180)
     return () => {
       window.clearTimeout(timer)
+      window.clearTimeout(deadline)
       controller.abort()
     }
   }, [key])

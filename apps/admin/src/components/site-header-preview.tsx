@@ -2,6 +2,7 @@
 
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react'
 import { framePreviewHeight } from '../lib/frame-preview-size.ts'
+import { Button, TextLink } from './ui/index.ts'
 import styles from './workspace.module.css'
 import frameStyles from './site-header-preview.module.css'
 
@@ -16,12 +17,14 @@ export function SiteHeaderPreview({
   part = 'header',
   channel,
   pending = false,
+  retry,
 }: {
   href: string | null
   channel?: string
   expanded?: boolean
   part?: 'header' | 'footer'
   pending?: boolean
+  retry?: () => void
 }) {
   const host = useRef<HTMLDivElement>(null)
   const frames = useRef(new Map<string, HTMLIFrameElement>())
@@ -30,6 +33,7 @@ export function SiteHeaderPreview({
   const [shown, setShown] = useState<Preview | null>(null)
   const [frameHeight, setFrameHeight] = useState(part === 'footer' ? 260 : 120)
   const [width, setWidth] = useState(0)
+  const [failedHref, setFailedHref] = useState<string | null>(null)
   useLayoutEffect(() => {
     latest.current = href ? { href, channel } : null
     displayed.current = shown
@@ -62,6 +66,14 @@ export function SiteHeaderPreview({
   }, [part])
 
   const updating = href !== null && shown?.href !== href
+  const failed = Boolean(href && updating && failedHref === href)
+  useEffect(() => {
+    if (!href || !updating) return
+    const timer = window.setTimeout(() => setFailedHref(href), 15000)
+    return () => window.clearTimeout(timer)
+  }, [href, updating])
+  const previewUrl = (url: string) =>
+    url + '?visit=1' + (part === 'footer' ? '#cms-preview-footer' : '#cms-preview-header')
   const previews = [...(shown ? [shown] : []), ...(href && updating ? [{ href, channel }] : [])]
   const scale = Math.min(1, width / 1280)
   const height = expanded ? Math.max(768, frameHeight) : frameHeight
@@ -73,58 +85,79 @@ export function SiteHeaderPreview({
       ? 'Footer preview'
       : 'Header preview'
   return (
-    <div
-      ref={host}
-      className={styles.previewStrip}
-      aria-busy={updating || pending}
-      style={
-        {
-          '--preview-width': '1280px',
-          '--preview-height': height + 'px',
-          '--preview-scale': scale,
-          height: height * scale,
-        } as CSSProperties
-      }
-    >
-      {!shown && (
-        <span className={styles.previewLoading} role="status">
-          Opening preview…
-        </span>
+    <>
+      <div
+        ref={host}
+        className={styles.previewStrip}
+        aria-busy={!failed && (updating || pending)}
+        style={
+          {
+            '--preview-width': '1280px',
+            '--preview-height': height + 'px',
+            '--preview-scale': scale,
+            height: height * scale,
+          } as CSSProperties
+        }
+      >
+        {!shown && !failed && (
+          <span className={styles.previewLoading} role="status">
+            Opening preview…
+          </span>
+        )}
+        {shown && !failed && (updating || pending) && (
+          <span className={frameStyles.updating} role="status">
+            Updating {part} preview…
+          </span>
+        )}
+        {previews.map(preview => {
+          const active = preview.href === shown?.href
+          return (
+            <iframe
+              key={preview.href}
+              ref={frame => {
+                if (frame) frames.current.set(preview.href, frame)
+                else frames.current.delete(preview.href)
+              }}
+              onLoad={() => {
+                // The owned ticket sends its verified size after the frame is
+                // ready. A generic iframe load also fires on error pages.
+                if (
+                  preview.channel ||
+                  latest.current?.href !== preview.href ||
+                  displayed.current?.href === preview.href
+                )
+                  return
+                setShown(preview)
+              }}
+              aria-hidden={!active || undefined}
+              inert={!active || !expanded}
+              title={active ? title : 'Loading ' + title}
+              sandbox="allow-scripts allow-same-origin"
+              referrerPolicy="no-referrer"
+              className={frameStyles.frame}
+              // Chrome can suspend requestAnimationFrame in an invisible cross-origin
+              // frame. Keep it in layout so it can send its verified ready message.
+              style={active ? undefined : { opacity: 0, pointerEvents: 'none' }}
+              src={previewUrl(preview.href)}
+            />
+          )
+        })}
+      </div>
+      {failed && href && (
+        <div className={frameStyles.failure} role="status">
+          <p>The inline preview hasn’t opened. Your changes are still here.</p>
+          <div className={styles.actions}>
+            {retry && (
+              <Button variant="secondary" onClick={retry}>
+                Try preview again
+              </Button>
+            )}
+            <TextLink href={previewUrl(href)} target="_blank" rel="noopener noreferrer">
+              Open preview in a new tab
+            </TextLink>
+          </div>
+        </div>
       )}
-      {shown && (updating || pending) && (
-        <span className={frameStyles.updating} role="status">
-          Updating {part} preview…
-        </span>
-      )}
-      {previews.map(preview => {
-        const active = preview.href === shown?.href
-        return (
-          <iframe
-            key={preview.href}
-            ref={frame => {
-              if (frame) frames.current.set(preview.href, frame)
-              else frames.current.delete(preview.href)
-            }}
-            onLoad={() => {
-              // The owned ticket sends its verified size after the frame is
-              // ready. A generic iframe load also fires on error pages.
-              if (preview.channel || latest.current?.href !== preview.href || displayed.current?.href === preview.href)
-                return
-              setShown(preview)
-            }}
-            aria-hidden={!active || undefined}
-            inert={!active || !expanded}
-            title={active ? title : 'Loading ' + title}
-            sandbox="allow-scripts allow-same-origin"
-            referrerPolicy="no-referrer"
-            className={frameStyles.frame}
-            // Chrome can suspend requestAnimationFrame in an invisible cross-origin
-            // frame. Keep it in layout so it can send its verified ready message.
-            style={active ? undefined : { opacity: 0, pointerEvents: 'none' }}
-            src={preview.href + '?visit=1' + (part === 'footer' ? '#cms-preview-footer' : '#cms-preview-header')}
-          />
-        )
-      })}
-    </div>
+    </>
   )
 }
