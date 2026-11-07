@@ -55,3 +55,43 @@ test('header and footer reserve error wording and retry for a failed preview, th
     await f.pool.end()
   }
 })
+
+test('a stalled inline preview offers a standalone view and can be retried', async ({ page }) => {
+  test.setTimeout(60000)
+  const f = await sawsoFixture(true, true)
+  try {
+    await signIn(page, 'root@example.test')
+    let failed = false
+    await page.route(
+      url => url.pathname.startsWith('/__cms/canvas/') && url.searchParams.get('visit') === '1',
+      async route => {
+        if (failed) return route.continue()
+        failed = true
+        await route.fulfill({ status: 503, body: 'Temporary preview error' })
+      },
+    )
+    await page.goto('/sites/' + f.siteId + '/header')
+    await expect(page.getByRole('heading', { name: 'Header & menu', level: 1 })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Add to menu', exact: true })).toBeEnabled()
+    await expect(
+      page.getByText('The inline preview hasn’t opened. Your changes are still here.', { exact: true }),
+    ).toBeVisible({ timeout: 20000 })
+    const fallback = page.getByRole('link', { name: 'Open preview in a new tab', exact: true })
+    await expect(fallback).toBeVisible()
+    const opened = page.waitForEvent('popup')
+    await fallback.click()
+    const visitor = await opened
+    try {
+      await expect(visitor.locator('.cms-frame--header')).toBeVisible()
+    } finally {
+      await visitor.close()
+    }
+    await page.getByRole('button', { name: 'Try preview again', exact: true }).click()
+    await expect(page.frameLocator('iframe[title="Header preview"]').locator('header')).toBeVisible()
+    await expect(fallback).toHaveCount(0)
+  } finally {
+    await f.pool.query('UPDATE sites SET archived_at=now() WHERE id=$1', [f.siteId])
+    f.client.release()
+    await f.pool.end()
+  }
+})
