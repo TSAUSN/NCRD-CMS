@@ -25,18 +25,6 @@ jobs:
       group: cms-release-${{ inputs.target }}
       cancel-in-progress: false
     env:
-      CMS_DEPLOY_PROJECT: ${{ vars.CMS_DEPLOY_PROJECT }}
-      CMS_DEPLOY_PROJECT_NUMBER: ${{ vars.CMS_DEPLOY_PROJECT_NUMBER }}
-      CMS_DEPLOY_REGION: ${{ vars.CMS_DEPLOY_REGION }}
-      CMS_DEPLOY_IMAGE: ${{ vars.CMS_DEPLOY_IMAGE }}
-      CMS_DEPLOY_SOURCE_BUCKET: ${{ vars.CMS_DEPLOY_SOURCE_BUCKET }}
-      CMS_DEPLOY_BUILDER: ${{ vars.CMS_DEPLOY_BUILDER }}
-      CMS_DEPLOY_ADMIN: ${{ vars.CMS_DEPLOY_ADMIN }}
-      CMS_DEPLOY_SITE: ${{ vars.CMS_DEPLOY_SITE }}
-      CMS_DEPLOY_WORKER: ${{ vars.CMS_DEPLOY_WORKER }}
-      CMS_DEPLOY_ADMIN_ORIGIN: ${{ vars.CMS_DEPLOY_ADMIN_ORIGIN }}
-      CMS_DEPLOY_SITE_ORIGIN: ${{ vars.CMS_DEPLOY_SITE_ORIGIN }}
-      CMS_DEPLOY_SCHEMA_REF: ${{ vars.CMS_DEPLOY_SCHEMA_REF }}
       RELEASE_DIR: ${{ runner.temp }}/cms-release
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -48,10 +36,24 @@ jobs:
       - name: Verify the target project before signing in
         env:
           CMS_RELEASE_TARGET: ${{ inputs.target }}
+          CMS_DEPLOY_PROJECT: ${{ vars.CMS_DEPLOY_PROJECT }}
+          CMS_DEPLOY_PROJECT_NUMBER: ${{ vars.CMS_DEPLOY_PROJECT_NUMBER }}
+          CMS_DEPLOY_REGION: ${{ vars.CMS_DEPLOY_REGION }}
+          CMS_DEPLOY_IMAGE: ${{ vars.CMS_DEPLOY_IMAGE }}
+          CMS_DEPLOY_SOURCE_BUCKET: ${{ vars.CMS_DEPLOY_SOURCE_BUCKET }}
+          CMS_DEPLOY_BUILDER: ${{ vars.CMS_DEPLOY_BUILDER }}
+          CMS_DEPLOY_ADMIN: ${{ vars.CMS_DEPLOY_ADMIN }}
+          CMS_DEPLOY_SITE: ${{ vars.CMS_DEPLOY_SITE }}
+          CMS_DEPLOY_WORKER: ${{ vars.CMS_DEPLOY_WORKER }}
+          CMS_DEPLOY_ADMIN_ORIGIN: ${{ vars.CMS_DEPLOY_ADMIN_ORIGIN }}
+          CMS_DEPLOY_SITE_ORIGIN: ${{ vars.CMS_DEPLOY_SITE_ORIGIN }}
+          CMS_DEPLOY_SCHEMA_REF: ${{ vars.CMS_DEPLOY_SCHEMA_REF }}
+          CMS_DEPLOY_IDENTITY_PROVIDER: ${{ vars.CMS_DEPLOY_IDENTITY_PROVIDER }}
+          CMS_DEPLOY_SERVICE_ACCOUNT: ${{ vars.CMS_DEPLOY_SERVICE_ACCOUNT }}
           CMS_STAGING_BRANCH: ${{ vars.CMS_STAGING_BRANCH }}
           CMS_RELEASE_STAGING_PROJECT_NUMBER: ${{ vars.CMS_RELEASE_STAGING_PROJECT_NUMBER }}
           CMS_RELEASE_PRODUCTION_PROJECT_NUMBER: ${{ vars.CMS_RELEASE_PRODUCTION_PROJECT_NUMBER }}
-        run: bash scripts/check-release-environment.sh
+        run: bash scripts/check-release-environment.sh --github-env
 
       - uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3
 

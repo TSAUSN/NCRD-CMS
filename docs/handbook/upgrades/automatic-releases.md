@@ -23,7 +23,8 @@ name in the staging environment's branch rule and federation condition.
    the repository's plan supports it. Protect both branches and review
    changes to `.github/workflows/` and `scripts/deploy-google-release.sh`.
 3. Configure [Google workload identity federation for GitHub](https://github.com/google-github-actions/auth#workload-identity-federation-through-a-service-account).
-   Use a separate deploy identity per project. Restrict the provider by
+   Create the provider and deploy service account in each target project.
+   Restrict the provider by
    the exact GitHub repository ID, `push` event, branch, and environment
    claims. For staging require the exact configured branch ref and the
    `staging` environment; for
