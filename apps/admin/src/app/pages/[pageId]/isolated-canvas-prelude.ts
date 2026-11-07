@@ -189,10 +189,17 @@ if (token && /^[a-f0-9]{64}$/.test(token)) {
         reportFramePreviewSize(document, window, 'header')
       }
     }
-    window.addEventListener('load', () => raf(() => raf(reveal)), { once: true })
+    // A cross-origin frame can be throttled before it is revealed. DOM
+    // readiness, not a paint callback or every image finishing, opens it.
+    const ready = () => {
+      reveal()
+      void document.fonts.ready.then(reveal)
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', ready, { once: true })
+    else ready()
+    window.addEventListener('load', reveal, { once: true })
     window.addEventListener('hashchange', reveal)
     window.addEventListener('resize', () => raf(reveal))
-    void document.fonts.ready.then(() => raf(reveal))
   }
   // Pause on the first field selection, before another carousel timer can move
   // the clicked words. Ordinary navigation/menu interaction keeps running.
