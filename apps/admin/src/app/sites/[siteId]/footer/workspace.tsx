@@ -1,4 +1,8 @@
 'use client'
+import { useReorderableList } from '../../../../components/ui/use-reorderable-list.ts'
+import { flatReorderIntent } from '../../../../components/ui/flat-reorder.ts'
+import { DropIndicator, ReorderAnnouncement } from '../../../../components/ui/drop-indicator.tsx'
+import reorderStyles from '../../../../components/ui/reorderable-list.module.css'
 import { contentCountsForPages } from '../../../../lib/content-counts.ts'
 import { unpublishedChangeLabel } from '../../../../components/status.tsx'
 import { useEffect, useRef, useState } from 'react'
@@ -78,8 +82,7 @@ export function FooterWorkspace({
     [linkDraft, setLinkDraft] = useState<FooterLink>({ label: '', url: '' }),
     [removing, setRemoving] = useState<number | null>(null),
     [query, setQuery] = useState(''),
-    [linkKind, setLinkKind] = useState('url'),
-    [drag, setDrag] = useState<number | null>(null)
+    [linkKind, setLinkKind] = useState('url')
   const busy = useRef(false),
     serial = JSON.stringify(footer),
     dirty = serial !== saved,
@@ -225,12 +228,26 @@ export function FooterWorkspace({
     updated[editing.index] = next
     if (next.label.trim() && NavUrl.safeParse(next.url).success) value('links', writeFooterLinks(updated))
   }
+  const reorder = useReorderableList({
+    mimeType: 'application/x-cms-footer',
+    decide: point =>
+      flatReorderIntent(
+        (links ?? []).map((_, index) => String(index)),
+        point,
+      ),
+    apply: ({ from, to }) => move(from, to),
+  })
   function move(from: number, to: number) {
     if (!links || from === to || to < 0 || to >= links.length) return
     const next = [...links],
       item = next.splice(from, 1)[0]!
     next.splice(to, 0, item)
     value('links', writeFooterLinks(next))
+    return `Moved ${item.label} to position ${to + 1}.`
+  }
+  function moveByKeyboard(from: number, to: number) {
+    const message = move(from, to)
+    if (message) reorder.announce(message)
   }
   function textField(id: string, label: string) {
     const slot = fields.find(field => field.id === id)
@@ -437,26 +454,15 @@ export function FooterWorkspace({
                 {textField('links', 'Footer links')}
               </div>
             ) : links.length ? (
-              <ul className={styles.rowList}>
+              <ul className={styles.rowList + ' ' + reorderStyles.list} data-reorder-list>
                 {links.map((link, index) => (
-                  <li
-                    key={index}
-                    className={styles.menuRow}
-                    draggable={!pending}
-                    onDragStart={event => {
-                      event.dataTransfer.setData('application/x-cms-footer', String(index))
-                      setDrag(index)
-                    }}
-                    onDragEnd={() => setDrag(null)}
-                    onDragOver={event => {
-                      if (!pending && drag !== null) event.preventDefault()
-                    }}
-                    onDrop={event => {
-                      event.preventDefault()
-                      if (drag !== null && !pending) move(drag, index)
-                      setDrag(null)
-                    }}
-                  >
+                  <li key={index} className={styles.menuRow} {...reorder.row(String(index), pending)}>
+                    <DropIndicator marker={reorder.marker} row={String(index)} />
+                    {(reorder.blocked ?? reorder.rejection)?.row === String(index) && (
+                      <span className={reorderStyles.reason} aria-hidden="true">
+                        {(reorder.blocked ?? reorder.rejection)?.message}
+                      </span>
+                    )}
                     <IconDrag size={10} />
                     <span className={styles.itemLabel} title={link.label}>
                       {link.label}
@@ -468,14 +474,14 @@ export function FooterWorkspace({
                       <Button
                         variant="tertiary"
                         disabled={pending || index === 0}
-                        onClick={() => move(index, index - 1)}
+                        onClick={() => moveByKeyboard(index, index - 1)}
                       >
                         Move up
                       </Button>
                       <Button
                         variant="tertiary"
                         disabled={pending || index === links.length - 1}
-                        onClick={() => move(index, index + 1)}
+                        onClick={() => moveByKeyboard(index, index + 1)}
                       >
                         Move down
                       </Button>
@@ -489,6 +495,7 @@ export function FooterWorkspace({
             ) : (
               <p className={styles.emptyRow}>No footer links yet. Add a page or website.</p>
             )}
+            <ReorderAnnouncement>{reorder.announcement}</ReorderAnnouncement>
           </Card>
         </div>
       ) : (

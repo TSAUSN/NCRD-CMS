@@ -103,7 +103,12 @@ test('Footer keeps the header logo, cancels live link additions and saves only i
     await capture(page, 'footer', info.project.name)
     const links = page.getByRole('region', { name: 'Links', exact: true }),
       count = await links.getByRole('listitem').count()
-    await links.getByRole('listitem').first().dragTo(links.getByRole('listitem').nth(1))
+    const nextLink = links.getByRole('listitem').nth(1)
+    const nextLinkBounds = await nextLink.boundingBox()
+    expect(nextLinkBounds).not.toBeNull()
+    await links.getByRole('listitem').first().dragTo(nextLink, {
+      targetPosition: { x: 12, y: Math.round(nextLinkBounds!.height * 0.78) },
+    })
     await expect(links.getByRole('listitem').first()).toContainText('Give')
     await links.getByRole('button', { name: 'Actions for Home', exact: true }).click()
     await links.getByRole('button', { name: 'Move up', exact: true }).click()
