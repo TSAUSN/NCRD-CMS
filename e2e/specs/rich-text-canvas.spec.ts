@@ -3,6 +3,9 @@ import { resolve } from 'node:path'
 import { expect, test, type Page } from '@playwright/test'
 import { addSectionButton, canvas, saveDraft, savedState, signIn } from './helpers.ts'
 
+const proseSection = (page: Page) => canvas(page).locator('[data-cms-section].cms-section--prose')
+const proseBody = (page: Page) => proseSection(page).locator('[data-cms-slot="body"][data-cms-kind="richtext"]')
+
 // Every case owns a new page, so rich-text edits cannot contaminate the seeded
 // page used by unrelated editor and publication tests.
 async function prepare(page: Page) {
@@ -67,17 +70,19 @@ async function prepare(page: Page) {
   await inspector.getByLabel('HTML source', { exact: true }).fill(original)
   await saveDraft(page)
   const editorPath = new URL(page.url()).pathname
+  await expect(proseSection(page)).toHaveCount(1)
+  const section = Number(await proseSection(page).getAttribute('data-cms-section'))
   await page.context().clearCookies()
   await signIn(page, 'editor@example.test')
-  await page.goto(editorPath + '?section=1')
+  await page.goto(editorPath + '?section=' + section)
   await expect(addSectionButton(page)).toHaveCount(0)
-  const body = canvas(page).locator('[data-cms-slot="body"][data-cms-kind="richtext"]')
+  const body = proseBody(page)
   await expect(body.locator('h2')).toHaveText('Shared content')
-  return { body, inspector }
+  return { body, inspector, section }
 }
 
 async function editOnPage(page: Page) {
-  const body = canvas(page).locator('[data-cms-slot="body"][data-cms-kind="richtext"]')
+  const body = proseBody(page)
   await body.click()
   await body.click()
   await expect(body).toHaveAttribute('contenteditable', 'true')
@@ -215,18 +220,15 @@ test('native keyboard copy and paste preserves allowed canvas formatting through
 test('keyboard activation works; foreign and wrong-kind bridge edits cannot flatten formatted content', async ({
   page,
 }) => {
-  const { body } = await prepare(page)
+  const { body, section } = await prepare(page)
   const original = await body.innerHTML()
-  await page.evaluate(() => {
-    window.postMessage({ type: 'cms:edit-richtext', section: 1, slot: 'body' }, location.origin)
-    window.postMessage({ type: 'cms:edit', section: 1, slot: 'body', value: 'Foreign flattened body' }, location.origin)
-  })
-  await body.evaluate(() => {
-    parent.postMessage(
-      { type: 'cms:edit', section: 1, slot: 'body', value: 'Wrong-kind flattened body' },
-      location.origin,
-    )
-  })
+  await page.evaluate(section => {
+    window.postMessage({ type: 'cms:edit-richtext', section, slot: 'body' }, location.origin)
+    window.postMessage({ type: 'cms:edit', section, slot: 'body', value: 'Foreign flattened body' }, location.origin)
+  }, section)
+  await body.evaluate((_, section) => {
+    parent.postMessage({ type: 'cms:edit', section, slot: 'body', value: 'Wrong-kind flattened body' }, location.origin)
+  }, section)
   await expect(body).toHaveJSProperty('innerHTML', original)
   await expect(body).not.toHaveAttribute('contenteditable')
   await body.focus()
