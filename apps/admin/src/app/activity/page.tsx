@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import { GuardedLink as Link } from '../../components/guarded-link.tsx'
 import { notFound } from 'next/navigation'
 import { AppShell } from '../../components/app-shell.tsx'
 import { navigationFor } from '../../components/nav.ts'

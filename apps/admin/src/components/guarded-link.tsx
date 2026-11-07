@@ -3,6 +3,8 @@
 import NextLink from 'next/link'
 import { useRouter } from 'next/navigation'
 import type { ComponentProps } from 'react'
+import { canvasRoute } from '../lib/canvas-route.ts'
+import { DocumentLink } from './document-link.tsx'
 import { confirmClientNavigation, requestClientNavigation } from './navigation-guard.ts'
 
 /**
@@ -16,9 +18,27 @@ export function GuardedLink({
   onNavigate,
   onDraftLeave,
   prefetch = false,
+  replace,
+  scroll,
   ...props
 }: ComponentProps<typeof NextLink> & { onDraftLeave?: () => void }) {
   const router = useRouter()
+  if (
+    typeof props.href === 'string' &&
+    props.href.startsWith('/') &&
+    !props.href.startsWith('//') &&
+    canvasRoute(props.href.split(/[?#]/, 1)[0]!)
+  ) {
+    return (
+      <DocumentLink
+        {...props}
+        href={props.href}
+        replace={replace}
+        onNavigate={onNavigate}
+        onDraftLeave={onDraftLeave}
+      />
+    )
+  }
   const resume = () => {
     let canceled = false
     onNavigate?.({
@@ -27,8 +47,8 @@ export function GuardedLink({
       },
     })
     if (!canceled && typeof props.href === 'string') {
-      const options = { scroll: props.scroll }
-      if (props.replace) router.replace(props.href, options)
+      const options = { scroll }
+      if (replace) router.replace(props.href, options)
       else router.push(props.href, options)
     }
   }
@@ -36,6 +56,8 @@ export function GuardedLink({
     <NextLink
       {...props}
       prefetch={prefetch}
+      replace={replace}
+      scroll={scroll}
       onNavigate={event => {
         if (
           !(typeof props.href === 'string' ? requestClientNavigation(resume, onDraftLeave) : confirmClientNavigation())

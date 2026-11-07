@@ -1,5 +1,5 @@
 'use client'
-import Link from 'next/link'
+import { GuardedLink as Link } from '../../../../../../components/guarded-link.tsx'
 import { useEffect, useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button, Dialog, EmptyState, SegmentedControl } from '../../../../../../components/ui/index.ts'

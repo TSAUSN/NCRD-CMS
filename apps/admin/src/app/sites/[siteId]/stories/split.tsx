@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
-import Link from 'next/link'
+import { GuardedLink as Link } from '../../../../components/guarded-link.tsx'
 import type { CollectionRights } from '../../../../lib/collection-queries.ts'
 import type { getStoryListState } from '../../../../lib/stories-workspace.ts'
 import { storyInSource, storyListLive } from '../../../../lib/story-list.ts'

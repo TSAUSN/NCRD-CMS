@@ -96,3 +96,27 @@ across concurrent journey requests and can exceed elapsed screen time.
 | People | 353 | 353 | 3 | 3 |
 | Inbox | 60 | 60 | 2 | 4 |
 | Editor | 314 | 328 | 1136 | 1159 |
+
+## Open canvas routes as documents
+
+An HTML document sets the frame policy once, when it loads. Links into a
+canvas now go straight to that document; the policy check and fallback
+reload still apply. The browser checks confirmed one document request, no
+RSC request and a working Back button for the editor, Header and Footer.
+Keep editing, Discard and Save draft and leave each followed the existing
+leave rules, without a second native prompt.
+
+Five warm local samples per route, after the shared pool change:
+
+| Route | Documents / RSC before | Documents / RSC after | Controls before (ms) | Controls after (ms) | Ready before (ms) | Ready after (ms) |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Header | 1 / 1 | 1 / 0 | 538 | 320 | 1433 | 1140 |
+| Footer | 1 / 1 | 1 / 0 | 591 | 312 | 1412 | 1125 |
+| Site look | 0 / 1 | 1 / 0 | 249 | 320 | 1099 | 1181 |
+| Editor | 0 / 1 | 1 / 0 | 328 | 384 | 442 | 521 |
+
+Header and Footer each went from 32 to 20 transactions and from 195 to
+140 statements for the whole journey. The editor and Site look samples
+started without a fallback reload on this fixture; their full document
+loads were slower. The request-count gain applies to routes that previously
+made both requests.

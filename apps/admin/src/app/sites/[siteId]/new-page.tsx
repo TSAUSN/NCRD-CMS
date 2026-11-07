@@ -8,7 +8,6 @@
 // the consequence is still cheap to understand.
 import styles from './new-page.module.css'
 import shared from '../../../components/workspace.module.css'
-import { useRouter } from 'next/navigation'
 import { Button, Field, SegmentedControl } from '../../../components/ui/index.ts'
 import { duplicatePageAction } from '../../pages/[pageId]/page-copy-actions.ts'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -72,7 +71,6 @@ export function NewPageForm({
   primary?: boolean
   prompt?: boolean
 }) {
-  const router = useRouter()
   const [copyMode, setCopyMode] = useState(false),
     [designId, setDesignId] = useState(designs[0]?.id ?? '')
   const [copyId, setCopyId] = useState(''),
@@ -85,7 +83,7 @@ export function NewPageForm({
     setCopyError(null)
     try {
       const result = await duplicatePageAction(page.id, Number(page.revision), { title, address: effective })
-      if (result.ok) router.push('/pages/' + result.pageId)
+      if (result.ok) window.location.assign('/pages/' + result.pageId)
       else setCopyError(result.message)
     } catch {
       setCopyError('The copy could not be confirmed. Check Pages before trying again.')

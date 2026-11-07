@@ -67,7 +67,7 @@ export function PageManagement({
     start(async () => {
       try {
         const next = await duplicatePageAction(pageId, Number(revision))
-        if (next.ok) router.push('/pages/' + next.pageId)
+        if (next.ok) window.location.assign('/pages/' + next.pageId)
         else setResult(next)
       } catch {
         setResult({
