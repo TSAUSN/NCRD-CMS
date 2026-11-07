@@ -1,6 +1,6 @@
 # Where things live
 
-For a maintainer opening CMS V2 for the first time. Last checked: November 5, 2026.
+For a maintainer opening CMS V2 for the first time. Last checked: November 7, 2026.
 Start with [architecture](../../architecture.md), the current [SPEC status](../../../SPEC.md)
 and [local setup](../hosting/local-demo.md). Product task instructions are in the
 [handbook index](../INDEX.md); the Friday deployment procedure is separate.
@@ -16,13 +16,14 @@ remain the executable authority; never edit a past migration or apply the refere
 
 | Feature | Admin route → actions/commands | SQL commands to find | Public/preview renderer | Browser proof |
 | --- | --- | --- | --- | --- |
-| Pages and editing | `app/pages/[pageId]/page.tsx` → `editor.tsx`; `app/actions/page-draft.ts`; `lib/queries.ts` | `app.save_page_draft`, `app.restore_version_as_draft` | `packages/renderer/src/render.ts`; `apps/site/src/lib/canvas-page-handler.ts` | `editor-canvas`, `editor-loop`, `page-recovery`, `page-lifecycle`, `r8-isolated-canvas` |
+| Pages and editing | `app/pages/[pageId]/page.tsx` → `editor.tsx`; `app/actions/page-draft.ts`; `lib/queries.ts` | `app.save_page_draft`, `app.restore_version_as_draft` | `packages/renderer/src/document/render-page.ts`; `apps/site/src/lib/canvas-page-handler.ts` | `editor-canvas`, `editor-loop`, `page-recovery`, `page-lifecycle`, `r8-isolated-canvas` |
 | Page History | `app/pages/[pageId]/history/`; `lib/page-history.ts` | Search current index for page version/restore commands | Admin `preview/[versionId]/route.ts` uses the same renderer with read-only options | `activity-history`, `page-lifecycle`, `preview-layout` |
 | Stories, tags and feeds | `app/sites/[siteId]/stories/actions.ts`, `tags/actions.ts` → `lib/stories-edit.ts`, `stories-tags.ts`, `story-list-commands.ts` | Collection-entry commands and Story review/placement helpers | `packages/renderer/src/newsroom.ts` and `story-*` modules | `sawso-stories`, `sawso-create-story`, `round3-stories-list`, `round3-story-*` |
 | Chapters and divisions | `app/sites/[siteId]/chapters/actions.ts` → `lib/chapters.ts`, `local-chapter-mail.ts` | `app.create_division_chapter`, `app.create_chapter_page`, chapter setup/team commands | `echelon-*.ts` and chapter-directory widget in renderer | `echelon-access`, `echelon-teams`, `round3-chapter-division`, `round3-echelon-directory` |
-| Header, menu and Footer | `app/sites/[siteId]/{header,footer}/actions.ts`; legacy routes `navigation/`, `global-elements/` | `app.save_navigation_draft`, `app.save_global_elements_draft`, corresponding publish commands | `render.ts`, `national-*`, `echelon-*`; `canvas-page-handler.ts` | `global-elements-workspace`, `frame-source-drafts`, `round3-national-frame` |
-| Site look and fonts | `app/sites/[siteId]/design/`, `design/fonts/` → site-look/theme actions under `app/actions/` and page `site-look-actions.ts` | `app.save_theme_draft`, `app.publish_theme` | `render.ts` theme CSS, font registry, presentation CSS in renderer; local licensed-font routes | `theme-workspace`, `round3-fonts`, `round3-font-leave`, `r8-isolated-canvas` |
+| Header, menu and Footer | `app/sites/[siteId]/{header,footer}/actions.ts`; legacy routes `navigation/`, `global-elements/` | `app.save_navigation_draft`, `app.save_global_elements_draft`, corresponding publish commands | `frame/site-frame.ts`, `national-*`, `echelon-*`; `canvas-page-handler.ts` | `global-elements-workspace`, `frame-source-drafts`, `round3-national-frame` |
+| Site look and fonts | `app/sites/[siteId]/design/`, `design/fonts/` → site-look/theme actions under `app/actions/` and page `site-look-actions.ts` | `app.save_theme_draft`, `app.publish_theme` | `theme/theme-css.ts`, font registry, presentation CSS in renderer; local licensed-font routes | `theme-workspace`, `round3-fonts`, `round3-font-leave`, `r8-isolated-canvas` |
 | Media and documents | `app/sites/[siteId]/media/`, `documents/`; `app/api/media/` → `lib/media-*-repository.ts` | Upload lifecycle, metadata/organization, replacement and public resolution commands | `packages/platform/src/storage.ts`, media delivery repositories; image handling in renderer | `media-*`, `documents-workspace`, `document-upload-http`, `image-focus` |
+| Contact messages | `app/sites/[siteId]/settings/contact-messages/` | `public_api.submit_contact` and the `contact_messages` site policy | `apps/site/src/lib/contact-handler.ts` saves form submissions; the private inbox has no email forwarding | `round3-echelon-faq-contact` |
 | Data values | `app/sites/[siteId]/data/`; page `data-values-actions.ts` → `lib/data-values.ts` | Search current index for data-value draft/publish commands | Data-value bindings in shared renderer | `round3-data-values`, `round3-rich-data-values` |
 | Lists and items | `app/sites/[siteId]/content/`; `app/collection-review-actions.ts` → `lib/collection-*.ts` | Collection schema/entry/review commands | Shared list bindings and site widgets | `collections-workspace`, `collection-richtext`, `collection-options-http` |
 | Publish, review and schedule | `app/actions/page-publish.ts`, `reviews.ts`; page `page-{review,schedule}-actions.ts` → `lib/releases.ts` | `app.publish_page`, release prepare/publish and scheduled-action lease commands | Published projections are read by `apps/site`; same `render.ts` | `r8-publishing`, `editor-publish-review`, `round3-page-schedule`, `scheduled-supersession` |
@@ -61,11 +62,24 @@ local-source importer cases; a skipped source suite does not prove parity.
 local database; `pnpm schema:reference:check` and its database test catch drift.
 Browser tests use `E2E_DATABASE` and configurable `E2E_ADMIN_PORT`/`E2E_SITE_PORT`.
 
-The editor still owns the document, revision and undo history. Extract its seams
-mechanically; do not redesign its state model while moving code. Delivery-round
-test filenames, live CSS organization, renderer capability/data migrations and
-SQL source-of-truth changes are deliberately separate work: they have wider
-compatibility or review costs. Friday uses a walked frozen commit. Refactor work
-ships only if all required gates pass; otherwise its complete commits stay on
-`refactor/handover` for review next week. Current readiness belongs in SPEC, not
-in this architecture map or old dated decision entries.
+## Find a specific editor, renderer or style change
+
+- Start in `app/pages/[pageId]/editor.tsx` for the editor’s wiring. Draft
+  persistence and recovery live in `use-editor-draft-session.ts`. The preview
+  bridge and messages live in `use-editor-canvas-session.ts` and
+  `use-canvas-messages.ts`. Toolbar, structure, inspector, and publication
+  dialogs have their own files. The domain package owns undoable changes.
+- The renderer entry point exports the supported API. Follow
+  `document/render-page.ts` for a whole document, `frame/site-frame.ts` for
+  header and footer, `section/` for sections and slots, `theme/` for theme
+  CSS, and `behaviors/registry.ts` for the handlers and their order.
+- Admin `app/globals.css` lists ordinary CSS imports in cascade order.
+  Look for screen rules next to the route and shared patterns under
+  `components/workspace-styles/`. The small `workspace.module.css` keeps
+  cross-screen layout. Buttons, dialogs, fields and other shared controls
+  own styles under `components/ui/`. After moving styles, check a direct
+  load, a link between screens, and the navigation drawer at 900 px.
+
+Use [known issues](../start-here/known-issues.md) for release limitations.
+A local demo, the personal review copy, and a production release are
+separate environments; one result does not prove the others.

@@ -2,7 +2,7 @@
 
 Install the normal seeded demo in its own local database, without a private dump.
 
-For: A maintainer with only this repository. Last checked: 2026-11-04.
+For: A maintainer with only this repository. Last checked: 2026-11-07.
 
 **Most people only need two commands.** From a fresh clone, run `pnpm install`
 and then `pnpm demo`. That builds what is needed, creates the local database,
@@ -57,7 +57,7 @@ that checkout and start with `cd` below. Never copy another checkout's `.env`,
 
 ```sh
 TASK_CHECKOUT=/absolute/path/to/cms-v2-second-maintainer
-git clone --branch main ORGANIZATION_REPOSITORY_URL "$TASK_CHECKOUT"
+git clone --branch main REVIEWED_REPOSITORY_URL "$TASK_CHECKOUT"
 cd "$TASK_CHECKOUT"
 git status --porcelain
 git rev-parse HEAD
@@ -199,9 +199,10 @@ The bundled Echelon site is the earlier red chapter-directory starter, with text
 branding and labelled sample content. The normal seed now leaves optional photos
 unselected on untouched initial chapter pages. It uses no other site's photos;
 publication still refuses generic sample pictures. Generic templates retain their
-explicit sample-image placeholders when creating a private draft. These changes
-passed the focused seed and chapter checks; the final fresh setup repeat remains
-incomplete as recorded above. The reviewed navy national composition is separately
+explicit sample-image placeholders when creating a private draft. The fresh clone was built and seeded on macOS with the locked packages and
+browsers from local caches. Admin, Site and Worker health, local sign-in, and
+both public demo pages were verified. This does not test downloads on another
+computer. The reviewed navy national composition is separately
 assembled retained authoring and is not supplied by the normal seed.
 
 ## Stop and remove this copy's database
