@@ -118,7 +118,9 @@ export function SiteHeaderPreview({
             sandbox="allow-scripts allow-same-origin"
             referrerPolicy="no-referrer"
             className={frameStyles.frame}
-            style={active ? undefined : { visibility: 'hidden' }}
+            // Chrome can suspend requestAnimationFrame in an invisible cross-origin
+            // frame. Keep it in layout so it can send its verified ready message.
+            style={active ? undefined : { opacity: 0, pointerEvents: 'none' }}
             src={preview.href + '?visit=1' + (part === 'footer' ? '#cms-preview-footer' : '#cms-preview-header')}
           />
         )
