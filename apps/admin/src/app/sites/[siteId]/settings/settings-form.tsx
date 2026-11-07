@@ -8,7 +8,7 @@ import { TextLink } from '../../../../components/ui/text-link.tsx'
 import { Card } from '../../../../components/ui/card.tsx'
 import { Field } from '../../../../components/ui/field.tsx'
 import { Button } from '../../../../components/ui/button.tsx'
-import styles from '../../../../components/ui/ui.module.css'
+import surfaceControlsStyles from '../../../../components/ui/styles/surface-controls.module.css'
 import { changeSiteSettings } from './actions.ts'
 
 export function SiteSettingsForm({
@@ -76,7 +76,7 @@ export function SiteSettingsForm({
           />
         </Field>
         {canManage && !archived && (
-          <div className={styles.actions}>
+          <div className={surfaceControlsStyles.actions}>
             <Button type="submit" loading={pending} disabled={!nextName.trim()}>
               Save site name
             </Button>

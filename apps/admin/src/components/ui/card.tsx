@@ -1,5 +1,6 @@
 import type { HTMLAttributes, ReactNode } from 'react'
-import styles from './ui.module.css'
+import surfaceControlsStyles from './styles/surface-controls.module.css'
+import ownedStyles from './card-styles.module.css'
 export function Card({
   title,
   children,
@@ -22,32 +23,32 @@ export function Card({
     <section
       aria-label={typeof title === 'string' ? title : undefined}
       {...props}
-      className={`${styles.card} ${className}`}
+      className={`${surfaceControlsStyles.card} ${className}`}
       data-tone={tone}
       data-density={density}
     >
       {title &&
         (headerActions || description ? (
-          <div className={styles.cardHeading}>
+          <div className={surfaceControlsStyles.cardHeading}>
             <div>
               <h2>{title}</h2>
               {description && <p>{description}</p>}
             </div>
-            {headerActions && <div className={styles.cardHeadingActions}>{headerActions}</div>}
+            {headerActions && <div className={ownedStyles.cardHeadingActions}>{headerActions}</div>}
           </div>
         ) : (
           <h2>{title}</h2>
         ))}
-      <div className={styles.cardBody}>{children}</div>
-      {actions && <div className={styles.actions}>{actions}</div>}
+      <div className={surfaceControlsStyles.cardBody}>{children}</div>
+      {actions && <div className={surfaceControlsStyles.actions}>{actions}</div>}
     </section>
   )
 }
 
 /** Composable card regions keep complex forms on the same spacing and type. */
 export function CardHeading({ children }: { children: ReactNode }) {
-  return <header className={styles.cardHeading}>{children}</header>
+  return <header className={surfaceControlsStyles.cardHeading}>{children}</header>
 }
 export function CardContent({ children }: { children: ReactNode }) {
-  return <div className={styles.cardContent}>{children}</div>
+  return <div className={ownedStyles.cardContent}>{children}</div>
 }

@@ -1,5 +1,6 @@
 import type { ComponentProps } from 'react'
-import styles from './ui.module.css'
+import buttonStyles from './styles/button.module.css'
+import ownedStyles from './button-styles.module.css'
 export type ButtonProps = ComponentProps<'button'> & {
   variant?: 'primary' | 'secondary' | 'tertiary' | 'destructive' | 'publish'
   size?: 's' | 'm' | 'compact' | 'standard'
@@ -20,7 +21,7 @@ export function Button({
     <button
       {...props}
       type={type}
-      className={`${styles.button} ${className}`}
+      className={`${buttonStyles.button} ${className}`}
       data-variant={variant}
       data-size={size}
       data-full-width={fullWidth || undefined}
@@ -34,5 +35,5 @@ export function IconButton({
   className = '',
   ...props
 }: Omit<ButtonProps, 'title' | 'aria-label'> & { tooltip: string }) {
-  return <Button {...props} className={`${styles.icon} ${className}`} title={tooltip} aria-label={tooltip} />
+  return <Button {...props} className={`${ownedStyles.icon} ${className}`} title={tooltip} aria-label={tooltip} />
 }

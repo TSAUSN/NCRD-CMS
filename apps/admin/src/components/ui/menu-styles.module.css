@@ -1,0 +1,66 @@
+.menu summary:focus-visible {
+  outline: var(--line-focus) solid var(--focus);
+  outline-offset: var(--focus-offset);
+}
+.menu {
+  position: relative;
+}
+.menu summary {
+  list-style: none;
+  cursor: pointer;
+  min-height: var(--target-small);
+  min-width: var(--target-small);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.menu summary::-webkit-details-marker {
+  display: none;
+}
+.menuBody {
+  position: fixed;
+  inset: auto;
+  margin: 0;
+  z-index: var(--z-popover);
+  min-width: var(--target-small);
+  width: max-content;
+  padding: var(--space-2);
+  display: none;
+  gap: var(--space-1);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-2);
+  border: var(--line-thin) solid var(--border);
+  border-radius: var(--radius-card);
+}
+.menuBody:popover-open {
+  display: grid;
+}
+.menuBody > :is(a, button):not([data-variant]) {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--target-small);
+  padding: var(--space-1) var(--space-2);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--primary);
+  font: inherit;
+  text-align: start;
+  text-decoration: none;
+  cursor: pointer;
+}
+.menuBody > :is(a, button):not([data-variant]):hover {
+  background: var(--surface-sunken);
+}
+.menuBody > :is(a, button):focus-visible {
+  outline: var(--line-focus) solid var(--focus);
+  outline-offset: var(--focus-offset);
+}
+.menuBody > p {
+  margin: var(--space-1) var(--space-2);
+}
+.menu summary:not([data-variant]) {
+  padding-inline: var(--space-1);
+}

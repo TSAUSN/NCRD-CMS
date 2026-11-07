@@ -1,7 +1,8 @@
 'use client'
 import { useLayoutEffect, useId, useRef, type ReactNode, type RefObject } from 'react'
 import { IconButton } from './button.tsx'
-import styles from './ui.module.css'
+import surfaceControlsStyles from './styles/surface-controls.module.css'
+import ownedStyles from './dialog-styles.module.css'
 export function Dialog({
   title,
   children,
@@ -48,7 +49,7 @@ export function Dialog({
       data-density={density}
       role={role}
       aria-labelledby={id}
-      className={`${styles.modal} ${footer || drawer ? styles.fixed : ''} ${drawer ? styles.drawer : ''} ${size === 'wide' ? styles.wide : size === 'medium' ? styles.medium : size === 'narrow' ? styles.narrow : size === 'large' ? styles.large : ''}`}
+      className={`${surfaceControlsStyles.modal} ${footer || drawer ? surfaceControlsStyles.fixed : ''} ${drawer ? ownedStyles.drawer : ''} ${size === 'wide' ? ownedStyles.wide : size === 'medium' ? ownedStyles.medium : size === 'narrow' ? ownedStyles.narrow : size === 'large' ? ownedStyles.large : ''}`}
       onKeyDown={event => {
         if (event.key !== 'Tab' || event.defaultPrevented) return
         const focusable = [
@@ -93,7 +94,7 @@ export function Dialog({
         }
       }}
     >
-      <div className={styles.modalHead}>
+      <div className={surfaceControlsStyles.modalHead}>
         <h2 id={id}>{title}</h2>
         {showClose && (
           <IconButton tooltip={closeLabel ?? `Close ${title}`} variant="tertiary" disabled={pending} onClick={onClose}>
@@ -101,8 +102,8 @@ export function Dialog({
           </IconButton>
         )}
       </div>
-      <div className={styles.modalBody}>{children}</div>
-      {footer && <div className={styles.modalFooter}>{footer}</div>}
+      <div className={surfaceControlsStyles.modalBody}>{children}</div>
+      {footer && <div className={surfaceControlsStyles.modalFooter}>{footer}</div>}
     </dialog>
   )
 }

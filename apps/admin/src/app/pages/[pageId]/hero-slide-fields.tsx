@@ -11,7 +11,7 @@ import workspaceFormsStyles from '../../../components/workspace-styles/workspace
 import recordTableStyles from '../../../components/workspace-styles/record-table.module.css'
 import selectionControlsStyles from '../../../components/workspace-styles/selection-controls.module.css'
 import workspacePreviewStyles from '../../../components/workspace-styles/workspace-preview.module.css'
-import ui from '../../../components/ui/ui.module.css'
+import buttonStyles from '../../../components/ui/styles/button.module.css'
 /** The miniature button is a noninteractive preview; actual page links remain in the canvas. */
 export function HeroSlideFields({
   repeat,
@@ -162,7 +162,7 @@ export function HeroSlideFields({
                   <span
                     role="img"
                     aria-label={label + ' preview: ' + String(link.label ?? '')}
-                    className={ui.button}
+                    className={buttonStyles.button}
                     data-size="s"
                     style={preview}
                   >

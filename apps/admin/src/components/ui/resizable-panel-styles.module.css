@@ -1,0 +1,38 @@
+.handle:focus-visible {
+  outline: var(--line-focus) solid var(--focus);
+  outline-offset: var(--focus-offset);
+}
+.panel {
+  position: relative;
+  flex: none;
+  min-width: 0;
+}
+.handle {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: var(--panel-handle);
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  cursor: col-resize;
+  touch-action: none;
+  z-index: var(--z-popover);
+}
+.handle::after {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: calc(50% - var(--panel-line) / 2);
+  width: var(--panel-line);
+  background: transparent;
+}
+.handle:hover::after,
+.handle:focus-visible::after {
+  background: var(--focus);
+}
+.panel[data-edge='right'] .handle {
+  inset-inline-start: auto;
+  inset-inline-end: 0;
+}

@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { IconButton } from './button.tsx'
-import styles from './ui.module.css'
+import styles from './feedback-styles.module.css'
 import state from '../state.module.css'
 import { IconPage } from '../icons.tsx'
 export function EmptyState({ title, children, action }: { title: string; children: ReactNode; action?: ReactNode }) {

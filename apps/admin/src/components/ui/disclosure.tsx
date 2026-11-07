@@ -1,6 +1,6 @@
 import type { ComponentProps, ReactNode } from 'react'
 import { IconChevronRight } from '../icons.tsx'
-import styles from './ui.module.css'
+import styles from './disclosure-styles.module.css'
 
 /** Shared native disclosure,with one controlled chrome style and keyboard behavior. */
 export function Disclosure({

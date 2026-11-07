@@ -1,6 +1,6 @@
 import type { ComponentProps } from 'react'
 import { GuardedLink } from '../guarded-link.tsx'
-import styles from './ui.module.css'
+import styles from './text-link-styles.module.css'
 
 /** A quiet chrome link with the same navigation guard and focus treatment. */
 export function TextLink({ className = '', ...props }: ComponentProps<typeof GuardedLink>) {

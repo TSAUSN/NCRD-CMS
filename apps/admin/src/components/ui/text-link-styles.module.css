@@ -1,0 +1,13 @@
+.textLink {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: var(--weight-medium);
+}
+.textLink:hover {
+  text-decoration: underline;
+}
+.textLink:focus-visible {
+  outline: var(--line-focus) solid var(--focus);
+  outline-offset: var(--focus-offset);
+  border-radius: var(--radius-control);
+}

@@ -1,0 +1,57 @@
+.toast {
+  position: fixed;
+  inset: auto var(--space-5) var(--space-5) auto;
+  z-index: var(--z-dialog);
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  max-width: calc(100% - var(--space-7));
+  background: var(--surface);
+  border: var(--line-thin) solid var(--border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-2);
+}
+.empty {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-4);
+  padding: var(--space-7);
+  text-align: center;
+}
+.empty h2,
+.empty p {
+  margin: 0;
+}
+.note {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-fact);
+  padding: var(--space-fact) var(--space-3);
+  border-radius: var(--note-radius);
+  background: var(--note-fill);
+  color: var(--note-ink);
+  font-size: var(--text-note);
+  line-height: 1.5;
+  margin: 0 0 var(--space-4);
+}
+.note svg {
+  flex: none;
+  margin-top: var(--line-thin);
+}
+.note[data-tone='success'] {
+  background: var(--status-live-bg);
+  color: var(--status-live);
+}
+.note[data-tone='warning'] {
+  background: var(--status-pending-bg);
+  color: var(--status-pending);
+}
+.note[data-tone='shared'] {
+  background: var(--status-review-bg);
+  color: var(--status-review);
+}
+.note[data-tone='info'] {
+  background: var(--note-info-fill);
+  color: var(--note-info-ink);
+}

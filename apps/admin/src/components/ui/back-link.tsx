@@ -2,7 +2,8 @@
 import { useRouter } from 'next/navigation'
 import { GuardedLink } from '../guarded-link.tsx'
 import { requestClientNavigation } from '../navigation-guard.ts'
-import styles from './ui.module.css'
+import buttonStyles from './styles/button.module.css'
+import ownedStyles from './back-link-styles.module.css'
 export function safeCmsPath(value: unknown, origin: string): string | null {
   if (typeof value !== 'string' || !value.trim()) return null
   try {
@@ -20,7 +21,7 @@ export function BackLink({ fallback = '/', appearance }: { fallback?: string; ap
       prefetch={false}
       href={fallback}
       aria-label="Back"
-      className={appearance === 'button' ? styles.button : styles.back}
+      className={appearance === 'button' ? buttonStyles.button : ownedStyles.back}
       data-variant={appearance === 'button' ? 'secondary' : undefined}
       onClick={event => {
         if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return

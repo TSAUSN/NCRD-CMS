@@ -1,0 +1,7 @@
+.icon {
+  width: var(--target-small);
+  height: var(--target-small);
+  min-height: var(--target-small);
+  padding: 0;
+  flex: none;
+}

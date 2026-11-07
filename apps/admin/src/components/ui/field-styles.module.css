@@ -1,0 +1,11 @@
+.error {
+  color: var(--danger);
+  margin: 0;
+}
+
+.fieldLabel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}

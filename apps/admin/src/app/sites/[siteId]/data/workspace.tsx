@@ -22,7 +22,7 @@ import selectionControlsStyles from '../../../../components/workspace-styles/sel
 import listInspectorStyles from '../../../../components/workspace-styles/list-inspector.module.css'
 import reviewWorkbenchStyles from '../../../../components/workspace-styles/review-workbench.module.css'
 import ownedStyles from './workspace-styles.module.css'
-import ui from '../../../../components/ui/ui.module.css'
+import surfaceControlsStyles from '../../../../components/ui/styles/surface-controls.module.css'
 type Usage = Record<string, { id: string; title: string }[]>
 export function DataValuesWorkspace({
   siteId,
@@ -363,7 +363,7 @@ export function DataValuesWorkspace({
                 </select>
               </Field>
               <div className={listInspectorStyles.formStack}>
-                <p className={ui.help}>Shown on</p>
+                <p className={surfaceControlsStyles.help}>Shown on</p>
                 {pageLinks.length ? (
                   <div className={workspaceFormsStyles.actions}>
                     {pageLinks.map(page => (
@@ -450,12 +450,12 @@ export function DataValuesWorkspace({
                         {row.value}
                       </strong>
                     </td>
-                    <td data-secondary className={ui.help}>
+                    <td data-secondary className={surfaceControlsStyles.help}>
                       <span className={recordTableStyles.truncateValue} title={row.source}>
                         {row.source}
                       </span>
                     </td>
-                    <td data-secondary data-col="date" className={ui.help}>
+                    <td data-secondary data-col="date" className={surfaceControlsStyles.help}>
                       <span className={recordTableStyles.truncateValue} title={row.asOf || 'Unknown'}>
                         {row.asOf || 'Unknown'}
                       </span>

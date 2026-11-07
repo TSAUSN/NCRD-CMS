@@ -1,0 +1,29 @@
+.drawer {
+  inset: 0 0 0 auto;
+  margin: 0;
+  width: var(--sheet-width);
+  height: 100%;
+  max-height: 100%;
+  border-radius: 0;
+}
+
+.wide {
+  width: var(--size-1100);
+}
+
+.medium {
+  width: var(--dialog-medium-width);
+}
+
+.narrow {
+  width: var(--size-360);
+}
+
+.large {
+  width: var(--dialog-large-width);
+}
+
+.drawer[data-density='compact'] {
+  margin: 0;
+  border-radius: 0;
+}

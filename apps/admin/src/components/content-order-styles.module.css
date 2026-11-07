@@ -1,0 +1,109 @@
+.contentOrderList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+.contentOrderRow {
+  display: grid;
+  grid-template-columns: var(--space-4) var(--space-7) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  padding: var(--space-2);
+  border: var(--line-thin) solid var(--border);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+}
+.contentOrderRow[draggable='true'] {
+  cursor: grab;
+}
+.contentOrderPosition {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: var(--text-help);
+  color: var(--text-muted);
+}
+.contentOrderPhoto {
+  display: block;
+  width: var(--space-7);
+  height: var(--space-7);
+  overflow: hidden;
+  border-radius: var(--radius-control);
+  background: var(--surface-sunken);
+}
+.contentOrderPhoto img,
+.contentPreviewPhoto img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+.contentOrderPhoto > span,
+.contentPreviewPhoto > span[aria-label] {
+  height: 100%;
+  display: grid;
+  place-items: center;
+  color: var(--text-muted);
+}
+.contentOrderWords {
+  min-width: 0;
+  display: grid;
+  gap: var(--space-1);
+}
+.contentOrderWords strong {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  font-size: var(--text-help);
+  font-weight: var(--weight-medium);
+}
+.contentOrderWords small {
+  color: var(--text-muted);
+  font-size: var(--text-help);
+}
+.contentOrderActions {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0;
+}
+.contentPreviewGrid {
+  list-style: none;
+  margin: 0;
+  padding: var(--space-3);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--size-160)), 1fr));
+  gap: var(--space-3);
+  background: var(--surface);
+  border-radius: var(--radius-card);
+}
+.contentPreviewGrid > li {
+  min-width: 0;
+  display: grid;
+  align-content: start;
+  gap: var(--space-1);
+}
+.contentPreviewGrid strong {
+  font-size: var(--text-help);
+  font-weight: var(--weight-semibold);
+  line-height: var(--line-help);
+}
+.contentPreviewPhoto {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border-radius: var(--radius-control);
+  background: var(--surface-sunken);
+}
+.contentPreviewPhoto > span:not([aria-label]) {
+  position: absolute;
+  inset-block-start: var(--space-1);
+  inset-inline-start: var(--space-1);
+  background: var(--publish);
+  color: var(--text-on-dark);
+  border-radius: var(--radius-pill);
+  padding: 0 var(--space-1);
+  font-size: var(--text-help);
+}

@@ -1,0 +1,35 @@
+.disclosure {
+  min-width: 0;
+}
+.disclosure.disclosure > summary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--target-small);
+  list-style: none;
+  cursor: pointer;
+  color: var(--text);
+  font-size: var(--text-meta);
+  font-weight: var(--weight-medium);
+}
+.disclosure.disclosure > summary::-webkit-details-marker {
+  display: none;
+}
+.disclosure.disclosure > summary::marker {
+  content: '';
+}
+.disclosure.disclosure > summary::before,
+.disclosure.disclosure > summary::after {
+  content: none;
+}
+.disclosure > summary > svg {
+  flex: none;
+  transition: transform var(--motion-fast) var(--ease);
+}
+.disclosure[open] > summary > svg {
+  transform: rotate(90deg);
+}
+.disclosureBody {
+  padding-block-start: var(--space-3);
+  min-width: 0;
+}

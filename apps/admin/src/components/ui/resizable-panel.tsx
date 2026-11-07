@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
-import styles from './ui.module.css'
+import styles from './resizable-panel-styles.module.css'
 export function clampPanelWidth(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value))
 }

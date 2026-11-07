@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react'
-import styles from './ui.module.css'
+import buttonStyles from './styles/button.module.css'
+import ownedStyles from './menu-styles.module.css'
 export function Menu({
   label,
   children,
@@ -104,7 +105,7 @@ export function Menu({
   return (
     <details
       ref={ref}
-      className={styles.menu}
+      className={ownedStyles.menu}
       onToggle={position}
       onKeyDown={event => {
         if (event.key === 'Escape') {
@@ -115,7 +116,7 @@ export function Menu({
       }}
     >
       <summary
-        className={appearance === 'button' ? styles.button : undefined}
+        className={appearance === 'button' ? buttonStyles.button : undefined}
         data-variant={appearance === 'button' ? 'secondary' : undefined}
         role="button"
         aria-label={accessibleLabel}
@@ -127,7 +128,7 @@ export function Menu({
         ref={body}
         popover="manual"
         style={popupStyle}
-        className={styles.menuBody}
+        className={ownedStyles.menuBody}
         onClick={event => {
           if ((event.target as Element)?.closest('a,button')) close(true)
         }}

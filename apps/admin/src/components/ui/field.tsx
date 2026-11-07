@@ -1,5 +1,6 @@
 import { Children, cloneElement, isValidElement, type ReactElement, type ReactNode } from 'react'
-import styles from './ui.module.css'
+import surfaceControlsStyles from './styles/surface-controls.module.css'
+import ownedStyles from './field-styles.module.css'
 export function Field({
   id,
   label,
@@ -27,12 +28,12 @@ export function Field({
 }) {
   return (
     <div
-      className={styles.field + (className ? ' ' + className : '')}
+      className={surfaceControlsStyles.field + (className ? ' ' + className : '')}
       data-density={density}
       data-label-hidden={labelHidden || undefined}
     >
       {counter !== undefined ? (
-        <div className={styles.fieldLabel}>
+        <div className={ownedStyles.fieldLabel}>
           <label id={`${id}-label`} htmlFor={id}>
             {label}
             {required && (
@@ -42,7 +43,7 @@ export function Field({
               </>
             )}
           </label>
-          <span className={styles.help} id={`${id}-counter`}>
+          <span className={surfaceControlsStyles.help} id={`${id}-counter`}>
             {counter}
           </span>
         </div>
@@ -58,7 +59,7 @@ export function Field({
         </label>
       )}
       {help && !helpAfter && (
-        <p className={styles.help} id={`${id}-help`}>
+        <p className={surfaceControlsStyles.help} id={`${id}-help`}>
           {help}
         </p>
       )}
@@ -83,12 +84,12 @@ export function Field({
         })
       })}
       {help && helpAfter && (
-        <p className={styles.help} id={`${id}-help`}>
+        <p className={surfaceControlsStyles.help} id={`${id}-help`}>
           {help}
         </p>
       )}
       {error && (
-        <p className={styles.error} id={`${id}-error`} role="alert">
+        <p className={ownedStyles.error} id={`${id}-error`} role="alert">
           {error}
         </p>
       )}

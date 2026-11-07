@@ -1,6 +1,6 @@
 'use client'
 import { useId, useRef, type ReactNode } from 'react'
-import styles from './ui.module.css'
+import styles from './controls-styles.module.css'
 export type Choice = { value: string; label: string; accessibleLabel?: string; disabled?: boolean; icon?: ReactNode }
 export function SegmentedControl({
   label,

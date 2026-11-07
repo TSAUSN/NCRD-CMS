@@ -1,7 +1,7 @@
 'use client'
 import { useState, type HTMLAttributes, type ReactNode } from 'react'
 import { IconImage, IconDrag } from './icons.tsx'
-import styles from './ui/ui.module.css'
+import styles from './content-order-styles.module.css'
 function ContentPhoto({ src }: { src: string | null }) {
   const [failed, setFailed] = useState<string | null>(null)
   return src && src !== failed ? (

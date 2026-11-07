@@ -1,6 +1,6 @@
 import type { ChangeEventHandler, ReactNode } from 'react'
 import { IconSearch } from '../icons.tsx'
-import styles from './ui.module.css'
+import styles from './search-field-styles.module.css'
 export function SearchField({
   id,
   label,
