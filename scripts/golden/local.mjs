@@ -16,7 +16,7 @@ export function target(env = process.env) {
     !['postgres:', 'postgresql:'].includes(value.protocol) ||
     !['localhost', '127.0.0.1'].includes(value.hostname) ||
     value.port !== '54329' ||
-    !/^\/cms_e2e_refactor(?:_golden|_screens)?$/.test(value.pathname) ||
+    !/^\/cms_e2e_refactor(?:_golden|_screens|_perf|_burst(?:_autosave|_checkpoint)?)?$/.test(value.pathname) ||
     value.search ||
     value.hash
   )
@@ -73,7 +73,7 @@ export async function schemaSnapshot(t, out) {
     await db.end()
   }
 }
-export async function applications(t, out, mediaRoot) {
+export async function applications(t, out, mediaRoot, { traceFile } = {}) {
   if (demoNeedsBuild(root)) throw Error('Build admin and site from the current source before golden capture.')
   if (!existsSync(join(root, 'apps/admin/.next/BUILD_ID')) || !existsSync(join(root, 'apps/site/.next/BUILD_ID')))
     throw Error('Build admin and site before golden capture.')
@@ -99,6 +99,7 @@ export async function applications(t, out, mediaRoot) {
     SCHEDULING_ENABLED: 'false',
     APP_VERSION: 'golden-local',
     NODE_ENV: 'production',
+    ...(traceFile ? { CMS_PERF_TRACE: '1', DATABASE_POOL_MAX: '2' } : {}),
   }
   const children = []
   const stop = async () => {
@@ -126,9 +127,27 @@ export async function applications(t, out, mediaRoot) {
       ['site', t.ports.site],
     ]) {
       const log = openSync(join(out, app + '.log'), 'w', 0o600)
-      const child = spawn('pnpm', ['--filter', app, 'start', '--hostname', '127.0.0.1'], {
-        cwd: root,
-        env: { ...env, PORT: String(port) },
+      const directory = join(root, 'apps', app)
+      const command = traceFile
+        ? [
+            process.execPath,
+            [
+              '--import',
+              join(root, 'scripts/perf/request-trace.mjs'),
+              createRequire(join(directory, 'package.json')).resolve('next/dist/bin/next'),
+              'start',
+              '--hostname',
+              '127.0.0.1',
+            ],
+          ]
+        : ['pnpm', ['--filter', app, 'start', '--hostname', '127.0.0.1']]
+      const child = spawn(command[0], command[1], {
+        cwd: traceFile ? directory : root,
+        env: {
+          ...env,
+          PORT: String(port),
+          ...(traceFile ? { CMS_PERF_APP: app, CMS_PERF_TRACE_FILE: traceFile } : {}),
+        },
         stdio: ['ignore', log, log],
         detached: true,
       })

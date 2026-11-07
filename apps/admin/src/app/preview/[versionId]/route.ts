@@ -1,3 +1,4 @@
+import { measurePerfRender } from '@cms/platform/perf-trace'
 import { SiteFileProjection } from '@cms/schema'
 import { PREVIEW_FONT_STYLES, PREVIEW_FONT_FILES, PREVIEW_FONT_IMAGES } from '../../../lib/preview-font-policy.ts'
 import { storyWidgetQuery } from '@cms/renderer'
@@ -138,27 +139,29 @@ export async function GET(request: Request, context: { params: Promise<{ version
     ),
   }
 
-  const { html } = renderPage({
-    manifest: preview.manifest,
-    shell: preview.shell,
-    navigationPaths: preview.navigationPaths,
-    // A preview is never a public surface, so it never asks to be indexed.
-    isStaging: true,
-    // History is evidence, not an editor canvas. It uses the canonical render
-    // without selection wrappers or the message bridge, while the ordinary
-    // preview keeps the instrumentation click-to-edit needs.
-    options:
-      visitorPreview && version.site_status !== 'archived'
-        ? {
-            ...SCRIPTLESS_RENDER_OPTIONS,
-            visitorPreview: true,
-            storyWidgets,
-            showHiddenSections: params.get('hidden') === '1',
-          }
-        : readOnly
-          ? { ...SCRIPTLESS_RENDER_OPTIONS, storyWidgets }
-          : { preview: true, showHiddenSections: params.get('hidden') === '1' },
-  })
+  const { html } = measurePerfRender(() =>
+    renderPage({
+      manifest: preview.manifest,
+      shell: preview.shell,
+      navigationPaths: preview.navigationPaths,
+      // A preview is never a public surface, so it never asks to be indexed.
+      isStaging: true,
+      // History is evidence, not an editor canvas. It uses the canonical render
+      // without selection wrappers or the message bridge, while the ordinary
+      // preview keeps the instrumentation click-to-edit needs.
+      options:
+        visitorPreview && version.site_status !== 'archived'
+          ? {
+              ...SCRIPTLESS_RENDER_OPTIONS,
+              visitorPreview: true,
+              storyWidgets,
+              showHiddenSections: params.get('hidden') === '1',
+            }
+          : readOnly
+            ? { ...SCRIPTLESS_RENDER_OPTIONS, storyWidgets }
+            : { preview: true, showHiddenSections: params.get('hidden') === '1' },
+    }),
+  )
 
   return new Response(html, {
     headers: {

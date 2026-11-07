@@ -1,3 +1,4 @@
+import { measurePerfRender } from '@cms/platform/perf-trace'
 import { SiteFileProjection } from '@cms/schema'
 import {
   renderedFeatures,
@@ -44,21 +45,23 @@ export function createCanvasPageHandler(deps: {
         headers: { 'cache-control': 'no-store', 'content-type': 'text/plain; charset=utf-8' },
       })
     }
-    const { html } = renderPage({
-      manifest: snapshot.manifest,
-      shell: snapshot.shell,
-      navigationPaths: snapshot.navigationPaths,
-      isStaging: true,
-      options: {
-        servingHost: host,
-        preview: !visitor,
-        visitorPreview: visitor,
-        previewRuntime: false,
-        externalRuntimes: true,
-        siteFiles: true,
-        showHiddenSections: snapshot.showHiddenSections,
-      },
-    })
+    const { html } = measurePerfRender(() =>
+      renderPage({
+        manifest: snapshot.manifest,
+        shell: snapshot.shell,
+        navigationPaths: snapshot.navigationPaths,
+        isStaging: true,
+        options: {
+          servingHost: host,
+          preview: !visitor,
+          visitorPreview: visitor,
+          previewRuntime: false,
+          externalRuntimes: true,
+          siteFiles: true,
+          showHiddenSections: snapshot.showHiddenSections,
+        },
+      }),
+    )
     const files = renderSiteFiles(snapshot.shell.site_files, snapshot.manifest.page.id)
     const features = renderedFeatures(html)
     const headers = publicSecurityHeaders({

@@ -1,3 +1,4 @@
+import { measurePerfRender } from '@cms/platform/perf-trace'
 import { openCanvasTicket } from '../../../../../../lib/canvas-tickets.ts'
 import { isStrictSameOriginRequest } from '../../../../../../lib/request-origin.ts'
 import { readBoundedRequestBody } from '../../../../../../lib/request-body.ts'
@@ -148,21 +149,23 @@ export async function POST(request: Request, context: { params: Promise<{ siteId
     input.previewContext === undefined ? undefined : sitePreviewContext(input.previewContext) === 'draft',
   )
   if (!preview) notFound()
-  const { html } = renderPage({
-    manifest: preview.manifest,
-    shell: {
-      ...preview.shell,
-      ...(tokens?.success ? { theme: tokens.data } : {}),
-      ...(menu?.success ? { navigation: menu.data } : {}),
-      header: header.data,
-      footer: footer.data,
-      header_component: components.header,
-      footer_component: components.footer,
-    },
-    isStaging: true,
-    navigationPaths: preview.navigationPaths,
-    options: SCRIPTLESS_RENDER_OPTIONS,
-  })
+  const { html } = measurePerfRender(() =>
+    renderPage({
+      manifest: preview.manifest,
+      shell: {
+        ...preview.shell,
+        ...(tokens?.success ? { theme: tokens.data } : {}),
+        ...(menu?.success ? { navigation: menu.data } : {}),
+        header: header.data,
+        footer: footer.data,
+        header_component: components.header,
+        footer_component: components.footer,
+      },
+      isStaging: true,
+      navigationPaths: preview.navigationPaths,
+      options: SCRIPTLESS_RENDER_OPTIONS,
+    }),
+  )
   return new Response(scriptlessPreviewHtml(html), {
     headers: {
       'content-type': 'text/html; charset=utf-8',

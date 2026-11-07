@@ -13,6 +13,7 @@
 //   asWorker() — job execution. Server-side, still unprivileged.
 import { Pool, type PoolClient } from 'pg'
 import { mapErrors } from '@cms/domain'
+import { perfTrace } from './perf-trace.ts'
 
 export type DatabaseRole = 'authenticated' | 'public' | 'worker' | 'migration'
 
@@ -58,6 +59,61 @@ export function poolFor(role: DatabaseRole): Pool {
   return pool
 }
 
+async function connectForRequest(role: DatabaseRole) {
+  const pool = poolFor(role)
+  const trace = perfTrace()
+  if (!trace) {
+    const client = await pool.connect()
+    return { client, release: () => client.release() }
+  }
+  trace.maxQueued = Math.max(trace.maxQueued, pool.waitingCount)
+  const start = performance.now()
+  const pending = pool.connect()
+  trace.maxQueued = Math.max(trace.maxQueued, pool.waitingCount)
+  const client = await pending.finally(() => {
+    const waited = performance.now() - start
+    trace.connectionWaitMs += waited
+    trace.longestConnectionWaitMs = Math.max(trace.longestConnectionWaitMs, waited)
+  })
+  if (role === 'authenticated' || role === 'worker') trace.transactions++
+
+  const originalQuery = client.query
+  // Track only calls made on this checked-out client, and remove the probe
+  // before handing the client back to the pool.
+  client.query = new Proxy(originalQuery, {
+    apply(target, receiver, args) {
+      const start = performance.now()
+      trace.statements++
+      const recordTime = () => {
+        trace.queryMs += performance.now() - start
+      }
+      const callback = args.at(-1)
+      if (typeof callback === 'function') {
+        args[args.length - 1] = function (this: unknown, ...result: unknown[]) {
+          recordTime()
+          return Reflect.apply(callback, this, result)
+        }
+      }
+      try {
+        const result = Reflect.apply(target, receiver, args)
+        if (result instanceof Promise) return result.finally(recordTime)
+        if (typeof callback !== 'function') recordTime()
+        return result
+      } catch (error) {
+        recordTime()
+        throw error
+      }
+    },
+  })
+  return {
+    client,
+    release: () => {
+      client.query = originalQuery
+      client.release()
+    },
+  }
+}
+
 export async function closePools(): Promise<void> {
   for (const pool of pools.values()) await pool.end()
   pools.clear()
@@ -75,7 +131,7 @@ export async function asUser<T>(
   fn: (client: PoolClient) => Promise<T>,
   options: { isolation?: 'repeatable read' } = {},
 ): Promise<T> {
-  const client = await poolFor('authenticated').connect()
+  const { client, release } = await connectForRequest('authenticated')
   try {
     await client.query(options.isolation === 'repeatable read' ? 'BEGIN ISOLATION LEVEL REPEATABLE READ' : 'BEGIN')
     await client.query('SELECT set_config($1, $2, true)', ['app.user_id', ctx.userId ?? ''])
@@ -87,22 +143,22 @@ export async function asUser<T>(
     await client.query('ROLLBACK').catch(() => {})
     throw error
   } finally {
-    client.release()
+    release()
   }
 }
 
 /** Read-only public rendering. No identity: this role has none to set. */
 export async function asPublic<T>(fn: (client: PoolClient) => Promise<T>): Promise<T> {
-  const client = await poolFor('public').connect()
+  const { client, release } = await connectForRequest('public')
   try {
     return await mapErrors(() => fn(client))
   } finally {
-    client.release()
+    release()
   }
 }
 
 export async function asWorker<T>(workerId: string, fn: (client: PoolClient) => Promise<T>): Promise<T> {
-  const client = await poolFor('worker').connect()
+  const { client, release } = await connectForRequest('worker')
   try {
     await client.query('BEGIN')
     await client.query('SELECT set_config($1, $2, true)', ['app.worker_id', workerId])
@@ -113,6 +169,6 @@ export async function asWorker<T>(workerId: string, fn: (client: PoolClient) => 
     await client.query('ROLLBACK').catch(() => {})
     throw error
   } finally {
-    client.release()
+    release()
   }
 }

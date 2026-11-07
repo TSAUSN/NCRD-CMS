@@ -1,3 +1,4 @@
+import { countPerfAuth } from './perf-trace.ts'
 import { createLocalAuthProvider, type AuthProvider, type AuthSubject, type VerifiedAuthSession } from './session.ts'
 import { createHash, randomBytes } from 'node:crypto'
 
@@ -117,6 +118,7 @@ export function createSupabaseAuthProvider(
 
   async function request(path: string, body?: Record<string, unknown>, token?: string): Promise<Response> {
     try {
+      countPerfAuth('outboundAuthCalls')
       return await fetcher(`${origin}/auth/v1${path}`, {
         method: body ? 'POST' : 'GET',
         headers: {
@@ -135,6 +137,7 @@ export function createSupabaseAuthProvider(
   }
 
   async function verify(token: string | null | undefined): Promise<AuthSubject | null> {
+    countPerfAuth('authChecks')
     if (!token || token.length > 3800 || /[\s\r\n]/.test(token)) return null
     const response = await request('/user', undefined, token)
     if ([400, 401, 403].includes(response.status)) return null

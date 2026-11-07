@@ -13,6 +13,7 @@
 import { createHmac, timingSafeEqual } from 'node:crypto'
 import type { Principal, SiteRole } from '@cms/domain'
 import { asUser } from './database.ts'
+import { countPerfAuth } from './perf-trace.ts'
 
 export type AuthSubject = { subject: string; email: string; authenticatedAt?: number }
 export type VerifiedAuthSession = { token: string; refreshToken: string; expiresIn: number; subject: AuthSubject }
@@ -53,6 +54,7 @@ export function createLocalAuthProvider(secret: string): AuthProvider & Required
       return `${payload}.${sign(payload)}`
     },
     async verify(token) {
+      countPerfAuth('authChecks')
       if (!token) return null
       const dot = token.lastIndexOf('.')
       if (dot <= 0) return null

@@ -1,3 +1,4 @@
+import { measurePerfRender } from '@cms/platform/perf-trace'
 import {
   renderedFeatures,
   type StoryWidgetContext,
@@ -25,19 +26,21 @@ export async function publicPageResponse(
   const paths = Object.fromEntries(
     (await siteRoutes(resolveRequestHost(request.headers) ?? '')).map(entry => [entry.pageId, entry.path]),
   )
-  const { html, noindex } = renderPage({
-    manifest: route.manifest,
-    shell: route.shell,
-    isStaging: route.isStaging,
-    navigationPaths: paths,
-    options: {
-      servingHost: resolveRequestHost(request.headers) ?? undefined,
-      canonicalBase: route.canonicalHost ? `https://${route.canonicalHost}` : undefined,
-      storyWidgets: context.storyWidgets,
-      siteWidgets: context,
-      newsroom: context.newsroom,
-    },
-  })
+  const { html, noindex } = measurePerfRender(() =>
+    renderPage({
+      manifest: route.manifest,
+      shell: route.shell,
+      isStaging: route.isStaging,
+      navigationPaths: paths,
+      options: {
+        servingHost: resolveRequestHost(request.headers) ?? undefined,
+        canonicalBase: route.canonicalHost ? `https://${route.canonicalHost}` : undefined,
+        storyWidgets: context.storyWidgets,
+        siteWidgets: context,
+        newsroom: context.newsroom,
+      },
+    }),
+  )
   const files = renderSiteFiles(route.shell.site_files, route.pageId)
   const privateResponse = Boolean(context.contactSent || context.contactError)
   const features = renderedFeatures(html)
