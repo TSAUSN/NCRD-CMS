@@ -43,6 +43,13 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
+      - name: Verify the target project before signing in
+        env:
+          CMS_RELEASE_TARGET: ${{ inputs.target }}
+          CMS_RELEASE_STAGING_PROJECT_NUMBER: ${{ vars.CMS_RELEASE_STAGING_PROJECT_NUMBER }}
+          CMS_RELEASE_PRODUCTION_PROJECT_NUMBER: ${{ vars.CMS_RELEASE_PRODUCTION_PROJECT_NUMBER }}
+        run: bash scripts/check-release-environment.sh
+
       - uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3
 
       - name: Sign in to the target project for the build

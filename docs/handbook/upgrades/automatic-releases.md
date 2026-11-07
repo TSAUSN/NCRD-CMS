@@ -22,8 +22,12 @@ Pull requests and manual CI runs can test code without deploying it.
    production require `refs/heads/main` and `production`. Grant
    `roles/iam.workloadIdentityUser` on only the matching deploy account.
    Do not use a service account key.
-4. Set the variables below on each GitHub **environment**. Run the local
-   read-only `plan` first using the intended project and release commit.
+4. Set the variables below on each GitHub **environment**. At the
+   **repository** level, set `CMS_RELEASE_STAGING_PROJECT_NUMBER` and, before
+   enabling production, `CMS_RELEASE_PRODUCTION_PROJECT_NUMBER`. These
+   numbers must be distinct; the release rejects an environment with the
+   wrong number before it asks for credentials. Run the local read-only
+   `plan` first using the intended project and release commit.
    Verify all three services and that the project number matches.
 5. Set the **repository** variable `CMS_AUTODEPLOY_STAGING=true`, make a
    normal staging push without a CI skip marker, and verify the revision,
