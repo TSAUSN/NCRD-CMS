@@ -225,3 +225,8 @@ the inbox at most once every 30 seconds. The provider does not authorize any pag
 In the browser, Home → All sites → Home used one request. The site-change
 event caused one refresh. Opening the picker and then reloading a site
 workspace reused those choices. This change does not alter the endpoint.
+
+The sidebar switches request state when the server reports different grants.
+It drops the previous sidebar data without remounting the current screen.
+Creating a chapter can grant access to its new page; the save confirmation
+must stay visible while the sidebar reads for that new scope.

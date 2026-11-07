@@ -26,9 +26,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         <a className="skip" href="#main">
           Skip to content
         </a>
-        <SidebarDataProvider key={scope ?? 'signed-out'} scope={scope}>
-          {children}
-        </SidebarDataProvider>
+        <SidebarDataProvider scope={scope}>{children}</SidebarDataProvider>
       </body>
     </html>
   )
