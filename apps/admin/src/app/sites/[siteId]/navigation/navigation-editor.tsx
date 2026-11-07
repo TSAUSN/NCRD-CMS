@@ -1,7 +1,12 @@
 'use client'
 import { useEffect, useMemo, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import type { NavChild, NavNode, NavTree } from '@cms/schema'
+import type { NavNode, NavTree } from '@cms/schema'
+import { dropMenuItem, moveMenuItem } from '../../../../lib/menu-editing.ts'
+import { menuReorderIntent, type MenuMove } from '../../../../lib/menu-reorder-intent.ts'
+import { useReorderableList } from '../../../../components/ui/use-reorderable-list.ts'
+import { DropIndicator, ReorderAnnouncement } from '../../../../components/ui/drop-indicator.tsx'
+import reorderStyles from '../../../../components/ui/reorderable-list.module.css'
 import {
   IconAlert,
   IconArrowDown,
@@ -50,10 +55,6 @@ function targetDescription(node: NavNode, pages: PageChoice[]): string {
   return pages.find(page => page.id === target.page_id)?.path ?? 'Page no longer available'
 }
 
-function asChild(node: NavNode): NavChild {
-  return { label: node.label, target: node.target, visible: node.visible }
-}
-
 export function NavigationEditor({
   siteId,
   siteName,
@@ -76,7 +77,6 @@ export function NavigationEditor({
   const [linkOpen, setLinkOpen] = useState(false)
   const [linkLabel, setLinkLabel] = useState('')
   const [linkUrl, setLinkUrl] = useState('')
-  const [dragIndex, setDragIndex] = useState<number | null>(null)
   const [pending, startTransition] = useTransition()
 
   const usedPages = useMemo(() => pageIds(tree), [tree])
@@ -129,65 +129,42 @@ export function NavigationEditor({
     )
   }
 
-  function moveRoot(index: number, direction: -1 | 1) {
-    const destination = index + direction
-    if (destination < 0 || destination >= tree.length) return
-    setTree(current => {
-      const next = [...current]
-      ;[next[index], next[destination]] = [next[destination]!, next[index]!]
-      return next
-    })
+  const reorder = useReorderableList({
+    mimeType: 'application/x-cms-navigation',
+    decide: point => menuReorderIntent(tree, point),
+    apply: ({ from, to, position }: MenuMove) => {
+      const next = dropMenuItem(tree, from, to, position)
+      if (next === tree) return
+      setTree(next)
+      const [parent, child] = to.split('.').map(Number)
+      const target = child === undefined ? tree[parent!] : tree[parent!]?.children?.[child]
+      return 'Moved ' + (position === 'inside' ? 'under ' : position + ' ') + (target?.label || 'the menu item') + '.'
+    },
+  })
+
+  function moveByKeyboard(path: string, action: 'up' | 'down' | 'indent' | 'outdent') {
+    const next = moveMenuItem(tree, path, action)
+    if (next === tree) return
+    setTree(next)
+    const [parent, child] = path.split('.').map(Number)
+    const moved = child === undefined ? tree[parent!] : tree[parent!]?.children?.[child]
+    const placement =
+      action === 'indent' ? 'under the previous item' : action === 'outdent' ? 'out of the dropdown' : action
+    reorder.announce(`Moved ${moved?.label || 'menu item'} ${placement}.`)
   }
 
-  function moveChild(parentIndex: number, childIndex: number, direction: -1 | 1) {
-    setTree(current =>
-      current.map((node, index) => {
-        if (index !== parentIndex) return node
-        const children = [...(node.children ?? [])]
-        const destination = childIndex + direction
-        if (destination < 0 || destination >= children.length) return node
-        ;[children[childIndex], children[destination]] = [children[destination]!, children[childIndex]!]
-        return { ...node, children }
-      }),
+  function dropFeedback(path: string) {
+    const rejected = reorder.blocked ?? reorder.rejection
+    return (
+      <>
+        <DropIndicator marker={reorder.marker} row={path} />
+        {rejected?.row === path && (
+          <span aria-hidden="true" className={reorderStyles.reason}>
+            {rejected.message}
+          </span>
+        )}
+      </>
     )
-  }
-
-  function indent(index: number) {
-    if (index === 0) return
-    setTree(current => {
-      const next = [...current]
-      const [node] = next.splice(index, 1)
-      const parentIndex = index - 1
-      const parent = next[parentIndex]!
-      if (!node || (parent.children?.length ?? 0) >= 20) return current
-      next[parentIndex] = { ...parent, children: [...(parent.children ?? []), asChild(node)] }
-      return next
-    })
-  }
-
-  function outdent(parentIndex: number, childIndex: number) {
-    setTree(current => {
-      const next = [...current]
-      const parent = next[parentIndex]!
-      const children = [...(parent.children ?? [])]
-      const [child] = children.splice(childIndex, 1)
-      if (!child) return current
-      next[parentIndex] = children.length === 0 ? { ...parent, children: undefined } : { ...parent, children }
-      next.splice(parentIndex + 1, 0, child)
-      return next
-    })
-  }
-
-  function dropRoot(destination: number) {
-    if (dragIndex === null || dragIndex === destination) return setDragIndex(null)
-    setTree(current => {
-      const next = [...current]
-      const [dragged] = next.splice(dragIndex, 1)
-      if (!dragged) return current
-      next.splice(destination > dragIndex ? destination - 1 : destination, 0, dragged)
-      return next
-    })
-    setDragIndex(null)
   }
 
   function addPage(page: PageChoice) {
@@ -346,24 +323,13 @@ export function NavigationEditor({
                 </p>
               </div>
             ) : (
-              <ol className="navigation-list">
+              <ol className={'navigation-list ' + reorderStyles.list} data-reorder-list>
                 {tree.map((node, index) => (
                   <li
                     key={`${node.target.type}-${targetDescription(node, initial.pages)}-${index}`}
-                    className={dragIndex === index ? 'is-dragging' : ''}
-                    draggable={canManage}
-                    onDragStart={event => {
-                      setDragIndex(index)
-                      event.dataTransfer.effectAllowed = 'move'
-                    }}
-                    onDragOver={event => {
-                      if (canManage) event.preventDefault()
-                    }}
-                    onDrop={event => {
-                      event.preventDefault()
-                      dropRoot(index)
-                    }}
+                    {...reorder.row(String(index), !canManage || pending)}
                   >
+                    {dropFeedback(String(index))}
                     <NavigationRow
                       node={node}
                       description={targetDescription(node, initial.pages)}
@@ -371,16 +337,24 @@ export function NavigationEditor({
                       nested={false}
                       onChange={next => replaceRoot(index, next)}
                       onRemove={() => removeRoot(index)}
-                      onUp={() => moveRoot(index, -1)}
-                      onDown={() => moveRoot(index, 1)}
-                      onIndent={index > 0 ? () => indent(index) : undefined}
+                      onUp={() => moveByKeyboard(String(index), 'up')}
+                      onDown={() => moveByKeyboard(String(index), 'down')}
+                      onIndent={
+                        index > 0 && !node.children?.length && (tree[index - 1]?.children?.length ?? 0) < 20
+                          ? () => moveByKeyboard(String(index), 'indent')
+                          : undefined
+                      }
                       first={index === 0}
                       last={index === tree.length - 1}
                     />
                     {node.children && node.children.length > 0 && (
-                      <ol className="navigation-children">
+                      <ol className="navigation-children" data-reorder-child-list>
                         {node.children.map((child, childIndex) => (
-                          <li key={`${child.target.type}-${targetDescription(child, initial.pages)}-${childIndex}`}>
+                          <li
+                            key={`${child.target.type}-${targetDescription(child, initial.pages)}-${childIndex}`}
+                            {...reorder.row(index + '.' + childIndex, !canManage || pending)}
+                          >
+                            {dropFeedback(index + '.' + childIndex)}
                             <NavigationRow
                               node={child}
                               description={targetDescription(child, initial.pages)}
@@ -388,9 +362,11 @@ export function NavigationEditor({
                               nested
                               onChange={next => replaceChild(index, childIndex, next)}
                               onRemove={() => removeChild(index, childIndex)}
-                              onUp={() => moveChild(index, childIndex, -1)}
-                              onDown={() => moveChild(index, childIndex, 1)}
-                              onOutdent={() => outdent(index, childIndex)}
+                              onUp={() => moveByKeyboard(index + '.' + childIndex, 'up')}
+                              onDown={() => moveByKeyboard(index + '.' + childIndex, 'down')}
+                              onOutdent={
+                                tree.length < 50 ? () => moveByKeyboard(index + '.' + childIndex, 'outdent') : undefined
+                              }
                               first={childIndex === 0}
                               last={childIndex === node.children!.length - 1}
                             />
@@ -402,6 +378,7 @@ export function NavigationEditor({
                 ))}
               </ol>
             )}
+            <ReorderAnnouncement>{reorder.announcement}</ReorderAnnouncement>
           </section>
 
           {canManage && (
