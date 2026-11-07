@@ -140,7 +140,11 @@ jobs:
           retention-days: 7
 
   image:
-    if: github.event_name != 'pull_request'
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'push' &&
+       (github.ref == 'refs/heads/main' ||
+        github.ref == format('refs/heads/{0}', vars.CMS_STAGING_BRANCH || 'staging')))
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
