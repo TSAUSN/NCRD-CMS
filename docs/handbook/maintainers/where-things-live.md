@@ -69,7 +69,9 @@ Browser tests use `E2E_DATABASE` and configurable `E2E_ADMIN_PORT`/`E2E_SITE_POR
   persistence and recovery live in `use-editor-draft-session.ts`. The preview
   bridge and messages live in `use-editor-canvas-session.ts` and
   `use-canvas-messages.ts`. Toolbar, structure, inspector, and publication
-  dialogs have their own files. The domain package owns undoable changes.
+  dialogs have their own files. The page outline and page settings live in
+  `page-inspector.tsx`; selected-section fields live in `inspector.tsx`. The
+  domain package owns undoable changes.
 - The renderer entry point exports the supported API. Follow
   `document/render-page.ts` for a whole document, `frame/site-frame.ts` for
   header and footer, `section/` for sections and slots, `theme/` for theme

@@ -26,8 +26,8 @@ Pull requests and manual CI runs can test code without deploying it.
    read-only `plan` first using the intended project and release commit.
    Verify all three services and that the project number matches.
 5. Set the **repository** variable `CMS_AUTODEPLOY_STAGING=true`, make a
-   normal staging push, and verify the revision, admin sign-in and public
-   review site. When production is independently ready, set
+   normal staging push without a CI skip marker, and verify the revision,
+   admin sign-in and public review site. When production is independently ready, set
    `CMS_AUTODEPLOY_PRODUCTION=true`. Unset a flag to pause future deploys.
 
 | Environment variable | Value |

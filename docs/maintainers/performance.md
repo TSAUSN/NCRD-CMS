@@ -254,3 +254,27 @@ Eight local comparisons matched the previous rows, counts, and facets
 across sorting, filters, pagination, and permissions. The median time for
 the database reads fell from 68.3 ms to 24.5 ms across five paired samples,
 with six statements reduced to three.
+
+## November 7 review measurements
+
+These measurements answer different questions. Compare a screen journey with
+another screen journey and a database query with the same database query.
+
+| Operation | Before | After |
+| --- | ---: | ---: |
+| Hosted Header & menu controls, three warm signed-in Chrome samples | 1.63 s median | 1.03 s median |
+| Hosted Media controls, same browser and viewport | 0.87 s median | 0.57 s median |
+| Local site switcher SQL, five warm samples | 311.91 ms median | 0.22 ms median |
+| Local Media database reads, five paired samples | 68.3 ms median; six statements | 24.5 ms median; three statements |
+| Local fix links for 51 release candidates, five paired Super admin samples | 62.42 ms median; 102 statements | 19.33 ms median; two statements |
+
+Screen times end at visible controls, before an embedded preview settles. The
+Media and switcher reads kept the same ordered results in the tested roles.
+The release comparison kept exact fix links and page/version boundaries. No
+change to readiness rules or approval is implied.
+
+A single cold Admin sample took 11.33 s on the original build and 11.69 s
+on the measured release. Instance-start logs confirmed both cold samples;
+they do not show a gain. One-off hosted save and publish observations were
+not a matched workload. Repeat the same edit on the same disposable page
+under both builds to draw a publishing performance conclusion.
