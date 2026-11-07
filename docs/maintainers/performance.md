@@ -230,3 +230,13 @@ The sidebar switches request state when the server reports different grants.
 It drops the previous sidebar data without remounting the current screen.
 Creating a chapter can grant access to its new page; the save confirmation
 must stay visible while the sidebar reads for that new scope.
+
+The browser's sidebar session sits beside the route content. When verified
+grants change, it discards the old choices while leaving the current route
+mounted. The global Your sites links and site picker still share one read per
+tab and verified scope. A site change refreshes that result.
+
+A narrower query returned the same ordered site choices in 15 local role
+contexts and reduced the median SQL time from 363.87 ms to 0.25 ms. The Admin
+preview images did not pass the exact pixel check with that change, so the
+original query stays in use. Those timings are for the candidate only.

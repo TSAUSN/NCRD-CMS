@@ -6,7 +6,7 @@ import { CommandSearch } from '../components/command-search.tsx'
 import { currentSession } from '../lib/session.ts'
 import { DraftLeavePrompt } from '../components/draft-leave-prompt.tsx'
 import { NavigationHistory } from '../components/ui/navigation-history.tsx'
-import { SidebarDataProvider } from '../components/sidebar-data.tsx'
+import { SidebarSession } from '../components/sidebar-data.tsx'
 import { sidebarScope } from '../lib/sidebar-scope.ts'
 import { NavigationProgress } from '../components/shell/navigation-progress.tsx'
 
@@ -26,7 +26,8 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         <a className="skip" href="#main">
           Skip to content
         </a>
-        <SidebarDataProvider scope={scope}>{children}</SidebarDataProvider>
+        <SidebarSession scope={scope} />
+        {children}
       </body>
     </html>
   )

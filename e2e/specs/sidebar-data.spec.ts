@@ -46,3 +46,43 @@ test('keeps site choices and the inbox count across client navigation', async ({
   await expect(sidebar.getByRole('link', { name: 'Demo site', exact: true })).toBeVisible()
   expect(siteReads).toBe(2)
 })
+
+test('drops a cached site list from another access scope before opening a site', async ({ page }) => {
+  await signIn(page, 'root@example.test')
+  const storageKey = 'cms.sidebar.site-choices'
+  await expect.poll(() => page.evaluate(key => sessionStorage.getItem(key), storageKey)).not.toBeNull()
+  await page.evaluate(key => {
+    sessionStorage.setItem(
+      key,
+      JSON.stringify({ scope: 'previous-grants', sites: [{ id: 'stale-site', name: 'Stale site' }] }),
+    )
+  }, storageKey)
+  let allowChoices: () => void = () => {}
+  const paused = new Promise<void>(resolve => {
+    allowChoices = resolve
+  })
+  let reads = 0
+  const choices = (url: URL) => url.pathname === '/api/sites'
+  await page.route(choices, async route => {
+    reads++
+    await paused
+    await route.continue()
+  })
+  try {
+    const request = page.waitForRequest(item => choices(new URL(item.url())))
+    await page.reload()
+    await request
+    await expect(page.getByRole('heading', { name: 'Home', exact: true })).toBeVisible()
+    const sidebar = page.getByRole('navigation', { name: 'Sections of the CMS' })
+    await expect(sidebar.getByRole('link', { name: 'Stale site', exact: true })).toHaveCount(0)
+    await expect.poll(() => page.evaluate(key => sessionStorage.getItem(key), storageKey)).toBeNull()
+    const fresh = page.waitForResponse(item => choices(new URL(item.url())))
+    allowChoices()
+    expect((await fresh).ok()).toBe(true)
+    await expect(sidebar.getByText('Your sites', { exact: true })).toBeVisible()
+    await expect(sidebar.getByRole('link', { name: 'Demo site', exact: true })).toBeVisible()
+    expect(reads).toBe(1)
+  } finally {
+    allowChoices()
+  }
+})

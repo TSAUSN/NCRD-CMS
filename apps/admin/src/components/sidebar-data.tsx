@@ -1,22 +1,43 @@
 'use client'
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useEffect, useLayoutEffect, useSyncExternalStore } from 'react'
 
 type SiteChoice = { id: string; name: string }
-type SidebarData = {
-  sites: SiteChoice[] | null
-  sitesError: boolean
-  inboxCount: number | null
-  start: () => void
+type SidebarReader = {
+  scope: string
+  sitesStarted: boolean
+  inboxStarted: boolean
+  sitesRequest: AbortController | null
+  inboxRequest: AbortController | null
+  lastInboxStarted: number
 }
+type SidebarData = { sites: SiteChoice[] | null; sitesError: boolean; inboxCount: number | null }
+type Snapshot = SidebarData & { reader: SidebarReader | null }
 
 const siteChoicesChanged = 'cms:site-choices-changed'
 const inboxChanged = 'cms:inbox-changed'
 const inboxFocusInterval = 30_000
 const siteChoicesCache = 'cms.sidebar.site-choices'
+const empty: Snapshot = { reader: null, sites: null, sitesError: false, inboxCount: null }
+const listeners = new Set<() => void>()
+let snapshot = empty
 
-const empty: SidebarData = { sites: null, sitesError: false, inboxCount: null, start: () => {} }
-const Context = createContext(empty)
+function subscribe(listener: () => void) {
+  listeners.add(listener)
+  return () => {
+    listeners.delete(listener)
+  }
+}
+function getSnapshot() {
+  return snapshot
+}
+function getServerSnapshot() {
+  return empty
+}
+function setSnapshot(next: Snapshot) {
+  snapshot = next
+  for (const listener of listeners) listener()
+}
 
 export function notifySiteChoicesChanged() {
   clearSiteChoices()
@@ -53,112 +74,103 @@ function readStoredSites(scope: string): SiteChoice[] | null {
   return null
 }
 
-type SidebarReader = {
-  scope: string | null
-  started: boolean
-  sitesRequest: AbortController | null
-  inboxRequest: AbortController | null
-  lastInboxStarted: number
+function current(reader: SidebarReader, signal: AbortSignal) {
+  return snapshot.reader === reader && !signal.aborted
 }
-type Scoped<T> = { reader: SidebarReader; value: T }
-type SiteResult = { sites: SiteChoice[] | null; error: boolean }
 
-export function SidebarDataProvider({ children, scope }: { children: ReactNode; scope: string | null }) {
-  // A grant change invalidates sidebar data, not local state in the page.
-  // Each reader owns its requests so an old cleanup cannot abort a new scope.
-  const reader = useMemo<SidebarReader>(
-    () => ({ scope, started: false, sitesRequest: null, inboxRequest: null, lastInboxStarted: -Infinity }),
-    [scope],
-  )
-  const [siteResult, setSiteResult] = useState<Scoped<SiteResult> | null>(null)
-  const [inboxResult, setInboxResult] = useState<Scoped<number | null> | null>(null)
-
-  const readSites = useCallback(async () => {
-    const scope = reader.scope
-    if (!scope) return
-    reader.sitesRequest?.abort()
-    const controller = new AbortController()
-    reader.sitesRequest = controller
+async function readSites(reader: SidebarReader) {
+  reader.sitesRequest?.abort()
+  const controller = new AbortController()
+  reader.sitesRequest = controller
+  try {
+    const response = await fetch('/api/sites', { cache: 'no-store', signal: controller.signal })
+    if (!response.ok) throw Error('Sites unavailable')
+    const { sites } = (await response.json()) as { sites: SiteChoice[] }
+    if (!current(reader, controller.signal)) return
+    setSnapshot({ ...snapshot, sites, sitesError: false })
     try {
-      const response = await fetch('/api/sites', { cache: 'no-store', signal: controller.signal })
-      if (!response.ok) throw Error('Sites unavailable')
-      const result = (await response.json()) as { sites: SiteChoice[] }
-      if (!controller.signal.aborted) {
-        setSiteResult({ reader, value: { sites: result.sites, error: false } })
-        try {
-          sessionStorage.setItem(siteChoicesCache, JSON.stringify({ scope, sites: result.sites }))
-        } catch {}
-      }
-    } catch {
-      if (!controller.signal.aborted) {
-        clearSiteChoices()
-        setSiteResult({ reader, value: { sites: null, error: true } })
-      }
+      sessionStorage.setItem(siteChoicesCache, JSON.stringify({ scope: reader.scope, sites }))
+    } catch {}
+  } catch {
+    if (!current(reader, controller.signal)) return
+    clearSiteChoices()
+    setSnapshot({ ...snapshot, sites: null, sitesError: true })
+  }
+}
+
+async function readInbox(reader: SidebarReader) {
+  reader.inboxRequest?.abort()
+  const controller = new AbortController()
+  reader.inboxRequest = controller
+  reader.lastInboxStarted = Date.now()
+  try {
+    const response = await fetch('/api/inbox/summary', { cache: 'no-store', signal: controller.signal })
+    if (!response.ok) throw Error('Inbox count unavailable')
+    const { count } = (await response.json()) as { count: number }
+    if (current(reader, controller.signal))
+      setSnapshot({ ...snapshot, inboxCount: Number.isSafeInteger(count) && count >= 0 ? count : null })
+  } catch {
+    if (current(reader, controller.signal)) setSnapshot({ ...snapshot, inboxCount: null })
+  }
+}
+
+/** Set the browser's verified scope without wrapping or remounting any route. */
+export function SidebarSession({ scope }: { scope: string | null }) {
+  useLayoutEffect(() => {
+    if (!scope) {
+      clearSiteChoices()
+      setSnapshot(empty)
+      return
     }
-  }, [reader])
-
-  const readInbox = useCallback(async () => {
-    reader.inboxRequest?.abort()
-    const controller = new AbortController()
-    reader.inboxRequest = controller
-    reader.lastInboxStarted = Date.now()
-    try {
-      const response = await fetch('/api/inbox/summary', { cache: 'no-store', signal: controller.signal })
-      if (!response.ok) throw Error('Inbox count unavailable')
-      const result = (await response.json()) as { count: number }
-      if (!controller.signal.aborted)
-        setInboxResult({ reader, value: Number.isSafeInteger(result.count) && result.count >= 0 ? result.count : null })
-    } catch {
-      if (!controller.signal.aborted) setInboxResult({ reader, value: null })
+    const reader: SidebarReader = {
+      scope,
+      sitesStarted: false,
+      inboxStarted: false,
+      sitesRequest: null,
+      inboxRequest: null,
+      lastInboxStarted: -Infinity,
     }
-  }, [reader])
-
-  const start = useCallback(() => {
-    if (reader.started || !reader.scope) return
-    reader.started = true
-    const stored = readStoredSites(reader.scope)
-    if (stored) setSiteResult({ reader, value: { sites: stored, error: false } })
-    else void readSites()
-    void readInbox()
-  }, [reader, readSites, readInbox])
-
-  useEffect(() => {
-    if (!reader.scope) clearSiteChoices()
+    readStoredSites(scope) // Discard stale grants before the first choices request.
+    setSnapshot({ ...empty, reader })
     function refreshSites() {
-      if (reader.started) void readSites()
+      if (reader.sitesStarted) void readSites(reader)
     }
     function refreshInbox() {
-      if (reader.started) void readInbox()
+      if (reader.inboxStarted) void readInbox(reader)
     }
     function onFocus() {
-      if (reader.started && Date.now() - reader.lastInboxStarted >= inboxFocusInterval) void readInbox()
+      if (reader.inboxStarted && Date.now() - reader.lastInboxStarted >= inboxFocusInterval) void readInbox(reader)
     }
     window.addEventListener(siteChoicesChanged, refreshSites)
     window.addEventListener(inboxChanged, refreshInbox)
     window.addEventListener('focus', onFocus)
     return () => {
-      reader.sitesRequest?.abort()
-      reader.inboxRequest?.abort()
-      reader.started = false
       window.removeEventListener(siteChoicesChanged, refreshSites)
       window.removeEventListener(inboxChanged, refreshInbox)
       window.removeEventListener('focus', onFocus)
+      reader.sitesRequest?.abort()
+      reader.inboxRequest?.abort()
+      if (snapshot.reader === reader) setSnapshot(empty)
     }
-  }, [reader, readSites, readInbox])
-
-  const activeSites = siteResult?.reader === reader ? siteResult.value : null
-  const inboxCount = inboxResult?.reader === reader ? inboxResult.value : null
-  return (
-    <Context.Provider
-      value={{ sites: activeSites?.sites ?? null, sitesError: activeSites?.error ?? false, inboxCount, start }}
-    >
-      {children}
-    </Context.Provider>
-  )
+  }, [scope])
+  return null
 }
 
-export function useSidebarData() {
-  const data = useContext(Context)
-  useEffect(() => data.start(), [data.start])
+export function useSidebarData(): SidebarData {
+  const data = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot)
+  useEffect(() => {
+    const reader = data.reader
+    if (!reader || snapshot.reader !== reader) return
+    if (!reader.sitesStarted) {
+      reader.sitesStarted = true
+      const cached = readStoredSites(reader.scope)
+      if (cached) setSnapshot({ ...snapshot, sites: cached })
+      else void readSites(reader)
+    }
+    if (!reader.inboxStarted) {
+      reader.inboxStarted = true
+      void readInbox(reader)
+    }
+  }, [data.reader])
   return data
 }
