@@ -1,0 +1,13 @@
+/* Header button settings; app/sites/[siteId]/header/workspace.tsx.
+   Keep an unused optional control compact beside the active button form. */
+.buttons.buttons[data-secondary] {
+  align-items: start;
+}
+.buttons.buttons[data-secondary='off'] {
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+}
+@media (max-width: 60em) {
+  .buttons.buttons[data-secondary] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

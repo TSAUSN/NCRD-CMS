@@ -41,6 +41,7 @@ import { DEFAULT_FOOTER_CONFIG } from '@cms/schema'
 import { useSiteLookCanvas } from '../design/use-site-look-canvas.ts'
 import { prepareNationalHeader, saveHeaderMenu } from './actions.ts'
 import styles from '../../../../components/workspace.module.css'
+import buttonStyles from './header-buttons.module.css'
 const record = (value: unknown): Record<string, unknown> =>
   value && typeof value === 'object' && !Array.isArray(value) ? (value as Record<string, unknown>) : {}
 export function HeaderMenuWorkspace({
@@ -558,7 +559,11 @@ export function HeaderMenuWorkspace({
           {tab === 'buttons' && (
             <>
               {header.schemaVersion === 2 ? (
-                <div className={styles.equalColumns} data-align="controls">
+                <div
+                  className={styles.equalColumns + ' ' + buttonStyles.buttons}
+                  data-align="controls"
+                  data-secondary={Object.hasOwn(values, 'secondary') ? 'on' : 'off'}
+                >
                   {buttons.map(slot => {
                     const current = record(values[slot.id]),
                       optional = slot.id === 'secondary',

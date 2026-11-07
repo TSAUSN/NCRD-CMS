@@ -190,6 +190,23 @@ test('Header & menu adds without leftovers, nests, edits identity and saves thro
     await page.getByLabel(/^Description \(for screen readers\)/).fill('[Reviewed logo description]')
     await page.getByRole('tab', { name: 'Header buttons', exact: true }).click()
     const donate = page.getByRole('region', { name: 'Donate button', exact: true })
+    for (const width of [1440, 1024]) {
+      await page.setViewportSize({ width, height: 1000 })
+      const main = await donate.boundingBox(),
+        optional = await page.getByRole('region', { name: 'Second button', exact: true }).boundingBox()
+      expect(main).not.toBeNull()
+      expect(optional).not.toBeNull()
+      expect(optional!.width).toBeLessThan(main!.width)
+      expect(optional!.height).toBeLessThan(main!.height * 0.6)
+      await page.screenshot({
+        path: resolve(
+          '../.r8-progress/round3/header-screen/' + info.project.name,
+          'buttons-disabled-' + width + '.png',
+        ),
+        animations: 'disabled',
+      })
+    }
+    await page.setViewportSize({ width: 1440, height: 900 })
     await donate.getByRole('button', { name: 'A website', exact: true }).click()
     await donate.getByLabel(/^Web address/).fill('https://example.org/give?form=main#donate')
     await donate.getByLabel('Tracking code', { exact: true }).fill('utm_source=site')
