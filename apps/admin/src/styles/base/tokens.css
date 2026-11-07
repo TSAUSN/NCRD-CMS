@@ -1,0 +1,157 @@
+/* The admin's whole stylesheet.
+ *
+ * ------------------------------------------------------------------ layout --
+ *
+ * Two layout models live here and they answer SPEC §7's "one document scroll per
+ * screen" (D11) differently on purpose:
+ *
+ *   * The list screens — sites, pages, the section library — are documents. They
+ *     scroll once, at the page level, and nothing inside them scrolls at all.
+ *   * The editor is an application shell. It is exactly one viewport tall, and
+ *     the two rails and the canvas each scroll on their own, because they are
+ *     the "genuinely independent panels" the rule carves out. There is still
+ *     only one scroll under the pointer at any moment, which is the property the
+ *     rule is protecting; a page-level scroll *underneath* three panes would be
+ *     the nested scrolling it forbids.
+ *
+ * ------------------------------------------------------------------- colour --
+ *
+ * Navy is the structure and red is the identity, and they are deliberately not
+ * interchangeable. Ordinary actions are navy — buttons, links, selection, the
+ * active tab — so an editor learns one colour for "this does something". Red is
+ * kept for the one action a screen exists for (`.cta`: Publish, Create a site),
+ * for what needs attention, and for what destroys work. A screen with three red
+ * buttons has no primary action at all, which is what V2 used to look like.
+ *
+ * Red therefore covers both identity and danger. Nothing distinguishes those by
+ * hue, so nothing may: every error and destructive control here carries an icon
+ * and a word as well, which is the WCAG 1.4.1 rule the status chips already
+ * follow and the reason they can share a palette without becoming ambiguous.
+ *
+ * The neutrals are V1's cool greys (decision 2026-10-07): a calm workspace that
+ * lets the site being edited supply the colour.
+ *
+ * -------------------------------------------------------------------- type --
+ *
+ * No web fonts, no CDN (SPEC §6.6): every face here is one the operating system
+ * already has. The UI is set in the platform's own sans because that is what
+ * makes an admin feel native and dense without feeling cramped; the wordmark and
+ * the signed-out screen are set in a serif, which is the whole of the type
+ * pairing and is deliberately confined to identity rather than sprayed across
+ * headings, where it would read as a brochure instead of a tool.
+ *
+ * ------------------------------------------------------------------ themes --
+ *
+ * Three states, not two. An explicit choice stamps `data-theme` on the root; the
+ * default "system" setting stamps nothing and only `prefers-color-scheme`
+ * separates light from dark. So the bare `:root` carries the complete light
+ * palette, the media query redefines only tokens and is guarded so an explicit
+ * light choice still wins, and `[data-theme=dark]` redefines them again. Nothing
+ * below this block states a colour outside a token.
+ */
+
+:root {
+  /* Shared tokens (brand, ink, lines, surfaces, nav and status colours, radii,
+   * sidebar widths) are defined once in styles/tokens.css, which loads after
+   * this file. Only admin-specific tokens stay here. */
+  /* -- Salvation Army identity -------------------------------------------
+   * These are the brand's own values, taken from the V1 admin's token block
+   * rather than invented here, so the two products are recognisably the same
+   * organisation.
+   *
+   * `--sa-red` is the brand fill. White text on it measures 3.6:1, which is
+   * enough for a large heading or a 3px rule and not enough for a 14px button
+   * label, so it is never the background of small text. `--sa-red-ink` is the
+   * same red darkened until it passes AA both ways (5.4:1 on white, 5.4:1
+   * under white) and is what buttons, links and error text actually use. Two
+   * tokens rather than one because "the brand red" and "a red you may set type
+   * on" are genuinely different questions.
+   */
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  --sa-red-tint: #fdecec;
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  --sa-red-line: #f3c3c5;
+
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  --sa-navy-deep: #001640;
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  --sa-navy-soft: #12325f;
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  --sa-navy-ink: #0d3574;
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  --sa-navy-tint: #e8eef7;
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  --sa-navy-tint-2: #cddcef;
+
+  /* -- ground: V1's calm cool neutrals ------------------------------------
+   * A pale blue-grey workspace with white working surfaces, the shape V1's
+   * admin provided in the approved design. The page being edited carries its own
+   * brand; the tool around it stays quiet. */
+
+  /* Aliases, so the rules below can talk about roles rather than about the
+     brand. Navy is structure and every ordinary action; red is identity,
+     attention and destruction. */
+  --navy-900: var(--sa-navy-deep);
+  --navy-800: var(--sa-navy);
+  --navy-700: var(--sa-navy-soft);
+  --navy-600: var(--sa-navy-ink);
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  --navy-500: #2f5f9e;
+  --navy-tint: var(--sa-navy-tint);
+  --navy-tint-2: var(--sa-navy-tint-2);
+
+  /* -- semantic ---------------------------------------------------------- */
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  --ok-line: #a5cfb8;
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  --warn-line: #ecd29f;
+  --info: var(--sa-navy-ink);
+  --info-tint: var(--sa-navy-tint);
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  --info-line: #b3c8e4;
+  --danger-tint: var(--sa-red-tint);
+  --danger-line: var(--sa-red-line);
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  --scheduled: #4a3a8f;
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  --scheduled-tint: #ece9f8;
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  --scheduled-line: #bfb6e4;
+
+  /* -- the mark ---------------------------------------------------------- */
+
+  /* -- navigation -------------------------------------------------------- */
+  --nav-bg-deep: var(--sa-navy-deep);
+
+  /* -- app bar (the editor keeps one) ------------------------------------ */
+
+  /* -- shape ------------------------------------------------------------- */
+  --r-xs: 0.25rem;
+  --r-md: 0.5rem;
+  --r: 0.5rem;
+  --r-xl: 1rem;
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  --r-pill: 999px;
+  --bar-h: 3.5rem;
+  --pane-tree-w: 17.5rem;
+  --pane-inspector-w: 22.5rem;
+
+  /* -- elevation --------------------------------------------------------- */
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  --e1: 0 1px 2px rgba(16, 24, 40, 0.04);
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  --e2: 0 1px 2px rgba(0, 32, 86, 0.05), 0 8px 20px -8px rgba(0, 32, 86, 0.18);
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  --e3: 0 2px 8px rgba(0, 22, 64, 0.14), 0 32px 64px -24px rgba(0, 22, 64, 0.45);
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  --ring: 0 0 0 3px var(--navy-tint-2);
+
+  /* -- type -------------------------------------------------------------- */
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* -- motion ------------------------------------------------------------ */
+  --fast: 0.12s;
+  --slide: 0.2s;
+
+  color-scheme: light;
+}

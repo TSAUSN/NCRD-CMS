@@ -1,0 +1,435 @@
+/* In the editor the library is a working shelf, occupying the inspector column
+   instead of covering the page. V1's persistent catalogue was the right mental
+   model; the extra width, static thumbnails and explicit Preview/Insert actions
+   are the upgrade. */
+.library-drawer {
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  box-shadow: -8px 0 22px rgba(10, 18, 28, 0.06);
+  position: relative;
+  z-index: 2;
+}
+.library-drawer .overlay-head {
+  padding: 0.72rem 0.8rem 0.72rem 0.9rem;
+}
+.library-drawer .overlay-head h2 {
+  display: block;
+}
+.library-drawer .overlay-head .where {
+  display: block;
+  margin-top: 0.16rem;
+  line-height: 1.35;
+  font-size: 0.75rem;
+}
+/* Search gets the full width of the shelf; count and filters share the row
+   below. (A two-column grid gave the hidden label a cell and left the search
+   box a few characters wide.) */
+/* Sections or page recipes: the two things the shelf can add. */
+.library-drawer .library-views {
+  display: flex;
+  margin: 0.65rem 0.75rem 0;
+}
+.library-drawer .library-views > button {
+  flex: 1 1 0;
+  min-height: 2rem;
+}
+.library-drawer .overlay-controls {
+  padding: 0.65rem 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem 0.6rem;
+}
+.library-drawer .overlay-controls .search-field {
+  flex: 1 1 100%;
+  max-width: none;
+}
+.library-drawer .overlay-controls > label:not(.sr-only) {
+  margin: 0;
+  font-size: 0.8125rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.library-drawer .overlay-controls > select {
+  width: auto;
+  flex: 1 1 7rem;
+  min-width: 0;
+}
+.library-drawer .overlay-count {
+  order: 3;
+  flex-basis: 100%;
+}
+.library-drawer .overlay-keyhint {
+  display: none;
+}
+.library-drawer .overlay-body {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+/* Categories wrap as V1's did, so every one is visible without scrolling
+   sideways through a strip. */
+.library-drawer .overlay-categories {
+  flex: none;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  padding: 0.1rem 0.75rem 0.65rem;
+  overflow: visible;
+  border-right: 0;
+  border-bottom: var(--line-thin) solid var(--line);
+}
+.library-drawer .overlay-categories .eyebrow {
+  display: none;
+}
+.library-drawer .overlay-categories button {
+  flex: none;
+  border: var(--line-thin) solid var(--line);
+  background: var(--surface);
+  padding: 0.15rem 0.55rem;
+  gap: 0.3rem;
+  white-space: nowrap;
+  min-height: 1.6rem;
+  font-size: 0.75rem;
+  border-radius: var(--r-pill);
+}
+.library-drawer .overlay-categories button[aria-pressed='true'] {
+  background: var(--navy-600);
+  border-color: var(--navy-600);
+  color: var(--text-on-dark);
+}
+.library-drawer .overlay-categories button[aria-pressed='true'] .tally {
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  color: rgba(255, 255, 255, 0.75);
+}
+/* Two cards to a row, as on V1's shelf: twice the sections in view, each still
+   drawn from the section itself. */
+.library-drawer .overlay-grid {
+  /* max-content, not auto: in this fixed-height scroller auto rows shrink to a
+     card's minimum, which overflow: hidden makes zero. */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-rows: max-content;
+  gap: 0.55rem;
+  padding: 0.65rem 0.65rem 2rem;
+  min-height: 0;
+  flex: 1 1 auto;
+  align-content: start;
+}
+.library-drawer .overlay-grid > :not(.section-card) {
+  grid-column: 1 / -1;
+}
+.library-drawer .section-card {
+  min-height: 0;
+  cursor: grab;
+}
+.library-drawer .section-card:active {
+  cursor: grabbing;
+}
+.library-drawer .section-thumb-frame {
+  aspect-ratio: 5 / 2;
+}
+.library-drawer .section-card-body {
+  padding: 0.45rem 0.5rem 0.5rem;
+  gap: 0.15rem;
+}
+.library-drawer .section-card-name {
+  font-size: 0.8125rem;
+  line-height: 1.3;
+  align-items: flex-start;
+}
+.library-drawer .section-card-name > span:first-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.library-drawer .section-card-name .favourite-star {
+  flex: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  min-height: 0;
+  margin: -0.15rem -0.25rem 0 0;
+  color: var(--ink-3);
+  font-size: 0.95rem;
+  padding: 0;
+}
+.library-drawer .section-card-name .favourite-star.is-on {
+  color: var(--warn);
+}
+.library-drawer .section-card-meta {
+  font-size: 0.6875rem;
+  gap: 0.25rem;
+}
+.library-drawer .section-card-warn {
+  font-size: 0.6875rem;
+}
+.library-drawer .section-card-actions {
+  margin-top: 0.3rem;
+  padding-top: 0.4rem;
+  gap: 0.3rem;
+}
+.library-drawer .section-card-actions > button {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 1.75rem;
+  padding: 0.15rem 0.3rem;
+  font-size: 0.75rem;
+  justify-content: center;
+}
+.library-drawer .library-preview {
+  width: 100%;
+  padding: 0.75rem;
+  overflow-y: auto;
+}
+.library-drawer .library-preview-copy {
+  display: block;
+  padding: 0.75rem;
+}
+.library-drawer .library-preview-copy > button {
+  width: 100%;
+  margin-top: 0.75rem;
+  justify-content: center;
+}
+.library-drawer .library-preview-stage .section-thumb-frame {
+  aspect-ratio: 3 / 2;
+}
+/* Where the shelf becomes a full-width tab (tablet), as many columns as fit. */
+@media (max-width: 64rem) {
+  .library-drawer .overlay-grid {
+    grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  }
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  background: rgba(10, 18, 28, 0.55);
+  display: grid;
+  place-items: center;
+  padding: 1.5rem 1rem;
+  z-index: 40;
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  backdrop-filter: blur(2px);
+}
+/* A centred sheet rather than the library's full-height dialog. */
+.overlay-centre {
+  place-items: center;
+}
+/* A confirmation taller than the window (a retry with its findings and a
+   reason field, on a 720px laptop) scrolls inside itself, so its actions stay
+   reachable instead of falling below the fixed overlay. */
+.confirm {
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  box-shadow: var(--e3);
+  width: min(26rem, 100%);
+  padding: 1.25rem 1.35rem 1.15rem;
+  border: var(--line-thin) solid var(--line);
+  max-height: calc(100dvh - 3rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.confirm-head {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.75rem;
+}
+.confirm-head h2 {
+  margin: 0;
+  font-size: 1.0625rem;
+  color: var(--sa-navy);
+  letter-spacing: -0.01em;
+}
+.confirm-mark {
+  flex: none;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--danger-tint);
+  color: var(--danger);
+}
+.confirm p {
+  margin: 0 0 0.5rem;
+  font-size: 0.875rem;
+  color: var(--ink-2);
+}
+.confirm-reassurance {
+  color: var(--ink-3) !important;
+  font-size: 0.8125rem !important;
+}
+.confirm-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  margin-top: 1.1rem;
+}
+
+.overlay-dialog {
+  background: var(--paper);
+  border-radius: var(--r-lg);
+  width: min(78rem, 100%);
+  height: min(48rem, 92vh);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: var(--e3);
+  border: var(--line-thin) solid var(--line);
+}
+.overlay-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem 0.75rem 1.15rem;
+  background: var(--bar-bg);
+  color: var(--bar-ink);
+  flex: none;
+  border-bottom: var(--line-focus) solid var(--brand);
+}
+.overlay-head h2 {
+  margin: 0;
+  font-size: 1rem;
+  text-transform: none;
+  letter-spacing: -0.008em;
+  color: var(--bar-ink);
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.overlay-head .where {
+  font-size: 0.8125rem;
+  color: var(--bar-ink-2);
+  font-weight: 400;
+}
+.overlay-head button.icon-btn {
+  color: var(--bar-ink-2);
+}
+.overlay-head button.icon-btn:hover {
+  background: var(--bar-hover);
+  color: var(--bar-ink);
+}
+
+.overlay-controls {
+  padding: 0.6rem 1.15rem;
+  border-bottom: var(--line-thin) solid var(--line);
+  background: var(--surface);
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex: none;
+  flex-wrap: wrap;
+}
+.overlay-controls .search-field {
+  flex: 1 1 16rem;
+  max-width: 24rem;
+}
+.overlay-count {
+  font-size: 0.8125rem;
+  color: var(--ink-3);
+  flex: none;
+}
+.overlay-keyhint {
+  font-size: 0.75rem;
+  color: var(--ink-3);
+  margin-left: auto;
+  flex: none;
+}
+.library-drag-hint {
+  margin: 0 0 0.6rem;
+  font-size: 0.8125rem;
+  color: var(--ink-3);
+}
+.library-drawer .library-drag-hint {
+  margin: 0.55rem 0.75rem 0;
+  font-size: 0.75rem;
+}
+.overlay-keyhint kbd {
+  font-family: var(--font-ui);
+  font-size: 0.6875rem;
+  border: var(--line-thin) solid var(--line-strong);
+  border-bottom-width: var(--line-focus);
+  border-radius: var(--r-xs);
+  padding: 0 0.3rem;
+  background: var(--surface);
+  color: var(--ink-2);
+  margin: 0 0.1rem;
+}
+
+.overlay-body {
+  display: grid;
+  grid-template-columns: 13rem minmax(0, 1fr);
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.overlay-body.showing-preview {
+  display: block;
+  overflow-y: auto;
+  background: var(--paper-sunk);
+}
+.overlay-categories {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  padding: 0.85rem 0.65rem;
+  overflow-y: auto;
+  border-right: var(--line-thin) solid var(--line);
+  background: var(--surface);
+}
+.overlay-categories .eyebrow {
+  padding: 0 0.55rem;
+  margin: 0 0 0.4rem;
+}
+.overlay-categories button {
+  background: none;
+  border: 0;
+  text-align: left;
+  color: var(--ink-2);
+  justify-content: space-between;
+  padding: 0.35rem 0.55rem;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.8125rem;
+  gap: 0.5rem;
+}
+.overlay-categories button:hover {
+  background: var(--surface-3);
+  color: var(--ink);
+}
+.overlay-categories button[aria-pressed='true'] {
+  background: var(--navy-tint);
+  color: var(--navy-600);
+  font-weight: 650;
+}
+.overlay-categories .tally {
+  font-size: 0.75rem;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+  flex: none;
+}
+.overlay-categories button[aria-pressed='true'] .tally {
+  color: var(--navy-600);
+}
+
+.overlay-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(24rem, 1fr));
+  grid-auto-rows: minmax(18rem, max-content);
+  align-content: start;
+  padding: 1rem 1.15rem 2rem;
+  overflow-y: auto;
+}
+.overlay-empty {
+  padding: 2.5rem 1.15rem;
+  grid-column: 1 / -1;
+}

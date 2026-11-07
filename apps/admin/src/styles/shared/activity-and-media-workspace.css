@@ -1,0 +1,371 @@
+.activity-filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.activity-filters .actions {
+  grid-column: 1 / -1;
+}
+.activity-list {
+  list-style: none;
+  margin: 0 0 1.5rem;
+  padding: 0;
+  display: grid;
+  gap: 1rem;
+}
+.activity-entry {
+  min-width: 0;
+}
+.activity-entry-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+}
+.activity-entry-heading h2 {
+  font-size: 1rem;
+  margin: 0;
+}
+.activity-entry time {
+  font-size: 0.8rem;
+}
+.activity-entry pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 0.8rem;
+  max-width: 100%;
+}
+.activity-references {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 0.4rem 1rem;
+  font-size: 0.8rem;
+}
+.activity-references dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.section-request-form {
+  margin-bottom: 1.5rem;
+}
+.section-request-form > summary {
+  font-weight: 650;
+  cursor: pointer;
+}
+.section-request-form form,
+.section-request-card form {
+  margin-top: 1rem;
+}
+.request-body {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.request-list {
+  display: grid;
+  gap: 1rem;
+}
+.section-request-card h3 {
+  margin-top: 0;
+}
+.inbox-section {
+  margin-top: 2rem;
+  scroll-margin-top: 1rem;
+}
+.inbox-jump-links {
+  margin-bottom: 1.5rem;
+}
+.nav-count {
+  margin-left: auto;
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  color: #182e4a;
+  font-size: 0.7rem;
+  font-weight: 700;
+  min-width: 1.35rem;
+  text-align: center;
+  padding: 0.1rem 0.3rem;
+}
+.app[data-rail='on'] .nav-count {
+  display: none;
+}
+.overlay-grid > .section-request-form {
+  grid-column: 1 / -1;
+  width: 100%;
+  margin-bottom: 0;
+}
+/* On the shelf it is a quiet line after the cards, not a box before them. */
+.library-drawer .overlay-grid > .section-request-form {
+  order: 1;
+  padding: 0.55rem 0.7rem;
+  box-shadow: none;
+  background: var(--surface-2);
+  font-size: 0.8125rem;
+}
+
+/* Folder-based media workspace. Keep the selected image beside the library. */
+.media-controls {
+  flex-wrap: wrap;
+}
+.media-organizer {
+  display: grid;
+  grid-template-columns: 10rem minmax(0, 1fr) 18rem;
+  align-items: start;
+}
+.media-folders {
+  padding: 0.85rem 0.6rem;
+  min-width: 0;
+}
+.media-folders-head {
+  display: grid;
+  gap: 0.2rem;
+  padding: 0 0.4rem 0.7rem;
+}
+.media-folders-head small {
+  color: var(--ink-3);
+  font-size: 0.67rem;
+}
+.media-folders > button {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  gap: 0.4rem;
+  margin-bottom: 0.2rem;
+  padding: 0.55rem 0.65rem;
+  color: var(--ink-2);
+  background: transparent;
+  border-color: transparent;
+  text-align: left;
+  font-size: 0.75rem;
+}
+.media-folders > button span {
+  overflow-wrap: anywhere;
+}
+.media-folders > button strong {
+  color: var(--ink-3);
+}
+.media-folders > button:hover,
+.media-folders > button.on {
+  background: var(--navy-tint-2);
+  color: var(--navy-800);
+}
+.media-results {
+  min-width: 0;
+  border-left: var(--line-thin) solid var(--line);
+}
+.media-results-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.65rem 0.85rem;
+}
+.media-results-head p {
+  margin: 0;
+  color: var(--ink-3);
+  font-size: 0.75rem;
+}
+.media-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.85rem;
+  border-top: var(--line-thin) solid var(--line);
+  font-size: 0.72rem;
+}
+.media-pagination label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.media-pagination select {
+  width: auto;
+  min-width: 4rem;
+  padding: 0.3rem 1.5rem 0.3rem 0.5rem;
+}
+.media-pagination button {
+  padding: 0.4rem 0.5rem;
+  font-size: 0.72rem;
+}
+.media-asset-check {
+  position: absolute;
+  inset: 0.45rem auto auto 0.45rem;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  padding: 0.2rem;
+  background: var(--surface);
+  border-radius: 0.2rem;
+}
+.media-asset-check input {
+  margin: 0;
+  width: 1rem;
+  height: 1rem;
+}
+.media-asset:focus-visible {
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  outline: 3px solid var(--navy-500);
+  outline-offset: var(--line-focus);
+}
+/* The workspace's image cards: a list item holding the details button and, beside it, the selection checkbox. */
+ul.media-assets {
+  margin: 0;
+  list-style: none;
+}
+.media-asset-open {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.media-asset-open:hover {
+  background: none;
+  box-shadow: none;
+}
+.media-asset-open:focus-visible {
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  outline: 3px solid var(--navy-500);
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  outline-offset: -3px;
+}
+.is-list .media-asset-open {
+  flex-direction: row;
+  align-items: center;
+}
+.media-card-tags {
+  font-size: 0.65rem;
+  color: var(--ink-3);
+  margin-top: 0.3rem;
+}
+.media-detail-tabs {
+  display: flex;
+  gap: 0.3rem;
+  padding-bottom: 0.7rem;
+}
+.media-detail-tabs button {
+  flex: 1;
+  color: var(--ink-2);
+  background: var(--surface-2);
+  border-color: var(--line);
+}
+.media-detail-tabs button[aria-selected='true'] {
+  color: var(--text-on-dark);
+  background: var(--navy-800);
+  border-color: var(--navy-800);
+}
+.media-bulk {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: var(--navy-tint-2);
+  border: var(--line-thin) solid var(--line);
+  border-radius: var(--r);
+}
+.media-bulk > div,
+.media-bulk label {
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.78rem;
+}
+.media-bulk label {
+  flex: 1 1 10rem;
+}
+.media-bulk input {
+  width: 100%;
+}
+.media-usage-detail h4 {
+  display: flex;
+  justify-content: space-between;
+  margin: 1rem 0 0.4rem;
+  font-size: 0.8rem;
+}
+.media-usage-detail ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.media-usage-detail li {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.65rem 0;
+  border-bottom: var(--line-thin) solid var(--line);
+  font-size: 0.75rem;
+}
+.media-usage-detail li small {
+  display: block;
+  color: var(--ink-3);
+}
+.media-usage-detail time {
+  flex: none;
+  font-size: 0.65rem;
+  color: var(--ink-3);
+}
+.media-usage-empty {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--ink-3);
+}
+.media-organizer .is-list .media-asset-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.2rem;
+}
+@media (max-width: 80rem) {
+  .media-organizer {
+    grid-template-columns: minmax(0, 1fr) 18rem;
+  }
+  .media-folders {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    border-bottom: var(--line-thin) solid var(--line);
+  }
+  .media-folders-head {
+    padding: 0.3rem 0.7rem 0.3rem 0.2rem;
+  }
+  .media-folders > button {
+    width: auto;
+    align-self: center;
+    margin: 0;
+  }
+  .media-results {
+    border-left: 0;
+  }
+}
+@media (max-width: 55rem) {
+  .media-organizer {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .media-organizer > .media-detail {
+    border-left: 0;
+    border-top: var(--line-thin) solid var(--line);
+  }
+  .media-folders-head {
+    width: 100%;
+  }
+  .media-organizer .media-assets.is-grid {
+    grid-template-columns: repeat(auto-fill, minmax(min(10rem, 100%), 1fr));
+  }
+}

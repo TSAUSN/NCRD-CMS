@@ -1,0 +1,274 @@
+.media-asset[aria-selected='true']::after,
+.media-asset[data-selected='true']::after {
+  content: '';
+  position: absolute;
+  inset: 0.45rem 0.45rem auto auto;
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: var(--navy-600);
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  box-shadow: 0 0 0 3px var(--surface);
+}
+.media-thumb {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  color: var(--ink-3);
+  /* stylelint-disable declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  background:
+    linear-gradient(135deg, transparent 75%, rgba(0, 32, 86, 0.025) 75%) 0 0 / 0.75rem 0.75rem,
+    var(--surface-3);
+  /* stylelint-enable declaration-property-value-disallowed-list */
+}
+.media-thumb img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+.media-thumb.is-large {
+  aspect-ratio: 16 / 10;
+}
+.media-thumb-fallback {
+  gap: 0.35rem;
+}
+.media-spinner {
+  width: 1.5rem;
+  height: 1.5rem;
+  border: var(--line-focus) solid var(--line-strong);
+  border-top-color: var(--navy-600);
+  border-radius: 50%;
+  animation: media-spin 0.8s linear infinite;
+}
+@keyframes media-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.media-asset-copy {
+  min-width: 0;
+  padding: 0.65rem 0.7rem 0.7rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.media-asset-copy strong {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.8rem;
+}
+.media-asset-copy small {
+  margin-top: 0.15rem;
+  color: var(--ink-3);
+  font-size: 0.67rem;
+}
+.media-status {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 0.45rem;
+  padding: 0.12rem 0.4rem;
+  border: var(--line-thin) solid var(--line);
+  border-radius: var(--r-pill);
+  color: var(--ink-2);
+  background: var(--surface-3);
+  font-size: 0.63rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.media-status.status-ready {
+  color: var(--ok);
+  border-color: var(--ok-line);
+  background: var(--ok-tint);
+}
+.media-status.status-processing {
+  color: var(--info);
+  border-color: var(--info-line);
+  background: var(--info-tint);
+}
+.media-status.status-failed {
+  color: var(--danger);
+  border-color: var(--danger-line);
+  background: var(--danger-tint);
+}
+.media-status.status-deleted {
+  color: var(--ink-3);
+}
+.is-list .media-asset {
+  flex-direction: row;
+  align-items: center;
+}
+.is-list .media-thumb {
+  width: 5.75rem;
+  aspect-ratio: 4 / 3;
+  flex: none;
+}
+.is-list .media-asset-copy {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(8rem, 1fr) minmax(10rem, auto) auto;
+  align-items: center;
+  gap: 0.75rem;
+}
+.is-list .media-asset-copy small,
+.is-list .media-status {
+  margin: 0;
+}
+.media-detail {
+  min-width: 0;
+  padding: 1rem;
+  border-left: var(--line-thin) solid var(--line);
+  background: var(--surface);
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  box-shadow: -8px 0 24px -24px rgba(0, 32, 86, 0.45);
+}
+.media-detail-preview {
+  overflow: hidden;
+  border: var(--line-thin) solid var(--line);
+  border-radius: var(--r);
+}
+.media-detail-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.65rem;
+  margin: 0.9rem 0 0.75rem;
+}
+.media-detail-head h3,
+.media-picker-choice h3 {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-size: 0.95rem;
+}
+.media-detail-head .media-status {
+  flex: none;
+  margin: 0;
+}
+.media-facts {
+  margin: 0;
+  border-top: var(--line-thin) solid var(--line-soft);
+}
+.media-facts > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.48rem 0;
+  border-bottom: var(--line-thin) solid var(--line-soft);
+  font-size: 0.72rem;
+}
+.media-facts dt {
+  color: var(--ink-3);
+}
+.media-facts dd {
+  margin: 0;
+  min-width: 0;
+  color: var(--ink-2);
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+.media-description {
+  padding: 0.75rem 0;
+}
+.media-description > span {
+  color: var(--ink-3);
+  font-size: 0.7rem;
+  font-weight: 650;
+}
+.media-description p {
+  margin: 0.25rem 0 0;
+  color: var(--ink-2);
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+.media-usage {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+  padding: 0.65rem;
+  color: var(--info);
+  border-radius: var(--r-sm);
+  background: var(--info-tint);
+}
+.media-usage p {
+  margin: 0;
+  font-size: 0.71rem;
+  line-height: 1.4;
+}
+.media-detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 0.8rem;
+}
+.media-detail-empty {
+  min-height: 15rem;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 0.6rem;
+  color: var(--ink-3);
+  text-align: center;
+}
+.media-detail-empty p {
+  margin: 0;
+  font-size: 0.78rem;
+}
+.media-empty {
+  min-height: 25rem;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 0.45rem;
+  padding: 2rem;
+  text-align: center;
+}
+.media-empty > span {
+  width: 3rem;
+  height: 3rem;
+  display: grid;
+  place-items: center;
+  color: var(--navy-600);
+  background: var(--navy-tint);
+  border-radius: 50%;
+}
+.media-empty h3 {
+  margin: 0.3rem 0 0;
+  font-size: 1rem;
+}
+.media-empty p {
+  max-width: 30rem;
+  margin: 0 0 0.35rem;
+  color: var(--ink-3);
+  font-size: 0.8rem;
+}
+.media-empty.compact {
+  min-height: 17rem;
+}
+
+.media-loading {
+  border-radius: var(--r-lg);
+  background: linear-gradient(90deg, var(--surface-3), var(--surface), var(--surface-3));
+  background-size: 200% 100%;
+  animation: media-load 1.4s ease infinite;
+}
+.media-loading-head {
+  width: 55%;
+  height: 7rem;
+  margin-bottom: 1rem;
+}
+.media-loading-summary {
+  height: 4.6rem;
+  margin-bottom: 1rem;
+}
+.media-loading-browser {
+  height: 36rem;
+}
+@keyframes media-load {
+  to {
+    background-position: -200% 0;
+  }
+}

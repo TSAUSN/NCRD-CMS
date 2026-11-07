@@ -1,0 +1,279 @@
+/* A site card: the identity, the address, the state, and the way in. */
+.site-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding: 1.15rem 1.25rem;
+  background: var(--surface);
+  border: var(--line-thin) solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--e1);
+  transition:
+    border-color 0.12s ease,
+    box-shadow 0.12s ease;
+}
+.site-card:hover {
+  border-color: var(--navy-500);
+  box-shadow: var(--e2);
+}
+.site-card-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+.site-card-mark {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--r-sm);
+  flex: none;
+  display: grid;
+  place-items: center;
+  background: var(--navy-800);
+  color: var(--text-on-dark);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  letter-spacing: 0.01em;
+}
+.site-card-id {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.site-card-name {
+  font-size: 1rem;
+  font-weight: 650;
+  color: var(--ink);
+  text-decoration: none;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.site-card-name:hover {
+  color: var(--navy-600);
+  text-decoration: underline;
+}
+.site-card-host {
+  font-size: 0.8125rem;
+  color: var(--ink-3);
+  margin: 0.15rem 0 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.site-card-facts {
+  display: flex;
+  gap: 1.25rem;
+  font-size: 0.8125rem;
+  color: var(--ink-3);
+  padding-top: 0.75rem;
+  border-top: var(--line-thin) solid var(--line-soft);
+  flex-wrap: wrap;
+}
+.site-card-facts b {
+  color: var(--ink);
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+.site-card-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+.site-card-actions .btn {
+  flex: 0 1 auto;
+  min-width: 6rem;
+}
+
+.page-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr));
+  gap: 1rem;
+}
+.page-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  padding: 1.1rem 1.15rem;
+  border: var(--line-thin) solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: var(--e1);
+  transition:
+    border-color var(--fast),
+    box-shadow var(--fast);
+}
+.page-card:hover {
+  border-color: var(--navy-500);
+  box-shadow: var(--e2);
+}
+.page-card-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+}
+.page-card-id {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.page-posture {
+  margin: -0.35rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--ok);
+}
+.page-posture.attention {
+  color: var(--warn);
+}
+.page-card-actions {
+  display: flex;
+  gap: 0.45rem;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  margin-top: auto;
+  padding-top: 0.2rem;
+}
+.page-manage {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+.page-action-notice {
+  flex-basis: 100%;
+  margin: 0.35rem 0 0;
+  padding: 0.45rem 0.55rem;
+}
+.input-prefix {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.input-prefix input {
+  flex: 1;
+  min-width: 0;
+}
+.structured-builder ol {
+  list-style: none;
+  padding-left: 0.85rem;
+  margin: 0.5rem 0;
+}
+.structured-builder > ol {
+  padding-left: 0;
+}
+.builder-node {
+  padding: 0.65rem;
+  margin: 0.5rem 0;
+  border: var(--line-thin) solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface);
+}
+.builder-node-head {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: space-between;
+}
+.builder-node-actions,
+.builder-add {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+.builder-node .field {
+  margin-top: 0.5rem;
+}
+.builder-add {
+  margin: 0.65rem 0;
+}
+.visual-section-preview {
+  display: block;
+  width: 100%;
+  min-height: 26rem;
+  border: var(--line-thin) solid var(--line);
+  margin: 1rem 0;
+  background: var(--surface);
+}
+.section-preview-dialog {
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  width: min(94vw, 1280px);
+  max-height: 92vh;
+  padding: 1.25rem;
+  border: var(--line-thin) solid var(--line);
+  border-radius: 1rem;
+  background: var(--surface);
+  color: var(--ink);
+}
+.section-preview-dialog::backdrop {
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  background: rgb(15 23 42 / 0.65);
+}
+.section-preview-dialog-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.section-preview-dialog-head h2 {
+  margin: 0;
+}
+.section-live-preview-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  border: var(--line-thin) solid var(--line);
+  background: var(--surface-2);
+}
+.section-live-preview-scroll iframe {
+  display: block;
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  height: min(65vh, 650px);
+  max-width: none;
+  border: 0;
+  margin: 0 auto;
+  background: var(--surface);
+}
+.library-preview .section-live-preview-scroll iframe {
+  height: 34rem;
+}
+/* Updating an imported section's fields: what is edited now, and after. */
+.imported-update-fields {
+  width: 100%;
+  margin: 0.5rem 0;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+.imported-update-fields th {
+  padding: 0.3rem 0.5rem;
+  border-bottom: var(--line-thin) solid var(--line);
+  color: var(--ink-3);
+  font-size: 0.75rem;
+  font-weight: 650;
+  text-align: left;
+}
+.imported-update-fields td {
+  width: 50%;
+  padding: 0.45rem 0.5rem;
+  vertical-align: top;
+}
+.imported-update-fields ul {
+  margin: 0;
+  padding-left: 1rem;
+}
+.imported-update-fields li + li {
+  margin-top: 0.2rem;
+}
+.imported-update-renames caption {
+  caption-side: top;
+  text-align: left;
+  padding: 0.2rem 0.5rem 0.35rem;
+  font-size: 0.8125rem;
+  font-weight: 650;
+  color: var(--ink-2);
+}
+.imported-update-renames td {
+  padding-block: 0.25rem;
+  border-bottom: var(--line-thin) solid var(--line-soft);
+}

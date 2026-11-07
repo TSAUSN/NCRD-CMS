@@ -1,0 +1,182 @@
+.history-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0 0 1rem;
+  padding: 0.7rem 0.85rem;
+  border: var(--line-thin) solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface-2);
+}
+.history-toolbar p {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+}
+.history-toolbar .icon-svg {
+  color: var(--navy-600);
+  flex: none;
+}
+.history-layout {
+  display: grid;
+  grid-template-columns: 19rem minmax(0, 1fr);
+  gap: 1rem;
+  align-items: start;
+}
+.history-list,
+.history-detail {
+  border: var(--line-thin) solid var(--line);
+  border-radius: var(--r);
+  background: var(--surface);
+  box-shadow: var(--e1);
+}
+.history-list {
+  overflow: hidden;
+}
+.history-list ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.history-list li + li {
+  border-top: var(--line-thin) solid var(--line-soft);
+}
+.history-list li > a {
+  display: flex;
+  flex-direction: column;
+  gap: 0.28rem;
+  padding: 0.75rem 0.8rem;
+  color: var(--ink-2);
+  text-decoration: none;
+  font-size: 0.8125rem;
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  border-left: 3px solid transparent;
+}
+.history-list li > a:hover {
+  background: var(--surface-2);
+  color: var(--ink);
+}
+.history-list li > a.is-active {
+  background: var(--sa-navy-tint);
+  border-left-color: var(--navy-600);
+  color: var(--ink);
+}
+.history-list small {
+  color: var(--ink-3);
+}
+.history-version-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.history-version-head strong {
+  color: var(--sa-navy);
+  font-size: 0.875rem;
+}
+.history-version-head .chip {
+  flex: none;
+}
+.history-newer {
+  margin: 0.75rem;
+  width: calc(100% - 1.5rem);
+  justify-content: center;
+}
+.history-older {
+  margin: 0.75rem;
+  width: calc(100% - 1.5rem);
+  justify-content: center;
+}
+.history-detail {
+  padding: 1rem;
+  min-width: 0;
+}
+.history-detail-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.9rem;
+}
+.history-detail-head h2 {
+  margin: 0.1rem 0 0.2rem;
+  font-size: 1.25rem;
+  color: var(--sa-navy);
+}
+.history-detail-head .eyebrow {
+  margin: 0;
+}
+.history-detail-head .muted {
+  margin: 0;
+  font-size: 0.8125rem;
+}
+.history-current {
+  display: inline-flex;
+  padding: 0.38rem 0.6rem;
+  border-radius: var(--r-sm);
+  background: var(--surface-3);
+  color: var(--ink-2);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+.history-note {
+  margin: 0 0 0.9rem;
+  padding: 0.55rem 0.65rem;
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  border-left: 3px solid var(--line-strong);
+  background: var(--surface-2);
+  color: var(--ink-2);
+  font-size: 0.8125rem;
+}
+.history-preview-frame {
+  overflow: hidden;
+  border: var(--line-thin) solid var(--line-strong);
+  border-radius: var(--r-sm);
+  background: var(--surface-3);
+}
+.history-preview-bar {
+  padding: 0.4rem 0.65rem;
+  border-bottom: var(--line-thin) solid var(--line);
+  color: var(--ink-3);
+  background: var(--surface-2);
+  font-size: 0.75rem;
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.history-preview-frame iframe {
+  display: block;
+  width: 100%;
+  height: min(60vh, 45rem);
+  min-height: 28rem;
+  border: 0;
+  background: var(--surface);
+}
+
+@media (max-width: 56rem) {
+  .history-layout {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 36rem) {
+  .history-toolbar,
+  .history-detail-head {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .history-toolbar .btn,
+  .history-detail-head button {
+    width: 100%;
+    justify-content: center;
+  }
+  .history-preview-frame iframe {
+    min-height: 22rem;
+  }
+}
+
+/* ================================================================ EDITOR == */

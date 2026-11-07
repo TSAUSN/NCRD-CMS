@@ -1,0 +1,167 @@
+.card {
+  background: var(--surface);
+  border: var(--line-thin) solid var(--line);
+  border-radius: var(--r-lg);
+  padding: 1.25rem 1.35rem;
+  box-shadow: var(--e1);
+}
+/* A card's own heading starts at its top edge, whatever screen it is on. */
+.card > :is(h2, h3):first-child {
+  margin-top: 0;
+}
+.card + .card {
+  margin-top: 1rem;
+}
+.card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin: -0.15rem 0 0.85rem;
+}
+.card-head h2,
+.card-head h3 {
+  margin: 0;
+  /* Flex, so a heading that carries an icon keeps it on the same line. An SVG
+     is a block element here, and inside a block-level heading it lands on a
+     line of its own. */
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+.card-head .icon-svg {
+  color: var(--ink-3);
+}
+.card-quiet {
+  box-shadow: none;
+  background: var(--surface-2);
+}
+.card-pad-0 {
+  padding: 0;
+  overflow: hidden;
+}
+
+.grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+}
+/* Fewer, bigger cards. A section thumbnail is a 1200px-wide page band scaled
+   into the card, so a 340px card renders 16px type at five pixels and the
+   picture stops being something anybody can choose from. At 24rem the grid
+   settles on two or three columns and the band is legible. */
+.grid-cards {
+  grid-template-columns: repeat(auto-fill, minmax(24rem, 1fr));
+}
+
+/* A list of rows: the page list, the site list. The title is the link and the
+   actions sit beside it, so both stay individually reachable by keyboard. */
+.rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: var(--line-thin) solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  overflow: hidden;
+  box-shadow: var(--e1);
+}
+.rows li + li {
+  border-top: var(--line-thin) solid var(--line-soft);
+}
+.row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.8rem 1.1rem;
+  flex-wrap: wrap;
+  transition: background-color 0.12s ease;
+}
+.row:hover {
+  background: var(--surface-2);
+}
+.row-icon {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--r-sm);
+  flex: none;
+  display: grid;
+  place-items: center;
+  background: var(--navy-tint);
+  color: var(--navy-600);
+}
+.row-main {
+  flex: 1 1 15rem;
+  min-width: 0;
+}
+.row-title {
+  font-weight: 650;
+  font-size: 0.9375rem;
+  text-decoration: none;
+  color: var(--ink);
+  display: inline-block;
+}
+.row-title:hover {
+  color: var(--navy-600);
+  text-decoration: underline;
+}
+.row-sub {
+  color: var(--ink-3);
+  font-size: 0.8125rem;
+  margin: 0.05rem 0 0;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+.row-sub .mono {
+  color: var(--ink-2);
+}
+.row-actions {
+  display: flex;
+  gap: 0.35rem;
+  align-items: center;
+  flex: none;
+}
+
+/* Empty states teach: what the thing is, and what happens next (SPEC §7). */
+.empty-state {
+  background: var(--surface);
+  border: var(--line-thin) dashed var(--line-strong);
+  border-radius: var(--r);
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+}
+.empty-state h2,
+.empty-state h3 {
+  margin: 0 0 0.4rem;
+  font-size: 1.0625rem;
+  text-transform: none;
+  letter-spacing: -0.008em;
+  color: var(--ink);
+}
+.empty-state p {
+  color: var(--ink-2);
+  max-width: 34rem;
+  margin: 0 auto 1.1rem;
+  font-size: 0.875rem;
+}
+.empty-state p:last-child {
+  margin-bottom: 0;
+}
+.empty-state .actions {
+  justify-content: center;
+  margin-top: 1.25rem;
+}
+.empty-icon {
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: var(--r);
+  margin: 0 auto 0.85rem;
+  display: grid;
+  place-items: center;
+  background: var(--navy-tint);
+  color: var(--navy-600);
+}
+
+/* =============================================================== notices == */

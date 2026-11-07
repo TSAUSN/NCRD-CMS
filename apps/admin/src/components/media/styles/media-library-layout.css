@@ -1,0 +1,432 @@
+.media-workspace {
+  display: grid;
+  gap: 1rem;
+}
+.media-summary {
+  display: grid;
+  grid-template-columns: minmax(14rem, 1.1fr) minmax(24rem, 2fr) auto;
+  align-items: stretch;
+  min-width: 0;
+  overflow: hidden;
+  border: var(--line-thin) solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: var(--e1);
+}
+.media-summary-lead {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.9rem 1rem;
+  color: var(--text-on-dark);
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  background: radial-gradient(18rem 12rem at 100% 0, rgba(238, 58, 67, 0.35), transparent 65%), var(--navy-800);
+}
+.media-summary-mark {
+  width: 2.65rem;
+  height: 2.65rem;
+  border-radius: var(--r-sm);
+  display: grid;
+  place-items: center;
+  flex: none;
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  background: rgba(255, 255, 255, 0.12);
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  border: var(--line-thin) solid rgba(255, 255, 255, 0.15);
+}
+.media-summary-lead > span:last-child {
+  display: flex;
+  flex-direction: column;
+}
+.media-summary-lead strong {
+  font-size: 1.5rem;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.media-summary-lead small {
+  margin-top: 0.25rem;
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  color: rgba(255, 255, 255, 0.68);
+}
+.media-summary dl {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(5.5rem, 1fr));
+  min-width: 0;
+}
+.media-summary dl > div {
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: center;
+  padding: 0.75rem 1rem;
+  border-right: var(--line-thin) solid var(--line-soft);
+}
+.media-summary dt {
+  color: var(--ink-3);
+  font-size: 0.7rem;
+  font-weight: 650;
+}
+.media-summary dd {
+  margin: 0 0 0.2rem;
+  color: var(--navy-800);
+  font-size: 1.25rem;
+  line-height: 1;
+  font-weight: 720;
+  font-variant-numeric: tabular-nums;
+}
+.media-summary > button {
+  align-self: center;
+  margin: 0.75rem;
+  white-space: nowrap;
+}
+
+.media-upload {
+  display: grid;
+  grid-template-columns: minmax(14rem, 0.72fr) minmax(24rem, 1.6fr);
+  border: var(--line-thin) solid var(--navy-tint-2);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  background: var(--surface);
+  box-shadow: var(--e2);
+}
+.media-upload-head {
+  padding: 1.15rem 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  color: var(--ink-2);
+  background: linear-gradient(150deg, var(--navy-tint), var(--surface));
+  border-right: var(--line-thin) solid var(--line);
+}
+.media-upload-head .eyebrow {
+  margin: 0 0 0.3rem;
+}
+.media-upload-head h2 {
+  margin: 0;
+  color: var(--navy-800);
+  font-size: 1.15rem;
+}
+.media-upload-head p:last-child {
+  margin: 0.4rem 0 0;
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+.media-drop {
+  margin: 0.8rem;
+  min-height: 10.5rem;
+  padding: 1rem;
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  border: 1.5px dashed var(--line-strong);
+  border-radius: var(--r);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  background: var(--surface-2);
+  text-align: center;
+  transition:
+    background var(--fast),
+    border-color var(--fast),
+    box-shadow var(--fast);
+}
+.media-drop.is-dragging {
+  background: var(--navy-tint);
+  border-color: var(--navy-500);
+  box-shadow: inset var(--ring);
+}
+.media-drop strong {
+  margin-top: 0.25rem;
+  color: var(--ink);
+  font-size: 0.9rem;
+}
+.media-drop > span:not(.media-drop-mark) {
+  color: var(--ink-3);
+  font-size: 0.78rem;
+}
+.media-drop-mark {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: var(--navy-600);
+  background: var(--navy-tint);
+}
+.media-drop .secondary {
+  margin-top: 0.45rem;
+}
+.media-upload-form {
+  padding: 0.9rem 1rem 1rem;
+  display: grid;
+  gap: 0.8rem;
+}
+.media-file {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.65rem;
+  border: var(--line-thin) solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface-2);
+}
+.media-file-icon {
+  width: 2.15rem;
+  height: 2.15rem;
+  display: grid;
+  place-items: center;
+  flex: none;
+  border-radius: var(--r-sm);
+  color: var(--navy-600);
+  background: var(--navy-tint);
+}
+.media-file-name {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.media-file-name strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.84rem;
+}
+.media-file-name small {
+  color: var(--ink-3);
+  font-size: 0.72rem;
+}
+.media-purpose {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+.media-purpose legend {
+  width: 100%;
+  margin: 0 0 0.4rem;
+  color: var(--ink);
+  font-size: 0.78rem;
+  font-weight: 650;
+}
+.media-choice {
+  min-width: 0;
+  display: flex;
+  gap: 0.55rem;
+  align-items: flex-start;
+  padding: 0.65rem;
+  border: var(--line-thin) solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  cursor: pointer;
+}
+.media-choice:has(input:checked) {
+  border-color: var(--navy-500);
+  background: var(--navy-tint);
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  box-shadow: 0 0 0 1px var(--navy-500);
+}
+.media-choice input {
+  margin: 0.15rem 0 0;
+  accent-color: var(--navy-600);
+}
+.media-choice span {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.media-choice strong {
+  font-size: 0.78rem;
+}
+.media-choice small {
+  margin-top: 0.12rem;
+  color: var(--ink-3);
+  font-size: 0.7rem;
+  line-height: 1.35;
+}
+.media-progress {
+  display: grid;
+  gap: 0.35rem;
+  color: var(--ink-2);
+  font-size: 0.75rem;
+}
+.media-progress progress {
+  width: 100%;
+  height: 0.45rem;
+  accent-color: var(--navy-600);
+}
+.media-inline-error,
+.media-inline-success,
+.media-delivery-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0.55rem 0.65rem;
+  border: var(--line-thin) solid var(--danger-line);
+  border-radius: var(--r-sm);
+  color: var(--danger);
+  background: var(--danger-tint);
+  font-size: 0.76rem;
+  line-height: 1.4;
+}
+.media-inline-success {
+  color: var(--ok);
+  border-color: var(--ok-line);
+  background: var(--ok-tint);
+}
+.media-delivery-note {
+  color: var(--warn);
+  border-color: var(--warn-line);
+  background: var(--warn-tint);
+}
+.media-upload-actions {
+  margin: 0;
+  justify-content: flex-end;
+}
+.media-notice {
+  margin: 0;
+  align-items: center;
+}
+.media-notice .icon-btn {
+  margin-left: auto;
+  color: currentColor;
+}
+
+.media-library {
+  min-width: 0;
+  overflow: hidden;
+  border: var(--line-thin) solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: var(--e1);
+}
+.media-library-head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.1rem 0.85rem;
+}
+.media-library-head .eyebrow,
+.media-detail .eyebrow,
+.media-picker .eyebrow {
+  margin: 0 0 0.2rem;
+}
+.media-library-head h2 {
+  margin: 0;
+  font-size: 1.08rem;
+}
+.media-search {
+  width: min(25rem, 100%);
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0 0.65rem;
+  color: var(--ink-3);
+  border: var(--line-thin) solid var(--line-strong);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+}
+.media-search:focus-within {
+  border-color: var(--navy-500);
+  box-shadow: var(--ring);
+}
+.media-search input {
+  width: 100%;
+  min-width: 0;
+  height: 2.25rem;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  box-shadow: none;
+  background: transparent;
+}
+.media-controls,
+.media-picker-tools {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.65rem 1rem;
+  border-top: var(--line-thin) solid var(--line-soft);
+  border-bottom: var(--line-thin) solid var(--line);
+  background: var(--surface-2);
+}
+.media-filter,
+.media-density {
+  display: flex;
+  gap: 0.3rem;
+}
+.media-filter button[aria-pressed='true'],
+.media-density button[aria-pressed='true'] {
+  color: var(--text-on-dark);
+  border-color: var(--navy-800);
+  background: var(--navy-800);
+}
+.media-density {
+  margin-left: auto;
+  padding-left: 0.65rem;
+  border-left: var(--line-thin) solid var(--line);
+}
+.media-result-count {
+  margin: 0;
+  min-width: 4.5rem;
+  text-align: right;
+  color: var(--ink-3);
+  font-size: 0.74rem;
+}
+.media-browser {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 20.5rem;
+  min-height: 32rem;
+}
+.media-assets {
+  min-width: 0;
+  align-content: start;
+  padding: 0.85rem;
+  background: var(--surface-2);
+}
+.media-assets.is-grid,
+.media-picker-assets.is-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11.5rem, 1fr));
+  gap: 0.65rem;
+}
+.media-assets.is-list,
+.media-picker-assets.is-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.35rem;
+}
+.media-asset {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  text-align: left;
+  color: var(--ink);
+  border: var(--line-thin) solid var(--line);
+  border-radius: var(--r);
+  background: var(--surface);
+  box-shadow: var(--e1);
+}
+.media-asset:hover {
+  border-color: var(--navy-500);
+  background: var(--surface);
+  box-shadow: var(--e2);
+}
+.media-asset[aria-selected='true'],
+.media-asset[data-selected='true'] {
+  border-color: var(--navy-600);
+  /* stylelint-disable declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  box-shadow:
+    0 0 0 2px var(--navy-tint-2),
+    var(--e2);
+  /* stylelint-enable declaration-property-value-disallowed-list */
+}

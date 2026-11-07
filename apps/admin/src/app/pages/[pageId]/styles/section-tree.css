@@ -1,0 +1,443 @@
+/* ---------------------------------------------------------------- tree -- */
+
+.tree-tools {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.85rem;
+}
+.search-field {
+  position: relative;
+  display: block;
+}
+.search-field .icon-svg {
+  position: absolute;
+  left: 0.55rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--ink-3);
+  pointer-events: none;
+}
+.search-field input {
+  padding-left: 2rem;
+}
+
+.tree-list,
+.tree-slots {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.tree-slots {
+  margin: 0.1rem 0 0.2rem 1.35rem;
+  border-left: var(--line-thin) solid var(--line);
+  padding-left: 0.5rem;
+}
+.tree-section {
+  display: flex;
+  align-items: center;
+  gap: 0.1rem;
+  border-radius: var(--r-sm);
+  padding-right: 0.1rem;
+}
+.tree-section:hover {
+  background: var(--surface-3);
+}
+.tree-section.on,
+.tree-section.on:hover {
+  background: var(--navy-600);
+}
+.tree-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  text-align: left;
+  background: none;
+  border: 0;
+  color: var(--ink);
+  font-weight: 600;
+  padding: 0.38rem 0.45rem;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  font-size: 0.875rem;
+  white-space: normal;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  justify-content: flex-start;
+}
+.tree-label:hover {
+  background: none;
+}
+.tree-section.on .tree-label,
+.tree-section.on .tree-label:hover {
+  background: none;
+  color: var(--text-on-dark);
+}
+.tree-disclosures {
+  display: flex;
+  gap: 0.3rem;
+}
+.tree-disclosures button {
+  flex: 1;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.4rem;
+  min-height: 1.85rem;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+.tree-disclosures button[aria-pressed='true'] {
+  background: var(--navy-tint);
+  border-color: var(--navy-600);
+  color: var(--navy-600);
+}
+.tree-page-settings {
+  width: 100%;
+  margin-top: 0.5rem;
+}
+.tree-collapse {
+  flex: none;
+  width: 1.4rem;
+  min-height: 1.6rem;
+  padding: 0;
+  background: transparent;
+  color: var(--ink-3);
+  border: 0;
+}
+.tree-section.on .tree-collapse {
+  color: var(--text-on-dark);
+}
+.tree-slots[hidden] {
+  display: none;
+}
+.tree-grip {
+  color: var(--ink-3);
+  opacity: 0;
+  flex: none;
+  cursor: grab;
+}
+.tree-section:hover .tree-grip {
+  opacity: 0.8;
+}
+.tree-section.on .tree-grip {
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  color: #cfe0ef;
+  opacity: 0.8;
+}
+.tree-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tree-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.12rem;
+}
+.tree-text .tree-name {
+  max-width: 100%;
+  white-space: nowrap;
+}
+.tree-text .tree-flag {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.tree-slot {
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: 0;
+  color: var(--ink-2);
+  font-weight: 400;
+  padding: 0.3rem 0.45rem;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  font-size: 0.8125rem;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  justify-content: flex-start;
+}
+.tree-slot:hover {
+  background: var(--surface-3);
+  color: var(--ink);
+}
+.tree-slot.on,
+.tree-slot.on:hover {
+  background: var(--navy-tint);
+  color: var(--navy-600);
+  font-weight: 600;
+}
+.tree-slot .kind {
+  color: var(--ink-3);
+  flex: none;
+}
+.tree-slot.on .kind {
+  color: var(--navy-600);
+}
+.tree-slot .tree-name {
+  flex: 1 1 auto;
+}
+
+.tree-flag {
+  font-size: 0.75rem;
+  color: var(--ink-3);
+  font-weight: 400;
+  flex: none;
+}
+.tree-section.on .tree-flag {
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  color: #cfe0ef;
+}
+.tree-section.is-hidden:not(.on) {
+  opacity: 0.67;
+}
+.tree-visibility {
+  flex: none;
+  width: 1.65rem;
+  height: 1.65rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--r-xs);
+  background: none;
+  color: var(--ink-3);
+  opacity: 0;
+  cursor: pointer;
+}
+.tree-section:hover .tree-visibility,
+.tree-visibility:focus-visible,
+.tree-section.is-hidden .tree-visibility {
+  opacity: 1;
+}
+.tree-visibility:hover {
+  background: var(--surface);
+  color: var(--navy-600);
+}
+.tree-section.on .tree-visibility {
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  color: #cfe0ef;
+}
+.tree-section.on .tree-visibility:hover {
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  background: rgba(255, 255, 255, 0.16);
+  color: var(--text-on-dark);
+}
+.reorder {
+  display: inline-flex;
+  flex: none;
+  opacity: 0;
+}
+.tree-section:hover .reorder,
+.reorder:focus-within {
+  opacity: 1;
+}
+.tree-section.on .reorder {
+  opacity: 1;
+}
+.reorder button {
+  background: none;
+  border: 0;
+  color: var(--ink-3);
+  padding: 0;
+  width: 1.4rem;
+  height: 1.4rem;
+  cursor: pointer;
+  border-radius: var(--r-xs);
+}
+.reorder button:hover:not(:disabled) {
+  color: var(--navy-600);
+  background: var(--surface);
+}
+.tree-section.on .reorder button {
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  color: #cfe0ef;
+}
+.tree-section.on .reorder button:hover:not(:disabled) {
+  color: var(--text-on-dark);
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  background: rgba(255, 255, 255, 0.16);
+}
+.reorder button:disabled {
+  opacity: 0.25;
+  cursor: default;
+  background: none;
+}
+
+/* Section cards give long pages a scannable outline without squeezing names. */
+.tree-card {
+  border: var(--line-thin) solid var(--line);
+  border-radius: var(--r);
+  padding: 0.25rem;
+  background: var(--surface);
+}
+.tree-card.is-selected {
+  border-color: var(--navy-600);
+}
+/* One row per section, as in V1: name and field count, with show/hide and
+   move controls that appear on hover, focus or selection. */
+.tree-card .tree-section {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+.tree-card .tree-label {
+  flex: 1 1 auto;
+  padding: 0.4rem 0.25rem;
+}
+.tree-card .tree-collapse {
+  width: 1.2rem;
+}
+.tree-card .tree-visibility,
+.tree-card .reorder {
+  opacity: 0;
+}
+.tree-card .tree-section:hover :is(.tree-visibility, .reorder),
+.tree-card .tree-section.on :is(.tree-visibility, .reorder),
+.tree-card .tree-card.is-selected :is(.tree-visibility, .reorder),
+.tree-card :is(.tree-visibility, .reorder):focus-within,
+.tree-card .tree-visibility:focus-visible,
+.tree-card .tree-section.is-hidden .tree-visibility {
+  opacity: 1;
+}
+.tree-card.is-selected :is(.tree-visibility, .reorder) {
+  opacity: 1;
+}
+.tree-card .tree-grip {
+  display: none;
+}
+.tree-card .tree-text .tree-name {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-align: left;
+}
+.tree-field-count {
+  font-size: 0.6875rem;
+  font-weight: 400;
+  color: var(--ink-3);
+}
+.tree-card .tree-section.on {
+  background: var(--navy-tint);
+}
+.tree-card .tree-section.on .tree-label,
+.tree-card .tree-section.on .tree-collapse,
+.tree-card .tree-section.on .tree-visibility,
+.tree-card .tree-section.on .reorder button {
+  color: var(--navy-600);
+}
+.tree-card .tree-section.on .tree-flag {
+  color: var(--ink-2);
+}
+.tree-card .tree-section.on .dot {
+  background: var(--brand);
+}
+.tree-card .tree-slots {
+  margin: 0.35rem 0.1rem 0.35rem 0.65rem;
+  padding-left: 0.4rem;
+}
+.tree-card .tree-slot {
+  padding: 0.4rem;
+}
+.tree-card .tree-slot .kind {
+  padding: 0.2rem;
+  border-radius: 0.25rem;
+  background: var(--surface-3);
+  display: inline-flex;
+}
+.editor .pane-head h2:not(.pane-title) {
+  font-size: 0.8125rem;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--ink);
+}
+.device-label {
+  font-size: 0.75rem;
+}
+@media (max-width: 85rem) {
+  .device-label {
+    display: none;
+  }
+}
+
+/* An insertion point between two sections: the keyboard-reachable half of
+   drag-to-place, and the only half that works without a pointer at all. */
+.tree-gap {
+  display: flex;
+  align-items: center;
+  height: 0.55rem;
+  margin: 0;
+}
+.tree-gap button {
+  opacity: 0;
+  background: none;
+  border: 0;
+  color: var(--navy-600);
+  font-size: 0.6875rem;
+  font-weight: 650;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  gap: 0.25rem;
+  position: relative;
+  border-radius: 0;
+}
+.tree-gap button::before {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  top: 50%;
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  height: 2px;
+  background: var(--navy-600);
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  border-radius: 1px;
+}
+.tree-gap button > * {
+  position: relative;
+  z-index: 1;
+  background: var(--surface);
+  padding: 0 0.3rem;
+}
+.tree-gap:hover button,
+.tree-gap button:focus-visible {
+  opacity: 1;
+}
+.tree-gap.drop-active {
+  height: 1.4rem;
+}
+.tree-gap.drop-active button {
+  opacity: 1;
+  color: var(--brand);
+}
+.tree-gap.drop-active button::before {
+  background: var(--brand);
+  height: var(--size-3);
+}
+
+.dot {
+  display: inline-block;
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  background: var(--brand);
+  flex: none;
+}
+.tree-section.on .dot {
+  background: var(--surface);
+}
+.field-head .dot {
+  margin-right: 0.1rem;
+}
+.empty-note {
+  font-size: 0.8125rem;
+  color: var(--ink-2);
+}
+.count {
+  font-size: 0.75rem;
+  margin: 1rem 0 0;
+  padding-top: 0.75rem;
+  border-top: var(--line-thin) solid var(--line-soft);
+  color: var(--ink-3);
+}

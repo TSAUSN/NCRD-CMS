@@ -1,0 +1,392 @@
+/* A sample of the planned site in its chosen tokens. On the Look step it stays
+   beside the choices while they scroll. */
+.wizard-summary.is-look {
+  position: sticky;
+  top: 1rem;
+}
+.wizard-sample {
+  display: block;
+  overflow: hidden;
+  border: var(--line-thin) solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--sample-surface);
+  color: var(--sample-ink);
+  font-family: var(--sample-body);
+  line-height: 1.45;
+}
+.wizard-sample-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.6rem 0.85rem;
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  border-top: 3px solid var(--sample-primary);
+  border-bottom: var(--line-thin) solid color-mix(in srgb, var(--sample-ink) 14%, transparent);
+}
+.wizard-sample.is-header-minimal .wizard-sample-header {
+  border-top: 0;
+}
+.wizard-sample-header.is-surface-soft {
+  background: var(--sample-band);
+}
+.wizard-sample-header.is-surface-primary {
+  background: var(--sample-primary);
+  color: var(--sample-on-primary);
+}
+.wizard-sample-header.is-surface-accent {
+  background: var(--sample-accent);
+  color: var(--sample-on-accent);
+}
+.wizard-sample.is-header-compact .wizard-sample-header {
+  padding-block: 0.35rem;
+}
+.wizard-sample.is-header-centered .wizard-sample-header {
+  flex-direction: column;
+  gap: 0.3rem;
+  text-align: center;
+}
+.wizard-sample-brand {
+  min-width: 0;
+  font-family: var(--sample-heading);
+  font-size: 0.9rem;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+.wizard-sample-nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.1rem 0.65rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+.wizard-sample-main {
+  display: grid;
+  justify-items: start;
+  gap: 0.4rem;
+  padding: 1.1rem 0.95rem 1.2rem;
+}
+.wizard-sample-eyebrow {
+  color: var(--sample-primary);
+  font-size: 0.625rem;
+  font-weight: 750;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.wizard-sample-heading {
+  font-family: var(--sample-heading);
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+.wizard-sample-intro {
+  color: var(--sample-muted);
+  font-size: 0.8rem;
+}
+.wizard-sample-button {
+  margin-top: 0.35rem;
+  padding: 0.42rem 0.85rem;
+  border: var(--line-focus) solid var(--sample-button);
+  border-radius: var(--sample-button-radius);
+  background: var(--sample-button);
+  color: var(--sample-button-ink);
+  font-size: 0.78rem;
+  font-weight: var(--sample-button-weight);
+}
+.wizard-sample-button.is-outline {
+  background: transparent;
+  color: var(--sample-button);
+}
+.wizard-sample-button.is-text {
+  padding-inline: 0.2rem;
+  border-color: transparent;
+  background: transparent;
+  color: var(--sample-button);
+}
+.wizard-sample-band {
+  padding: 0.85rem 0.95rem;
+  background: var(--sample-band);
+  font-size: 0.75rem;
+}
+.wizard-sample-footer {
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.75rem 0.95rem;
+  border-top: var(--line-thin) solid color-mix(in srgb, var(--sample-ink) 12%, transparent);
+  font-size: 0.7rem;
+}
+.wizard-sample-footer-name {
+  font-family: var(--sample-heading);
+  font-size: 0.78rem;
+  font-weight: 750;
+}
+.wizard-contrast {
+  display: grid;
+  gap: 0.3rem;
+  margin: 0.6rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+.wizard-contrast li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+}
+.wizard-contrast .icon-svg {
+  flex: none;
+  margin-top: 0.1rem;
+}
+.wizard-contrast .pass {
+  color: var(--ok);
+}
+.wizard-contrast .fail {
+  color: var(--danger);
+}
+
+/* The review step names every choice before anything is created. */
+.wizard-review {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.6rem;
+  margin: 0 0 0.8rem;
+}
+.wizard-review > div {
+  padding: 0.7rem 0.8rem;
+  border: var(--line-thin) solid var(--line);
+  border-radius: var(--r-md);
+}
+.wizard-review dt {
+  margin: 0;
+}
+.wizard-review dd {
+  margin: 0.3rem 0 0;
+  overflow-wrap: anywhere;
+}
+.wizard-review-pages {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0 0 0.9rem;
+  padding: 0;
+  list-style: none;
+}
+.wizard-review-pages li {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border: var(--line-thin) solid var(--line);
+  border-radius: var(--r-sm);
+}
+.wizard-review-pages code {
+  color: var(--ink-3);
+  font-size: 0.75rem;
+}
+.wizard-review-pages span {
+  margin-left: auto;
+  color: var(--ink-3);
+  font-size: 0.75rem;
+}
+@media (max-width: 1050px) {
+  .site-wizard-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .wizard-summary.is-look {
+    position: static;
+  }
+}
+@media (max-width: 640px) {
+  .look-colours,
+  .look-types,
+  .look-headers,
+  .wizard-review,
+  .wizard-page-choices {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .wizard-page-choices .checkbox {
+    margin-top: 0;
+  }
+  .look-shapes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.people-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(20rem, 1fr);
+  gap: 1rem;
+  align-items: start;
+}
+.people-list {
+  display: grid;
+  gap: 0.65rem;
+}
+.person-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 0.75rem;
+  margin: 0;
+}
+.person-card h2 {
+  font-size: 1rem;
+  margin: 0 0 0.3rem;
+}
+.person-card p {
+  margin: 0.2rem 0;
+  overflow-wrap: anywhere;
+}
+.person-card > div {
+  min-width: 0;
+}
+.person-card button {
+  flex-shrink: 0;
+}
+.people-editor fieldset {
+  padding: 0;
+  border: 0;
+  margin: 0;
+}
+.people-editor .people-assignments {
+  margin: 1rem 0;
+}
+.people-assignments legend {
+  font-weight: 700;
+  padding: 0;
+}
+@media (max-width: 1050px) {
+  .people-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .people-editor {
+    grid-row: 1;
+  }
+}
+.history-compare-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+.history-compare-form label {
+  flex-basis: 100%;
+  font-weight: 600;
+}
+.history-compare-form select {
+  flex: 1 1 14rem;
+  min-width: 0;
+}
+.version-changes {
+  margin: 1rem 0;
+}
+.history-preview-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+@media (max-width: 1100px) {
+  .history-preview-pair {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.version-table-scroll {
+  overflow: auto;
+  max-height: 30rem;
+  margin: 1rem 0;
+}
+.version-table-scroll table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.version-table-scroll th,
+.version-table-scroll td {
+  padding: 0.55rem;
+  border: var(--line-thin) solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+.version-table-scroll thead th {
+  position: sticky;
+  top: 0;
+  background: var(--paper);
+}
+.version-table-scroll pre {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  min-width: 8rem;
+  max-width: 30rem;
+  font: inherit;
+}
+.archived-pages {
+  margin-top: 2rem;
+  padding-top: 1.25rem;
+  border-top: var(--line-thin) solid var(--line);
+}
+.archived-pages > summary {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  cursor: pointer;
+  list-style: none;
+  flex-wrap: wrap;
+}
+.archived-pages > summary::-webkit-details-marker {
+  display: none;
+}
+.archived-pages > summary::before {
+  content: '▸';
+  color: var(--ink-3);
+  font-size: 0.8rem;
+}
+.archived-pages[open] > summary::before {
+  content: '▾';
+}
+.archived-pages > summary h2 {
+  margin: 0;
+  font-size: 1rem;
+}
+.archived-list {
+  list-style: none;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.55rem;
+}
+.archived-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.7rem 0.8rem;
+  border: var(--line-thin) solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface);
+}
+.archived-row > div:first-child {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.archived-row p {
+  margin: 0.15rem 0 0;
+  color: var(--ink-3);
+  font-size: 0.8125rem;
+}
+
+/* The heading of a list, with that list's own primary action beside it. */
+.section-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0 0 0.85rem;
+  flex-wrap: wrap;
+}
+.section-bar h2 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+/* ====================================================== the page creator == */

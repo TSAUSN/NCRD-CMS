@@ -1,0 +1,203 @@
+.placement-control {
+  margin: 1rem 0;
+}
+.placement-control-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  align-items: center;
+  padding: 0 1.1rem 1.1rem;
+}
+.placement-control-row select {
+  max-width: 16rem;
+}
+.placement-control .notice {
+  margin: 0 1.1rem 1.1rem;
+}
+
+/* Collection documents use the same governed picker dialog as image selection. */
+.collection-document-list {
+  list-style: none;
+  margin: 1rem 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+  max-height: 20rem;
+  overflow: auto;
+}
+.collection-document-list button {
+  width: 100%;
+  justify-content: flex-start;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+.collection-binding-choices {
+  display: grid;
+  gap: 0.5rem;
+  max-height: 14rem;
+  overflow: auto;
+  padding: 0.25rem;
+}
+.collection-binding-order {
+  margin: 0.5rem 0;
+  padding-left: 1.5rem;
+}
+.collection-binding-order li {
+  margin-bottom: 0.5rem;
+  overflow-wrap: anywhere;
+}
+.collection-binding-order .btn-row {
+  display: flex;
+  margin-top: 0.25rem;
+}
+
+/* Direct text controls remain CMS chrome; the mounted page field keeps source styling. */
+.canvas-rich-editor {
+  flex: 0 0 auto;
+  border: var(--line-thin) solid var(--line);
+  border-radius: var(--r-sm);
+  overflow: hidden;
+  background: var(--surface);
+}
+.canvas-rich-editor-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.8rem;
+}
+.canvas-rich-editor > p {
+  margin: 0;
+  padding: 0.5rem 0.6rem;
+  font-size: 0.8rem;
+}
+.editor-recovery {
+  flex: none;
+  padding: 0.3rem 0.85rem;
+  border-bottom: var(--line-thin) solid var(--line);
+  background: var(--surface-2);
+  font-size: 0.75rem;
+  color: var(--ink-2);
+  max-height: 28vh;
+  overflow: auto;
+}
+.recovery-status {
+  flex: none;
+  font-size: 0.75rem;
+  color: var(--bar-ink-2);
+}
+.recovery-status summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 0.25rem 0.45rem;
+  border-radius: var(--r-sm);
+  white-space: nowrap;
+}
+.recovery-status summary::-webkit-details-marker {
+  display: none;
+}
+.recovery-status summary:hover,
+.recovery-status[open] summary {
+  background: var(--bar-hover);
+  color: var(--bar-ink);
+}
+.recovery-status.is-unavailable summary {
+  color: var(--warn);
+  font-weight: 650;
+}
+.recovery-status summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+.recovery-status.is-quiet .recovery-label,
+.recovery-status.is-quiet .recovery-words {
+  position: absolute;
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  width: 1px;
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.recovery-label {
+  color: var(--ink-3);
+}
+.recovery-popover {
+  position: fixed;
+  z-index: 60;
+  width: min(22rem, calc(100vw - 1rem));
+  padding: 0.75rem 0.85rem;
+  border: var(--line-thin) solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  box-shadow: var(--e3);
+  color: var(--ink-2);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  white-space: normal;
+}
+.recovery-popover p {
+  margin: 0 0 0.55rem;
+}
+.editor-recovery .notice {
+  margin: 0.5rem 0;
+}
+.recovery-copies {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+}
+.recovery-dialog {
+  width: min(68rem, calc(100vw - 2rem));
+  max-height: calc(100dvh - 3rem);
+  overflow: auto;
+  border: var(--line-thin) solid var(--line-strong);
+  border-radius: var(--r-sm);
+  padding: 1.25rem;
+  background: var(--paper);
+  color: var(--ink);
+}
+.recovery-dialog::backdrop {
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  background: rgba(15, 25, 40, 0.45);
+}
+.recovery-dialog h2 {
+  margin-top: 0;
+}
+.recovery-dialog p {
+  font-size: 0.875rem;
+}
+.recovery-comparison {
+  max-height: 45vh;
+  overflow: auto;
+  border: var(--line-thin) solid var(--line);
+  margin: 0.75rem 0;
+}
+.recovery-comparison table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+}
+.recovery-comparison th,
+.recovery-comparison td {
+  padding: 0.6rem;
+  vertical-align: top;
+  border-bottom: var(--line-thin) solid var(--line);
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+.recovery-comparison th:first-child {
+  width: 22%;
+}
+.recovery-comparison pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  margin: 0;
+  font: inherit;
+}

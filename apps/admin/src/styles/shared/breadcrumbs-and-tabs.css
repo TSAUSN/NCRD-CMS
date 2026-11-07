@@ -1,0 +1,73 @@
+.wrap {
+  max-width: 78rem;
+  margin: 0 auto;
+  padding: 2rem 2rem 4rem;
+  width: 100%;
+}
+.wrap-narrow {
+  max-width: 46rem;
+}
+.wrap-wide {
+  max-width: 92rem;
+}
+
+/* The trail sits on the page rather than in a bar, because the bar it used to
+   sit in is now the sidebar and the sidebar says which product this is. */
+.crumbs {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 0;
+  font-size: 0.8125rem;
+  color: var(--ink-3);
+  margin: 0 0 0.85rem;
+  flex-wrap: wrap;
+}
+.crumbs a {
+  text-decoration: none;
+  color: var(--ink-3);
+  border-radius: var(--r-xs);
+}
+.crumbs a:hover {
+  color: var(--sa-navy);
+  text-decoration: underline;
+}
+.crumbs .sep {
+  color: var(--line-strong);
+  flex: none;
+}
+.crumbs [aria-current='page'] {
+  color: var(--ink-2);
+  font-weight: 600;
+}
+/* Sibling screens under one sidebar destination: Images and Documents, Sections
+   and Page templates, General and Domains. */
+.page-tabs {
+  display: flex;
+  gap: 0.25rem;
+  margin: 0 0 1.5rem;
+  border-bottom: var(--line-thin) solid var(--line);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.page-tabs a {
+  padding: 0.55rem 0.9rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--ink-3);
+  text-decoration: none;
+  border-bottom: var(--line-focus) solid transparent;
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  margin-bottom: -1px;
+  white-space: nowrap;
+}
+.page-tabs a:hover {
+  color: var(--ink);
+  text-decoration: none;
+}
+.page-tabs a[aria-current='page'] {
+  color: var(--sa-navy);
+  border-bottom-color: var(--sa-red);
+}
+
+/* ============================================================== controls == */

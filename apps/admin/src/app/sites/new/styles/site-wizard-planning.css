@@ -1,0 +1,358 @@
+.wizard-sample-partner {
+  font-size: 0.62rem;
+  opacity: 0.85;
+  white-space: nowrap;
+}
+.wizard-partner .wizard-link {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr) minmax(0, 1.2fr);
+  gap: 0.5rem 0.75rem;
+  align-items: end;
+  margin-top: 0.6rem;
+}
+.wizard-partner .wizard-link .field {
+  margin: 0;
+}
+@media (max-width: 40rem) {
+  .wizard-partner .wizard-link {
+    grid-template-columns: 1fr;
+  }
+}
+/* Links shared by every page: one row per link, text beside its address. */
+.wizard-links .wizard-link {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) auto;
+  gap: 0.5rem 0.75rem;
+  align-items: end;
+  margin: 0 0 0.6rem;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+.wizard-links .wizard-link .field {
+  margin: 0;
+}
+@media (max-width: 40rem) {
+  .wizard-links .wizard-link {
+    grid-template-columns: 1fr;
+  }
+}
+/* A nested page sits visibly under the page above it, as in the menu it makes. */
+.wizard-page.is-nested {
+  margin-left: 1.5rem;
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  border-left: 3px solid var(--line-strong);
+}
+/* V1 kept wizard progress in the browser and said so above the steps. */
+.wizard-progress {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin: 0 0 0.75rem;
+  padding: 0.55rem 0.9rem;
+  border: var(--line-thin) solid var(--info-line);
+  border-radius: var(--r);
+  background: var(--info-tint);
+}
+.wizard-progress p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--ink-2);
+}
+.wizard-progress button {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+.site-wizard-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(19rem, 1fr);
+  gap: 1rem;
+  align-items: start;
+}
+.site-wizard-layout > .card + .card {
+  margin-top: 0;
+}
+.site-wizard-layout > .card > h2:first-child {
+  margin-top: 0;
+}
+.wizard-lede {
+  margin: -0.35rem 0 1.1rem;
+  color: var(--ink-2);
+}
+.site-wizard .steps button {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: none;
+  color: inherit;
+  padding: 0.2rem;
+  border: 0;
+}
+.site-kind {
+  display: grid;
+  gap: 0.6rem;
+  margin: 1rem 0 !important;
+}
+.site-kind legend {
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+.site-kind label {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  border: var(--line-thin) solid var(--line);
+  padding: 0.75rem;
+  border-radius: var(--r-md);
+}
+.site-kind label small {
+  display: block;
+  color: var(--ink-3);
+  font-weight: 400;
+}
+.site-kind input {
+  width: auto;
+}
+.wizard-page {
+  padding: 0.7rem;
+  margin: 0.6rem 0;
+  border: var(--line-thin) solid var(--line);
+  border-radius: var(--r-md);
+}
+.wizard-page summary {
+  cursor: pointer;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+.wizard-page-meta {
+  margin-left: 0.5rem;
+  color: var(--ink-3);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+.wizard-page-choices {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0.5rem 1rem;
+  align-items: start;
+  margin-bottom: 0.75rem;
+}
+.wizard-page-choices .field {
+  margin: 0;
+  grid-row: span 2;
+}
+.wizard-page-choices .checkbox {
+  margin: 1.55rem 0 0;
+  grid-column: 2;
+}
+.wizard-page-choices .checkbox + .checkbox {
+  margin-top: 0.4rem;
+}
+.wizard-page-choices .checkbox small {
+  display: block;
+  color: var(--ink-3);
+  font-size: 0.72rem;
+  line-height: 1.4;
+}
+.wizard-summary ol {
+  padding-left: 1.25rem;
+}
+.wizard-summary-tools {
+  margin-top: 1rem;
+  font-size: 0.8125rem;
+}
+.wizard-summary-tools > summary {
+  cursor: pointer;
+  color: var(--ink-2);
+}
+.wizard-summary-tools .cluster {
+  gap: 0.4rem;
+}
+.wizard-actions {
+  margin-top: 1.25rem;
+}
+
+/* The Look step (reference 22): choices judged by eye. Each choice is a card
+   whose radio is invisible but covers the card, so a click, a tap or a voice
+   command lands on the real control; the checked card carries the border, the
+   tint and the name, so the state never rests on colour alone. */
+.look-group {
+  margin: 0 0 1.35rem !important;
+}
+.look-group legend,
+.wizard-preview h3,
+.wizard-review dt {
+  padding: 0;
+  margin: 0 0 0.55rem;
+  color: var(--ink-3);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.look-options {
+  display: grid;
+  gap: 0.5rem;
+}
+.look-colours,
+.look-types {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.look-shapes {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.look-headers {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+/* A header drawn small: the brand rule, the name and three menu items. */
+.header-sketch {
+  position: relative;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.2rem;
+  width: 4.25rem;
+  height: 2.25rem;
+  margin-top: 0.1rem;
+  padding: 0.3rem 0.35rem;
+  border: var(--line-thin) solid var(--line-strong);
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  border-top: 3px solid var(--navy-600);
+  border-radius: 0.3rem;
+  background: var(--surface);
+}
+.header-sketch i {
+  display: block;
+  width: 1.35rem;
+  height: 0.3rem;
+  border-radius: 0.15rem;
+  background: var(--ink-2);
+}
+.header-sketch b {
+  display: block;
+  width: 0.55rem;
+  height: 0.2rem;
+  border-radius: 0.1rem;
+  background: var(--ink-3);
+}
+.header-sketch.is-centered {
+  display: grid;
+  grid-template-columns: repeat(3, 0.55rem);
+  justify-content: center;
+  align-content: center;
+  gap: 0.25rem 0.2rem;
+}
+.header-sketch.is-centered i {
+  grid-column: 1 / -1;
+  justify-self: center;
+}
+.header-sketch.is-compact {
+  height: 1.6rem;
+  margin-top: 0.4rem;
+}
+.header-sketch.is-minimal {
+  border-top-width: var(--line-thin);
+  border-top-color: var(--line-strong);
+}
+.header-surface-sample {
+  border: var(--line-thin) solid var(--line-strong);
+}
+.look-option {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0.65rem 0.7rem;
+  border: var(--line-thin) solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: 400;
+  cursor: pointer;
+  transition:
+    border-color 0.12s ease,
+    background-color 0.12s ease,
+    box-shadow 0.12s ease;
+}
+.look-option:hover {
+  border-color: var(--navy-500);
+}
+.look-option:has(input:checked) {
+  border-color: var(--navy-600);
+  background: var(--navy-tint);
+  box-shadow: inset 0 0 0 var(--line-thin) var(--navy-600);
+}
+.look-option:has(input:focus-visible) {
+  box-shadow:
+    inset 0 0 0 var(--line-thin) var(--navy-600),
+    var(--ring);
+}
+.look-option input {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.look-option-copy {
+  display: grid;
+  gap: 0.15rem;
+  min-width: 0;
+}
+.look-option strong {
+  color: var(--ink);
+  font-size: 0.875rem;
+  font-weight: 650;
+  line-height: 1.3;
+}
+.look-option small {
+  color: var(--ink-3);
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+.look-swatch {
+  flex: none;
+  width: 1.35rem;
+  height: 1.35rem;
+  margin-top: 0.05rem;
+  border-radius: 0.35rem;
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.14);
+}
+.look-type-sample {
+  flex: none;
+  width: 2rem;
+  margin-top: 0.05rem;
+  color: var(--ink);
+  font-size: 1.35rem;
+  line-height: 1;
+  text-align: center;
+}
+.look-shape {
+  flex-direction: column;
+  align-items: center;
+  gap: 0.45rem;
+  text-align: center;
+}
+.look-button-sample {
+  display: block;
+  width: 4.25rem;
+  height: 1.6rem;
+}
+.look-custom {
+  margin-top: 0.85rem;
+}
+.look-custom .theme-colour-input {
+  max-width: 13rem;
+}
+.look-custom.is-chosen .theme-colour-input input[type='text'] {
+  border-color: var(--navy-600);
+  box-shadow: inset 0 0 0 var(--line-thin) var(--navy-600);
+}

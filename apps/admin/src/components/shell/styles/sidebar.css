@@ -1,0 +1,344 @@
+.app {
+  display: flex;
+  height: 100dvh;
+  overflow: clip;
+  background: var(--paper);
+}
+.app-main {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.app-scrim {
+  display: none;
+}
+
+.sidebar {
+  flex: none;
+  width: var(--sidebar-w);
+  background: var(--nav-bg);
+  color: var(--nav-ink);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  transition: width var(--slide) ease;
+  /* A flex item's `min-width` resolves to `auto` — a content-based minimum — so
+     folding to a 64px rail moved every label out of flow and left the sidebar
+     at its full width anyway, because something inside still reported a wider
+     min-content size. `width` is the authority here; this is what lets it be. */
+  min-width: 0;
+}
+.app[data-rail='on'] .sidebar {
+  width: var(--sidebar-rail-w);
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.85rem 0.9rem;
+  border-bottom: var(--line-thin) solid var(--nav-line);
+  min-height: 3.75rem;
+}
+.sidebar-brandtext {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.25;
+}
+.sidebar-brandtext strong {
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: -0.005em;
+}
+.sidebar-brandtext span {
+  font-size: 0.75rem;
+  color: var(--nav-ink-3);
+}
+.sidebar-close {
+  display: none;
+}
+
+.sidebar-nav {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0.5rem 0.6rem 1rem;
+  scrollbar-width: thin;
+}
+.sidebar-group + .sidebar-group {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: var(--line-thin) solid var(--nav-line);
+}
+/* The product-wide group needs no heading of its own; the site group's
+   heading is the site's name, which is the useful one. */
+.sidebar-group:first-child .sidebar-group-label {
+  position: absolute;
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  width: 1px;
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.sidebar-group-label {
+  margin: 0 0 0.35rem;
+  padding: 0 0.55rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--nav-ink-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.navlink {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.44rem 0.6rem;
+  border-radius: var(--r-sm);
+  color: var(--nav-ink-2);
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 550;
+  transition:
+    background-color var(--fast) ease,
+    color var(--fast) ease;
+  position: relative;
+}
+.navlink:hover {
+  background: var(--nav-hover);
+  color: var(--nav-ink);
+  text-decoration: none;
+}
+.navlink[aria-current='page'] {
+  background: var(--nav-active);
+  color: var(--nav-ink);
+  font-weight: 650;
+}
+/* The current destination also carries the identity red, which is the one place
+   in the chrome where the accent means "you are here".
+   Inset rather than a bar positioned outside the link: at a negative offset it
+   sat against the window edge with a gap between it and the row it belonged to,
+   and read as a stray mark rather than as this row's marker. */
+.navlink[aria-current='page'] {
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  box-shadow: inset 3px 0 0 var(--sa-red);
+}
+.navlink-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 1.25rem;
+}
+.navlink-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.navlink-button {
+  width: 100%;
+  background: none;
+  border: 0;
+  text-align: left;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 550;
+  justify-content: flex-start;
+}
+.navlink-button:hover {
+  background: var(--nav-hover);
+  color: var(--nav-ink);
+  border: 0;
+}
+
+.sidebar-foot {
+  flex: none;
+  padding: 0.6rem 0.6rem 0.8rem;
+  border-top: var(--line-thin) solid var(--nav-line);
+}
+.whoami {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.55rem;
+  border-radius: var(--r-sm);
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  background: rgba(255, 255, 255, 0.06);
+  margin-bottom: 0.35rem;
+}
+.whoami-initial {
+  flex: none;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--sa-red);
+  color: var(--text-on-dark);
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+.whoami-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.3;
+}
+.whoami-email {
+  font-size: 0.75rem;
+  color: var(--nav-ink-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.whoami-role {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--nav-ink-3);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Folded: the labels go, the names stay. */
+.app[data-rail='on'] .navlink-label,
+.app[data-rail='on'] .sidebar-brandtext {
+  position: absolute;
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  width: 1px;
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  top: 0;
+  left: 0;
+}
+.app[data-rail='on'] .sidebar-brand {
+  justify-content: center;
+  padding-inline: 0;
+}
+.app[data-rail='on'] .navlink,
+.app[data-rail='on'] .whoami {
+  justify-content: center;
+  padding-inline: 0.35rem;
+}
+.app[data-rail='on'] .sidebar-group-label {
+  display: none;
+}
+.app[data-rail='on'] .sidebar-group + .sidebar-group {
+  margin-top: 0.6rem;
+  padding-top: 0.6rem;
+}
+
+/* The slim bar that exists only where the sidebar does not. */
+.app-topbar {
+  display: none;
+}
+
+@media (max-width: 60rem) {
+  .sidebar {
+    position: fixed;
+    inset-block: 0;
+    left: 0;
+    z-index: 60;
+    width: min(17rem, 82vw);
+    transform: translateX(-100%);
+    transition: transform var(--slide) ease;
+    box-shadow: var(--e3);
+  }
+  .app[data-drawer='open'] .sidebar {
+    transform: none;
+  }
+  .app[data-rail='on'] .sidebar {
+    width: min(17rem, 82vw);
+  }
+  /* Folding is a desktop idea; on a phone the sidebar is already a sheet you
+     dismiss, and a 64px rail there would be a third state with no benefit. */
+  .app[data-rail='on'] .navlink-label,
+  .app[data-rail='on'] .sidebar-brandtext {
+    position: static;
+    width: auto;
+    height: auto;
+    clip-path: none;
+  }
+  .app[data-rail='on'] .sidebar-group-label {
+    display: block;
+  }
+  .app[data-rail='on'] .navlink,
+  .app[data-rail='on'] .whoami {
+    justify-content: flex-start;
+    padding-inline: 0.55rem;
+  }
+  .app[data-rail='on'] .sidebar-brand {
+    justify-content: flex-start;
+    padding-inline: 0.9rem;
+  }
+  .sidebar-close {
+    display: inline-flex;
+    margin-left: auto;
+    background: none;
+    border: 0;
+    color: var(--nav-ink-2);
+    padding: 0.35rem;
+    border-radius: var(--r-sm);
+  }
+  .sidebar-close:hover {
+    background: var(--nav-hover);
+    color: var(--nav-ink);
+    border: 0;
+  }
+
+  .app-scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+    background: rgba(0, 22, 64, 0.5);
+    border: 0;
+    border-radius: 0;
+    padding: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--slide) ease;
+  }
+  .app[data-drawer='open'] .app-scrim {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .app-topbar {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex: none;
+    padding: 0.5rem 0.75rem;
+    background: var(--surface);
+    border-bottom: var(--line-thin) solid var(--line);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .app-topbar-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--sa-navy);
+  }
+}
+
+/* ============================================================ app chrome == */

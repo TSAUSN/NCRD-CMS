@@ -1,0 +1,256 @@
+/* The docked library's full-width preview (V1 reference 11). */
+/* One column that cannot grow past the dialog: the 1200px desktop frame
+   scrolls inside its own viewport instead of widening the head and actions. */
+.library-preview-dialog {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.85rem;
+  overflow: auto;
+}
+.library-preview-dialog[open] {
+  display: grid;
+}
+.library-preview-dialog .section-preview-dialog-head {
+  margin-bottom: 0;
+  align-items: flex-start;
+}
+.library-preview-dialog .section-preview-dialog-head h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 1.0625rem;
+  font-weight: 650;
+  letter-spacing: normal;
+  text-transform: none;
+}
+.library-preview-dialog .section-preview-dialog-head > button {
+  flex: none;
+}
+.library-preview-dialog .section-preview-dialog-head p {
+  margin: 0.15rem 0 0;
+  font-size: 0.8125rem;
+}
+.library-preview-dialog .section-live-preview-scroll iframe {
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  height: min(58vh, 620px);
+}
+.library-preview-foot {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.library-preview-foot p {
+  margin: 0 0 0.3rem;
+}
+.library-preview-foot > button {
+  flex: 0 1 auto;
+  max-width: 50%;
+  text-align: left;
+  white-space: normal;
+}
+.library-preview-fields {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+}
+.library-preview-fields > span:first-child {
+  margin-right: 0.2rem;
+  color: var(--ink-3);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+.section-upgrade-controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0;
+  font-size: 0.8125rem;
+}
+.section-upgrade-controls label {
+  margin: 0;
+}
+.section-upgrade-controls select {
+  width: auto;
+}
+.section-upgrade-controls span {
+  color: var(--ink-2);
+}
+.section-upgrade-viewport {
+  overflow: auto;
+  background: var(--bg);
+}
+.section-upgrade-viewport iframe {
+  display: block;
+  max-width: none;
+  margin: 0 auto;
+}
+.replacement-mapping {
+  border: var(--line-thin) solid var(--line);
+  border-radius: var(--r-md);
+  padding: 0.75rem 1rem 1rem;
+  margin: 1rem 0;
+  min-width: 0;
+}
+.replacement-mapping legend {
+  font-weight: 600;
+  padding: 0 0.25rem;
+}
+.replacement-mapping > .hint {
+  margin: 0 0 0.5rem;
+}
+.replacement-mapping table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.replacement-mapping th,
+.replacement-mapping td {
+  text-align: left;
+  padding: 0.5rem 0.75rem 0.5rem 0;
+  vertical-align: top;
+  border-top: var(--line-thin) solid var(--line);
+  font-size: 0.875rem;
+}
+.replacement-mapping thead th {
+  border-top: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+.replacement-mapping tbody th {
+  font-weight: 500;
+  width: 42%;
+}
+.replacement-mapping tbody th label {
+  margin: 0;
+  display: block;
+}
+.replacement-kind {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--ink-2);
+}
+.replacement-mapping select {
+  width: 100%;
+  max-width: 24rem;
+}
+.replacement-mapping td .hint {
+  margin: 0.25rem 0 0;
+}
+.schedule-fields {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  border: 0;
+  padding: 0;
+}
+.scheduled-list {
+  list-style: none;
+  margin: 1rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.65rem;
+}
+.scheduled-list > li {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 0.75rem;
+  border-top: var(--line-thin) solid var(--line);
+  padding-top: 0.65rem;
+}
+.scheduled-list p {
+  margin: 0.2rem 0;
+}
+.release-choices {
+  border: 0;
+  padding: 0;
+  margin: 1rem 0;
+  display: grid;
+  gap: 0.5rem;
+}
+.release-choices legend {
+  font-weight: 650;
+  margin-bottom: 0.35rem;
+  float: left;
+}
+.release-choices .release-all {
+  justify-self: start;
+  margin-bottom: 0.25rem;
+  clear: both;
+}
+.release-choices small {
+  color: var(--ink-3);
+}
+.release-choices label {
+  display: flex;
+  align-items: start;
+  gap: 0.5rem;
+  font-weight: 500;
+}
+.release-choices input {
+  width: auto;
+  margin-top: 0.25rem;
+}
+.release-choices small {
+  display: block;
+  color: var(--ink-3);
+  font-weight: 400;
+}
+.release-review {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: var(--line-thin) solid var(--line);
+}
+.release-review details {
+  margin: 0.5rem 0;
+}
+.release-history {
+  margin-top: 1rem;
+}
+.release-history ul {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+@media (max-width: 1050px) {
+  .schedule-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+/* The section creator's tool choice sits under its title as one control (V1
+   reference 20 named the task first); the preview's appearance sits with it. */
+.creator-mode {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin: 0 0 1rem;
+}
+.creator-mode .group > button {
+  padding: 0.4rem 0.9rem;
+  font-size: 0.875rem;
+  min-height: 2.1rem;
+}
+.creator-mode .hint {
+  margin: 0;
+}
+.creator-appearance {
+  margin-bottom: 0.75rem;
+}
+.creator-appearance select {
+  width: 100%;
+}
+.creator-appearance .hint {
+  margin: 0.3rem 0 0;
+}
+.creator .card > h2:first-child {
+  margin-top: 0;
+}
+.site-wizard fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}

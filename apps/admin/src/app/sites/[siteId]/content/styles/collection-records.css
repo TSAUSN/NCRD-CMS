@@ -1,0 +1,230 @@
+.record-key-field label {
+  font-size: 0.75rem;
+  font-weight: 650;
+}
+.record-key-field input {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+}
+.record-key-field small {
+  grid-column: 2;
+  color: var(--ink-3);
+  font-size: 0.68rem;
+}
+.record-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem 1.1rem;
+  padding-top: 1rem;
+}
+.record-fields .collection-field:has(textarea),
+.record-fields .collection-check {
+  grid-column: 1 / -1;
+}
+.collection-field > small {
+  color: var(--ink-3);
+}
+.collection-field.has-error input,
+.collection-field.has-error textarea,
+.collection-field.has-error select {
+  border-color: var(--danger-line);
+}
+.collection-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: 0.75rem;
+  background: var(--surface-2);
+  border: var(--line-thin) solid var(--line);
+  border-radius: var(--r);
+}
+.collection-check input {
+  margin-top: 0.2rem;
+}
+.collection-check span {
+  display: grid;
+}
+.collection-check small {
+  color: var(--ink-3);
+}
+.record-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding-top: 0.85rem;
+  border-top: var(--line-thin) solid var(--line-soft);
+}
+.collection-image-field {
+  border: var(--line-thin) solid var(--line);
+  padding: 0.55rem;
+  border-radius: var(--r);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  min-height: 3.2rem;
+}
+.collection-image-thumb {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+}
+.collection-image-thumb img {
+  width: 2.6rem;
+  height: 2.2rem;
+  object-fit: cover;
+  border-radius: var(--r-sm);
+}
+.collection-image-thumb span {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 0.72rem;
+  color: var(--ink-2);
+}
+.collection-image-empty {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--ink-3);
+  font-size: 0.75rem;
+}
+
+.collection-empty,
+.collection-welcome {
+  min-height: 28rem;
+  padding: 4rem 2rem;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  text-align: center;
+}
+.collection-empty > span,
+.collection-welcome > span {
+  width: 3.25rem;
+  height: 3.25rem;
+  display: grid;
+  place-items: center;
+  border-radius: var(--r-lg);
+  background: var(--navy-tint);
+  color: var(--navy-700);
+}
+.collection-empty h3,
+.collection-welcome h2 {
+  margin: 0.7rem 0 0.25rem;
+}
+.collection-empty p,
+.collection-welcome > p:last-of-type {
+  color: var(--ink-3);
+  max-width: 34rem;
+}
+.collection-empty.compact {
+  min-height: 16rem;
+  padding: 2rem;
+}
+
+.collection-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: grid;
+  place-items: center;
+  padding: 2rem;
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  background: rgba(0, 22, 64, 0.56);
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  backdrop-filter: blur(3px);
+}
+.collection-dialog {
+  width: min(38rem, 100%);
+  max-height: min(52rem, calc(100dvh - 4rem));
+  overflow-y: auto;
+  background: var(--surface);
+  border-radius: var(--r-xl);
+  box-shadow: var(--e3);
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  border: var(--line-thin) solid rgba(255, 255, 255, 0.5);
+}
+.collection-dialog.is-wide {
+  width: min(72rem, 100%);
+}
+.collection-dialog > header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem 1.4rem;
+  background: var(--surface);
+  border-bottom: var(--line-thin) solid var(--line);
+}
+.collection-dialog > header h2 {
+  margin: 0.1rem 0 0.2rem;
+  font-size: 1.2rem;
+}
+.collection-dialog > header p:last-child {
+  color: var(--ink-3);
+  margin: 0;
+  max-width: 47rem;
+  font-size: 0.8rem;
+}
+.collection-dialog > header .icon-btn {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+.collection-dialog > footer {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding: 0.9rem 1.4rem;
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  background: rgba(255, 255, 255, 0.96);
+  border-top: var(--line-thin) solid var(--line);
+}
+.collection-dialog-notice {
+  margin: 0.75rem 1.4rem;
+}
+
+.preset-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+  padding: 1.2rem 1.4rem;
+}
+.preset-grid > button {
+  min-height: 5rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: 0.8rem;
+  text-align: left;
+  color: var(--ink);
+  background: var(--surface-2);
+  border: var(--line-thin) solid var(--line);
+  box-shadow: none;
+}
+.preset-grid > button:hover,
+.preset-grid > button.is-selected {
+  background: var(--navy-tint);
+  border-color: var(--navy-tint-2);
+}
+.preset-grid > button > span {
+  display: grid;
+}
+.preset-grid small {
+  color: var(--ink-3);
+  font-weight: 400;
+  line-height: 1.35;
+}
+.collection-create-fields {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr;
+  gap: 1rem;
+  padding: 0 1.4rem 1.25rem;
+}

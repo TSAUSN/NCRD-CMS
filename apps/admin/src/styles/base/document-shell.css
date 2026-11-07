@@ -1,0 +1,175 @@
+/* The admin is a single-theme product and says so.
+ *
+ * A brand palette is not a set of hues that can be inverted and still be the
+ * brand: Salvation Army navy is a *dark* colour, and a dark theme built from it
+ * ends up either unreadable or not navy. Rather than ship a second palette
+ * nobody has approved, the page paints its own ground and its own colours
+ * explicitly, so it holds whatever the host is set to.
+ */
+
+/* ============================================================== elements == */
+
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Focus is visible everywhere, including on the navy bar, because editor chrome
+   has to meet WCAG 2.1 AA itself (SPEC §7). Two rings — a light one and a dark
+   one — so the indicator is visible against whichever it lands on. */
+:focus-visible {
+  outline: var(--line-focus) solid var(--navy-600);
+  outline-offset: var(--line-focus);
+  border-radius: var(--r-xs);
+}
+.bar :focus-visible,
+.overlay-dialog .overlay-head :focus-visible {
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  outline-color: #fff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* The skip link is invisible until focused — which is a position, not a
+   `display`, because a link that is not in the layout is not in the tab order
+   either. */
+.skip {
+  position: fixed;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 200;
+  transform: translateY(-200%);
+  background: var(--surface);
+  color: var(--navy-600);
+  font-weight: 600;
+  padding: 0.55rem 1rem;
+  border-radius: var(--r-sm);
+  box-shadow: var(--e3);
+  text-decoration: none;
+  border: var(--line-thin) solid var(--line);
+}
+.skip:focus {
+  transform: translateY(0);
+}
+
+.sr-only {
+  position: absolute;
+  width: var(--line-thin);
+  height: var(--line-thin);
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+a {
+  color: var(--sa-navy-ink);
+  text-underline-offset: 0.15em;
+}
+a:hover {
+  text-decoration-thickness: var(--line-focus);
+}
+
+h1,
+h2,
+h3,
+h4 {
+  color: var(--ink);
+  text-wrap: balance;
+}
+h1 {
+  font-size: 1.5rem;
+  line-height: 1.2;
+  margin: 0 0 0.3rem;
+  letter-spacing: -0.015em;
+  font-weight: 650;
+}
+h2 {
+  font-size: 1.0625rem;
+  margin: 2rem 0 0.75rem;
+  letter-spacing: -0.008em;
+  font-weight: 650;
+}
+h3 {
+  font-size: 0.9375rem;
+  margin: 1.5rem 0 0.4rem;
+  font-weight: 650;
+}
+p {
+  margin: 0 0 1rem;
+}
+p.lede {
+  color: var(--ink-2);
+  margin: 0 0 1.25rem;
+  max-width: 46rem;
+  font-size: 0.9375rem;
+}
+.muted {
+  color: var(--ink-3);
+  font-size: 0.8125rem;
+}
+.mono {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+}
+code.mono {
+  background: var(--surface-3);
+  padding: 0.08em 0.3em;
+  border-radius: var(--r-xs);
+  border: var(--line-thin) solid var(--line-soft);
+}
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+/* An eyebrow: the small capitalised label that names a group. Above a
+   heading it only repeats what the heading says, so there it is left to
+   assistive technology and the heading speaks for the card. */
+.eyebrow:has(+ h2),
+.eyebrow:has(+ h3) {
+  position: absolute;
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  width: 1px;
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.eyebrow {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 0;
+}
+
+/* Icons sit on the text baseline rather than on the line box, which is what
+   stops a 16px glyph pushing a 13px label a pixel off centre. */
+.icon-svg {
+  flex: none;
+  display: block;
+}
+
+/* ========================================================= collections == */

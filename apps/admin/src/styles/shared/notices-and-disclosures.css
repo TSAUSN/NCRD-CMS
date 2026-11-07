@@ -1,0 +1,209 @@
+.notice {
+  border-radius: var(--r-sm);
+  padding: 0.7rem 0.9rem;
+  margin: 0 0 1rem;
+  border: var(--line-thin) solid;
+  font-size: 0.875rem;
+  display: flex;
+  gap: 0.55rem;
+  align-items: flex-start;
+  line-height: 1.5;
+}
+.notice > .icon-svg {
+  margin-top: 0.12rem;
+}
+.notice-body {
+  min-width: 0;
+}
+.notice-ok {
+  background: var(--ok-tint);
+  border-color: var(--ok-line);
+  color: var(--ok);
+}
+.notice-info {
+  background: var(--info-tint);
+  border-color: var(--info-line);
+  color: var(--info);
+}
+.notice-warn {
+  background: var(--warn-tint);
+  border-color: var(--warn-line);
+  color: var(--warn);
+}
+.notice-error {
+  background: var(--danger-tint);
+  border-color: var(--danger-line);
+  color: var(--danger);
+}
+.notice ul {
+  margin: 0.4rem 0 0;
+  padding-left: 1.15rem;
+}
+.notice li + li {
+  margin-top: 0.2rem;
+}
+.notice p {
+  margin: 0;
+}
+.notice p + p {
+  margin-top: 0.4rem;
+}
+.notice button.link {
+  color: inherit;
+}
+.notice strong {
+  font-weight: 650;
+}
+
+.stats {
+  display: grid;
+  gap: 0.85rem 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr));
+  margin: 0;
+}
+.stats div {
+  margin: 0;
+}
+.stats dt {
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-3);
+  font-weight: 700;
+}
+.stats dd {
+  margin: 0.1rem 0 0;
+  font-size: 1.25rem;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+/* A figure that is a sentence rather than a number sets at body size: "nothing
+   waiting" at 1.25rem wraps onto two lines and reads as a broken statistic. */
+.stats dd.words {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--ink-2);
+}
+.stats dd.bad {
+  color: var(--danger);
+}
+
+/* Label and value pairs in a card. */
+.facts {
+  display: grid;
+  gap: 0.85rem;
+  margin: 0;
+}
+.facts > div {
+  display: grid;
+  grid-template-columns: 10rem minmax(0, 1fr);
+  gap: 1rem;
+  align-items: baseline;
+}
+.facts dt {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--ink-3);
+}
+.facts dd {
+  margin: 0;
+}
+.facts .hint {
+  margin-top: 0.25rem;
+}
+@media (max-width: 40rem) {
+  .facts > div {
+    grid-template-columns: 1fr;
+    gap: 0.2rem;
+  }
+}
+
+.split {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: start;
+}
+@media (max-width: 60rem) {
+  .split {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* A disclosure that says what it is before it opens. */
+.hatch {
+  border: var(--line-thin) solid var(--line);
+  border-radius: var(--r-sm);
+  margin: 0.75rem 0;
+  background: var(--surface);
+}
+.hatch > summary {
+  padding: 0.55rem 0.75rem;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.875rem;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: var(--r-sm);
+  color: var(--ink);
+}
+.hatch > summary::-webkit-details-marker {
+  display: none;
+}
+.hatch > summary::before {
+  content: '';
+  width: 0;
+  height: 0;
+  flex: none;
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  border-left: 5px solid currentColor;
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  border-top: 4px solid transparent;
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  border-bottom: 4px solid transparent;
+  color: var(--ink-3);
+  transition: transform 0.15s ease;
+  transform-origin: 25% 50%;
+}
+.hatch[open] > summary::before {
+  transform: rotate(90deg);
+}
+.hatch > summary:hover {
+  background: var(--surface-2);
+}
+.hatch[open] > summary {
+  border-bottom: var(--line-thin) solid var(--line-soft);
+  border-radius: var(--r-sm) var(--r-sm) 0 0;
+}
+.hatch-body {
+  padding: 0.85rem 0.75rem;
+}
+.hatch-flag {
+  margin-left: auto;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--warn);
+  flex: none;
+}
+.hatch-consequence {
+  background: var(--warn-tint);
+  border: var(--line-thin) solid var(--warn-line);
+  border-radius: var(--r-sm);
+  padding: 0.6rem 0.75rem;
+  font-size: 0.8125rem;
+  margin: 0 0 0.75rem;
+  color: var(--warn);
+  line-height: 1.5;
+}
+.hatch-consequence ul {
+  margin: 0.4rem 0 0;
+  padding-left: 1.1rem;
+}
+.hatch-consequence li + li {
+  margin-top: 0.15rem;
+}
+
+/* ========================================================= page history == */

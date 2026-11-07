@@ -1,0 +1,373 @@
+/* --------------------------------------------------------------- canvas -- */
+
+/* The workspace the page sits in. Recessed and a shade cooler than the document
+   ground, so the page reads as a sheet on a desk rather than as more of the
+   application. */
+.canvas-pane {
+  background: var(--paper-sunk);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0.85rem 0.85rem;
+  min-height: 0;
+  overflow: hidden;
+}
+.canvas-frame {
+  width: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
+  margin: 0 auto;
+  transition: max-width 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--r-md);
+  background: var(--surface);
+  /* stylelint-disable declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  box-shadow:
+    0 1px 2px rgba(16, 24, 40, 0.06),
+    0 8px 24px -12px rgba(16, 24, 40, 0.22);
+  /* stylelint-enable declaration-property-value-disallowed-list */
+  border: var(--line-thin) solid var(--line);
+  overflow: hidden;
+}
+.canvas-viewport {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+}
+.canvas-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+.canvas-loading span {
+  padding: 0.6rem 0.9rem;
+  border: var(--line-thin) solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  color: var(--ink-2);
+  font-size: 0.875rem;
+}
+.canvas-loading-retry {
+  max-width: 22rem;
+  padding: 1rem;
+  margin: 1rem;
+  border: var(--line-thin) solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  text-align: center;
+  pointer-events: auto;
+}
+.canvas-loading-retry p {
+  margin: 0 0 0.75rem;
+  font-size: 0.875rem;
+}
+.canvas-loading-retry p:last-child {
+  margin: 0.75rem 0 0;
+}
+.canvas-viewport[data-zoom='actual'] {
+  overflow-x: auto;
+}
+/* One slim row of view controls above the page. */
+.canvas-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 1rem;
+  width: 100%;
+  flex: none;
+  font-size: 0.78125rem;
+  color: var(--ink-2);
+}
+.canvas-tool {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.canvas-tool label,
+label.canvas-tool {
+  margin: 0;
+  font-size: inherit;
+  font-weight: 600;
+  color: var(--ink-3);
+}
+.canvas-tool select {
+  width: auto;
+  min-height: 1.85rem;
+  font-size: inherit;
+  padding: 0.15rem 1.7rem 0.15rem 0.55rem;
+  background-color: var(--surface);
+  border-color: var(--line);
+}
+.canvas-draft-chip {
+  font-size: 0.6875rem;
+  font-weight: 650;
+  color: var(--warn);
+  background: var(--warn-tint);
+  border: var(--line-thin) solid var(--warn-line);
+  border-radius: var(--r-pill);
+  padding: 0.05rem 0.5rem;
+  cursor: help;
+}
+.canvas-width {
+  margin-left: auto;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.75rem;
+}
+.canvas-toolbar .canvas-focus {
+  min-height: 1.85rem;
+  padding: 0.2rem 0.55rem;
+  color: var(--ink-2);
+}
+.canvas-hidden-toggle {
+  cursor: pointer;
+}
+.canvas-hidden-toggle input {
+  width: 0.95rem;
+  min-height: 0;
+  margin: 0;
+  accent-color: var(--navy-600);
+}
+.editor-site-tools {
+  display: grid;
+  gap: 0.75rem;
+}
+.editor-site-tools a {
+  display: block;
+  line-height: 1.45;
+}
+.canvas-visibility-note {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  flex: none;
+  padding: 0.6rem 0.75rem;
+  border: var(--line-thin) solid var(--warn-line);
+  border-radius: var(--r-md);
+  background: var(--warn-tint);
+  color: var(--warn);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}
+.canvas-visibility-note span {
+  flex: 1;
+  min-width: 0;
+}
+.canvas-visibility-note button {
+  flex: none;
+  white-space: normal;
+  max-width: 10rem;
+}
+@media (max-width: 64rem) {
+  .canvas-visibility-note {
+    flex-wrap: wrap;
+  }
+}
+.inspector .field[data-selected='true'] {
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  border-left: 3px solid var(--navy-600);
+  padding-left: 0.65rem;
+}
+/* An imported link: its words and its destination under the link's name. */
+.inspector .link-group {
+  display: grid;
+  gap: 0.6rem;
+}
+.link-group-title {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 0.8125rem;
+  font-weight: 650;
+}
+.link-group-row .field-head label {
+  color: var(--ink-3);
+  font-size: 0.75rem;
+}
+/* A repeated list (LIB-02): each item a small card with its own fields. */
+.inspector .repeat-list {
+  display: grid;
+  gap: 0.55rem;
+}
+.repeat-list-title {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 0.8125rem;
+  font-weight: 650;
+}
+.repeat-list-title .muted {
+  margin-left: auto;
+  font-weight: 400;
+  font-size: 0.75rem;
+}
+.repeat-items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.45rem;
+}
+.repeat-item {
+  border: var(--line-thin) solid var(--line);
+  border-radius: 0.5rem;
+  background: var(--surface-2);
+}
+.repeat-item[data-selected='true'] {
+  border-color: var(--navy-600);
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  box-shadow: inset 3px 0 0 var(--navy-600);
+}
+.repeat-item summary {
+  cursor: pointer;
+  padding: 0.45rem 0.65rem;
+  font-size: 0.8125rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.repeat-item details[open] summary {
+  border-bottom: var(--line-thin) solid var(--line-soft);
+}
+.repeat-item details > :not(summary) {
+  margin: 0.55rem 0.65rem;
+}
+.repeat-item .field[data-selected='true'] {
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  border-left: 3px solid var(--navy-600);
+  padding-left: 0.55rem;
+}
+.repeat-item-actions {
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+/* V1's own icon drawings as a choice (LIB-02). */
+.drawing-field {
+  display: grid;
+  gap: 0.45rem;
+}
+.drawing-current {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--ink-2);
+}
+.drawing-swatch {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border: var(--line-thin) solid var(--line);
+  border-radius: 0.4rem;
+  background: var(--surface);
+  color: var(--navy-600);
+}
+.drawing-swatch svg,
+.drawing-choice svg {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+.drawing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(2.25rem, 1fr));
+  gap: 0.3rem;
+  max-height: 9.75rem;
+  overflow: auto;
+  padding: 0.1rem;
+}
+.drawing-choice {
+  display: grid;
+  place-items: center;
+  height: 2.25rem;
+  min-height: 0;
+  padding: 0;
+  border: var(--line-thin) solid var(--line);
+  border-radius: 0.4rem;
+  background: var(--surface);
+  color: var(--ink);
+}
+.drawing-choice:hover {
+  border-color: var(--line-strong);
+  background: var(--surface-2);
+}
+.drawing-choice[aria-pressed='true'] {
+  border-color: var(--navy-600);
+  background: var(--navy-tint);
+  color: var(--navy-600);
+  box-shadow: inset 0 0 0 var(--line-thin) var(--navy-600);
+}
+.link-choices {
+  display: grid;
+  gap: 0.45rem;
+  margin-top: 0.6rem;
+}
+.link-choices .checkbox {
+  margin: 0;
+}
+.link-choices .checkbox small {
+  display: block;
+  color: var(--ink-3);
+  font-size: 0.72rem;
+  font-weight: 400;
+  line-height: 1.4;
+}
+@media (min-width: 64.001rem) {
+  .editor[data-focus-canvas='true'] .panes {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .editor[data-focus-canvas='true'] .panes > .pane {
+    display: none;
+  }
+}
+@media (max-width: 64rem) {
+  .canvas-toolbar .canvas-focus {
+    display: none;
+  }
+}
+iframe.canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  max-width: none;
+  border: 0;
+  background: var(--surface);
+  display: block;
+  transform-origin: top left;
+}
+.canvas-size {
+  flex: none;
+  color: var(--ink-3);
+  font-size: 0.6875rem;
+  font-variant-numeric: tabular-nums;
+}
+.canvas-help {
+  text-align: center;
+  max-width: 44rem;
+  flex: none;
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--ink-3);
+}
+.canvas-empty {
+  background: var(--surface);
+  border-radius: var(--r);
+  padding: 3rem 1.5rem;
+  text-align: center;
+  margin: auto;
+  width: 100%;
+}

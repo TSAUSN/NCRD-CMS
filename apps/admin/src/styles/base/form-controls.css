@@ -1,0 +1,416 @@
+/* THE BUTTON HIERARCHY
+ *
+ * An ordinary button is navy: Save, Open, Choose, Upload. The one action a
+ * screen exists for carries `.cta` and is Salvation Army red, which is what V1
+ * does and what makes Publish unmistakable. It is `--sa-red-ink` rather than
+ * `--sa-red`, because white on the brand red measures 3.6:1 and a button label
+ * is small text.
+ *
+ * Destructive is red too and deliberately a different *shape*: an outline
+ * rather than a fill, always carrying the trash mark and always followed by a
+ * dialog that names the consequence. Red has to cover both identity and danger
+ * in this palette, so nothing here is distinguished by hue alone.
+ */
+button,
+.btn {
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 0.5rem 0.95rem;
+  border-radius: var(--r-md);
+  border: var(--line-thin) solid var(--sa-navy);
+  background: var(--sa-navy);
+  color: var(--text-on-dark);
+  min-height: 2.25rem;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  line-height: 1.35;
+  white-space: nowrap;
+  transition:
+    background-color var(--fast) ease,
+    border-color var(--fast) ease,
+    color var(--fast) ease,
+    box-shadow var(--fast) ease;
+}
+button:hover,
+.btn:hover {
+  background: var(--sa-navy-soft);
+  border-color: var(--sa-navy-soft);
+  text-decoration: none;
+}
+button.cta,
+.btn.cta {
+  background: var(--sa-red-ink);
+  border-color: var(--sa-red-ink);
+  color: var(--text-on-dark);
+}
+button.cta:hover,
+.btn.cta:hover {
+  background: var(--sa-red-deep);
+  border-color: var(--sa-red-deep);
+}
+/* Disabled is grey, not a faded brand colour.
+ *
+ * A pale red button reads as broken rather than as unavailable — the eye sees a
+ * failed state, not "not yet". Grey says "there is nothing here to press", which
+ * is what is true, and it stops a screen of not-yet-available steps looking
+ * like a screen of errors. */
+button:disabled,
+.btn[aria-disabled='true'],
+button[disabled] {
+  cursor: not-allowed;
+  background: var(--surface-3);
+  border-color: var(--line);
+  color: var(--ink-3);
+  box-shadow: none;
+}
+button:disabled:hover,
+button[disabled]:hover {
+  background: var(--surface-3);
+  border-color: var(--line);
+  color: var(--ink-3);
+}
+
+button.secondary,
+.btn.secondary {
+  background: var(--surface);
+  color: var(--sa-navy);
+  border-color: var(--line-strong);
+}
+button.secondary:hover,
+.btn.secondary:hover {
+  background: var(--surface-3);
+  border-color: var(--sa-navy);
+  color: var(--sa-navy);
+}
+/* The quieter primary: navy, for a confirming action that is not the one the
+   screen exists for. */
+button.navy,
+.btn.navy {
+  background: var(--sa-navy);
+  border-color: var(--sa-navy);
+  color: var(--text-on-dark);
+}
+button.navy:hover,
+.btn.navy:hover {
+  background: var(--sa-navy-soft);
+  border-color: var(--sa-navy-soft);
+}
+button.ghost,
+.btn.ghost {
+  background: none;
+  border-color: transparent;
+  color: var(--ink-2);
+  font-weight: 500;
+}
+button.ghost:hover,
+.btn.ghost:hover {
+  background: var(--surface-3);
+  color: var(--ink);
+  border-color: transparent;
+}
+button.danger,
+.btn.danger {
+  background: var(--surface);
+  color: var(--danger);
+  border-color: var(--danger-line);
+}
+button.danger:hover {
+  background: var(--danger-tint);
+  border-color: var(--danger);
+}
+button.small,
+.btn.small {
+  padding: 0.28rem 0.6rem;
+  font-size: 0.8125rem;
+}
+button.large,
+.btn.large {
+  padding: 0.6rem 1.15rem;
+  font-size: 0.9375rem;
+}
+button.wide,
+.btn.wide {
+  width: 100%;
+}
+button.link {
+  background: none;
+  border: 0;
+  color: var(--navy-600);
+  text-decoration: underline;
+  padding: 0;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline;
+  white-space: normal;
+}
+button.link:hover {
+  background: none;
+  text-decoration-thickness: var(--line-focus);
+}
+
+/* A control whose whole content is an icon. Square, so a row of them is a row
+   and not a ragged edge, and always carrying an `aria-label`. */
+button.icon-btn,
+.btn.icon-btn {
+  padding: 0;
+  width: 2rem;
+  height: 2rem;
+  flex: none;
+  background: none;
+  border-color: transparent;
+  color: var(--ink-2);
+}
+button.icon-btn:hover:not(:disabled) {
+  background: var(--surface-3);
+  color: var(--ink);
+  border-color: transparent;
+}
+button.icon-btn:disabled {
+  background: none;
+  border-color: transparent;
+  opacity: 0.3;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+label {
+  display: block;
+  font-weight: 600;
+  margin: 0 0 0.3rem;
+  font-size: 0.8125rem;
+  color: var(--ink-2);
+}
+
+/* `input:not([type])` because a text field without an explicit type is still a
+   text field; fifty of them across the admin were left at the browser's tiny
+   default box while their typed neighbours had the field styling. */
+input[type='text'],
+input[type='email'],
+input[type='url'],
+input[type='number'],
+input[type='search'],
+input[type='tel'],
+input[type='password'],
+input[type='date'],
+input[type='time'],
+input[type='datetime-local'],
+input:not([type]),
+textarea,
+select {
+  width: 100%;
+  padding: 0.45rem 0.6rem;
+  border: var(--line-thin) solid var(--line-strong);
+  border-radius: var(--r-sm);
+  font: inherit;
+  font-size: 0.875rem;
+  background: var(--surface);
+  color: var(--ink);
+  transition:
+    border-color 0.12s ease,
+    box-shadow 0.12s ease;
+}
+input:hover:not(:disabled),
+textarea:hover:not(:disabled),
+select:hover:not(:disabled) {
+  border-color: var(--ink-3);
+}
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--navy-600);
+  box-shadow: var(--ring);
+}
+input:disabled,
+textarea:disabled,
+select:disabled {
+  background: var(--surface-3);
+  color: var(--ink-3);
+  cursor: not-allowed;
+}
+input::placeholder,
+textarea::placeholder {
+  color: var(--ink-3);
+  opacity: 0.75;
+}
+textarea {
+  min-height: 6rem;
+  resize: vertical;
+}
+textarea.code {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  min-height: 14rem;
+  white-space: pre;
+  tab-size: 2;
+  background: var(--surface-2);
+}
+select {
+  appearance: none;
+  background-image:
+    linear-gradient(45deg, transparent 50%, currentColor 50%),
+    linear-gradient(135deg, currentColor 50%, transparent 50%);
+  /* stylelint-disable declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  background-position:
+    calc(100% - 15px) 52%,
+    calc(100% - 10px) 52%;
+  /* stylelint-enable declaration-property-value-disallowed-list */
+  /* stylelint-disable declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  background-size:
+    5px 5px,
+    5px 5px;
+  /* stylelint-enable declaration-property-value-disallowed-list */
+  background-repeat: no-repeat;
+  padding-right: 1.75rem;
+}
+
+.hint {
+  color: var(--ink-3);
+  font-size: 0.8125rem;
+  margin: 0.35rem 0 0;
+  line-height: 1.45;
+}
+.field {
+  margin-bottom: 1rem;
+}
+.field:last-child {
+  margin-bottom: 0;
+}
+.field-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+.field-head label {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.subfields {
+  display: block;
+}
+.subfields label {
+  margin-top: 0.75rem;
+}
+.subfields > label:first-child {
+  margin-top: 0;
+}
+.subfield-label {
+  display: block;
+  margin: 0.75rem 0 0.3rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+.link-destination-switch {
+  display: flex;
+  width: 100%;
+}
+.link-destination-switch > button {
+  flex: 1 1 50%;
+  justify-content: center;
+  white-space: normal;
+  line-height: 1.25;
+}
+.row2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  align-items: start;
+}
+@media (max-width: 32rem) {
+  .row2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+.checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-weight: 400;
+  margin: 0.5rem 0;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: var(--ink);
+  cursor: pointer;
+}
+.checkbox input {
+  width: auto;
+  margin-top: 0.2rem;
+  flex: none;
+  accent-color: var(--navy-600);
+}
+.checkbox:has(input:disabled) {
+  cursor: not-allowed;
+  color: var(--ink-3);
+}
+
+/* A segmented control: one choice out of a few, shown all at once. */
+.group {
+  display: inline-flex;
+  background: var(--surface-3);
+  border-radius: var(--r-sm);
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  padding: 2px;
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  gap: 2px;
+  flex: none;
+}
+.group > button {
+  border: 0;
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  border-radius: calc(var(--r-sm) - 1px);
+  background: none;
+  color: var(--ink-2);
+  padding: 0.28rem 0.55rem;
+  font-weight: 600;
+  font-size: 0.8125rem;
+  min-height: 1.75rem;
+}
+.group > button:hover:not(:disabled):not([aria-pressed='true']) {
+  background: var(--surface);
+  color: var(--ink);
+}
+.group > button[aria-pressed='true'] {
+  background: var(--surface);
+  color: var(--navy-600);
+  box-shadow: var(--e1);
+}
+.group > button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  background: none;
+}
+.group.group-plain {
+  background: none;
+  padding: 0;
+  gap: 0.1rem;
+}
+
+/* Toolbar clusters, separated by a hairline rather than by guesswork. */
+.cluster {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex: none;
+}
+.cluster + .cluster {
+  padding-left: 0.6rem;
+  border-left: var(--line-thin) solid var(--line);
+  margin-left: 0.25rem;
+}

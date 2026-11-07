@@ -1,0 +1,403 @@
+/* --------------------------------------------------- site header & footer -- */
+
+.global-elements-workspace {
+  display: grid;
+  gap: 1rem;
+}
+.global-commandbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.8rem 0.9rem 0.8rem 1rem;
+  border: var(--line-thin) solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: var(--e1);
+}
+.global-commandbar > div:first-child {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+.global-commandbar > div:first-child > span:last-child {
+  min-width: 0;
+  display: grid;
+  gap: 0.1rem;
+}
+.global-commandbar strong {
+  color: var(--ink);
+  font-size: 0.82rem;
+}
+.global-commandbar small {
+  color: var(--ink-3);
+  font-size: 0.72rem;
+}
+.global-commandbar .actions {
+  margin: 0;
+  flex: none;
+}
+.global-ownership {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: 0.8rem 1rem;
+  border: var(--line-thin) solid var(--navy-200);
+  border-radius: var(--r-lg);
+  background: var(--navy-tint);
+  color: var(--navy-800);
+}
+.global-ownership .icon-svg {
+  flex: none;
+  margin-top: 0.05rem;
+}
+.global-ownership > div {
+  display: grid;
+  gap: 0.12rem;
+  min-width: 0;
+}
+.global-ownership strong {
+  font-size: 0.76rem;
+}
+.global-ownership span {
+  color: var(--ink-2);
+  font-size: 0.7rem;
+  line-height: 1.5;
+}
+.global-ownership a {
+  color: var(--navy-700);
+  font-weight: 720;
+}
+
+.global-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 31rem;
+  align-items: start;
+  gap: 1rem;
+}
+.global-controls {
+  min-width: 0;
+  display: grid;
+  gap: 1rem;
+}
+.global-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.3rem;
+  padding: 0.3rem;
+  border: var(--line-thin) solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--paper);
+  box-shadow: var(--e1);
+}
+.global-tabs button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  min-height: 2.45rem;
+  border-color: transparent;
+  background: transparent;
+  color: var(--ink-3);
+  font-size: 0.76rem;
+}
+.global-tabs button:hover {
+  border-color: var(--line);
+  background: var(--surface);
+  color: var(--ink);
+}
+.global-tabs button.on {
+  border-color: var(--navy-300);
+  background: var(--surface);
+  color: var(--navy-700);
+  box-shadow: var(--e1);
+}
+.frame-source {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.25rem;
+  padding: 0.25rem;
+  border: var(--line-thin) dashed var(--line);
+  border-radius: var(--r-md);
+  background: var(--paper);
+}
+.frame-source button {
+  min-height: 2.1rem;
+  border-color: transparent;
+  background: transparent;
+  color: var(--ink-3);
+  font-size: 0.74rem;
+}
+.frame-source button.on {
+  border-color: var(--navy-300);
+  background: var(--surface);
+  color: var(--navy-700);
+}
+.frame-scope-notice .global-panel-head h2 {
+  color: var(--navy-700);
+}
+.global-panel,
+.global-preview {
+  overflow: hidden;
+  border: var(--line-thin) solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: var(--e1);
+}
+.global-panel-head {
+  display: grid;
+  grid-template-columns: 2.25rem minmax(0, 1fr);
+  align-items: start;
+  gap: 0.75rem;
+  padding: 0.9rem 1rem;
+  border-bottom: var(--line-thin) solid var(--line);
+  background: var(--paper);
+}
+.global-panel-head > span {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.55rem;
+  background: var(--navy-tint);
+  color: var(--navy-700);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+.global-panel-head .eyebrow {
+  margin: 0 0 0.18rem;
+}
+.global-panel-head h2 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 1rem;
+}
+.global-panel-head p:last-child {
+  margin: 0.25rem 0 0;
+  color: var(--ink-3);
+  font-size: 0.73rem;
+  line-height: 1.45;
+}
+.global-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem 1rem;
+  padding: 1rem;
+}
+.global-form-grid-inset {
+  padding: 0;
+}
+.global-span-two {
+  grid-column: 1 / -1;
+}
+.check-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  min-width: 0;
+  margin: 0;
+  padding: 0.72rem;
+  border: var(--line-thin) solid var(--line-soft);
+  border-radius: var(--r-md);
+  background: var(--paper);
+  cursor: pointer;
+}
+.check-row input {
+  flex: none;
+  width: 1rem;
+  height: 1rem;
+  margin-top: 0.06rem;
+  accent-color: var(--navy-600);
+}
+.check-row > span {
+  display: grid;
+  gap: 0.12rem;
+  min-width: 0;
+}
+.check-row strong {
+  color: var(--ink);
+  font-size: 0.72rem;
+}
+.check-row small {
+  color: var(--ink-3);
+  font-size: 0.65rem;
+  line-height: 1.4;
+}
+.check-row:has(input:disabled) {
+  cursor: default;
+}
+.check-row-compact {
+  align-self: end;
+}
+.global-logo-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  padding: 1rem;
+}
+.global-logo-choice {
+  display: grid;
+  grid-template-columns: 4rem minmax(0, 1fr);
+  align-items: center;
+  gap: 0.7rem;
+  margin-top: 0.6rem;
+  padding: 0.55rem;
+  border: var(--line-thin) solid var(--line-soft);
+  border-radius: var(--r-md);
+  background: var(--paper);
+}
+.global-logo-choice img {
+  width: 4rem;
+  height: 2.8rem;
+  object-fit: contain;
+  border-radius: 0.25rem;
+  background: var(--surface);
+}
+.global-logo-choice > span {
+  display: grid;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: var(--ink);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+.global-logo-choice small {
+  color: var(--ink-3);
+  font-size: 0.62rem;
+  font-weight: 500;
+}
+.global-list {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem;
+}
+.global-empty {
+  margin: 0;
+  padding: 1.1rem;
+  border: var(--line-thin) dashed var(--line-strong);
+  border-radius: var(--r-md);
+  color: var(--ink-3);
+  text-align: center;
+  font-size: 0.7rem;
+}
+.global-add {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  width: 100%;
+  min-height: 2.35rem;
+  border: var(--line-thin) dashed var(--navy-300);
+  background: var(--navy-tint);
+  color: var(--navy-700);
+  font-size: 0.7rem;
+}
+.global-add:hover {
+  border-style: solid;
+  border-color: var(--navy-500);
+  background: var(--surface);
+}
+.global-add-small {
+  width: auto;
+  justify-self: start;
+  min-height: 2rem;
+  padding: 0.35rem 0.65rem;
+}
+.global-link-row {
+  overflow: hidden;
+  border: var(--line-thin) solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface);
+}
+.global-link-row-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  min-height: 2.15rem;
+  padding: 0.35rem 0.45rem 0.35rem 0.7rem;
+  border-bottom: var(--line-thin) solid var(--line-soft);
+  background: var(--paper);
+}
+.global-link-row-head > span {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--ink-2);
+  font-size: 0.68rem;
+  font-weight: 740;
+}
+.global-link-fields {
+  display: grid;
+  grid-template-columns: minmax(8rem, 1fr) minmax(8rem, 0.8fr);
+  gap: 0.65rem;
+  padding: 0.7rem;
+}
+.global-link-destination {
+  grid-column: 1 / -1;
+}
+.global-link-fields .field label,
+.global-group .field label {
+  font-size: 0.62rem;
+}
+.global-link-fields input,
+.global-link-fields select,
+.global-group input {
+  height: 2.1rem;
+  font-size: 0.7rem;
+}
+.global-group {
+  display: grid;
+  gap: 0.65rem;
+  padding: 0.75rem;
+  border: var(--line-thin) solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--paper);
+}
+.global-group-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 0.6rem;
+}
+.global-group .global-link-row {
+  background: var(--surface);
+}
+.global-social-row {
+  display: grid;
+  grid-template-columns: 9rem minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 0.6rem;
+}
+.global-social-row .icon-button {
+  margin-bottom: 0.08rem;
+}
+.global-remove-text {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  min-height: 2rem;
+  border: var(--line-thin) solid var(--danger-line);
+  background: transparent;
+  color: var(--danger);
+  font-size: 0.66rem;
+}
+.global-copyright {
+  margin-bottom: 0.1rem;
+}
+
+.global-preview {
+  position: sticky;
+  top: 1rem;
+}
+.global-preview-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.9rem 1rem;
+  border-bottom: var(--line-thin) solid var(--line);
+}

@@ -1,0 +1,428 @@
+/* Exactly one viewport tall. `100dvh` rather than `100vh` because on a phone the
+   two differ by the height of a toolbar that appears and disappears while you
+   scroll, and the difference is the Publish button. */
+.editor {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--paper);
+}
+
+.editor-bar {
+  --bar-bg: var(--surface);
+  --bar-ink: var(--ink);
+  --bar-ink-2: var(--ink-2);
+  --bar-hover: var(--surface-3);
+  --bar-line: var(--line);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: none;
+  background: var(--bar-bg);
+  color: var(--bar-ink);
+  border-bottom: var(--line-thin) solid var(--line);
+  padding: 0 0.85rem;
+  min-height: var(--bar-h);
+  position: relative;
+  z-index: 20;
+}
+.editor-bar a {
+  color: var(--bar-ink);
+}
+
+/* The way out, and what you are in. */
+.editor-exit {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  flex: none;
+  text-decoration: none;
+  color: var(--bar-ink-2);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  padding: 0.3rem 0.5rem 0.3rem 0.3rem;
+  border-radius: var(--r-sm);
+  max-width: 12rem;
+}
+.editor-exit:hover {
+  background: var(--bar-hover);
+  color: var(--bar-ink);
+  text-decoration: none;
+}
+.editor-exit-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.editor-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1 1 auto;
+  min-width: 0;
+  padding-left: 0.6rem;
+  border-left: var(--line-thin) solid var(--bar-line);
+}
+.editor-title strong {
+  font-size: 0.9375rem;
+  font-weight: 650;
+  color: var(--bar-ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.editor-live-note {
+  color: var(--ink-2);
+  font-size: 0.6875rem;
+  font-weight: 650;
+  letter-spacing: 0.015em;
+  white-space: nowrap;
+}
+
+/* A quiet toolbar leaves the page itself as the visual focus. */
+.bar-tools {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: none;
+}
+.bar-tools .cluster + .cluster {
+  border-left-color: var(--line);
+}
+.bar-tools .group {
+  background: var(--surface-3);
+}
+.bar-tools .group > button {
+  color: var(--bar-ink-2);
+}
+.bar-tools .group > button:hover:not(:disabled):not([aria-pressed='true']) {
+  background: var(--surface-2);
+  color: var(--bar-ink);
+}
+.bar-tools .group > button[aria-pressed='true'] {
+  background: var(--surface);
+  color: var(--navy-600);
+  box-shadow: none;
+}
+.bar-tools button.icon-btn {
+  color: var(--bar-ink-2);
+}
+.bar-tools button.icon-btn:hover:not(:disabled) {
+  background: var(--bar-hover);
+  color: var(--bar-ink);
+}
+.bar-tools button.icon-btn:disabled {
+  opacity: 0.3;
+}
+.bar-tools .btn.ghost,
+.bar-tools button.ghost {
+  color: var(--bar-ink-2);
+}
+.bar-tools .btn.ghost:hover,
+.bar-tools button.ghost:hover {
+  background: var(--bar-hover);
+  color: var(--bar-ink);
+}
+.bar-tools .tip::after {
+  top: calc(100% + 0.55rem);
+}
+
+/* Truthful, and deliberately given room so it never reflows the buttons beside
+   it as the words change length. */
+.saved-state {
+  min-width: 8.5rem;
+  font-size: 0.78125rem;
+  color: var(--bar-ink-2);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex: none;
+}
+.saved-state::before {
+  content: '';
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  background: currentColor;
+  flex: none;
+}
+.saved-state.is-dirty {
+  color: var(--ink);
+}
+.saved-state.is-saving {
+  color: var(--bar-ink-2);
+}
+
+.editor-notices {
+  flex: none;
+  padding: 0.6rem 0.85rem 0;
+}
+.editor-notices .notice {
+  margin-bottom: 0.5rem;
+}
+.together {
+  margin-top: 0.5rem;
+  display: grid;
+  gap: 0.55rem;
+}
+.notice .together-pages {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+.notice .together-pages li + li {
+  margin-top: 0;
+}
+.together-pages li {
+  background: var(--surface);
+  border: var(--line-thin) solid var(--line);
+  border-radius: var(--r-pill);
+  padding: 0.1rem 0.6rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+.together-pages li span {
+  font-weight: 400;
+  color: var(--ink-3);
+  margin-left: 0.25rem;
+}
+
+/* Tablet controls switch the auxiliary pane; the page stays in view. */
+.pane-tabs {
+  display: none;
+  flex: none;
+  gap: 0.25rem;
+  padding: 0 0.5rem;
+  background: var(--surface);
+  border-bottom: var(--line-thin) solid var(--line);
+}
+.pane-tabs button {
+  flex: 1;
+  background: none;
+  border: 0;
+  border-bottom: var(--line-focus) solid transparent;
+  border-radius: 0;
+  color: var(--ink-3);
+  font-size: 0.8125rem;
+  font-weight: 650;
+  padding: 0.6rem 0.25rem;
+  justify-content: center;
+  gap: 0.35rem;
+}
+.pane-tabs button:hover {
+  background: var(--surface-2);
+  color: var(--ink);
+}
+.pane-tabs button[aria-selected='true'] {
+  color: var(--navy-600);
+  border-bottom-color: var(--brand);
+  background: none;
+}
+
+.panes {
+  display: grid;
+  grid-template-columns: 16rem minmax(0, 1fr) 20rem;
+  background: var(--line);
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
+  gap: 1px;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.pane {
+  background: var(--surface);
+  padding: 0.85rem 1rem 2.5rem;
+  overflow-y: auto;
+  min-height: 0;
+}
+.pane-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 0.75rem;
+  min-height: 2rem;
+}
+.pane-head h2 {
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  font-weight: 700;
+  color: var(--ink-3);
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* The selected section's own name is not a category label, so it is not set like
+   one: it is the title of everything below it and reads as a heading. */
+.pane-head h2.pane-title {
+  font-size: 0.9375rem;
+  text-transform: none;
+  letter-spacing: -0.008em;
+  color: var(--sa-navy);
+  font-weight: 700;
+}
+.pane h3 {
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  font-weight: 700;
+  color: var(--ink-3);
+  margin: 1.5rem 0 0.5rem;
+  padding-top: 1rem;
+  border-top: var(--line-thin) solid var(--line-soft);
+}
+.pane h3:first-of-type {
+  border-top: 0;
+  padding-top: 0;
+}
+.pane-section {
+  margin-top: 1.25rem;
+}
+
+@media (max-width: 64rem) {
+  /* Two rows, not four and not one.
+   *
+   * Four is what the wrapping toolbar produced on a phone, and it ate a third
+   * of the viewport before the page appeared. One row does not fit either: the
+   * controls alone are wider than 390 pixels, so the crumb trail was squeezed
+   * to nothing and the editor stopped saying which page was open — which is
+   * exactly the fact somebody arriving on a small screen most needs.
+   *
+   * So identity gets its own short row, and the controls get a row they are
+   * allowed to scroll sideways in. Publish stays at the end, where a thumb
+   * expects it, and nothing is ever unreachable. */
+  .editor-bar {
+    padding: 0 0.5rem;
+    gap: 0;
+    flex-wrap: wrap;
+    align-items: stretch;
+    min-height: 0;
+    row-gap: 0;
+  }
+  /* Identity on one row, then the controls. `flex-basis: 0` on the title is
+     what keeps it beside the exit control rather than wrapping under it: at
+     `auto` its basis is its own text width, and a page title plus a status chip
+     is wider than what is left of a phone. */
+  .editor-bar .editor-exit {
+    order: 1;
+    flex: none;
+    padding: 0.4rem 0.3rem;
+    border-radius: var(--r-sm);
+    min-height: 0;
+    max-width: none;
+  }
+  .editor-exit-label {
+    display: none;
+  }
+  .editor-title {
+    order: 2;
+    flex: 1 1 0%;
+    min-width: 0;
+    padding: 0.4rem 0 0.4rem 0.4rem;
+    border-left: var(--line-thin) solid var(--bar-line);
+  }
+  .editor-title strong {
+    font-size: 0.875rem;
+  }
+  .bar-tools {
+    order: 3;
+    flex: 1 1 100%;
+    justify-content: flex-end;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding: 0.35rem 0;
+    gap: 0.4rem;
+    border-top: var(--line-thin) solid var(--bar-line);
+  }
+  .bar-tools::-webkit-scrollbar {
+    display: none;
+  }
+  .saved-state {
+    min-width: 0;
+  }
+  /* Inside the bar the controls stay compact even on a touch screen: three rows
+     of 44px chrome is half a phone's viewport, and the canvas is the point. */
+  .editor-bar button,
+  .editor-bar .btn {
+    min-height: 2.25rem;
+  }
+  .editor-bar button.icon-btn,
+  .editor-bar .btn.icon-btn {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+
+  .pane-tabs {
+    display: flex;
+  }
+  .panes {
+    grid-template-columns: 1fr;
+  }
+  .panes > .pane,
+  .panes > .canvas-pane {
+    display: none;
+  }
+  .panes[data-shown='canvas'] > .canvas-pane {
+    display: flex;
+  }
+  .panes[data-shown='tree'] > .tree,
+  .panes[data-shown='inspector'] > .inspector {
+    display: block;
+  }
+  .panes[data-shown='library'] > .library-drawer {
+    display: flex;
+  }
+}
+
+@media (min-width: 48rem) and (max-width: 64rem) {
+  .panes {
+    grid-template-columns: minmax(0, 1fr) 19rem;
+  }
+  .panes > .canvas-pane {
+    display: flex;
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .panes > .pane,
+  .panes > .library-drawer {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .panes[data-shown='canvas'] > .inspector {
+    display: block;
+  }
+}
+
+/* Under 30rem the controls are wider than the screen even at their smallest, so
+   they take two rows of their own: the ones you reach for while looking (undo,
+   redo, width, the live page) and the two that decide something. Publish is
+   never the control that scrolled off the side. */
+@media (max-width: 30rem) {
+  .bar-tools {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    row-gap: 0.4rem;
+  }
+  /* The dot still says it; the words are what does not fit. */
+  .saved-state .saved-words {
+    display: none;
+  }
+  .bar-tools .cluster:nth-child(3) {
+    margin-left: auto;
+  }
+  .bar-tools .cluster:nth-child(4) {
+    flex: 1 1 100%;
+    justify-content: flex-end;
+    padding-left: 0;
+    border-left: 0;
+    margin-left: 0;
+  }
+  .bar-tools .cluster:nth-child(4) > button {
+    flex: 1 1 auto;
+  }
+}

@@ -1,0 +1,107 @@
+/* Tooltip on a control whose label is its icon. CSS-only, so it costs no
+   JavaScript and cannot get stuck open; the accessible name is on the control
+   itself, so this is a visual echo and never the only way to know. */
+.tip {
+  position: relative;
+}
+.tip::after {
+  content: attr(data-tip);
+  position: absolute;
+  top: calc(100% + 0.4rem);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--navy-900);
+  color: var(--text-on-dark);
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--r-xs);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.12s ease 0.25s;
+  z-index: 60;
+  box-shadow: var(--e2);
+}
+.tip:hover::after,
+.tip:focus-visible::after {
+  opacity: 1;
+}
+.tip-right::after {
+  left: auto;
+  right: 0;
+  transform: none;
+}
+
+/* ========================================================== status chips == */
+
+/* One vocabulary app-wide — Draft / Submitted / Published / Scheduled / Error —
+   colour plus label, never colour alone (SPEC §7). The dot is a third channel
+   for anyone who reads shape faster than either. */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 650;
+  letter-spacing: 0.005em;
+  padding: 0.1rem 0.5rem 0.1rem 0.4rem;
+  border-radius: var(--r-pill);
+  border: var(--line-thin) solid var(--line);
+  background: var(--surface-3);
+  color: var(--ink-2);
+  white-space: nowrap;
+  flex: none;
+  line-height: 1.5;
+}
+.chip::before {
+  content: '';
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  background: currentColor;
+  flex: none;
+}
+.chip-draft {
+  background: var(--warn-tint);
+  border-color: var(--warn-line);
+  color: var(--warn);
+}
+.chip-published {
+  background: var(--ok-tint);
+  border-color: var(--ok-line);
+  color: var(--ok);
+}
+.chip-submitted {
+  background: var(--info-tint);
+  border-color: var(--info-line);
+  color: var(--info);
+}
+.chip-scheduled {
+  background: var(--scheduled-tint);
+  border-color: var(--scheduled-line);
+  color: var(--scheduled);
+}
+.chip-error {
+  background: var(--danger-tint);
+  border-color: var(--danger-line);
+  color: var(--danger);
+}
+/* A tag rather than a state: no dot, because the dot is what says "this is a
+   status" everywhere else in the product. */
+.chip-neutral {
+  background: var(--surface-3);
+  border-color: var(--line);
+  color: var(--ink-3);
+  padding-inline: 0.5rem;
+  font-weight: 600;
+}
+.chip-neutral::before {
+  display: none;
+}
+.chip-lg {
+  font-size: 0.8125rem;
+  padding: 0.2rem 0.65rem 0.2rem 0.5rem;
+}
+
+/* ============================================================ containers == */
