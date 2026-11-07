@@ -120,3 +120,47 @@ Header and Footer each went from 32 to 20 transactions and from 195 to
 started without a fallback reload on this fixture; their full document
 loads were slower. The request-count gain applies to routes that previously
 made both requests.
+
+## Trim admin reads and keep navigation responsive
+
+These are five warm local samples per route, compared with the document
+navigation build. The journey includes previews and background requests. The
+loader numbers count only the first admin document or Flight response, which
+includes session work. They exclude preview, image and sidebar requests.
+
+| Route | Controls before (ms) | Controls after (ms) | Loader transactions before → after | Loader statements before → after |
+| --- | ---: | ---: | ---: | ---: |
+| Home | 383 | 377 | 9 → 8 | 45 → 37 |
+| Site overview | 242 | 189 | 11 → 10 | 59 → 50 |
+| Pages | 186 | 145 | 9 → 8 | 49 → 40 |
+| Header | 320 | 223 | 10 → 10 | 47 → 45 |
+| Footer | 312 | 212 | 10 → 10 | 47 → 45 |
+| Publishing | 278 | 281 | 14 → 14 | 91 → 85 |
+| Editor | 384 | 410 | 19 → 19 | 81 → 81 |
+
+The Header and Footer loader response medians were 196 → 99 ms and
+194 → 98 ms. They read the normalized draft theme without computing its
+usage. The page list reads one copy of each visible site's draft menu; the
+role comparison returned the same ordered page props. A paired release
+probe reduced SELECTs for page pins from 2,653 to 200 and for list
+selections from 644 to 212. The Home review count no longer transmits full
+review snapshots. One browser Lists save dropped from one action and one
+extra Flight request to just the action. The saved row survived reload.
+
+The progress bar reached its first visible frame in 13.2 ms and 13.8 ms
+at 1440 px and 1024 px. Main segment loading screens were tried and held:
+browser mutation timing found that Pages controls took 154 ms on pristine
+and 335 ms with the fallback. Stories took 106 ms and 344 ms. With the
+progress bar and without those segment fallbacks, the two measured clicks
+took 120 ms and 104 ms. The editor retains a loading state on its document.
+
+The editor still uses 19 transactions; the goal of eight is not met.
+Two grouped read trials slowed one editor open and were held. The
+six-transaction goal is also unmet on several workspaces. To check for
+regressions against the measured work, run the budget check with the
+private evidence directory containing `routes.json` and
+`capture/requests.jsonl`:
+
+```sh
+node scripts/perf/check-loader-budgets.mjs "$PRIVATE/run-directory"
+```
