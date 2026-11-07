@@ -10,8 +10,15 @@ export const ORDINARY_PAGE_SQL = `p.slug NOT LIKE 'stories/%' AND NOT EXISTS (
   WHERE sc.site_id=p.site_id AND sc.reader_key='stories' AND se.archived_at IS NULL
     AND sv.values->>'story_url'=CASE WHEN p.slug='' THEN '/' ELSE '/'||p.slug END
 )`
-function siteSummary(homepageVersion: string) {
-  return `
+const SITE_ORDER_SQL = `CASE s.slug WHEN 'sawso' THEN 0 WHEN 'echelon-chapters' THEN 1 WHEN 'bt2027-r8' THEN 2 ELSE 3 END,s.name`
+
+export const SITE_CHOICE_SQL = `
+  SELECT s.id, s.name
+    FROM sites s
+   WHERE s.status <> 'archived'
+   ORDER BY ${SITE_ORDER_SQL}, s.slug, s.id`
+
+export const SITE_SUMMARY_SQL = `
   SELECT s.id, s.slug, s.name, s.status, s.staging_hostname, s.kind, EXISTS(SELECT 1 FROM collections c WHERE c.site_id=s.id AND c.reader_key='stories') AS has_stories, CASE WHEN app.has_site_access(s.id) THEN app.site_hosting_status(s.id) ELSE 'ready' END AS hosting_status,
          (SELECT d.hostname_normalized FROM domains d WHERE d.site_id=s.id AND d.kind='primary'
            AND d.status='live' AND d.removed_at IS NULL LIMIT 1) AS primary_hostname,
@@ -22,7 +29,13 @@ function siteSummary(homepageVersion: string) {
             CASE WHEN m.id IS NOT NULL THEN '/media/'||m.id::text||'/'||
               CASE WHEN EXISTS(SELECT 1 FROM media_variants mv WHERE mv.media_id=m.id AND mv.kind='card') THEN 'card' ELSE 'original' END END,
             CASE WHEN sf.id IS NOT NULL THEN '/site-files/'||sf.id::text||'/'||sf.sha256||'/'||sf.name END)
-          ${homepageVersion}
+          FROM pages hp
+          -- The page/version foreign key guarantees this belongs to the homepage.
+          JOIN LATERAL (
+            SELECT v.content FROM page_versions v
+            WHERE v.page_id=hp.id AND v.id=COALESCE(hp.draft_version_id,hp.published_version_id)
+            LIMIT 1
+          ) hv ON true
           CROSS JOIN LATERAL jsonb_path_query(hv.content,'$[*] ? (!exists(@.hidden) || @.hidden != true).values.* ? (@.src != null || @.media_id != null)') WITH ORDINALITY pic(value,position)
           LEFT JOIN media m ON m.site_id=s.id AND m.status='ready' AND m.deleted_at IS NULL
             AND (m.id::text=pic.value->>'media_id' OR pic.value->>'src' LIKE '/media/'||m.id::text||'/%')
@@ -43,19 +56,4 @@ function siteSummary(homepageVersion: string) {
     FROM sites s
     LEFT JOIN pages p ON p.site_id = s.id AND p.archived_at IS NULL
    GROUP BY s.id, s.slug, s.name, s.status, s.staging_hostname, s.kind
-   ORDER BY CASE s.slug WHEN 'sawso' THEN 0 WHEN 'echelon-chapters' THEN 1 WHEN 'bt2027-r8' THEN 2 ELSE 3 END,s.name`
-}
-
-export const SITE_SUMMARY_SQL = siteSummary(`FROM pages hp
-          -- The page/version foreign key guarantees this belongs to the homepage.
-          JOIN LATERAL (
-            SELECT v.content FROM page_versions v
-            WHERE v.page_id=hp.id AND v.id=COALESCE(hp.draft_version_id,hp.published_version_id)
-            LIMIT 1
-          ) hv ON true`)
-
-// The sidebar has its own read path. It can switch to a narrower query
-// without coupling the dashboard lookup to unrelated screens.
-export const SIDEBAR_SITE_SUMMARY_SQL = siteSummary(
-  `FROM pages hp JOIN page_versions hv ON hv.id=COALESCE(hp.draft_version_id,hp.published_version_id)`,
-)
+   ORDER BY ${SITE_ORDER_SQL}`

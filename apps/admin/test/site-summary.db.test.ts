@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { CHECKED_CLEAN, TestDatabase } from '@cms/schema/testing'
 import { heroContent, seedScenario, type Scenario } from '@cms/schema/fixtures'
-import { SITE_SUMMARY_SQL } from '../src/lib/site-summary.ts'
+import { SITE_CHOICE_SQL, SITE_SUMMARY_SQL } from '../src/lib/site-summary.ts'
 
 type Summary = {
   id: string
@@ -149,4 +149,21 @@ it('selects only a ready site-owned saved picture without building a page previe
   expect(row.preview_image).toBe('/media/' + picture + '/original')
   const other = (await db.asUser(s.editorB, c => c.query<Summary>(SITE_SUMMARY_SQL))).rows[0]!
   expect(other.preview_image).toBeNull()
+})
+
+it('keeps the picker scoped, orders identical names consistently, and excludes archived sites', async () => {
+  await db.as('owner', c =>
+    c.query("UPDATE sites SET name='Shared label' WHERE id=ANY($1::uuid[])", [[s.siteA, s.siteB]]),
+  )
+  const choices = async (user: string) =>
+    (await db.asUser(user, c => c.query<{ id: string; name: string }>(SITE_CHOICE_SQL))).rows
+  const siteA = { id: s.siteA, name: 'Shared label' }
+  const siteB = { id: s.siteB, name: 'Shared label' }
+  expect(await choices(s.superAdmin)).toEqual([siteA, siteB])
+  expect(await choices(s.editorA)).toEqual([siteA])
+  expect(await choices(s.editorB)).toEqual([siteB])
+  expect(await choices(s.disabled)).toEqual([])
+  await db.as('owner', c => c.query("UPDATE sites SET status='archived',archived_at=now() WHERE id=$1", [s.siteB]))
+  expect(await choices(s.superAdmin)).toEqual([siteA])
+  expect(await choices(s.editorB)).toEqual([])
 })

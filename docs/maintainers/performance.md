@@ -209,7 +209,7 @@ The dashboard uses one indexed page/version lookup per site's homepage.
 Both version pointers already have a foreign key that requires them to
 belong to that page. The query still reads under the requesting user's role
 and keeps the existing counts, preview choice and ordering.
-The sidebar keeps its existing query until its own read changes.
+The sidebar uses its own names-and-IDs query, described below.
 
 All 15 role contexts returned the same ordered results. Five warm local SQL
 samples went from 397 to 70 ms median. A larger local fixture returned all
@@ -224,7 +224,7 @@ the inbox at most once every 30 seconds. The provider does not authorize any pag
 
 In the browser, Home → All sites → Home used one request. The site-change
 event caused one refresh. Opening the picker and then reloading a site
-workspace reused those choices. This change does not alter the endpoint.
+workspace reused those choices.
 
 The sidebar switches request state when the server reports different grants.
 It drops the previous sidebar data without remounting the current screen.
@@ -236,7 +236,10 @@ grants change, it discards the old choices while leaving the current route
 mounted. The global Your sites links and site picker still share one read per
 tab and verified scope. A site change refreshes that result.
 
-A narrower query returned the same ordered site choices in 15 local role
-contexts and reduced the median SQL time from 363.87 ms to 0.25 ms. The Admin
-preview images did not pass the exact pixel check with that change, so the
-original query stays in use. Those timings are for the candidate only.
+The picker reads only the names and IDs of visible, non-archived sites. It
+does not need page counts or homepage photos. Sites with the same display name
+are ordered by their stable slugs and IDs.
+
+The query returned the same ordered choices in 15 local role contexts. In
+five warm SQL samples, median execution fell from 311.91 ms to 0.22 ms.
+This is a database measurement, not hosted page load time.
