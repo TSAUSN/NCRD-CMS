@@ -86,6 +86,10 @@ async function createPage(page: Page, name: string): Promise<{ slug: string }> {
   for (const remaining of [1, 0]) {
     await treeLabels(page).first().click()
     await deleteSelectedSection(page)
+    if (remaining && (await page.getByRole('button', { name: 'Open Structure', exact: true }).isVisible())) {
+      await page.getByRole('button', { name: 'Open Structure', exact: true }).focus()
+      await page.keyboard.press('Enter')
+    }
     await expect(treeLabels(page)).toHaveCount(remaining)
   }
   await saveDraft(page)
