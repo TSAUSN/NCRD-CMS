@@ -1,4 +1,8 @@
 'use client'
+import { DropIndicator, ReorderAnnouncement } from '../../../components/ui/drop-indicator.tsx'
+import { flatReorderIntent } from '../../../components/ui/flat-reorder.ts'
+import reorderStyles from '../../../components/ui/reorderable-list.module.css'
+import { useReorderableList } from '../../../components/ui/use-reorderable-list.ts'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { GuardedLink as Link } from '../../../components/guarded-link.tsx'
 import { Button, ButtonLink, SearchField, Note, EmptyState, SegmentedControl } from '../../../components/ui/index.ts'
@@ -9,6 +13,7 @@ import type { WorkspacePage } from '../../../lib/workspace-queries.ts'
 import type { PageListControls } from '../../../lib/page-list-workspace.ts'
 import { useNavigationGuard } from '../../../components/navigation-guard.ts'
 import { changePageList } from './page-list-actions.ts'
+import { movePageInOrder } from './page-order.ts'
 import { PageManagement } from './page-management.tsx'
 import styles from '../../../components/workspace.module.css'
 export function NativePagesTable({
@@ -34,8 +39,7 @@ export function NativePagesTable({
     [pending, setPending] = useState(false),
     [notice, setNotice] = useState(''),
     [error, setError] = useState(''),
-    busy = useRef(false),
-    drag = useRef<string | null>(null)
+    busy = useRef(false)
   useEffect(() => setControls(initial), [initial])
   useNavigationGuard(() => ({ dirty: false, pending: pending || busy.current }))
   const ordinary = useMemo(
@@ -62,28 +66,54 @@ export function NativePagesTable({
   async function save(
     pageId: string,
     kind: 'menu' | 'footer' | 'move',
-    options: { on?: boolean; beforeId?: string } = {},
+    options: { on?: boolean; beforeId?: string; afterId?: string } = {},
   ) {
     if (!controls || busy.current) return
     busy.current = true
     setPending(true)
     setNotice('')
     setError('')
+    const before = controls
+    if (kind === 'move') {
+      const order = movePageInOrder(before.order, pageId, options)
+      if (order) setControls({ ...before, order })
+    }
     try {
       const result = await changePageList({ siteId, pageId, kind, ...options, controls })
       if (result.ok) {
         setControls(result.controls)
         setNotice(result.message)
-      } else setError(result.message)
+      } else {
+        if (kind === 'move') setControls(before)
+        setError(result.message)
+      }
     } catch {
+      if (kind === 'move') setControls(before)
       setError('The save could not be confirmed. Reload to compare before trying again.')
     } finally {
       busy.current = false
       setPending(false)
     }
   }
+  const canReorder = canAdmin && !term && tab !== 'drafts'
+  const reorder = useReorderableList({
+    mimeType: 'application/x-cms-page',
+    decide: point => {
+      const intent = flatReorderIntent(
+        rows.map(row => row.id),
+        point,
+      )
+      if (intent.status !== 'move') return intent
+      return { ...intent, move: { id: point.from, over: point.over, edge: point.edge } }
+    },
+    apply: ({ id, over, edge }) => {
+      void save(id, 'move', edge === 'before' ? { beforeId: over } : { afterId: over })
+      return 'Saving page order.'
+    },
+  })
   return (
     <div className={styles.denseStack}>
+      <ReorderAnnouncement>{reorder.announcement}</ReorderAnnouncement>
       <div className={styles.listToolbar}>
         <div className={styles.actions}>
           <SegmentedControl
@@ -153,41 +183,23 @@ export function NativePagesTable({
                 </th>
               </tr>
             </thead>
-            <tbody>
+            <tbody data-reorder-list className={reorderStyles.list}>
               {rows.map((page, index) => {
                 const locations = controls ? pageMenuLocations(controls.menu, page.id) : [],
-                  under = locations[0]?.split(' › ').slice(0, -1).join(' › '),
-                  reorder = canAdmin && !term && tab !== 'drafts'
+                  under = locations[0]?.split(' › ').slice(0, -1).join(' › ')
                 return (
-                  <tr
-                    key={page.id}
-                    onDragOver={event => {
-                      if (reorder && !pending && drag.current && drag.current !== page.id) event.preventDefault()
-                    }}
-                    onDrop={event => {
-                      event.preventDefault()
-                      const id = drag.current
-                      drag.current = null
-                      if (reorder && id && id !== page.id) void save(id, 'move', { beforeId: page.id })
-                    }}
-                  >
+                  <tr key={page.id} {...reorder.row(page.id, !canReorder || pending, false)}>
                     <td>
+                      <DropIndicator marker={reorder.marker} row={page.id} />
                       <div className={styles.title}>
-                        {reorder && (
+                        {canReorder && (
                           <span
-                            draggable={!pending}
+                            {...reorder.grip(page.id, pending)}
                             role="button"
                             tabIndex={pending ? -1 : 0}
                             aria-disabled={pending || undefined}
                             aria-label={'Move ' + page.title}
                             aria-description="Use the Up and Down arrow keys to move this page."
-                            onDragStart={event => {
-                              drag.current = page.id
-                              event.dataTransfer.setData('application/x-cms-page', page.id)
-                            }}
-                            onDragEnd={() => {
-                              drag.current = null
-                            }}
                             onKeyDown={event => {
                               if (event.key === 'ArrowUp' && index > 0) {
                                 event.preventDefault()

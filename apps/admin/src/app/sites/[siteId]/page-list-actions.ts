@@ -1,4 +1,5 @@
 'use server'
+import { movePageInOrder } from './page-order.ts'
 import { randomUUID } from 'node:crypto'
 import { revalidatePath } from 'next/cache'
 import { asUser, type Queryable } from '@cms/platform'
@@ -59,6 +60,7 @@ export async function changePageList(input: {
   kind: 'menu' | 'footer' | 'move'
   on?: boolean
   beforeId?: string
+  afterId?: string
   controls: Pick<PageListControls, 'headerRevision' | 'footerRevision' | 'menuRevision' | 'orderToken'>
 }) {
   const session = await currentSession()
@@ -103,9 +105,8 @@ export async function changePageList(input: {
           } else if (input.kind === 'move') {
             if (current.orderToken !== input.controls.orderToken)
               throw new DomainError('stale_revision', 'The page order changed. Reload before moving this page.')
-            if (!input.beforeId || !current.order.includes(input.beforeId) || input.beforeId === page.id) return current
-            const order = current.order.filter(id => id !== page.id)
-            order.splice(order.indexOf(input.beforeId), 0, page.id)
+            const order = movePageInOrder(current.order, page.id, input)
+            if (!order) return current
             menu = reorderPageMenu(menu, order)
             await client.query(
               'UPDATE pages p SET sort_index=ordered.position::int FROM unnest($2::uuid[]) WITH ORDINALITY ordered(id,position) WHERE p.site_id=$1 AND p.id=ordered.id',
