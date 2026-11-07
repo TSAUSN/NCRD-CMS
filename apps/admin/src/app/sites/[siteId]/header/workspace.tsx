@@ -22,7 +22,6 @@ import {
   Card,
   Dialog,
   Disclosure,
-  EmptyState,
   Field,
   Note,
   PageHeader,
@@ -32,7 +31,8 @@ import {
 import { LinkDestinationPicker } from '../../../../components/link-settings.tsx'
 import { validHeaderButtonUrl } from '../../../../lib/header-button-link.ts'
 import { CompactMenuEditor } from '../../../../components/compact-menu-editor.tsx'
-import { SiteHeaderPreview } from '../../../../components/site-header-preview.tsx'
+import { SiteHeaderPreview, type FramePreviewTicket } from '../../../../components/site-header-preview.tsx'
+import { SiteFramePreview } from '../../../../components/site-frame-preview.tsx'
 import { SiteLogoField } from '../../../../components/site-logo-field.tsx'
 import { MediaPicker } from '../../../pages/[pageId]/media-picker.tsx'
 import { FrameField } from '../global-elements/frame-component-panel.tsx'
@@ -81,7 +81,7 @@ export function HeaderMenuWorkspace({
     [picker, setPicker] = useState(false),
     [previewOpen, setPreviewOpen] = useState(false),
     [retry, setRetry] = useState(0),
-    [previewHref, setPreviewHref] = useState<string | null>(null),
+    [previewTicket, setPreviewTicket] = useState<FramePreviewTicket | null>(null),
     [logoFailed, setLogoFailed] = useState<string | null>(null)
   const busy = useRef(false),
     serial = JSON.stringify([header, tree, mode]),
@@ -137,7 +137,7 @@ export function HeaderMenuWorkspace({
     retry,
   })
   useEffect(() => {
-    if (canvas.ticket) setPreviewHref(canvas.ticket.href)
+    if (canvas.ticket) setPreviewTicket(canvas.ticket)
   }, [canvas.ticket])
   useNavigationGuard(() => ({
     dirty,
@@ -240,35 +240,18 @@ export function HeaderMenuWorkspace({
   const changes =
     (JSON.stringify(header) !== JSON.stringify(initial.header.published) ? 1 : 0) +
     (JSON.stringify(tree) !== JSON.stringify(navigation.published) ? 1 : 0)
-  const preview =
-    !canvas.error && previewHref ? (
-      <div aria-busy={valid && canvas.loading}>
-        <SiteHeaderPreview channel={canvas.ticket?.channel} href={previewHref} />
-      </div>
-    ) : (
-      <EmptyState
-        title={
-          !page
-            ? 'Add a page to preview the header'
-            : !valid
-              ? 'Complete the fields to preview your changes'
-              : canvas.error
-                ? 'Header preview unavailable'
-                : 'Opening the header preview…'
-        }
-      >
-        {!page
-          ? 'The header and menu can still be saved before the first page is ready.'
-          : !valid
-            ? 'Check the required fields below.'
-            : canvas.error || null}
-        {page && valid && canvas.error && (
-          <Button variant="secondary" onClick={() => setRetry(value => value + 1)}>
-            Try preview again
-          </Button>
-        )}
-      </EmptyState>
-    )
+  const preview = (
+    <SiteFramePreview
+      part="header"
+      ticket={canvas.ticket}
+      valid={valid}
+      loading={canvas.loading}
+      error={canvas.error}
+      pageAvailable={Boolean(page)}
+      previouslyOpened={Boolean(previewTicket)}
+      retry={() => setRetry(value => value + 1)}
+    />
+  )
   return (
     <div className={styles.denseStack + ' ' + styles.singleColumn}>
       <PageHeader
@@ -330,8 +313,8 @@ export function HeaderMenuWorkspace({
       >
         <div className={styles.formStack + ' ' + styles.singleColumn}>
           {preview}
-          {valid && canvas.loading && previewHref && <p role="status">Updating header preview…</p>}
-          {!valid && previewHref && <p role="status">Complete the fields to show your changes in the preview.</p>}
+
+          {!valid && previewTicket && <p role="status">Complete the fields to show your changes in the preview.</p>}
           {tab === 'menu' && (
             <>
               <CompactMenuEditor

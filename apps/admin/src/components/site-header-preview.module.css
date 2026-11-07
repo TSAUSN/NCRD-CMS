@@ -1,0 +1,16 @@
+.frame {
+  position: absolute;
+  inset: 0 auto auto 0;
+}
+
+.updating {
+  position: absolute;
+  z-index: 1;
+  inset: var(--space-2) var(--space-2) auto auto;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-control);
+  color: var(--text-muted);
+  background: var(--surface-sunken);
+  font-size: var(--text-meta);
+  pointer-events: none;
+}

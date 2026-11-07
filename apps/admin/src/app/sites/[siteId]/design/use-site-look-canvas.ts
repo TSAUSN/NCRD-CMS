@@ -11,18 +11,30 @@ export function useSiteLookCanvas(input: {
   look: { tokens: ThemeTokens; header: HeaderConfig; footer: FooterConfig; menu: NavTree } | null
   retry: number
 }) {
-  const [ticket, setTicket] = useState<ReturnType<typeof readCanvasTicket>>(null),
-    [loading, setLoading] = useState(false),
-    [error, setError] = useState('')
+  const [issued, setIssued] = useState<{
+      key: string
+      ticket: NonNullable<ReturnType<typeof readCanvasTicket>>
+    } | null>(null),
+    [failure, setFailure] = useState<{ key: string; message: string } | null>(null)
   const serial = JSON.stringify(input.look)
+  const key = JSON.stringify([
+    input.origin,
+    input.siteId,
+    input.pageId,
+    input.versionId,
+    input.purpose,
+    input.retry,
+    serial,
+  ])
+  const ticket = issued?.key === key ? issued.ticket : null
+  const error = failure?.key === key ? failure.message : ''
+  const loading = Boolean(input.origin && input.pageId && input.versionId && input.look && !ticket && !error)
+  const fail = (message: string) => setFailure({ key, message })
   useEffect(() => {
     if (!input.origin || !input.pageId || !input.versionId || !input.look) return
     if (!canvasDocumentReady(input.origin)) return
     const controller = new AbortController(),
       channel = crypto.randomUUID()
-    setTicket(null)
-    setLoading(true)
-    setError('')
     const timer = window.setTimeout(() => {
       void (async () => {
         try {
@@ -41,12 +53,10 @@ export function useSiteLookCanvas(input: {
           })
           const next = response.ok ? readCanvasTicket(await response.json(), input.origin!, channel) : null
           if (!next) throw Error('unavailable')
-          if (!controller.signal.aborted) setTicket(next)
+          if (!controller.signal.aborted) setIssued({ key, ticket: next })
         } catch {
           if (!controller.signal.aborted)
-            setError('The site preview could not be opened. Your choices are still here. Try the preview again.')
-        } finally {
-          if (!controller.signal.aborted) setLoading(false)
+            fail('The site preview could not be opened. Your choices are still here. Try the preview again.')
         }
       })()
     }, 180)
@@ -54,7 +64,7 @@ export function useSiteLookCanvas(input: {
       window.clearTimeout(timer)
       controller.abort()
     }
-  }, [input.origin, input.siteId, input.pageId, input.versionId, serial, input.retry, input.purpose])
+  }, [key])
   useEffect(() => {
     if (!ticket) return
     let active = true,
@@ -76,7 +86,7 @@ export function useSiteLookCanvas(input: {
         ticket.expiresAt = next.expiresAt
       } catch {
         if (active && Date.parse(ticket.expiresAt) <= Date.now() + 60_000)
-          setError('The site preview expired. Your choices are still here. Try the preview again.')
+          fail('The site preview expired. Your choices are still here. Try the preview again.')
       } finally {
         pending = false
       }

@@ -25,7 +25,6 @@ import {
   Card,
   Dialog,
   Disclosure,
-  EmptyState,
   Field,
   Menu,
   Note,
@@ -34,7 +33,8 @@ import {
   TextLink,
 } from '../../../../components/ui/index.ts'
 import { IconDrag, IconMore, IconPlus } from '../../../../components/icons.tsx'
-import { SiteHeaderPreview } from '../../../../components/site-header-preview.tsx'
+import { SiteHeaderPreview, type FramePreviewTicket } from '../../../../components/site-header-preview.tsx'
+import { SiteFramePreview } from '../../../../components/site-frame-preview.tsx'
 import { MediaPicker } from '../../../pages/[pageId]/media-picker.tsx'
 import { RichTextField } from '../../../pages/[pageId]/rich-text-field.tsx'
 import { PresetFooterCards } from '../../../../components/preset-footer-cards.tsx'
@@ -77,7 +77,7 @@ export function FooterWorkspace({
     [picker, setPicker] = useState(false),
     [previewOpen, setPreviewOpen] = useState(false),
     [retry, setRetry] = useState(0),
-    [previewHref, setPreviewHref] = useState<string | null>(null),
+    [previewTicket, setPreviewTicket] = useState<FramePreviewTicket | null>(null),
     [editing, setEditing] = useState<LinkStep | null>(null),
     [linkDraft, setLinkDraft] = useState<FooterLink>({ label: '', url: '' }),
     [removing, setRemoving] = useState<number | null>(null),
@@ -112,7 +112,7 @@ export function FooterWorkspace({
       retry,
     })
   useEffect(() => {
-    if (canvas.ticket) setPreviewHref(canvas.ticket.href)
+    if (canvas.ticket) setPreviewTicket(canvas.ticket)
   }, [canvas.ticket])
   useNavigationGuard(() => ({
     dirty: dirty || Boolean(editing),
@@ -282,35 +282,18 @@ export function FooterWorkspace({
     )
   }
   const changed = JSON.stringify(footer) !== JSON.stringify(initial.footer.published),
-    preview =
-      !canvas.error && previewHref ? (
-        <div aria-busy={valid && canvas.loading}>
-          <SiteHeaderPreview part="footer" channel={canvas.ticket?.channel} href={previewHref} />
-        </div>
-      ) : (
-        <EmptyState
-          title={
-            !page
-              ? 'Add a page to preview the footer'
-              : !valid
-                ? 'Complete the fields to preview your changes'
-                : canvas.error
-                  ? 'Footer preview unavailable'
-                  : 'Opening the footer preview…'
-          }
-        >
-          {!page
-            ? 'The footer can still be saved before the first page is ready.'
-            : !valid
-              ? 'Check the required fields above.'
-              : canvas.error || null}
-          {page && valid && canvas.error && (
-            <Button variant="secondary" onClick={() => setRetry(value => value + 1)}>
-              Try preview again
-            </Button>
-          )}
-        </EmptyState>
-      )
+    preview = (
+      <SiteFramePreview
+        part="footer"
+        ticket={canvas.ticket}
+        valid={valid}
+        loading={canvas.loading}
+        error={canvas.error}
+        pageAvailable={Boolean(page)}
+        previouslyOpened={Boolean(previewTicket)}
+        retry={() => setRetry(value => value + 1)}
+      />
+    )
   return (
     <div className={styles.denseStack + ' ' + styles.singleColumn}>
       <PageHeader
@@ -364,7 +347,7 @@ export function FooterWorkspace({
         <TextLink href={'/sites/' + siteId + '/settings/social'}>Settings · Social accounts</TextLink>.
       </p>
       {preview}
-      {valid && canvas.loading && previewHref && <p role="status">Updating footer preview…</p>}
+
       {footer.schemaVersion === 2 ? (
         <div className={styles.threeColumns}>
           <Card title="Logo and name" density="editor">
