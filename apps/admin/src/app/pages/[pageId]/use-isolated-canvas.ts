@@ -1,5 +1,6 @@
 'use client'
 import { useCallback, useEffect, useRef, useState, type RefObject } from 'react'
+import { canvasDocumentOrigin } from '../../../lib/canvas-document-origin.ts'
 type Ticket = {
   href: string
   token: string
@@ -21,7 +22,7 @@ export function canvasDocumentReady(origin: string): boolean {
     const url = loaded && new URL(loaded.name)
     sameDocument = Boolean(url && url.origin === window.location.origin && url.pathname === window.location.pathname)
   } catch {}
-  if (sameDocument && document.documentElement.dataset.cmsCanvasOrigin === origin) return true
+  if (sameDocument && canvasDocumentOrigin() === origin) return true
   window.location.reload()
   return false
 }

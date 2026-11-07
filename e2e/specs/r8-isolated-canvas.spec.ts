@@ -260,6 +260,25 @@ test.beforeAll(async () => {
 test.afterAll(async () => {
   await f?.pool.end()
 })
+test('only the canvas document receives its exact frame origin; RSC and actions keep strict policy', async ({
+  page,
+}) => {
+  const path = '/pages/' + f.page
+  const readPolicy = (value: string) => value.split('; ').find(part => part.startsWith('frame-src '))
+  const anonymous = await page.request.get(path)
+  expect(readPolicy(anonymous.headers()['content-security-policy']!)).toBe("frame-src 'self'")
+  await signIn(page, 'root@example.test')
+  const actual = await page.goto(path)
+  expect(actual?.status()).toBe(200)
+  const ownOrigin = `http://${f.host}:${E2E_PORTS.site}`
+  expect(readPolicy(actual!.headers()['content-security-policy']!)).toBe("frame-src 'self' " + ownOrigin)
+  await expect(page.frameLocator('iframe[title="Page canvas"]').locator('h1')).toHaveText('Private carousel heading')
+  const probes: Record<string, string>[] = [{ RSC: '1' }, { 'Next-Action': 'test-invalid-action' }]
+  for (const headers of probes) {
+    const nonDocument = await page.request.get(path, { headers })
+    expect(readPolicy(nonDocument.headers()['content-security-policy']!)).toBe("frame-src 'self'")
+  }
+})
 test('isolated canvas runs reviewed scripts with private assets, exact CSP and no admin-origin access', async ({
   page,
   browserName,

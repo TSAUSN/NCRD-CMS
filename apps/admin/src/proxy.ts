@@ -14,7 +14,10 @@ export async function proxy(request: NextRequest) {
     !NO_RENEWAL.test(path) && request.cookies.has(REFRESH_COOKIE)
       ? await renewSession(request, configuredAuthProvider())
       : null
-  const origin = await requestCanvasFrameOrigin(request)
+  // Only a new HTML document can acquire a frame origin. The strict CSP is
+  // still sent for other requests, and authorization runs in every handler.
+  const isDocument = !request.headers.has('RSC') && !request.headers.has('Next-Action') && !/^\/api(?:\/|$)/.test(path)
+  const origin = isDocument ? await requestCanvasFrameOrigin(request) : null
   // Root layouts persist across client navigation; their marker describes the
   // actual document policy, not the policy of a later RSC response.
   request.headers.set('x-cms-canvas-origin', origin ?? '')

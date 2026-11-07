@@ -1,11 +1,13 @@
 'use client'
-import { useEffect } from 'react'
+import { useEffect, useLayoutEffect } from 'react'
 import { usePathname } from 'next/navigation'
 import { safeCmsPath } from './back-link.tsx'
+import { captureCanvasDocumentOrigin } from '../../lib/canvas-document-origin.ts'
 // A captured link records the source of both full-page and Next client navigation.
 // The source is attached to this browser history entry, so Back/Forward retain it.
 export function NavigationHistory() {
   const pathname = usePathname()
+  useLayoutEffect(captureCanvasDocumentOrigin, [])
   useEffect(() => {
     try {
       const pending = JSON.parse(sessionStorage.getItem('cms.navigation.pending') ?? 'null')
