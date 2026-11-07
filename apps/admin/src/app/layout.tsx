@@ -6,12 +6,15 @@ import { CommandSearch } from '../components/command-search.tsx'
 import { currentSession } from '../lib/session.ts'
 import { DraftLeavePrompt } from '../components/draft-leave-prompt.tsx'
 import { NavigationHistory } from '../components/ui/navigation-history.tsx'
+import { SidebarDataProvider } from '../components/sidebar-data.tsx'
+import { sidebarScope } from '../lib/sidebar-scope.ts'
 import { NavigationProgress } from '../components/shell/navigation-progress.tsx'
 
 export const metadata = { title: 'CMS v2' }
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
   const session = await currentSession()
+  const scope = session ? sidebarScope(session) : null
   const canvasOrigin = (await headers()).get('x-cms-canvas-origin') ?? ''
   return (
     <html lang="en" data-cms-canvas-origin={canvasOrigin}>
@@ -23,7 +26,9 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         <a className="skip" href="#main">
           Skip to content
         </a>
-        {children}
+        <SidebarDataProvider key={scope ?? 'signed-out'} scope={scope}>
+          {children}
+        </SidebarDataProvider>
       </body>
     </html>
   )

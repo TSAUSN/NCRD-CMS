@@ -215,3 +215,13 @@ All 15 role contexts returned the same ordered results. Five warm local SQL
 samples went from 397 to 70 ms median. A larger local fixture returned all
 60 rows in order and went from 11.78 to 0.31 s in three paired samples.
 These measure SQL execution; they do not measure the hosted service.
+
+## Share the site choices across screens
+
+The Admin root owns one request for site choices per tab and access scope.
+Changing a site or its name refreshes the choices. The focus listener checks
+the inbox at most once every 30 seconds. The provider does not authorize any page or action.
+
+In the browser, Home → All sites → Home used one request. The site-change
+event caused one refresh. Opening the picker and then reloading a site
+workspace reused those choices. This change does not alter the endpoint.

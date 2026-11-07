@@ -1,4 +1,5 @@
 'use client'
+import { notifySiteChoicesChanged } from '../../../components/sidebar-data.tsx'
 import { Button, ButtonLink, Card, Field } from '../../../components/ui/index.ts'
 import styles from './import.module.css'
 import { useNavigationGuard, requestLocalDraftNavigation } from '../../../components/navigation-guard.ts'
@@ -275,6 +276,7 @@ export function SiteImportForm({ actorId }: { actorId: string }) {
       if (!response.ok || !result.siteId)
         throw new Error(result.message ?? 'Import could not be confirmed. Retry with the same file and destination.')
       accepted.current = true
+      notifySiteChoicesChanged()
       setSiteId(result.siteId)
       baseline.current = empty
       baselineRequest.current = null

@@ -61,6 +61,7 @@ import { Button, IconButton } from './ui/button.tsx'
 import { Menu } from './ui/menu.tsx'
 import styles from './app-shell.module.css'
 import { navItemIsCurrent, type NavGroup, type NavIconName } from './nav.ts'
+import { useSidebarData } from './sidebar-data.tsx'
 
 const NAV_ICON = {
   home: IconHome,
@@ -100,57 +101,13 @@ export function AppShell({
 }) {
   const pathname = usePathname()
   const currentSite = groups.find(group => group.label !== 'CMS')
-  const [sites, setSites] = useState<{ id: string; name: string }[] | null>(null)
-  const [sitesError, setSitesError] = useState(false)
-  useEffect(() => {
-    const controller = new AbortController()
-    void fetch('/api/sites', { cache: 'no-store', signal: controller.signal })
-      .then(async response => {
-        if (!response.ok) throw new Error('Sites unavailable')
-        const body = await response.json()
-        setSites(body.sites)
-        setSitesError(false)
-      })
-      .catch(() => {
-        if (!controller.signal.aborted) setSitesError(true)
-      })
-    return () => controller.abort()
-  }, [currentSite?.label])
+  const { sites, sitesError, inboxCount } = useSidebarData()
   const [open, setOpen] = useState(false)
   const [rail, setRail] = useState(false)
   const [compact, setCompact] = useState(false)
-  const [inboxCount, setInboxCount] = useState<number | null>(null)
   const sidebar = useRef<HTMLElement>(null)
   const closeButton = useRef<HTMLButtonElement>(null)
   const opener = useRef<HTMLButtonElement>(null)
-
-  // Read-only, user-scoped counts. A failed lookup is unknown, never a made-up
-  // zero. Refresh on navigation, window focus, or an in-app request update.
-  useEffect(() => {
-    let request: AbortController | null = null
-    async function refresh() {
-      request?.abort()
-      const current = new AbortController()
-      request = current
-      try {
-        const response = await fetch('/api/inbox/summary', { cache: 'no-store', signal: current.signal })
-        if (!response.ok) throw new Error('Inbox count unavailable')
-        const body = await response.json()
-        if (!current.signal.aborted)
-          setInboxCount(Number.isSafeInteger(body.count) && body.count >= 0 ? body.count : null)
-      } catch {
-        if (!current.signal.aborted) setInboxCount(null)
-      }
-    }
-    void refresh()
-    window.addEventListener('focus', refresh)
-    window.addEventListener('cms:inbox-changed', refresh)
-    return () => {
-      request?.abort()
-      window.removeEventListener('focus', refresh)
-      window.removeEventListener('cms:inbox-changed', refresh)
-    }
-  }, [pathname])
 
   // Read once on mount rather than during render: the server has no
   // localStorage, and a value read during render is a hydration mismatch.

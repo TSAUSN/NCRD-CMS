@@ -1,4 +1,5 @@
 'use client'
+import { notifySiteChoicesChanged } from '../../../components/sidebar-data.tsx'
 
 import { GuardedLink as Link } from '../../../components/guarded-link.tsx'
 import { useNavigationGuard } from '../../../components/navigation-guard.ts'
@@ -479,6 +480,7 @@ export function SiteWizard({
         const outcome = await createSite(requestId.current!, parsed.data)
         setResult(outcome)
         if (outcome.ok) {
+          notifySiteChoicesChanged()
           try {
             if (progressKey) window.localStorage.removeItem(progressKey)
           } catch {

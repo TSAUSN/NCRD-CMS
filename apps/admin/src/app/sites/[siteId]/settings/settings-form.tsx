@@ -1,4 +1,5 @@
 'use client'
+import { notifySiteChoicesChanged } from '../../../../components/sidebar-data.tsx'
 
 import { useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
@@ -36,6 +37,7 @@ export function SiteSettingsForm({
         const outcome = await changeSiteSettings({ siteId, revision, name: nextName, archive })
         setResult(outcome)
         if (outcome.ok) {
+          notifySiteChoicesChanged()
           router.refresh()
         }
       } catch {
@@ -105,6 +107,7 @@ export function ArchiveSite({ siteId, name, revision }: { siteId: string; name: 
       try {
         const result = await changeSiteSettings({ siteId, revision, name, archive: true })
         if (result.ok) {
+          notifySiteChoicesChanged()
           setOpen(false)
           router.refresh()
         } else {
