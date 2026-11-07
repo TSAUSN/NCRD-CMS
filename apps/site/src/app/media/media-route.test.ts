@@ -142,19 +142,34 @@ describe('public media route', () => {
     expect(resolve).not.toHaveBeenCalled()
   })
   it('refuses same-length altered bytes, including cached and HEAD requests', async () => {
+    const get = vi.fn(async () => new Uint8Array([3, 2, 1]))
     const handle = createPublicMediaGetHandler({
       resolveSite: async () => ({ host: 'tenant.example', siteId: 'site-a' }),
       repository: repository(),
-      media: { ...mediaStore(), get: async () => new Uint8Array([3, 2, 1]) },
+      media: { ...mediaStore(), get },
     })
+    // A matching validator returns no new bytes. An ordinary or mismatched
+    // request still rejects corruption, even for HEAD.
+    for (const method of ['GET', 'HEAD']) {
+      const cached = await handle(
+        new Request('https://tenant.example/', { method, headers: { 'if-none-match': '"sha256-' + HASH + '"' } }),
+        MEDIA_ID,
+        'card',
+      )
+      expect(cached.status).toBe(304)
+      expect(cached.headers.get('cache-control')).toBe('public, max-age=0, must-revalidate')
+      expect(cached.body).toBeNull()
+    }
+    expect(get).not.toHaveBeenCalled()
     for (const method of ['GET', 'HEAD']) {
       const response = await handle(
-        new Request('https://tenant.example/', { method, headers: { 'if-none-match': '"sha256-' + HASH + '"' } }),
+        new Request('https://tenant.example/', { method, headers: { 'if-none-match': '"different"' } }),
         MEDIA_ID,
         'card',
       )
       expect(response.status).toBe(404)
       expect(response.headers.get('cache-control')).toBe('no-store')
     }
+    expect(get).toHaveBeenCalledTimes(2)
   })
 })

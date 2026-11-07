@@ -1,3 +1,4 @@
+import { storedObjectNotModified } from './stored-object-response.ts'
 import { createHash } from 'node:crypto'
 import type { MediaStore } from './ports.ts'
 
@@ -57,8 +58,8 @@ export function mediaObjectHeaders(
   }
 }
 
-/** Resolver-authorized native bytes share the same digest check in public and
- * private delivery. A matching cache validator never skips integrity/access. */
+/** Recheck access for every request. A matching public validator describes the
+ * authorized receipt; newly delivered bytes still pass the digest check. */
 export async function deliverMediaObject(input: {
   mediaId: string
   variant: string
@@ -82,6 +83,11 @@ export async function deliverMediaObject(input: {
     !isResolvedMediaObjectSafe(object)
   )
     return hidden()
+  const headers = mediaObjectHeaders(object, input.visibility)
+  if (input.visibility === 'public') {
+    const unchanged = storedObjectNotModified(input.request, headers)
+    if (unchanged) return unchanged
+  }
   const bytes = await input.store.get(object.objectKey)
   if (
     !bytes ||
@@ -89,8 +95,5 @@ export async function deliverMediaObject(input: {
     createHash('sha256').update(bytes).digest('hex') !== object.contentHash
   )
     return hidden()
-  const headers = mediaObjectHeaders(object, input.visibility)
-  if (input.visibility === 'public' && input.request?.headers.get('if-none-match') === headers.etag)
-    return new Response(null, { status: 304, headers })
   return new Response(input.request?.method === 'HEAD' ? null : new Uint8Array(bytes), { headers })
 }

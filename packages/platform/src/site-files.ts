@@ -1,3 +1,4 @@
+import { storedObjectNotModified } from './stored-object-response.ts'
 import { createHash } from 'node:crypto'
 import { siteFileAddress, SiteFileName, SiteFilePath, type SiteFileKind, type SiteFileView } from '@cms/schema'
 import type { Queryable } from './publication.ts'
@@ -124,6 +125,25 @@ export type ResolvedSiteFile = {
   bytes: string | number
   sha256: string
 }
+const FILE_TYPES: Record<SiteFileKind, readonly string[]> = {
+  script: ['text/javascript'],
+  stylesheet: ['text/css'],
+  data: ['application/json'],
+  font: ['font/woff2', 'font/woff', 'font/otf', 'font/ttf'],
+  image: ['image/png', 'image/jpeg', 'image/gif', 'image/webp', 'image/svg+xml'],
+}
+
+function isValidCacheReceipt(file: ResolvedSiteFile) {
+  const bytes = Number(file.bytes)
+  const limit = file.kind === 'image' || file.kind === 'font' ? 25 : 5
+  return (
+    Number.isSafeInteger(bytes) &&
+    bytes > 0 &&
+    bytes <= limit * 1024 * 1024 &&
+    FILE_TYPES[file.kind]?.includes(file.mime_type)
+  )
+}
+
 /** The resolver supplies a published, host-bound receipt. Never accept a
  * storage key, guessed content type, or a caller-provided approval flag. */
 export async function deliverReviewedSiteFile(input: {
@@ -133,6 +153,7 @@ export async function deliverReviewedSiteFile(input: {
   store: MediaStore
   resolve: () => Promise<ResolvedSiteFile | null>
   visibility: 'public' | 'admin'
+  request?: Request
 }): Promise<Response> {
   const hidden = () =>
     new Response(null, { status: 404, headers: { 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' } })
@@ -147,6 +168,19 @@ export async function deliverReviewedSiteFile(input: {
     file.object_key !== `site-files/${file.site_id}/${file.id}/${file.sha256}`
   )
     return hidden()
+  const headers = {
+    'content-type': file.mime_type,
+    'content-length': String(Number(file.bytes)),
+    'x-content-type-options': 'nosniff',
+    'cache-control': input.visibility === 'public' ? 'public, max-age=0, must-revalidate' : 'private, no-store',
+    etag: `"${file.sha256}"`,
+    'content-security-policy': "default-src 'none'; sandbox",
+    'referrer-policy': 'no-referrer',
+  }
+  if (input.visibility === 'public' && isValidCacheReceipt(file)) {
+    const unchanged = storedObjectNotModified(input.request, headers)
+    if (unchanged) return unchanged
+  }
   const bytes = await input.store.get(file.object_key)
   if (!bytes || bytes.length !== Number(file.bytes) || digest(bytes) !== file.sha256) return hidden()
   let inspected: { mimeType: string; sha256: string }
@@ -156,17 +190,7 @@ export async function deliverReviewedSiteFile(input: {
     return hidden()
   }
   if (inspected.mimeType !== file.mime_type) return hidden()
-  return new Response(new Uint8Array(bytes), {
-    headers: {
-      'content-type': file.mime_type,
-      'content-length': String(bytes.length),
-      'x-content-type-options': 'nosniff',
-      'cache-control': input.visibility === 'public' ? 'public, max-age=0, must-revalidate' : 'private, no-store',
-      etag: `"${file.sha256}"`,
-      'content-security-policy': "default-src 'none'; sandbox",
-      'referrer-policy': 'no-referrer',
-    },
-  })
+  return new Response(new Uint8Array(bytes), { headers })
 }
 
 /** An exact approved original address resolves to an authoritative receipt.
@@ -176,6 +200,7 @@ export async function deliverReviewedSiteFileAtPath(input: {
   store: MediaStore
   resolve: (path: string) => Promise<ResolvedSiteFile | null>
   visibility: 'public' | 'admin'
+  request?: Request
 }): Promise<Response> {
   const hidden = () =>
     new Response(null, { status: 404, headers: { 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' } })
@@ -189,5 +214,6 @@ export async function deliverReviewedSiteFileAtPath(input: {
     store: input.store,
     resolve: async () => file,
     visibility: input.visibility,
+    request: input.request,
   })
 }

@@ -365,6 +365,15 @@ site host, media id and a closed variant name; neither browser role can read an
 object key. Page-version insertion and publication independently refuse a
 deleted, unresolved, cross-site or missing-variant reference.
 
+The private admin media endpoint allows browser storage with `private, no-cache`.
+Each request still checks the current session and tenant before a matching ETag
+can return 304 without reading storage. Bytes previously delivered can remain
+in the browser cache after access is revoked; a later request is still denied.
+
+A matching public media or font validator checks current publication and
+returns no bytes. It cannot detect corruption in an object it did not read.
+Responses that serve new bytes still run the existing storage integrity checks.
+
 Deletion is a recoverable state change first. Physical cleanup is delayed and
 bound to the current outbox lease by a durable claim, so a restore either wins
 before cleanup or is refused while cleanup owns the object set; a retry may
@@ -503,7 +512,6 @@ frames, objects, connections and base URLs. SrcDoc previews receive the same
 policy in a meta element at the beginning of the generated head, because
 fetching HTML and assigning srcDoc does not carry the response's CSP headers.
 An authored policy cannot relax these restrictions. Media is fetched through
-the existing authenticated, no-store endpoint, where session/RLS and site/media
-ownership are still checked; no bearer URLs or unauthenticated asset route are
-introduced. Inline media copies were avoided so access continues to be checked
-at each image request and revoked sessions cannot reuse a new image fetch.
+the authenticated media endpoint, which checks the session and tenant on
+each request before returning bytes or a cache validator. The previews do not
+embed media bytes or expose a separate bearer URL.

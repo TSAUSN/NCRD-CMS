@@ -41,8 +41,28 @@ describe('admin media preview route', () => {
     expect(response.status).toBe(200)
     expect(currentSession).toHaveBeenCalledOnce()
     expect(resolve).toHaveBeenCalledWith('user-a', MEDIA_ID, 'card')
-    expect(response.headers.get('cache-control')).toBe('private, no-store')
+    expect(response.headers.get('cache-control')).toBe('private, no-cache')
     expect(response.headers.get('x-content-type-options')).toBe('nosniff')
+  })
+
+  it('revalidates authorized cached bytes without reading storage and rejects revoked access', async () => {
+    const get = vi.fn(async () => new Uint8Array([1, 2, 3]))
+    const currentSession = vi.fn(async () => ({ userId: 'user-a' }))
+    const resolve = vi
+      .fn<AdminMediaDeliveryRepository['resolve']>()
+      .mockResolvedValueOnce(object)
+      .mockResolvedValueOnce(null)
+    const handle = createAdminMediaGetHandler({ currentSession, repository: { resolve }, media: mediaStore(get) })
+    const request = new Request('https://admin.example.test/media', {
+      headers: { 'if-none-match': `"sha256-${HASH}"` },
+    })
+    const cached = await handle(MEDIA_ID, 'card', request)
+    expect(cached.status).toBe(304)
+    expect(cached.headers.get('cache-control')).toBe('private, no-cache')
+    expect((await handle(MEDIA_ID, 'card', request)).status).toBe(404)
+    expect(currentSession).toHaveBeenCalledTimes(2)
+    expect(resolve).toHaveBeenCalledTimes(2)
+    expect(get).not.toHaveBeenCalled()
   })
 
   it('does not read storage when RLS hides cross-tenant media', async () => {

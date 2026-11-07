@@ -15,6 +15,7 @@ export async function serveReviewedPath(request: Request, host: string, path: st
     path,
     store: configuredMediaStore(),
     visibility: 'public',
+    request,
     resolve: async () => file,
   })
   return request.method === 'HEAD'

@@ -18,6 +18,7 @@ export async function GET(
     name,
     store: configuredMediaStore(),
     visibility: 'public',
+    request,
     resolve: async () =>
       host && (await resolveHost(host))
         ? asPublic(

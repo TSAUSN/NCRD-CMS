@@ -1,3 +1,4 @@
+import { storedObjectNotModified } from './stored-object-response.ts'
 import { createHash } from 'node:crypto'
 import { SITE_FONT_REGISTRY, SiteAssetProvenance, type SiteFontKey } from '@cms/schema'
 import type { Queryable } from './publication.ts'
@@ -139,6 +140,7 @@ export async function deliverSiteAsset(input: {
   resolve: () => Promise<ResolvedSiteAsset | null>
   store: MediaStore
   visibility: 'admin' | 'public'
+  request?: Request
 }): Promise<Response> {
   const hidden = () =>
     new Response(null, { status: 404, headers: { 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' } })
@@ -152,6 +154,31 @@ export async function deliverSiteAsset(input: {
     Number(asset.bytes) > SITE_ASSET_LIMIT
   )
     return hidden()
+  const headers = {
+    'content-type': asset.mime_type,
+    'content-length': String(Number(asset.bytes)),
+    // Recheck publication/membership; immutable bytes do not imply permanent access.
+    'cache-control': input.visibility === 'admin' ? 'private, no-store' : 'public, max-age=0, must-revalidate',
+    etag: `"sha256-${asset.content_hash}"`,
+    'x-content-type-options': 'nosniff',
+    'content-security-policy': "default-src 'none'; sandbox",
+    'cross-origin-resource-policy': 'same-origin',
+    'content-disposition':
+      asset.kind === 'document'
+        ? `attachment; filename="document.pdf"; filename*=UTF-8''${encodeURIComponent(asset.original_name).replace(/'/g, '%27')}`
+        : 'inline',
+  }
+  if (input.visibility === 'public' && /^[a-f0-9]{64}$/.test(asset.content_hash)) {
+    const font = asset.font_key && SITE_FONT_REGISTRY[asset.font_key]
+    const safeReceipt =
+      asset.kind === 'document'
+        ? asset.mime_type === 'application/pdf' && asset.font_key === null
+        : asset.kind === 'font' && font && font.mimeType === asset.mime_type && font.sha256 === asset.content_hash
+    if (safeReceipt) {
+      const unchanged = storedObjectNotModified(input.request, headers)
+      if (unchanged) return unchanged
+    }
+  }
   const bytes = await input.store.get(asset.object_key)
   if (!bytes || bytes.length !== Number(asset.bytes)) return hidden()
   try {
@@ -160,20 +187,5 @@ export async function deliverSiteAsset(input: {
   } catch {
     return hidden()
   }
-  return new Response(bytes as unknown as ConstructorParameters<typeof Response>[0], {
-    headers: {
-      'content-type': asset.mime_type,
-      'content-length': String(bytes.length),
-      // Recheck publication/membership; immutable bytes do not imply permanent access.
-      'cache-control': input.visibility === 'admin' ? 'private, no-store' : 'public, max-age=0, must-revalidate',
-      etag: `"sha256-${asset.content_hash}"`,
-      'x-content-type-options': 'nosniff',
-      'content-security-policy': "default-src 'none'; sandbox",
-      'cross-origin-resource-policy': 'same-origin',
-      'content-disposition':
-        asset.kind === 'document'
-          ? `attachment; filename="document.pdf"; filename*=UTF-8''${encodeURIComponent(asset.original_name).replace(/'/g, '%27')}`
-          : 'inline',
-    },
-  })
+  return new Response(bytes as unknown as ConstructorParameters<typeof Response>[0], { headers })
 }

@@ -164,3 +164,15 @@ private evidence directory containing `routes.json` and
 ```sh
 node scripts/perf/check-loader-budgets.mjs "$PRIVATE/run-directory"
 ```
+
+## Revalidate images before reading storage
+
+Ten local authenticated image requests with matching ETags changed from
+200 responses carrying 135,422 bytes total to
+empty 304 responses. Ordinary requests still returned identical image
+bytes, validators and content types, and anonymous requests still
+returned 404. The median conditional request was
+1.53 → 1.67 ms
+on loopback; this removed transfer and storage work without measuring a
+local latency win. Authorization still runs on every request. Tests
+observe one storage read becoming zero on a matching validator.

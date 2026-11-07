@@ -1,5 +1,6 @@
 export * from './ports.ts'
 export * from './media.ts'
+export { storedObjectNotModified } from './stored-object-response.ts'
 export * from './database.ts'
 export * from './local/index.ts'
 export * from './session.ts'

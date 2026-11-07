@@ -2,6 +2,7 @@ import {
   isGovernedMediaVariant,
   isResolvedMediaObjectSafe,
   mediaObjectHeaders,
+  storedObjectNotModified,
   type GovernedMediaVariant,
   type MediaStore,
   type ResolvedMediaObject,
@@ -28,17 +29,20 @@ function hidden(): Response {
 }
 
 export function createAdminMediaGetHandler(deps: Deps) {
-  return async function GET(mediaId: string, variantName: string): Promise<Response> {
+  return async function GET(mediaId: string, variantName: string, request?: Request): Promise<Response> {
     if (!UUID.test(mediaId) || !isGovernedMediaVariant(variantName)) return hidden()
     const session = await deps.currentSession()
     if (!session) return hidden()
     const object = await deps.repository.resolve(session.userId, mediaId, variantName)
     if (!object || object.mediaId !== mediaId || object.variant !== variantName || !isResolvedMediaObjectSafe(object))
       return hidden()
+    const headers = { ...mediaObjectHeaders(object, 'admin'), 'cache-control': 'private, no-cache' }
+    const unchanged = storedObjectNotModified(request, headers)
+    if (unchanged) return unchanged
     const bytes = await deps.media.get(object.objectKey)
     if (!bytes || bytes.byteLength !== object.bytes) return hidden()
     return new Response(bytes as unknown as BodyInit, {
-      headers: mediaObjectHeaders(object, 'admin'),
+      headers,
     })
   }
 }

@@ -15,9 +15,9 @@ const handle = createAdminMediaGetHandler({
 })
 
 export async function GET(
-  _request: Request,
+  request: Request,
   context: { params: Promise<{ mediaId: string; variant: string }> },
 ): Promise<Response> {
   const { mediaId, variant } = await context.params
-  return handle(mediaId, variant)
+  return handle(mediaId, variant, request)
 }

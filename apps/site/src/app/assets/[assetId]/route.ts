@@ -27,6 +27,7 @@ export async function GET(request: Request, context: { params: Promise<{ assetId
     assetId: target,
     store: configuredMediaStore(),
     visibility: 'public',
+    request,
     resolve: async () =>
       host && (await resolveHost(host))
         ? asPublic(
