@@ -106,7 +106,7 @@ async function runRoute(page, origin, route) {
   if (mode === 'link') await Promise.all([page.waitForURL(url), href.click()])
   else await page.goto(url, { waitUntil: 'domcontentloaded' })
   await page
-    .locator(route.name === 'Editor' ? '.editor' : 'main h1')
+    .locator(route.name === 'Editor' ? '.editor' : 'main:not([aria-busy="true"]) h1')
     .first()
     .waitFor({ state: 'visible' })
   const controlsMs = performance.now() - start

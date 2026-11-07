@@ -2,6 +2,7 @@
 
 import type { ComponentProps, MouseEvent } from 'react'
 import { requestClientNavigation } from './navigation-guard.ts'
+import { startNavigationProgress } from './shell/navigation-progress.tsx'
 
 export type DocumentLinkProps = Omit<ComponentProps<'a'>, 'href'> & {
   href: string
@@ -37,6 +38,7 @@ export function DocumentLink({ onClick, onNavigate, onDraftLeave, replace, ...pr
           let canceled = false
           onNavigate?.({ preventDefault: () => (canceled = true) })
           if (canceled) return
+          startNavigationProgress(href)
           if (replace) window.location.replace(href)
           else window.location.assign(href)
         }

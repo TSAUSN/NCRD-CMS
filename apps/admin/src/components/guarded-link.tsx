@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import type { ComponentProps } from 'react'
 import { canvasRoute } from '../lib/canvas-route.ts'
 import { DocumentLink } from './document-link.tsx'
+import { startNavigationProgress } from './shell/navigation-progress.tsx'
 import { confirmClientNavigation, requestClientNavigation } from './navigation-guard.ts'
 
 /**
@@ -47,6 +48,7 @@ export function GuardedLink({
       },
     })
     if (!canceled && typeof props.href === 'string') {
+      startNavigationProgress(props.href)
       const options = { scroll }
       if (replace) router.replace(props.href, options)
       else router.push(props.href, options)
@@ -66,6 +68,9 @@ export function GuardedLink({
           return
         }
         onNavigate?.(event)
+        // Next exposes cancellation only to its own Link. Keep the caller's
+        // event intact and let the route fallback handle custom navigation.
+        if (!onNavigate && typeof props.href === 'string') startNavigationProgress(props.href)
       }}
     />
   )

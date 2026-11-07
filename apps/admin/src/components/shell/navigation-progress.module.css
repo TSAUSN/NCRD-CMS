@@ -1,0 +1,31 @@
+.progress {
+  position: fixed;
+  z-index: var(--z-popover);
+  inset: 0 0 auto;
+  block-size: var(--line-focus);
+  overflow: hidden;
+  pointer-events: none;
+}
+.progress::before {
+  display: block;
+  inline-size: 38%;
+  block-size: 100%;
+  background: var(--focus);
+  border-radius: var(--radius-pill);
+  content: '';
+  animation: crossing 1s var(--ease) infinite;
+}
+@keyframes crossing {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(265%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .progress::before {
+    inline-size: 100%;
+    animation: none;
+  }
+}
