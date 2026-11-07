@@ -307,7 +307,7 @@ function ChapterDetails({
   }, [row.id, attempt])
   const division = divisions.find(item => item.id === row.divisionId),
     page = row.config.pageId && !chapterUsesLinkedPage(row.config.destination),
-    invite = localInvitations && row.config.updateMode === 'chapter-editors' && page
+    canInviteHere = row.config.updateMode === 'chapter-editors' && page
   return (
     <DetailPanel
       title={row.config.name}
@@ -420,11 +420,17 @@ function ChapterDetails({
               ? division.name + ' web staff and site administrators retain their existing access.'
               : 'Site administrators retain their existing access.'}
           </p>
-          {invite && (
-            <Button variant="secondary" onClick={onInvite}>
-              Invite a volunteer
-            </Button>
-          )}
+          {canInviteHere &&
+            (localInvitations ? (
+              <Button variant="secondary" onClick={onInvite}>
+                Invite a volunteer
+              </Button>
+            ) : (
+              <p className={workspace.meta}>
+                Chapter invitations aren’t available on this installation. Ask a site administrator to arrange access
+                before assigning volunteers to update this page.
+              </p>
+            ))}
         </section>
         <p className={workspace.meta}>
           Saved setup can differ from what visitors see. Set up changes stay in draft until reviewed and published.
