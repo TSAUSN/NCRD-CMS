@@ -408,7 +408,13 @@ test.describe.serial('Collections admin workspace', () => {
       'Second response story',
     ])
 
-    await record(page, 'Community response opens').dragTo(record(page, 'Second response story'))
+    const second = record(page, 'Second response story')
+    const secondBounds = await second.boundingBox()
+    expect(secondBounds).not.toBeNull()
+    // The lower half visibly means "after"; the midpoint can round to "before".
+    await record(page, 'Community response opens').dragTo(second, {
+      targetPosition: { x: 12, y: Math.round(secondBounds!.height * 0.78) },
+    })
     await expect(activeRecords(page).locator('strong')).toHaveText([
       'Third response story',
       'Second response story',
