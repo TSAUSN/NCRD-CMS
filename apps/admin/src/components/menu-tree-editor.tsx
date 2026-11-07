@@ -1,10 +1,14 @@
 'use client'
 import { useId, useState } from 'react'
 import { NavUrl, type NavTree, type NavNode } from '@cms/schema'
-import { canAppendMenuItem, editMenuItem, menuHasPage, moveMenuItem, reorderMenuItem } from '../lib/menu-editing.ts'
+import { canAppendMenuItem, editMenuItem, menuHasPage, moveMenuItem, dropMenuItem } from '../lib/menu-editing.ts'
 import { Button, Dialog, IconButton } from './ui/index.ts'
 import { IconArrowUp, IconArrowDown, IconTrash } from './icons.tsx'
 import styles from './site-look-panel.module.css'
+import reorderStyles from './ui/reorderable-list.module.css'
+import { useReorderableList } from './ui/use-reorderable-list.ts'
+import { DropIndicator, ReorderAnnouncement } from './ui/drop-indicator.tsx'
+import { menuReorderIntent, type MenuMove } from '../lib/menu-reorder-intent.ts'
 type PageChoice = { id: string; title: string; published: boolean }
 export function MenuTreeEditor({
   tree,
@@ -35,6 +39,26 @@ export function MenuTreeEditor({
   const addId = useId(),
     available = pages.filter(page => !menuHasPage(tree, page.id)),
     canAdd = canAppendMenuItem(tree)
+  const reorder = useReorderableList({
+    mimeType: 'application/x-cms-menu',
+    decide: point => menuReorderIntent(tree, point),
+    apply: ({ from, to, position }: MenuMove) => {
+      const next = dropMenuItem(tree, from, to, position)
+      if (next === tree) return
+      onChange(next)
+      const [parent, child] = to.split('.').map(Number)
+      const target = child === undefined ? tree[parent!] : tree[parent!]?.children?.[child]
+      return 'Moved ' + (position === 'inside' ? 'under ' : position + ' ') + (target?.label || 'the menu item') + '.'
+    },
+  })
+  function keyboardMove(path: string, label: string, action: 'up' | 'down' | 'indent' | 'outdent') {
+    const next = moveMenuItem(tree, path, action)
+    if (next === tree) return
+    onChange(next)
+    const placement =
+      action === 'indent' ? 'under the previous item' : action === 'outdent' ? 'out of the dropdown' : action
+    reorder.announce(`Moved ${label || 'menu item'} ${placement}.`)
+  }
   const row = (node: NavNode, path: string, index: number, total: number, nested = false) => {
     const target = node.target,
       targetName =
@@ -49,17 +73,14 @@ export function MenuTreeEditor({
         className={styles.menuItem}
         data-nested={nested || undefined}
         data-hidden={!node.visible || undefined}
-        draggable={!disabled && !nested}
-        onDragStart={event => event.dataTransfer.setData('application/x-cms-menu', path)}
-        onDragOver={event => {
-          if (!nested && event.dataTransfer.types.includes('application/x-cms-menu')) event.preventDefault()
-        }}
-        onDrop={event => {
-          event.preventDefault()
-          if (disabled || nested) return
-          onChange(reorderMenuItem(tree, event.dataTransfer.getData('application/x-cms-menu'), path))
-        }}
+        {...reorder.row(path, disabled)}
       >
+        <DropIndicator marker={reorder.marker} row={path} />
+        {(reorder.blocked ?? reorder.rejection)?.row === path && (
+          <span className={reorderStyles.reason} aria-hidden="true">
+            {(reorder.blocked ?? reorder.rejection)?.message}
+          </span>
+        )}
         <label>
           Menu label
           <input
@@ -164,7 +185,7 @@ export function MenuTreeEditor({
             tooltip="Move menu item up"
             variant="tertiary"
             disabled={disabled || index === 0}
-            onClick={() => onChange(moveMenuItem(tree, path, 'up'))}
+            onClick={() => keyboardMove(path, node.label, 'up')}
           >
             <IconArrowUp size={16} />
           </IconButton>
@@ -172,7 +193,7 @@ export function MenuTreeEditor({
             tooltip="Move menu item down"
             variant="tertiary"
             disabled={disabled || index === total - 1}
-            onClick={() => onChange(moveMenuItem(tree, path, 'down'))}
+            onClick={() => keyboardMove(path, node.label, 'down')}
           >
             <IconArrowDown size={16} />
           </IconButton>
@@ -181,7 +202,7 @@ export function MenuTreeEditor({
               size="s"
               variant="tertiary"
               disabled={disabled || tree.length >= 50}
-              onClick={() => onChange(moveMenuItem(tree, path, 'outdent'))}
+              onClick={() => keyboardMove(path, node.label, 'outdent')}
             >
               Move out
             </Button>
@@ -195,7 +216,7 @@ export function MenuTreeEditor({
                 Boolean(node.children?.length) ||
                 (tree[index - 1]?.children?.length ?? 0) >= 20
               }
-              onClick={() => onChange(moveMenuItem(tree, path, 'indent'))}
+              onClick={() => keyboardMove(path, node.label, 'indent')}
             >
               Indent
             </Button>
@@ -224,7 +245,7 @@ export function MenuTreeEditor({
           </p>
         )}
         {node.children?.length ? (
-          <ul className={styles.menuList}>
+          <ul className={styles.menuList} data-reorder-child-list>
             {node.children.map((child, at) => row(child, path + '.' + at, at, node.children!.length, true))}
           </ul>
         ) : null}
@@ -240,7 +261,10 @@ export function MenuTreeEditor({
           : 'Change names here, drag to reorder, or use the arrows. Indent makes a dropdown. Open the menu in the preview to check it.'}
       </p>
       {!tree.length && <p className={styles.hiddenHelp}>Add a page or web link to help visitors find their way.</p>}
-      <ul className={styles.menuList}>{tree.map((node, index) => row(node, String(index), index, tree.length))}</ul>
+      <ul className={styles.menuList + ' ' + reorderStyles.list} data-reorder-list>
+        {tree.map((node, index) => row(node, String(index), index, tree.length))}
+      </ul>
+      <ReorderAnnouncement>{reorder.announcement}</ReorderAnnouncement>
       <div className={styles.addMenu}>
         <label htmlFor={addId}>Add page to menu</label>
         <select
