@@ -85,6 +85,7 @@ vi.mock('../../../../lib/document-library.ts', () => ({
 }))
 
 import { CollectionsWorkspace } from './collections-workspace.tsx'
+import { CollectionRecordList } from './collection-record-list.tsx'
 
 const model = {
   fields: [{ key: 'title', label: 'Title', type: 'text' as const, required: true }],
@@ -150,6 +151,10 @@ function flushEffects() {
 function elements(node: ReactNode): ReactElement<Record<string, any>>[] {
   if (Array.isArray(node)) return node.flatMap(elements)
   if (!isValidElement<Record<string, any>>(node)) return []
+  // Traverse the real rows after their extraction. Keep other components
+  // shallow so the harness still controls the workspace's pending handlers.
+  if (node.type === CollectionRecordList)
+    return [node, ...elements(CollectionRecordList(node.props as Parameters<typeof CollectionRecordList>[0]))]
   return [node, ...elements(node.props.children), ...elements(node.props.footer)]
 }
 function label(node: ReactNode): string {
@@ -260,11 +265,9 @@ describe('collection workspace pending mutation boundary', () => {
     ]) {
       expect(button(tree, name).props.disabled, name).toBe(true)
     }
-    expect(
-      elements(tree)
-        .filter(element => element.type === 'article' && element.props.onDragStart)
-        .every(element => !element.props.draggable),
-    ).toBe(true)
+    const rows = elements(tree).filter(element => element.type === 'article' && element.props.onDragStart)
+    expect(rows).toHaveLength(3)
+    expect(rows.every(element => !element.props.draggable)).toBe(true)
     expect(
       elements(tree).find(element => element.type === 'input' && element.props.value === 'new-item')?.props.disabled,
     ).toBe(true)
