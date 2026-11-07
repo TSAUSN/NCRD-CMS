@@ -11,7 +11,7 @@ name: CI
 # The reference images build on branch pushes and manual runs.
 on:
   push:
-    branches: [staging, main]
+    branches: [staging, 'staging/**', main]
     paths-ignore: ['**/*.md', 'docs/**']
   pull_request:
     paths-ignore: ['**/*.md', 'docs/**']
@@ -27,6 +27,10 @@ concurrency:
 
 jobs:
   checks:
+    if: >-
+      github.event_name != 'push' ||
+      github.ref == 'refs/heads/main' ||
+      github.ref == format('refs/heads/{0}', vars.CMS_STAGING_BRANCH || 'staging')
     runs-on: ubuntu-latest
     # A hung run would otherwise use GitHub's 6-hour default.
     timeout-minutes: 180
@@ -156,11 +160,13 @@ jobs:
     needs: [checks, image]
     if: >-
       github.event_name == 'push' &&
-      ((github.ref == 'refs/heads/staging' && vars.CMS_AUTODEPLOY_STAGING == 'true') ||
+      ((github.ref != 'refs/heads/main' &&
+        github.ref == format('refs/heads/{0}', vars.CMS_STAGING_BRANCH || 'staging') &&
+        vars.CMS_AUTODEPLOY_STAGING == 'true') ||
        (github.ref == 'refs/heads/main' && vars.CMS_AUTODEPLOY_PRODUCTION == 'true'))
     uses: ./.github/workflows/google-release.yml
     permissions:
       contents: read
       id-token: write
     with:
-      target: ${{ github.ref == 'refs/heads/staging' && 'staging' || 'production' }}
+      target: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}

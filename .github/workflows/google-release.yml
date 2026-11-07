@@ -11,7 +11,9 @@ jobs:
   publish:
     if: >-
       github.event_name == 'push' &&
-      ((github.ref == 'refs/heads/staging' && inputs.target == 'staging') ||
+      ((github.ref != 'refs/heads/main' &&
+        github.ref == format('refs/heads/{0}', vars.CMS_STAGING_BRANCH || 'staging') &&
+        inputs.target == 'staging') ||
        (github.ref == 'refs/heads/main' && inputs.target == 'production'))
     runs-on: ubuntu-latest
     timeout-minutes: 65
@@ -46,6 +48,7 @@ jobs:
       - name: Verify the target project before signing in
         env:
           CMS_RELEASE_TARGET: ${{ inputs.target }}
+          CMS_STAGING_BRANCH: ${{ vars.CMS_STAGING_BRANCH }}
           CMS_RELEASE_STAGING_PROJECT_NUMBER: ${{ vars.CMS_RELEASE_STAGING_PROJECT_NUMBER }}
           CMS_RELEASE_PRODUCTION_PROJECT_NUMBER: ${{ vars.CMS_RELEASE_PRODUCTION_PROJECT_NUMBER }}
         run: bash scripts/check-release-environment.sh

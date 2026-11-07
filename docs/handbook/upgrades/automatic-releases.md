@@ -5,6 +5,13 @@ environment. The `main` branch tests and publishes to **production**.
 The environments must point to different Cloud projects and databases.
 Pull requests and manual CI runs can test code without deploying it.
 
+If the repository already has branches under `staging/`, Git cannot also
+create a branch named `staging`. Keep the existing branches and choose one
+release branch under that prefix, such as `staging/cms-release`. Set its
+exact name in the repository variable `CMS_STAGING_BRANCH`. Use that same
+name in the staging environment's branch rule and federation condition.
+
+
 ## Enable the two environments
 
 1. Set up each environment separately using [the Google bootstrap](../hosting/bootstrap.md).
@@ -18,7 +25,8 @@ Pull requests and manual CI runs can test code without deploying it.
 3. Configure [Google workload identity federation for GitHub](https://github.com/google-github-actions/auth#workload-identity-federation-through-a-service-account).
    Use a separate deploy identity per project. Restrict the provider by
    the exact GitHub repository ID, `push` event, branch, and environment
-   claims. For staging require `refs/heads/staging` and `staging`; for
+   claims. For staging require the exact configured branch ref and the
+   `staging` environment; for
    production require `refs/heads/main` and `production`. Grant
    `roles/iam.workloadIdentityUser` on only the matching deploy account.
    Do not use a service account key.
