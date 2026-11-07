@@ -35,6 +35,7 @@ import shared from '../../../components/workspace.module.css'
 
 type Props = {
   site: SiteRow
+  editorCanvasOrigin: string | null
   principal: Principal
   email: string
   role: string
@@ -51,6 +52,7 @@ type Props = {
 /** The native workboard reads existing authorized records; it never publishes or refreshes a source. */
 export async function NativeSiteOverview({
   site,
+  editorCanvasOrigin,
   principal,
   email,
   role,
@@ -177,7 +179,9 @@ export async function NativeSiteOverview({
                 </ButtonLink>
               )}
               {active && first && (
-                <ButtonLink href={'/pages/' + first.id}>{scoped ? 'Edit ' + first.title : 'Edit home page'}</ButtonLink>
+                <ButtonLink editorCanvasOrigin={editorCanvasOrigin} href={'/pages/' + first.id}>
+                  {scoped ? 'Edit ' + first.title : 'Edit home page'}
+                </ButtonLink>
               )}
             </>
           }
@@ -243,7 +247,7 @@ export async function NativeSiteOverview({
                 </Link>
               )}
               {scoped && first && (
-                <Link className={shared.task} href={'/pages/' + first.id}>
+                <Link className={shared.task} editorCanvasOrigin={editorCanvasOrigin} href={'/pages/' + first.id}>
                   <span className={shared.taskIcon}>
                     <IconPage size={18} />
                   </span>
@@ -317,7 +321,11 @@ export async function NativeSiteOverview({
                         <IconPage size={18} />
                       </span>
                       <div className={shared.rowCopy}>
-                        <Link href={'/pages/' + page.id} aria-label={'Open recent change: ' + page.title}>
+                        <Link
+                          editorCanvasOrigin={editorCanvasOrigin}
+                          href={'/pages/' + page.id}
+                          aria-label={'Open recent change: ' + page.title}
+                        >
                           {page.title}
                         </Link>
                         <time className={shared.meta} dateTime={page.edited_at}>
@@ -420,7 +428,13 @@ export async function NativeSiteOverview({
         </div>
         <section aria-labelledby="site-pages-title">
           <h2 id="site-pages-title">Pages</h2>
-          <PagesTable compactActions pages={pages} canManage={active && canManagePages} liveOrigin={liveOrigin} />
+          <PagesTable
+            compactActions
+            editorCanvasOrigin={editorCanvasOrigin}
+            pages={pages}
+            canManage={active && canManagePages}
+            liveOrigin={liveOrigin}
+          />
         </section>
         {canManagePages && archivedPages.length > 0 && (
           <Disclosure title={<>Archived pages ({archivedPages.length})</>} className="archived-pages">

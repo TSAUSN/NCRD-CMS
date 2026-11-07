@@ -168,7 +168,7 @@ function NewPageDialog({
       const id = created.current?.pageId
       if (!id) onCreated('Website link added to the menu draft. There is no page to edit. Review it in Publish.')
       onClose()
-      if (id) window.location.assign('/pages/' + id)
+      if (id) router.push('/pages/' + id)
       else router.refresh()
     }
   }

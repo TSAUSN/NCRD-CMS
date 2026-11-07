@@ -14,11 +14,13 @@ export function PagesTable({
   pages,
   canManage,
   liveOrigin,
+  editorCanvasOrigin,
   compactActions = false,
 }: {
   pages: WorkspacePage[]
   canManage: boolean
   liveOrigin: string | null
+  editorCanvasOrigin?: string | null
   compactActions?: boolean
 }) {
   const [search, setSearch] = useState(''),
@@ -104,7 +106,7 @@ export function PagesTable({
                       style={{ paddingInlineStart: `calc(var(--space-5) * ${depth})` } as CSSProperties}
                     >
                       {depth > 0 && <span aria-hidden="true">↳</span>}
-                      <Link href={'/pages/' + page.id} title={page.title}>
+                      <Link editorCanvasOrigin={editorCanvasOrigin} href={'/pages/' + page.id} title={page.title}>
                         {page.title}
                       </Link>
                     </div>
@@ -141,7 +143,11 @@ export function PagesTable({
                           />
                         ) : (
                           <Menu accessibleLabel={'More actions for ' + page.title} label={<IconMore size={16} />}>
-                            <Link href={'/pages/' + page.id} aria-label={'Edit ' + page.title}>
+                            <Link
+                              editorCanvasOrigin={editorCanvasOrigin}
+                              href={'/pages/' + page.id}
+                              aria-label={'Edit ' + page.title}
+                            >
                               Edit
                             </Link>
                             {liveOrigin && page.live_path && (
@@ -160,6 +166,7 @@ export function PagesTable({
                         <>
                           <Link
                             className={`btn secondary small ${styles.edit}`}
+                            editorCanvasOrigin={editorCanvasOrigin}
                             href={'/pages/' + page.id}
                             aria-label={'Edit ' + page.title}
                           >

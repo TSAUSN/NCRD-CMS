@@ -1,3 +1,4 @@
+import { REVIEWED_PAGE_CANVAS_SQL } from './reviewed-page-canvas.ts'
 import { asUser, configuredAuthProvider, resolvePrincipal, SESSION_COOKIE, HOSTED_SESSION_COOKIE } from '@cms/platform'
 import type { NextRequest } from 'next/server'
 import { canvasFrameOrigin } from './canvas-frame-origin.ts'
@@ -22,7 +23,7 @@ export const canvasSiteHostname = (user: string, id: string, kind: 'page' | 'sit
     const row = (
       await client.query<{ staging_hostname: string }>(
         `SELECT s.staging_hostname FROM sites s WHERE ${where} AND s.status<>'archived'
-    AND (${kind === 'fonts' ? 'true' : 'false'} OR EXISTS(SELECT 1 FROM site_file_heads h JOIN site_file_versions v ON v.id IN(h.draft_version_id,h.published_version_id) WHERE h.site_id=s.id AND (jsonb_array_length(v.bundle->'files')>0 OR jsonb_array_length(COALESCE(v.bundle->'native','[]'))>0 OR v.bundle ? 'original')))`,
+    AND (${kind === 'fonts' ? 'true' : 'false'} OR ${REVIEWED_PAGE_CANVAS_SQL})`,
         [id],
       )
     ).rows[0]

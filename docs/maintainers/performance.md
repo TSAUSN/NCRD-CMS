@@ -99,14 +99,16 @@ across concurrent journey requests and can exceed elapsed screen time.
 
 ## Open canvas routes as documents
 
-An HTML document sets the frame policy once, when it loads. Links into a
-canvas now go straight to that document; the policy check and fallback
-reload still apply. The browser checks confirmed one document request, no
-RSC request and a working Back button for the editor, Header and Footer.
-Keep editing, Discard and Save draft and leave each followed the existing
-leave rules, without a second native prompt.
+An HTML document sets the frame policy when it loads. Header and Footer
+open that document directly. Page links from a site workspace also open it
+directly when the authorized editor uses a different preview origin. Ordinary
+page links stay in the current document so Back still opens the editor's
+draft confirmation. The strict policy check and reload fallback still apply.
 
-Five warm local samples per route, after the shared pool change:
+The browser checked one document request for the isolated editor, Header and
+Footer, one Flight request in the ordinary editor, and the original Back
+cancellation and draft-leave paths.
+Five warm local samples per route for the original document trial, after the shared pool change:
 
 | Route | Documents / RSC before | Documents / RSC after | Controls before (ms) | Controls after (ms) | Ready before (ms) | Ready after (ms) |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -120,6 +122,10 @@ Header and Footer each went from 32 to 20 transactions and from 195 to
 started without a fallback reload on this fixture; their full document
 loads were slower. The request-count gain applies to routes that previously
 made both requests.
+
+With the Back correction, the Editor fixture took 330 ms
+to controls and 450 ms to ready in five warm samples. The median
+request counts were 0 document and 1 Flight.
 
 ## Trim admin reads and keep navigation responsive
 

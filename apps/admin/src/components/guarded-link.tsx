@@ -4,7 +4,8 @@ import NextLink from 'next/link'
 import { useRouter } from 'next/navigation'
 import type { ComponentProps } from 'react'
 import { canvasRoute } from '../lib/canvas-route.ts'
-import { DocumentLink } from './document-link.tsx'
+import { DocumentLink, openGuardedDocument } from './document-link.tsx'
+import { canvasDocumentOrigin } from '../lib/canvas-document-origin.ts'
 import { startNavigationProgress } from './shell/navigation-progress.tsx'
 import { confirmClientNavigation, requestClientNavigation } from './navigation-guard.ts'
 
@@ -18,18 +19,18 @@ import { confirmClientNavigation, requestClientNavigation } from './navigation-g
 export function GuardedLink({
   onNavigate,
   onDraftLeave,
+  editorCanvasOrigin,
   prefetch = false,
   replace,
   scroll,
   ...props
-}: ComponentProps<typeof NextLink> & { onDraftLeave?: () => void }) {
+}: ComponentProps<typeof NextLink> & { onDraftLeave?: () => void; editorCanvasOrigin?: string | null }) {
   const router = useRouter()
-  if (
-    typeof props.href === 'string' &&
-    props.href.startsWith('/') &&
-    !props.href.startsWith('//') &&
-    canvasRoute(props.href.split(/[?#]/, 1)[0]!)
-  ) {
+  const route =
+    typeof props.href === 'string' && props.href.startsWith('/') && !props.href.startsWith('//')
+      ? canvasRoute(props.href.split(/[?#]/, 1)[0]!)
+      : null
+  if (route && route.kind !== 'page' && typeof props.href === 'string') {
     return (
       <DocumentLink
         {...props}
@@ -61,6 +62,19 @@ export function GuardedLink({
       replace={replace}
       scroll={scroll}
       onNavigate={event => {
+        // Same-document Back can keep the existing draft confirmation. Only
+        // leave this document when a verified editor destination needs a
+        // different frame policy. Unknown destinations retain the reload fallback.
+        if (
+          route?.kind === 'page' &&
+          editorCanvasOrigin &&
+          editorCanvasOrigin !== canvasDocumentOrigin() &&
+          typeof props.href === 'string'
+        ) {
+          event.preventDefault()
+          openGuardedDocument(new URL(props.href, window.location.href).href, { onNavigate, onDraftLeave, replace })
+          return
+        }
         if (
           !(typeof props.href === 'string' ? requestClientNavigation(resume, onDraftLeave) : confirmClientNavigation())
         ) {

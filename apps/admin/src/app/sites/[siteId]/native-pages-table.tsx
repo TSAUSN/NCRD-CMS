@@ -18,6 +18,7 @@ export function NativePagesTable({
   canAdmin,
   initial,
   liveOrigin,
+  editorCanvasOrigin,
 }: {
   siteId: string
   pages: WorkspacePage[]
@@ -25,6 +26,7 @@ export function NativePagesTable({
   canAdmin: boolean
   initial: PageListControls | null
   liveOrigin: string | null
+  editorCanvasOrigin?: string | null
 }) {
   const [search, setSearch] = useState(''),
     [tab, setTab] = useState('main'),
@@ -201,7 +203,9 @@ export function NativePagesTable({
                           </span>
                         )}
                         <div className={styles.rowCopy}>
-                          <Link href={'/pages/' + page.id}>{page.title}</Link>
+                          <Link editorCanvasOrigin={editorCanvasOrigin} href={'/pages/' + page.id}>
+                            {page.title}
+                          </Link>
                           <span className={styles.meta} title={'/' + page.slug}>
                             /{page.slug}
                           </span>

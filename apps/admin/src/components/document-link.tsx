@@ -23,6 +23,27 @@ function sameTab(event: MouseEvent<HTMLAnchorElement>) {
   )
 }
 
+type Navigation = Pick<DocumentLinkProps, 'replace' | 'onDraftLeave' | 'onNavigate'>
+
+/** Run the same leave guard before any editor link opens a full document. */
+export function openGuardedDocument(href: string, { onNavigate, onDraftLeave, replace }: Navigation) {
+  const source = window.location.href
+  const navigate = () => {
+    if (window.location.href !== source) return
+    let canceled = false
+    onNavigate?.({ preventDefault: () => (canceled = true) })
+    if (canceled) return
+    startNavigationProgress(href)
+    if (replace) window.location.replace(href)
+    else window.location.assign(href)
+  }
+  // A completed Save or Discard can enqueue a React state change.
+  // Let its existing beforeunload listener observe the committed draft
+  // before opening the document. Any fresh dirty edit still warns.
+  const resume = () => window.requestAnimationFrame(() => window.setTimeout(navigate, 0))
+  if (requestClientNavigation(resume, onDraftLeave)) navigate()
+}
+
 /** Open a document so its response can set the canvas frame policy. */
 export function DocumentLink({ onClick, onNavigate, onDraftLeave, replace, ...props }: DocumentLinkProps) {
   return (
@@ -31,23 +52,8 @@ export function DocumentLink({ onClick, onNavigate, onDraftLeave, replace, ...pr
       onClick={event => {
         onClick?.(event)
         if (!sameTab(event)) return
-        const href = event.currentTarget.href
-        const source = window.location.href
-        const navigate = () => {
-          if (window.location.href !== source) return
-          let canceled = false
-          onNavigate?.({ preventDefault: () => (canceled = true) })
-          if (canceled) return
-          startNavigationProgress(href)
-          if (replace) window.location.replace(href)
-          else window.location.assign(href)
-        }
-        // A completed Save or Discard can enqueue a React state change.
-        // Let its existing beforeunload listener observe the committed draft
-        // before opening the document. Any fresh dirty edit still warns.
-        const resume = () => window.requestAnimationFrame(() => window.setTimeout(navigate, 0))
         event.preventDefault()
-        if (requestClientNavigation(resume, onDraftLeave)) navigate()
+        openGuardedDocument(event.currentTarget.href, { onNavigate, onDraftLeave, replace })
       }}
     />
   )

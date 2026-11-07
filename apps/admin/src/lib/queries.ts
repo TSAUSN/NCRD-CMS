@@ -8,6 +8,7 @@ import { withDraftListPreview } from './draft-list-preview.ts'
 import { LINK_TARGETS_SQL } from './link-targets.ts'
 import { PAGE_HISTORY_SQL, PAGE_HISTORY_VERSION_SQL } from './page-history.ts'
 import { SITE_SUMMARY_SQL, ORDINARY_PAGE_SQL } from './site-summary.ts'
+import { REVIEWED_PAGE_CANVAS_SQL } from './reviewed-page-canvas.ts'
 import { readSitePreview, type SitePreview } from './site-preview.ts'
 import type { SitePreviewContext } from './preview-context.ts'
 import { CURRENT_SECTION_USES_SQL, SECTION_USAGE_SQL, type SectionUsageRow } from './section-usage.ts'
@@ -67,6 +68,7 @@ export type SiteRow = {
   initial_release_required?: boolean
   has_published_pages?: boolean
   original_design?: boolean
+  has_isolated_page_canvas?: boolean
   chapters_enabled?: boolean
   has_stories?: boolean
   has_content_lists?: boolean
@@ -147,7 +149,8 @@ export function getSite(userId: string, siteId: string): Promise<SiteRow | null>
         EXISTS(SELECT 1 FROM pages p WHERE p.site_id=s.id AND p.published_version_id IS NOT NULL
           AND p.archived_at IS NULL) AS has_published_pages,
         EXISTS(SELECT 1 FROM site_file_heads h JOIN site_file_versions v ON v.id=h.draft_version_id
-          WHERE h.site_id=s.id AND v.bundle ? 'original') AS original_design
+          WHERE h.site_id=s.id AND v.bundle ? 'original') AS original_design,
+        ${REVIEWED_PAGE_CANVAS_SQL} AS has_isolated_page_canvas
        FROM sites s WHERE s.id = $1`,
           [siteId],
         )

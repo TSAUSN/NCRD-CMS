@@ -48,6 +48,8 @@ export async function SiteWorkspace({
   // the same answer a site that does not exist gives. No existence oracle.
   const site = await getSite(session.principal.userId, siteId)
   if (!site) notFound()
+  const editorCanvasOrigin =
+    site.status !== 'archived' && site.has_isolated_page_canvas ? publicSiteOrigin(site.staging_hostname) : null
 
   const siteRole = session.principal.memberships.get(site.id)
   const scopedOnly = !session.principal.isSuperAdmin && !session.principal.memberships.has(site.id)
@@ -94,6 +96,7 @@ export async function SiteWorkspace({
     return (
       <NativeSiteOverview
         site={site}
+        editorCanvasOrigin={editorCanvasOrigin}
         principal={session.principal}
         email={session.email}
         role={role}
@@ -248,7 +251,11 @@ export async function SiteWorkspace({
                 <h2 className={styles.visuallyHidden}>Quick actions</h2>
                 <div className={styles.grid}>
                   {scopedOnly && pages[0] && (
-                    <Link className={styles.task} href={'/pages/' + pages[0].id}>
+                    <Link
+                      className={styles.task}
+                      editorCanvasOrigin={editorCanvasOrigin}
+                      href={'/pages/' + pages[0].id}
+                    >
                       <span className={styles.taskIcon}>
                         <IconPage size={18} />
                       </span>
@@ -256,7 +263,11 @@ export async function SiteWorkspace({
                     </Link>
                   )}
                   {pages.find(page => page.slug === '') && (
-                    <Link className={styles.task} href={'/pages/' + pages.find(page => page.slug === '')!.id}>
+                    <Link
+                      className={styles.task}
+                      editorCanvasOrigin={editorCanvasOrigin}
+                      href={'/pages/' + pages.find(page => page.slug === '')!.id}
+                    >
                       <span className={styles.taskIcon}>
                         <IconPage size={18} />
                       </span>
@@ -313,7 +324,11 @@ export async function SiteWorkspace({
                                 {page.published_version_id ? 'Changes not live' : 'Draft'}
                               </span>
                             </div>
-                            <Link className="btn secondary" href={'/pages/' + page.id}>
+                            <Link
+                              className="btn secondary"
+                              editorCanvasOrigin={editorCanvasOrigin}
+                              href={'/pages/' + page.id}
+                            >
                               Open page
                             </Link>
                           </li>
@@ -338,7 +353,11 @@ export async function SiteWorkspace({
                               <strong>{page.title}</strong>
                               <span className={styles.meta}>Sample content is live</span>
                             </div>
-                            <Link className="btn secondary" href={'/pages/' + page.id}>
+                            <Link
+                              className="btn secondary"
+                              editorCanvasOrigin={editorCanvasOrigin}
+                              href={'/pages/' + page.id}
+                            >
                               Replace samples
                             </Link>
                           </li>
@@ -356,7 +375,11 @@ export async function SiteWorkspace({
                               <IconPage size={18} />
                             </span>
                             <div className={styles.rowCopy}>
-                              <Link href={'/pages/' + page.id} aria-label={'Open recent change: ' + page.title}>
+                              <Link
+                                editorCanvasOrigin={editorCanvasOrigin}
+                                href={'/pages/' + page.id}
+                                aria-label={'Open recent change: ' + page.title}
+                              >
                                 {page.title}
                               </Link>
                               <span className={styles.meta}>
@@ -426,10 +449,16 @@ export async function SiteWorkspace({
                 canManage={canManagePages}
                 canAdmin={canAdmin && Boolean(pageControls)}
                 initial={pageControls}
+                editorCanvasOrigin={editorCanvasOrigin}
                 liveOrigin={liveOrigin}
               />
             ) : (
-              <PagesTable pages={pages} canManage={canManagePages} liveOrigin={liveOrigin} />
+              <PagesTable
+                editorCanvasOrigin={editorCanvasOrigin}
+                pages={pages}
+                canManage={canManagePages}
+                liveOrigin={liveOrigin}
+              />
             )}
           </section>
         </div>
