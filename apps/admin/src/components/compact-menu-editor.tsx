@@ -5,6 +5,10 @@ import { canAppendMenuItem, dropMenuItem, editMenuItem, moveMenuItem } from '../
 import { Badge, Button, Card, Dialog, Field, Menu, SegmentedControl, SearchableSelect } from './ui/index.ts'
 import { IconDrag, IconMore, IconPlus } from './icons.tsx'
 import styles from './workspace.module.css'
+import reorderStyles from './ui/reorderable-list.module.css'
+import { useReorderableList } from './ui/use-reorderable-list.ts'
+import { DropIndicator, ReorderAnnouncement } from './ui/drop-indicator.tsx'
+import { menuReorderIntent, type MenuMove } from '../lib/menu-reorder-intent.ts'
 type PageChoice = { id: string; title: string; path: string; published: boolean }
 type Editing = { path: string; snapshot: NavTree; fresh: boolean; kind: 'page' | 'url' | 'group' }
 export function CompactMenuEditor({
@@ -22,8 +26,27 @@ export function CompactMenuEditor({
 }) {
   const [editing, setEditing] = useState<Editing | null>(null),
     [removing, setRemoving] = useState<{ path: string; label: string } | null>(null),
-    [labelEdited, setLabelEdited] = useState(false),
-    [drop, setDrop] = useState<string | null>(null)
+    [labelEdited, setLabelEdited] = useState(false)
+  const reorder = useReorderableList({
+    mimeType: 'application/x-cms-menu',
+    decide: point => menuReorderIntent(tree, point),
+    apply: ({ from, to, position }: MenuMove) => {
+      const next = dropMenuItem(tree, from, to, position)
+      if (next === tree) return
+      onChange(next)
+      const target = to.split('.').map(Number)
+      const item = target.length === 1 ? tree[target[0]!] : tree[target[0]!]?.children?.[target[1]!]
+      return 'Moved ' + (position === 'inside' ? 'under ' : position + ' ') + (item?.label || 'the menu item') + '.'
+    },
+  })
+  function keyboardMove(path: string, label: string, action: 'up' | 'down' | 'indent' | 'outdent') {
+    const next = moveMenuItem(tree, path, action)
+    if (next === tree) return
+    onChange(next)
+    const placement =
+      action === 'indent' ? 'under the previous item' : action === 'outdent' ? 'out of the dropdown' : action
+    reorder.announce(`Moved ${label || 'menu item'} ${placement}.`)
+  }
   const node = editing
     ? editing.path
         .split('.')
@@ -89,22 +112,14 @@ export function CompactMenuEditor({
         className={styles.menuRow}
         data-nested={nested || undefined}
         data-hidden={!item.visible || undefined}
-        data-drop-inside={drop === path || undefined}
-        draggable={!disabled}
-        onDragStart={event => event.dataTransfer.setData('application/x-cms-menu', path)}
-        onDragEnd={() => setDrop(null)}
-        onDragOver={event => {
-          if (disabled || !event.dataTransfer.types.includes('application/x-cms-menu')) return
-          event.preventDefault()
-          setDrop(!nested && event.clientX > event.currentTarget.getBoundingClientRect().left + 60 ? path : null)
-        }}
-        onDrop={event => {
-          event.preventDefault()
-          if (disabled) return
-          onChange(dropMenuItem(tree, event.dataTransfer.getData('application/x-cms-menu'), path, drop === path))
-          setDrop(null)
-        }}
+        {...reorder.row(path, disabled)}
       >
+        <DropIndicator row={path} marker={reorder.marker} />
+        {(reorder.blocked ?? reorder.rejection)?.row === path && (
+          <span className={reorderStyles.reason} aria-hidden="true">
+            {(reorder.blocked ?? reorder.rejection)?.message}
+          </span>
+        )}
         <IconDrag size={10} />
         <Button
           variant="tertiary"
@@ -131,14 +146,14 @@ export function CompactMenuEditor({
           <Button
             variant="tertiary"
             disabled={disabled || index === 0}
-            onClick={() => onChange(moveMenuItem(tree, path, 'up'))}
+            onClick={() => keyboardMove(path, item.label, 'up')}
           >
             Move up
           </Button>
           <Button
             variant="tertiary"
             disabled={disabled || index === total - 1}
-            onClick={() => onChange(moveMenuItem(tree, path, 'down'))}
+            onClick={() => keyboardMove(path, item.label, 'down')}
           >
             Move down
           </Button>
@@ -146,7 +161,7 @@ export function CompactMenuEditor({
             <Button
               variant="tertiary"
               disabled={disabled || tree.length >= 50}
-              onClick={() => onChange(moveMenuItem(tree, path, 'outdent'))}
+              onClick={() => keyboardMove(path, item.label, 'outdent')}
             >
               Move out
             </Button>
@@ -159,7 +174,7 @@ export function CompactMenuEditor({
                 Boolean(item.children?.length) ||
                 (tree[index - 1]?.children?.length ?? 0) >= 20
               }
-              onClick={() => onChange(moveMenuItem(tree, path, 'indent'))}
+              onClick={() => keyboardMove(path, item.label, 'indent')}
             >
               Move under previous item
             </Button>
@@ -196,7 +211,7 @@ export function CompactMenuEditor({
             No menu items yet. Add a page, website or dropdown to help visitors find their way.
           </p>
         ) : (
-          <ul className={styles.rowList}>
+          <ul className={styles.rowList + ' ' + reorderStyles.list} data-reorder-list>
             {tree.flatMap((item, index) => [
               row(item, String(index), index, tree.length),
               ...(item.children ?? []).map((child, at) =>
@@ -205,6 +220,7 @@ export function CompactMenuEditor({
             ])}
           </ul>
         )}
+        <ReorderAnnouncement>{reorder.announcement}</ReorderAnnouncement>
       </Card>
       {editing && node && (
         <Dialog

@@ -81,11 +81,11 @@ it('drags between levels without a third level or an empty group', () => {
     { label: 'Two', target: { type: 'url', url: '/two' }, visible: true },
     { label: 'Three', target: { type: 'url', url: '/three' }, visible: true },
   ]
-  const nested = dropMenuItem(tree, '1', '0', true)
+  const nested = dropMenuItem(tree, '1', '0', 'inside')
   expect(nested[0]!.children!.map(item => item.label)).toEqual(['One', 'Two'])
   expect(tree).toHaveLength(3)
-  expect(dropMenuItem(tree, '0', '1', true)).toEqual(tree)
-  const moved = dropMenuItem(tree, '0.0', '2')
+  expect(dropMenuItem(tree, '0', '1', 'inside')).toEqual(tree)
+  const moved = dropMenuItem(tree, '0.0', '2', 'before')
   expect(moved.map(item => item.label)).toEqual(['Two', 'One', 'Three'])
   expect(moved.every(item => !item.dropdownGroup)).toBe(true)
 })

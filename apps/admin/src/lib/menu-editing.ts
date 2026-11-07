@@ -81,35 +81,4 @@ export function canAppendMenuItem(tree: NavTree): boolean {
   return tree.length < 50 && tree.reduce((count, node) => count + 1 + (node.children?.length ?? 0), 0) < 100
 }
 
-/** Drop before a row, or into a root row when the pointer moves right.
- * Reuses the same bounded two-level tree; no page or command is recreated. */
-export function dropMenuItem(tree: NavTree, from: string, to: string, inside = false): NavTree {
-  if (!/^\d+(?:\.\d+)?$/.test(from) || !/^\d+(?:\.\d+)?$/.test(to) || from === to) return tree
-  const a = from.split('.').map(Number),
-    b = to.split('.').map(Number),
-    next = structuredClone(tree)
-  if (!next[a[0]!] || !next[b[0]!]) return tree
-  const sourceParent = a.length === 2 ? next[a[0]!] : null,
-    destinationParent = b.length === 2 ? next[b[0]!] : null
-  const sourceList = sourceParent?.children ?? next,
-    destinationList = inside ? (next[b[0]!]!.children ?? []) : (destinationParent?.children ?? next)
-  const source = sourceList[a.at(-1)!] as NavNode | undefined,
-    destination = (b.length === 2 ? destinationParent?.children?.[b[1]!] : next[b[0]!]) as NavNode | undefined
-  if (!source || !destination || source === destination || source.children?.includes(destination)) return tree
-  const nested = inside || Boolean(destinationParent)
-  if (nested && (source.children?.length || (inside && (b.length !== 1 || (destination.children?.length ?? 0) >= 20))))
-    return tree
-  if (!nested && sourceParent && next.length >= 50) return tree
-  if (nested && !inside && destinationParent !== sourceParent && destinationList.length >= 20) return tree
-  sourceList.splice(a.at(-1)!, 1)
-  if (sourceParent?.children?.length === 0 && sourceParent !== destination && sourceParent !== destinationParent) {
-    if (sourceParent.dropdownGroup) next.splice(next.indexOf(sourceParent), 1)
-    else delete sourceParent.children
-  }
-  if (nested) {
-    const child = { label: source.label, target: source.target, visible: source.visible }
-    if (inside) destination.children = [...(destination.children ?? []), child]
-    else destinationList.splice(destinationList.indexOf(destination), 0, child)
-  } else next.splice(next.indexOf(destination), 0, source)
-  return next
-}
+export { dropMenuItem } from './menu-drop.ts'
