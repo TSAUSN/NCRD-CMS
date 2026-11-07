@@ -1,4 +1,8 @@
 'use client'
+import { useReorderableList } from '../../../../components/ui/use-reorderable-list.ts'
+import { flatReorderIntent, type FlatMove } from '../../../../components/ui/flat-reorder.ts'
+import { DropIndicator, ReorderAnnouncement } from '../../../../components/ui/drop-indicator.tsx'
+import reorderStyles from '../../../../components/ui/reorderable-list.module.css'
 import { createPortal } from 'react-dom'
 import { listItemUnit } from '../../../../lib/list-items.ts'
 import styles from './lists.module.css'
@@ -151,16 +155,19 @@ export function CollectionsWorkspace({
   const [imageFor, setImageFor] = useState<{ entryKey: string; fieldKey: string } | null>(null)
   const [documentFor, setDocumentFor] = useState<{ entryKey: string; fieldKey: string } | null>(null)
   const [uploadedDocuments, setUploadedDocuments] = useState<SiteDocument[]>([])
-  const [dragKey, setDragKey] = useState<string | null>(null)
-  // The dragover handshake must answer synchronously: the first dragover can
-  // arrive before React commits the dragstart state, and an unanswered
-  // dragover forbids the drop. State still drives the styling.
-  const dragKeyRef = useRef<string | null>(null)
   const [pending, startTransition] = useTransition()
   // Pending is committed on the next render. The ref also closes the same-tick
   // gap for repeated submissions, drag/drop and callbacks from open dialogs.
   const actionInFlight = useRef(false)
   const selectionEpoch = useRef(0)
+  const reorder = useReorderableList({
+    mimeType: 'application/x-cms-list-item',
+    decide: point =>
+      busy() || !rights.editEntries
+        ? { status: 'blocked', message: 'Wait for the current changes to finish before moving an item.' }
+        : flatReorderIntent(entries.filter(entry => !entry.archived).map(entryIdentity), point),
+    apply: move => applyEntryMove(move),
+  })
   useEffect(() => {
     selectionEpoch.current += 1
     setCreateOpen(false)
@@ -171,8 +178,7 @@ export function CollectionsWorkspace({
     setSubmitOpen(false)
     setSubmitNote('')
     setPublishOpen(false)
-    dragKeyRef.current = null
-    setDragKey(null)
+    reorder.cancel()
     return () => {
       selectionEpoch.current += 1
     }
@@ -185,8 +191,7 @@ export function CollectionsWorkspace({
   function runAction<T>(work: (isCurrent: () => boolean) => Promise<T>): Promise<T | undefined> | undefined {
     if (busy()) return
     actionInFlight.current = true
-    dragKeyRef.current = null
-    setDragKey(null)
+    reorder.cancel()
     const epoch = selectionEpoch.current
     const isCurrent = () => selectionEpoch.current === epoch
     return new Promise(resolve => {
@@ -374,39 +379,31 @@ export function CollectionsWorkspace({
     setExpanded(entryIdentity(next))
   }
 
-  function moveEntry(key: string, direction: -1 | 1) {
-    if (busy() || !rights.editEntries) return
+  function applyEntryMove({ from, to }: FlatMove) {
+    if (busy() || !rights.editEntries || from === to) return
+    const source = entries.filter(entry => !entry.archived)[from]
+    if (!source || !model) return
+    const key = entryIdentity(source)
     setEntries(current => {
       const active = current.filter(entry => !entry.archived)
-      const index = active.findIndex(entry => entryIdentity(entry) === key)
-      const destination = index + direction
-      if (index < 0 || destination < 0 || destination >= active.length) return current
-      ;[active[index], active[destination]] = [active[destination]!, active[index]!]
-      const ordered = active.map((entry, sortIndex) => ({ ...entry, sortIndex }))
-      return [...ordered, ...current.filter(entry => entry.archived)]
-    })
-  }
-
-  function dropEntry(destinationKey: string) {
-    const sourceKey = dragKeyRef.current
-    dragKeyRef.current = null
-    if (busy() || !rights.editEntries || !sourceKey || sourceKey === destinationKey) {
-      setDragKey(null)
-      return
-    }
-    setEntries(current => {
-      const active = current.filter(entry => !entry.archived)
-      const from = active.findIndex(entry => entryIdentity(entry) === sourceKey)
-      const to = active.findIndex(entry => entryIdentity(entry) === destinationKey)
-      if (from < 0 || to < 0) return current
-      const [dragged] = active.splice(from, 1)
-      active.splice(to, 0, dragged!)
+      if (!active[from] || entryIdentity(active[from]) !== key || !active[to]) return current
+      const [item] = active.splice(from, 1)
+      active.splice(to, 0, item!)
       return [
         ...active.map((entry, sortIndex) => ({ ...entry, sortIndex })),
         ...current.filter(entry => entry.archived),
       ]
     })
-    setDragKey(null)
+    return `Moved ${recordTitle(source, model)} to position ${to + 1}.`
+  }
+
+  function moveEntry(key: string, direction: -1 | 1) {
+    const active = entries.filter(entry => !entry.archived)
+    const from = active.findIndex(entry => entryIdentity(entry) === key)
+    const to = from + direction
+    if (from < 0 || to < 0 || to >= active.length) return
+    const moved = applyEntryMove({ from, to })
+    if (moved) reorder.announce(moved)
   }
 
   function submitForReview() {
@@ -1129,13 +1126,15 @@ export function CollectionsWorkspace({
                       {rights.editEntries && <span />}
                     </div>
                   )}
+                  <ReorderAnnouncement>{reorder.announcement}</ReorderAnnouncement>
                   {visible.length === 0 ? (
                     <EmptyState title={entries.length ? 'No matching items' : 'Add the first ' + noun}>
                       {entries.length ? 'Try another search or filter.' : 'Your list starts as a private draft.'}
                     </EmptyState>
                   ) : (
                     <div
-                      className={styles.results + ' ' + shared.recordRows}
+                      className={styles.results + ' ' + shared.recordRows + ' ' + reorderStyles.list}
+                      data-reorder-list
                       data-view={view}
                       role="list"
                       aria-label={selected.name + ' items'}
@@ -1147,30 +1146,28 @@ export function CollectionsWorkspace({
                             .filter(item => !item.archived)
                             .findIndex(item => entryIdentity(item) === key),
                           photo = imagePreview(recordImage(entry, model), availableMedia)
+                        const dragRow = reorder.row(key, !rights.editEntries || pending || entry.archived)
                         return (
                           <article
                             key={key}
                             role="listitem"
                             className={styles.item + ' ' + shared.recordRow}
                             data-selected={checked.includes(key)}
-                            draggable={rights.editEntries && !pending && !entry.archived}
+                            {...dragRow}
                             onDragStart={event => {
                               if (busy()) {
                                 event.preventDefault()
                                 return
                               }
-                              dragKeyRef.current = key
-                              setDragKey(key)
+                              dragRow.onDragStart(event)
                             }}
-                            onDragEnd={() => {
-                              dragKeyRef.current = null
-                              setDragKey(null)
-                            }}
-                            onDragOver={event => {
-                              if (!busy() && rights.editEntries && dragKeyRef.current) event.preventDefault()
-                            }}
-                            onDrop={() => dropEntry(key)}
                           >
+                            <DropIndicator marker={reorder.marker} row={key} />
+                            {(reorder.blocked ?? reorder.rejection)?.row === key && (
+                              <span className={reorderStyles.reason} aria-hidden="true">
+                                {(reorder.blocked ?? reorder.rejection)?.message}
+                              </span>
+                            )}
                             {rights.editEntries && (
                               <label className={styles.select + ' ' + shared.checkRow}>
                                 <input

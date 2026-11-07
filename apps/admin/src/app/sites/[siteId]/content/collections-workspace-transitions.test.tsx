@@ -288,7 +288,17 @@ describe('collection workspace pending mutation boundary', () => {
     const save = deferred<typeof success>()
     harness.save.mockReturnValue(save.promise)
     const sourceDrag = elements(tree).find(element => element.type === 'article' && element.props.onDragStart)!
-    sourceDrag.props.onDragStart({ preventDefault: vi.fn() })
+    const dataTransfer = { setData: vi.fn(), effectAllowed: '', types: ['application/x-cms-list-item'] }
+    const dragEvent = {
+      preventDefault: vi.fn(),
+      stopPropagation: vi.fn(),
+      clientX: 40,
+      clientY: 20,
+      currentTarget: { closest: () => null },
+      dataTransfer,
+    }
+    sourceDrag.props.onDragStart(dragEvent)
+    expect(dataTransfer.setData).toHaveBeenCalledOnce()
     button(tree, 'Save draft').props.onClick({ currentTarget: { focus: () => {} } })
     const savedSnapshot = harness.save.mock.calls[0]![0].get('entries')
     button(tree, 'Save draft').props.onClick({ currentTarget: { focus: () => {} } })
@@ -301,7 +311,7 @@ describe('collection workspace pending mutation boundary', () => {
       button(tree, name).props.onClick({ currentTarget: { focus: () => {} } })
     elements(tree)
       .find(element => element.type === 'article' && element.props.onDrop)
-      ?.props.onDrop()
+      ?.props.onDrop(dragEvent)
     const link = elements(tree).find(element => element.props.href === '/sites/site-one/content?all=1')!
     const event = { preventDefault: vi.fn() }
     link.props.onClick(event)
