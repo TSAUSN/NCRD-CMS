@@ -6,7 +6,7 @@ import { STORY_SECTORS, STORY_REGIONS } from '@cms/seeds/sawso-stories'
 import { FooterConfig, NavTree, chapterDestinationLabel, type ChapterSetup } from '@cms/schema'
 import { menuChangeWords, footerLinkChangeWords } from './page-list-links.ts'
 import { asUser } from '@cms/platform'
-import { getCollectionWorkspace } from './collection-queries.ts'
+import { getCollectionSelections } from './collection-queries.ts'
 import {
   changedCells,
   pageChangePresentation,
@@ -15,6 +15,26 @@ import {
   type ReleasePresentation,
 } from './release-copy.ts'
 import type { ReleaseItem } from './releases.ts'
+
+type ReleasePageContent = Parameters<typeof pageChangePresentation>[1]
+type PinnedPage = {
+  page_id: string
+  version_id: string
+  published_version_id: string | null
+  content: ReleasePageContent
+  meta: Record<string, unknown> | null
+  page_title: string
+  page_slug: string
+  carries_trusted_code: boolean
+  trusted_code_approved_by: string | null
+  live_content: ReleasePageContent | null
+  live_meta: Record<string, unknown> | null
+  live_title: string | null
+  live_slug: string | null
+  live_trusted_code: boolean | null
+  live_approved_by: string | null
+}
+type PinnedChapter = { page_version_id: string; draft: ChapterSetup; live: ChapterSetup | null }
 
 function chapterSetupCells(before: ChapterSetup | null, after: ChapterSetup) {
   return [
@@ -91,25 +111,42 @@ export async function releasePresentations(
         [siteId],
       )
     ).rows[0]
+    const pageItems = items.filter(item => item.type === 'page' && item.versionId !== null)
+    const versionIds = [...new Set(pageItems.map(item => item.versionId))]
+    const pageIds = [...new Set(pageItems.map(item => item.id))]
+    const pageRows = new Map<string, PinnedPage>()
+    const chapterRows = new Map<string, PinnedChapter>()
+    if (pageItems.length) {
+      const { rows } = await client.query<PinnedPage>(
+        `SELECT p.id AS page_id,d.id AS version_id,p.published_version_id,d.content,d.meta,d.page_title,d.page_slug,d.carries_trusted_code,d.trusted_code_approved_by,
+          l.content AS live_content,l.meta AS live_meta,l.page_title AS live_title,l.page_slug AS live_slug,l.carries_trusted_code AS live_trusted_code,l.trusted_code_approved_by AS live_approved_by
+          FROM pages p JOIN page_versions d ON d.page_id=p.id AND d.id=ANY($2::uuid[]) LEFT JOIN page_versions l ON l.id=p.published_version_id
+          WHERE p.site_id=$1 AND p.id=ANY($3::uuid[])`,
+        [siteId, versionIds, pageIds],
+      )
+      for (const row of rows) pageRows.set(`${row.page_id}:${row.version_id}`, row)
+      // A pin references one immutable chapter version. RLS still controls
+      // whether the caller can see the contact and setup details it contains.
+      const chapters = await client.query<PinnedChapter>(
+        `SELECT pin.page_version_id,d.config AS draft,l.config AS live FROM chapter_page_versions pin
+             JOIN chapters c ON c.id=pin.chapter_id AND c.site_id=pin.site_id
+             JOIN chapter_versions d ON d.id=pin.chapter_version_id
+             LEFT JOIN chapter_versions l ON l.id=c.published_version_id
+             WHERE pin.page_version_id=ANY($2::uuid[]) AND pin.site_id=$1`,
+        [siteId, [...new Set(rows.map(row => row.version_id))]],
+      )
+      for (const row of chapters.rows) chapterRows.set(row.page_version_id, row)
+    }
+    const candidateSettings = items.some(item => item.type === 'site_settings')
+      ? numberSettings?.draft
+      : numberSettings?.live
     for (const item of items) {
       if (item.type === 'page') {
-        const row = (
-          await client.query(
-            `SELECT p.published_version_id,d.content,d.meta,d.page_title,d.page_slug,d.carries_trusted_code,d.trusted_code_approved_by,
-          l.content AS live_content,l.meta AS live_meta,l.page_title AS live_title,l.page_slug AS live_slug,l.carries_trusted_code AS live_trusted_code,l.trusted_code_approved_by AS live_approved_by
-          FROM pages p JOIN page_versions d ON d.id=$3 AND d.page_id=p.id LEFT JOIN page_versions l ON l.id=p.published_version_id
-          WHERE p.id=$1 AND p.site_id=$2`,
-            [item.id, siteId, item.versionId],
-          )
-        ).rows[0]
+        const row = pageRows.get(`${item.id}:${item.versionId}`)
         if (!row) continue
         const presentation = pageChangePresentation(
           row.published_version_id ? resolvedDataSections(row.live_content ?? [], forms, numberSettings?.live) : null,
-          resolvedDataSections(
-            row.content,
-            forms,
-            items.some(item => item.type === 'site_settings') ? numberSettings?.draft : numberSettings?.live,
-          ),
+          resolvedDataSections(row.content, forms, candidateSettings),
           forms,
           row.published_version_id
             ? { title: row.live_title, address: row.live_slug, description: row.live_meta?.description }
@@ -120,16 +157,7 @@ export async function releasePresentations(
         // pinned to that exact page version. Its current draft may be newer.
         // Read through the caller's existing RLS; private contact fields remain
         // unavailable to whole-site Editors and other sites.
-        const chapter = (
-          await client.query(
-            `SELECT d.config AS draft,l.config AS live FROM chapter_page_versions pin
-             JOIN chapters c ON c.id=pin.chapter_id AND c.site_id=pin.site_id
-             JOIN chapter_versions d ON d.id=pin.chapter_version_id
-             LEFT JOIN chapter_versions l ON l.id=c.published_version_id
-             WHERE pin.page_version_id=$1 AND pin.site_id=$2`,
-            [item.versionId, siteId],
-          )
-        ).rows[0]
+        const chapter = item.versionId ? chapterRows.get(item.versionId) : undefined
         const chapterCells = chapter ? chapterSetupCells(chapter.live, chapter.draft) : []
         if (chapterCells.length) {
           const changes = chapterCells.map(cell => ({ text: 'Chapter setup: ' + cell.label + ' changed' }))
@@ -325,8 +353,10 @@ export async function releasePresentations(
       }
     }
   })
-  for (const id of new Set(items.filter(item => item.type.startsWith('collection_')).map(item => item.id))) {
-    const list = (await getCollectionWorkspace(userId, siteId, id)).selected
+  const collectionIds = [...new Set(items.filter(item => item.type.startsWith('collection_')).map(item => item.id))]
+  const collections = await getCollectionSelections(userId, siteId, collectionIds)
+  for (const id of collectionIds) {
+    const list = collections.get(id)
     if (!list) continue
     for (const item of items.filter(item => item.id === id && item.type.startsWith('collection_'))) {
       if (item.type === 'collection_schema') {

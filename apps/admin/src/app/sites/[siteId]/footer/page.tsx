@@ -6,7 +6,7 @@ import {
   getSite,
   getGlobalElementsWorkspace,
   getNavigationWorkspace,
-  getThemeWorkspace,
+  getDraftTheme,
   canManageTheme,
   listMediaAssets,
   roleLabel,
@@ -25,7 +25,7 @@ export default async function FooterPage({ params }: { params: Promise<{ siteId:
   const [frame, menu, theme, allowed, media, role] = await Promise.all([
     getGlobalElementsWorkspace(user, siteId),
     getNavigationWorkspace(user, siteId),
-    getThemeWorkspace(user, siteId),
+    getDraftTheme(user, siteId),
     canManageTheme(user, siteId),
     listMediaAssets(user, siteId),
     roleLabel(user),
@@ -40,7 +40,7 @@ export default async function FooterPage({ params }: { params: Promise<{ siteId:
           siteName={site.name}
           initial={frame}
           navigation={menu}
-          theme={theme.draft}
+          theme={theme}
           media={media.filter(item => item.status === 'ready' && !item.deletedAt)}
           superAdmin={session.principal.isSuperAdmin}
           origin={publicSiteOrigin(site.staging_hostname)}

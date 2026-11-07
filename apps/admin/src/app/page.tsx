@@ -10,8 +10,7 @@ import { navigationFor } from '../components/nav.ts'
 import { HealthChip, type HealthLabel } from '../components/status.tsx'
 import { EntryPanel } from '../components/entry.tsx'
 import { listWorkspacePages } from '../lib/workspace-queries.ts'
-import { listReviewSubmissions } from '../lib/review-queries.ts'
-import { listCollectionReviews } from '../lib/collection-review.ts'
+import { homeReviewCounts } from '../lib/home-review-counts.ts'
 import { Card, Disclosure } from '../components/ui/index.ts'
 import styles from '../components/workspace.module.css'
 import { SiteCard } from '../components/site-card.tsx'
@@ -34,12 +33,11 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
     )
   }
 
-  const [sites, role, pages, reviews, listReviews] = await Promise.all([
+  const [sites, role, pages, reviewCounts] = await Promise.all([
     listSites(session.principal.userId),
     roleLabel(session.principal.userId),
     listWorkspacePages(session.principal.userId),
-    listReviewSubmissions(session.principal.userId, { includeDecided: false }),
-    listCollectionReviews(session.principal.userId),
+    homeReviewCounts(session.principal.userId),
   ])
   // Queue internals are an operator surface. Editors need an editorial
   // overview, while a super admin still gets the exact worker evidence needed
@@ -81,10 +79,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
             })
           : null
       if (full && selected.has_stories && !stories) storyError = true
-      const ownReviews =
-        reviews.filter(review => review.siteId === selected.id && review.canReview).length +
-        listReviews.filter(review => review.siteId === selected.id && review.status === 'open' && review.canReview)
-          .length
+      const ownReviews = (reviewCounts.pages.get(selected.id) ?? 0) + (reviewCounts.lists.get(selected.id) ?? 0)
       return (
         <EditorHome
           email={session.email}
@@ -118,27 +113,22 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
         reviewCounts={Object.fromEntries(
           activeSites.map(site => [
             site.id,
-            reviews.filter(review => review.siteId === site.id && review.canReview).length +
-              listReviews.filter(review => review.siteId === site.id && review.status === 'open' && review.canReview)
-                .length,
+            (reviewCounts.pages.get(site.id) ?? 0) + (reviewCounts.lists.get(site.id) ?? 0),
           ]),
         )}
         operations={operations ? <BackgroundJobs heartbeat={operations[0][0]} queue={operations[1]} /> : null}
       />
     )
   const recent = [...pages].sort((a, b) => Date.parse(b.edited_at) - Date.parse(a.edited_at)).slice(0, 6)
-  const reviewCount =
-    reviews.filter(review => review.canReview).length +
-    listReviews.filter(review => review.status === 'open' && review.canReview).length
+  const total = (counts: Map<string, number>) => [...counts.values()].reduce((sum, count) => sum + count, 0)
+  const reviewCount = total(reviewCounts.pages) + total(reviewCounts.lists)
 
   const attention = activeSites
     .map(site => ({
       site,
       changed: Number(site.changed_count),
       samples: pages.filter(page => page.site_id === site.id && page.live_samples).length,
-      reviews:
-        reviews.filter(review => review.siteId === site.id && review.canReview).length +
-        listReviews.filter(review => review.siteId === site.id && review.status === 'open' && review.canReview).length,
+      reviews: (reviewCounts.pages.get(site.id) ?? 0) + (reviewCounts.lists.get(site.id) ?? 0),
     }))
     .filter(item => item.changed || item.samples || item.reviews)
     .sort(

@@ -276,6 +276,20 @@ export function canManageNavigation(userId: string, siteId: string): Promise<boo
   )
 }
 
+/** Header and Footer need the normalized draft, without page usage counts. */
+export function getDraftTheme(userId: string, siteId: string): Promise<ThemeTokenValues | null> {
+  return asUser({ userId }, async client => {
+    const { rows } = await client.query<{ draft: unknown }>(
+      `SELECT draft.tokens AS draft
+         FROM themes t
+         JOIN theme_versions draft ON draft.id = t.draft_version_id
+        WHERE t.site_id = $1`,
+      [siteId],
+    )
+    return rows[0] ? ThemeTokens.parse(rows[0].draft) : null
+  })
+}
+
 export type ThemeUsage = Record<string, number>
 export type ThemeWorkspace = {
   id: string

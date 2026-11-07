@@ -52,11 +52,14 @@ export async function SiteWorkspace({
   const siteRole = session.principal.memberships.get(site.id)
   const scopedOnly = !session.principal.isSuperAdmin && !session.principal.memberships.has(site.id)
   const canManagePages = session.principal.isSuperAdmin || siteRole === 'editor' || siteRole === 'site_admin'
+  const nativePages = area === 'pages' && !site.original_design
+  // The native overview and native pages use neither the library nor its cards.
+  const needsLibrary = canManagePages && (area === 'overview' ? site.original_design : !nativePages)
   const [pages, archivedPages, role, library, reviews, lists] = await Promise.all([
     listWorkspacePages(session.principal.userId, siteId),
     canManagePages ? listArchivedPages(session.principal.userId, siteId) : Promise.resolve([]),
     roleLabel(session.principal.userId),
-    canManagePages
+    needsLibrary
       ? listSectionLibrary(session.principal.userId, site.id).then(entries =>
           entries.filter(entry => (entry.placement ?? 'page') === 'page'),
         )
@@ -66,8 +69,7 @@ export async function SiteWorkspace({
       ? getCollectionWorkspace(session.principal.userId, siteId)
       : Promise.resolve(null),
   ])
-  const nativePages = area === 'pages' && !site.original_design,
-    canAdmin = session.principal.isSuperAdmin || siteRole === 'site_admin'
+  const canAdmin = session.principal.isSuperAdmin || siteRole === 'site_admin'
   let pageControlError = false
   const pageControls =
     !site.original_design && !scopedOnly

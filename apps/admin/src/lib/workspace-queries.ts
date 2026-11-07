@@ -20,21 +20,29 @@ export const WORKSPACE_PAGES_SQL = `SELECT p.id,p.site_id,s.name AS site_name,p.
  COALESCE(v.created_at,p.created_at)::text AS edited_at,
  CASE WHEN v.author_id=app.current_user_id() THEN 'You' ELSE 'Another editor' END AS edited_by,
  COALESCE(jsonb_path_exists(live.content, '$[*].values.__cms_sample_fields[*]'),false) AS live_samples,
- COALESCE((SELECT nv.tree FROM navigations n JOIN navigation_versions nv ON nv.id=n.draft_version_id WHERE n.site_id=p.site_id),'[]'::jsonb) AS menu_tree
+ CASE WHEN row_number() OVER(PARTITION BY p.site_id ORDER BY p.id)=1 THEN
+   COALESCE((SELECT nv.tree FROM navigations n JOIN navigation_versions nv ON nv.id=n.draft_version_id WHERE n.site_id=p.site_id),'[]'::jsonb) END AS menu_tree
  FROM pages p JOIN sites s ON s.id=p.site_id LEFT JOIN page_versions v ON v.id=p.draft_version_id
  LEFT JOIN page_versions live ON live.id=p.published_version_id
  WHERE p.archived_at IS NULL AND s.status<>'archived' AND ($1::uuid IS NULL OR p.site_id=$1)
  ORDER BY p.sort_index,p.slug<>'',p.title`
 export async function listWorkspacePages(userId: string, siteId: string | null = null): Promise<WorkspacePage[]> {
-  const pages = await asUser({ userId }, async client =>
-    (
-      await client.query<Omit<WorkspacePage, 'in_menu'> & { menu_tree: unknown }>(WORKSPACE_PAGES_SQL, [siteId])
-    ).rows.map(({ menu_tree, ...row }) => ({
+  const pages = await asUser({ userId }, async client => {
+    const { rows } = await client.query<Omit<WorkspacePage, 'in_menu'> & { menu_tree: unknown }>(WORKSPACE_PAGES_SQL, [
+      siteId,
+    ])
+    // The query sends each visible site's draft menu once, in the same read
+    // snapshot as its pages. Parse it once even when a site has many pages.
+    const menus = new Map<string, ReturnType<typeof NavTree.parse>>()
+    for (const row of rows) {
+      if (row.menu_tree !== null) menus.set(row.site_id, NavTree.parse(row.menu_tree))
+    }
+    return rows.map(({ menu_tree: _menu, ...row }) => ({
       ...row,
       edited_at: new Date(row.edited_at).toISOString(),
-      in_menu: pageInMenu(NavTree.parse(menu_tree), row.id),
-    })),
-  )
+      in_menu: pageInMenu(menus.get(row.site_id)!, row.id),
+    }))
+  })
   const sites = [
     ...new Set(
       pages

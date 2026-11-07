@@ -1,5 +1,5 @@
 import 'server-only'
-import { asUser } from '@cms/platform'
+import { asUser, type Queryable } from '@cms/platform'
 import { CollectionModel, type CollectionEntryDraft, type CollectionModel as CollectionModelValue } from '@cms/schema'
 import type { SiteDocument } from './document-library.ts'
 
@@ -117,109 +117,155 @@ function summary(row: SummaryRow): CollectionSummary {
   }
 }
 
-/**
- * One RLS-scoped read model for the collection rail and the open collection.
- * Entry bodies are fetched only for the selected collection; a 2,000-entry
- * catalogue therefore does not multiply by every collection in the rail.
- */
+type SelectedCollection = NonNullable<CollectionWorkspace['selected']>
+
+async function readCollectionRail(client: Queryable, siteId: string) {
+  const { rows } = await client.query<SummaryRow>(
+    `SELECT c.id, c.slug, c.reader_key, c.name, c.source, c.revision,
+            c.entry_revision, c.published_entry_revision,
+            c.draft_schema_version_id, c.published_schema_version_id,
+            draft.fields AS draft_fields, draft.sort AS draft_sort,
+            live.fields AS published_fields, live.sort AS published_sort,
+            count(e.id) FILTER (WHERE e.archived_at IS NULL)::text AS total_entries,
+            count(e.id) FILTER (WHERE e.published_archived_at IS NULL AND e.published_version_id IS NOT NULL)::text AS live_entries,
+            count(e.id) FILTER (
+              WHERE (e.published_version_id IS NULL AND e.archived_at IS NULL)
+                 OR (e.published_version_id IS NOT NULL AND (
+                    entry_draft.values IS DISTINCT FROM entry_live.values
+                 OR entry_draft.schema_version_id IS DISTINCT FROM entry_live.schema_version_id
+                 OR e.sort_index IS DISTINCT FROM e.published_sort_index
+                 OR (e.archived_at IS NULL) IS DISTINCT FROM (e.published_archived_at IS NULL)))
+            )::text AS changed_entries
+       FROM collections c
+       LEFT JOIN collection_schema_versions draft ON draft.id = c.draft_schema_version_id
+       LEFT JOIN collection_schema_versions live ON live.id = c.published_schema_version_id
+       LEFT JOIN collection_entries e ON e.collection_id = c.id
+       LEFT JOIN collection_entry_versions entry_draft ON entry_draft.id = e.draft_version_id
+       LEFT JOIN collection_entry_versions entry_live ON entry_live.id = e.published_version_id
+      WHERE c.site_id = $1
+      GROUP BY c.id, draft.fields, draft.sort, live.fields, live.sort
+      ORDER BY lower(c.name), c.created_at`,
+    [siteId],
+  )
+  const usage = (
+    await client.query<{ id: string; pages: { id: string; title: string }[] }>(
+      `SELECT c.id,COALESCE(jsonb_agg(DISTINCT jsonb_build_object('id',p.id,'title',p.title)) FILTER(WHERE p.id IS NOT NULL),'[]'::jsonb) AS pages
+    FROM collections c LEFT JOIN pages p ON p.site_id=c.site_id AND p.archived_at IS NULL AND EXISTS(SELECT 1 FROM page_versions v WHERE v.id IN(p.draft_version_id,p.published_version_id) AND jsonb_path_exists(v.content,'$[*].values.* ? (@.readerKey == $reader)',jsonb_build_object('reader',c.reader_key))) WHERE c.site_id=$1 GROUP BY c.id`,
+      [siteId],
+    )
+  ).rows
+  const collections = rows.map(row => ({
+    ...summary(row),
+    usedOn: usage.find(item => item.id === row.id)?.pages ?? [],
+  }))
+  return { rows, collections }
+}
+
+async function readCollectionEntries(client: Queryable, ids: string[]) {
+  const { rows } = await client.query<{
+    id: string
+    collection_id: string
+    stable_key: string
+    revision: string
+    sort_index: number
+    published_sort_index: number | null
+    edited_at: string
+    edited_by: string
+    draft_schema_version_id: string | null
+    draft_values: unknown
+    published_values: unknown
+    archived_at: Date | null
+    published_archived_at: Date | null
+  }>(
+    `SELECT e.id, e.collection_id, e.stable_key, e.revision, e.sort_index, e.published_sort_index, draft.created_at::text AS edited_at, CASE WHEN draft.author_id=app.current_user_id() THEN 'You' ELSE 'Another editor' END AS edited_by,
+            draft.schema_version_id AS draft_schema_version_id, draft.values AS draft_values, live.values AS published_values,
+            e.archived_at, e.published_archived_at
+       FROM collection_entries e
+       LEFT JOIN collection_entry_versions draft ON draft.id = e.draft_version_id
+       LEFT JOIN collection_entry_versions live ON live.id = e.published_version_id
+      WHERE e.collection_id = ANY($1::uuid[])
+      ORDER BY e.collection_id, e.archived_at NULLS FIRST, e.sort_index, e.created_at, e.id`,
+    [ids],
+  )
+  return rows
+}
+
+function collectionSelection(
+  selectedRow: SummaryRow,
+  collection: CollectionSummary,
+  entries: Awaited<ReturnType<typeof readCollectionEntries>>,
+): SelectedCollection {
+  return {
+    ...collection,
+    draft: parseStoredModel(selectedRow.draft_fields, selectedRow.draft_sort),
+    published:
+      selectedRow.published_schema_version_id === null
+        ? null
+        : parseStoredModel(selectedRow.published_fields, selectedRow.published_sort),
+    entries: entries.map(entry => ({
+      id: entry.id,
+      stableKey: entry.stable_key,
+      editedAt: new Date(entry.edited_at).toISOString(),
+      editedBy: entry.edited_by,
+      schemaVersionId: entry.draft_schema_version_id,
+      revision: Number(entry.revision),
+      sortIndex: entry.sort_index,
+      publishedSortIndex: entry.published_sort_index,
+      values: (entry.draft_values ?? {}) as Record<string, unknown>,
+      publishedValues: entry.published_values === null ? null : (entry.published_values as Record<string, unknown>),
+      archived: entry.archived_at !== null,
+      publishedArchived: entry.published_archived_at !== null,
+    })),
+  }
+}
+
+/** Load entries only for the selected collection; the rail remains a summary. */
 export function getCollectionWorkspace(
   userId: string,
   siteId: string,
   requestedCollectionId?: string,
 ): Promise<CollectionWorkspace> {
   return asUser({ userId }, async client => {
-    const { rows } = await client.query<SummaryRow>(
-      `SELECT c.id, c.slug, c.reader_key, c.name, c.source, c.revision,
-              c.entry_revision, c.published_entry_revision,
-              c.draft_schema_version_id, c.published_schema_version_id,
-              draft.fields AS draft_fields, draft.sort AS draft_sort,
-              live.fields AS published_fields, live.sort AS published_sort,
-              count(e.id) FILTER (WHERE e.archived_at IS NULL)::text AS total_entries,
-              count(e.id) FILTER (WHERE e.published_archived_at IS NULL AND e.published_version_id IS NOT NULL)::text AS live_entries,
-              count(e.id) FILTER (
-                WHERE (e.published_version_id IS NULL AND e.archived_at IS NULL)
-                   OR (e.published_version_id IS NOT NULL AND (
-                      entry_draft.values IS DISTINCT FROM entry_live.values
-                   OR entry_draft.schema_version_id IS DISTINCT FROM entry_live.schema_version_id
-                   OR e.sort_index IS DISTINCT FROM e.published_sort_index
-                   OR (e.archived_at IS NULL) IS DISTINCT FROM (e.published_archived_at IS NULL)))
-              )::text AS changed_entries
-         FROM collections c
-         LEFT JOIN collection_schema_versions draft ON draft.id = c.draft_schema_version_id
-         LEFT JOIN collection_schema_versions live ON live.id = c.published_schema_version_id
-         LEFT JOIN collection_entries e ON e.collection_id = c.id
-         LEFT JOIN collection_entry_versions entry_draft ON entry_draft.id = e.draft_version_id
-         LEFT JOIN collection_entry_versions entry_live ON entry_live.id = e.published_version_id
-        WHERE c.site_id = $1
-        GROUP BY c.id, draft.fields, draft.sort, live.fields, live.sort
-        ORDER BY lower(c.name), c.created_at`,
-      [siteId],
-    )
-    const usage = (
-      await client.query<{ id: string; pages: { id: string; title: string }[] }>(
-        `SELECT c.id,COALESCE(jsonb_agg(DISTINCT jsonb_build_object('id',p.id,'title',p.title)) FILTER(WHERE p.id IS NOT NULL),'[]'::jsonb) AS pages
-      FROM collections c LEFT JOIN pages p ON p.site_id=c.site_id AND p.archived_at IS NULL AND EXISTS(SELECT 1 FROM page_versions v WHERE v.id IN(p.draft_version_id,p.published_version_id) AND jsonb_path_exists(v.content,'$[*].values.* ? (@.readerKey == $reader)',jsonb_build_object('reader',c.reader_key))) WHERE c.site_id=$1 GROUP BY c.id`,
-        [siteId],
-      )
-    ).rows
-    const collections = rows.map(row => ({
-      ...summary(row),
-      usedOn: usage.find(item => item.id === row.id)?.pages ?? [],
-    }))
-    const selectedRow = rows.find(row => row.id === requestedCollectionId) ?? rows[0] ?? null
-    if (!selectedRow || selectedRow.draft_schema_version_id === null) {
-      return { collections, selected: null }
-    }
-
-    const entryRows = await client.query<{
-      id: string
-      stable_key: string
-      revision: string
-      sort_index: number
-      published_sort_index: number | null
-      edited_at: string
-      edited_by: string
-      draft_schema_version_id: string | null
-      draft_values: unknown
-      published_values: unknown
-      archived_at: Date | null
-      published_archived_at: Date | null
-    }>(
-      `SELECT e.id, e.stable_key, e.revision, e.sort_index, e.published_sort_index, draft.created_at::text AS edited_at, CASE WHEN draft.author_id=app.current_user_id() THEN 'You' ELSE 'Another editor' END AS edited_by,
-              draft.schema_version_id AS draft_schema_version_id, draft.values AS draft_values, live.values AS published_values,
-              e.archived_at, e.published_archived_at
-         FROM collection_entries e
-         LEFT JOIN collection_entry_versions draft ON draft.id = e.draft_version_id
-         LEFT JOIN collection_entry_versions live ON live.id = e.published_version_id
-        WHERE e.collection_id = $1
-        ORDER BY e.archived_at NULLS FIRST, e.sort_index, e.created_at, e.id`,
-      [selectedRow.id],
-    )
+    const { rows, collections } = await readCollectionRail(client, siteId)
+    const selected = rows.find(row => row.id === requestedCollectionId) ?? rows[0]
+    if (!selected?.draft_schema_version_id) return { collections, selected: null }
+    const entries = await readCollectionEntries(client, [selected.id])
     return {
       collections,
-      selected: {
-        ...collections.find(item => item.id === selectedRow.id)!,
-        draft: parseStoredModel(selectedRow.draft_fields, selectedRow.draft_sort),
-        published:
-          selectedRow.published_schema_version_id === null
-            ? null
-            : parseStoredModel(selectedRow.published_fields, selectedRow.published_sort),
-        entries: entryRows.rows.map(entry => ({
-          id: entry.id,
-          stableKey: entry.stable_key,
-          editedAt: new Date(entry.edited_at).toISOString(),
-          editedBy: entry.edited_by,
-          schemaVersionId: entry.draft_schema_version_id,
-          revision: Number(entry.revision),
-          sortIndex: entry.sort_index,
-          publishedSortIndex: entry.published_sort_index,
-          values: (entry.draft_values ?? {}) as Record<string, unknown>,
-          publishedValues: entry.published_values === null ? null : (entry.published_values as Record<string, unknown>),
-          archived: entry.archived_at !== null,
-          publishedArchived: entry.published_archived_at !== null,
-        })),
-      },
+      selected: collectionSelection(selected, collections.find(item => item.id === selected.id)!, entries),
     }
+  })
+}
+
+/** Release comparisons use one rail and one entry batch for all requested lists. */
+export function getCollectionSelections(userId: string, siteId: string, requestedIds: readonly string[]) {
+  if (!requestedIds.length) return Promise.resolve(new Map<string, SelectedCollection>())
+  return asUser({ userId }, async client => {
+    const { rows, collections } = await readCollectionRail(client, siteId)
+    const byId = new Map(rows.map(row => [row.id, row]))
+    const selected = new Map(
+      requestedIds.flatMap(id => {
+        // A missing requested list uses the same first visible list as the workspace.
+        const row = byId.get(id) ?? rows[0]
+        return row?.draft_schema_version_id ? [[id, row] as const] : []
+      }),
+    )
+    const ids = [...new Set([...selected.values()].map(row => row.id))]
+    if (!ids.length) return new Map<string, SelectedCollection>()
+    const entries = await readCollectionEntries(client, ids)
+    const entriesById = new Map<string, typeof entries>()
+    for (const entry of entries) {
+      const owned = entriesById.get(entry.collection_id)
+      if (owned) owned.push(entry)
+      else entriesById.set(entry.collection_id, [entry])
+    }
+    const summaries = new Map(collections.map(item => [item.id, item]))
+    return new Map(
+      [...selected].map(([id, row]) => [
+        id,
+        collectionSelection(row, summaries.get(row.id)!, entriesById.get(row.id) ?? []),
+      ]),
+    )
   })
 }
 
