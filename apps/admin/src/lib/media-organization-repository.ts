@@ -1,5 +1,6 @@
 import 'server-only'
 import { asUser } from '@cms/platform'
+import { MEDIA_FILTER_SQL, MEDIA_FACETS_SQL, mediaLibraryPageSql } from './media-library-queries.ts'
 import type {
   MediaAsset,
   MediaLibraryQuery,
@@ -44,26 +45,6 @@ type UsageRow = {
   is_current_live: boolean
   href: string | null
   created_at: Date
-}
-
-const FILTER_SQL = `
-  (m.site_id = $1 OR m.site_id IS NULL)
-  AND ($2 = '' OR
-    position(lower($2) in lower(coalesce(m.original_name,''))) > 0 OR
-    to_tsvector('simple', coalesce(m.original_name,'') || ' ' || coalesce(m.alt_text,'') || ' '
-      || coalesce(m.folder,'') || ' ' || coalesce(m.attribution,'') || ' ' || coalesce(m.source,''))
-      @@ websearch_to_tsquery('simple', $2)
-    OR EXISTS (SELECT 1 FROM unnest(m.tags) t WHERE position(lower($2) in lower(t)) > 0))
-  AND ($3 = 'all' OR m.status::text = $3)
-  AND ($4 = 'all' OR ($4 = 'site' AND m.site_id = $1) OR ($4 = 'shared' AND m.site_id IS NULL))
-  AND ($5 = '' OR m.folder = $5 OR starts_with(m.folder, $5 || '/'))
-  AND ($6 = '' OR m.tags @> ARRAY[$6]::text[])`
-
-const ORDER_SQL: Record<MediaLibraryQuery['sort'], string> = {
-  newest: "(m.status = 'deleted'), m.created_at DESC, m.id DESC",
-  oldest: "(m.status = 'deleted'), m.created_at, m.id",
-  'name-asc': "(m.status = 'deleted'), lower(m.original_name), m.id",
-  'name-desc': "(m.status = 'deleted'), lower(m.original_name) DESC, m.id DESC",
 }
 
 function focalPoint(value: unknown): { x: number; y: number } | null {
@@ -119,54 +100,28 @@ export function listMediaLibrary(
   return asUser({ userId }, async client => {
     const args = [siteId, query.search, query.status, query.scope, query.folder, query.tag]
     const total = Number(
-      (await client.query<{ count: string }>(`SELECT count(*) FROM media m WHERE ${FILTER_SQL}`, args)).rows[0]
+      (await client.query<{ count: string }>(`SELECT count(*) FROM media m WHERE ${MEDIA_FILTER_SQL}`, args)).rows[0]
         ?.count ?? 0,
     )
     const pageCount = Math.max(1, Math.ceil(total / query.pageSize))
     const page = Math.min(query.page, pageCount)
-    const rows = await client.query<MediaRow>(
-      `SELECT m.id,m.revision,m.site_id,m.original_name,m.alt_text,m.decorative,m.focal,
-              m.width,m.height,m.bytes,m.mime_type,m.status,m.folder,m.attribution,m.source,m.tags,
-              m.created_at,m.deleted_at,
-              count(DISTINCT u.item_id)::int AS used_on_items,
-              count(DISTINCT u.version_id)::int AS used_in_versions,
-              coalesce(bool_or(v.kind='thumbnail'),false) AS has_thumbnail,
-              coalesce(bool_or(v.kind='card'),false) AS has_card,
-              coalesce(bool_or(v.kind='wide'),false) AS has_wide
-         FROM media m
-         LEFT JOIN (SELECT media_id,item_id,version_id FROM media_usage
-           UNION ALL SELECT media_id,site_id,version_id FROM site_file_media_usage) u ON u.media_id=m.id
-         LEFT JOIN media_variants v ON v.media_id=m.id
-        WHERE ${FILTER_SQL}
-        GROUP BY m.id
-        ORDER BY ${ORDER_SQL[query.sort]}
-        LIMIT $7 OFFSET $8`,
-      [...args, query.pageSize, (page - 1) * query.pageSize],
-    )
-
-    const folderRows = await client.query<{ path: string; count: string }>(
-      `SELECT folder AS path,count(*) FROM media m
-        WHERE (m.site_id=$1 OR m.site_id IS NULL) GROUP BY folder ORDER BY folder`,
-      [siteId],
-    )
-    const tagRows = await client.query<{ tag: string; count: string }>(
-      `SELECT tag,count(*) FROM media m CROSS JOIN LATERAL unnest(m.tags) tag
-        WHERE m.site_id=$1 OR m.site_id IS NULL GROUP BY tag ORDER BY tag`,
-      [siteId],
-    )
-    const scopeRows = await client.query<{ scope: 'site' | 'shared'; count: string }>(
-      `SELECT CASE WHEN site_id IS NULL THEN 'shared' ELSE 'site' END AS scope,count(*)
-         FROM media m WHERE m.site_id=$1 OR m.site_id IS NULL GROUP BY scope`,
-      [siteId],
-    )
-    const statusRows = await client.query<{ status: MediaStatus; count: string }>(
-      `SELECT status,count(*) FROM media m WHERE m.site_id=$1 OR m.site_id IS NULL GROUP BY status`,
-      [siteId],
-    )
+    const rows = await client.query<MediaRow>(mediaLibraryPageSql(query.sort), [
+      ...args,
+      query.pageSize,
+      (page - 1) * query.pageSize,
+    ])
+    const facets = (
+      await client.query<{
+        folders: Array<{ path: string; count: string }>
+        tags: Array<{ tag: string; count: string }>
+        scopes: Array<{ scope: 'site' | 'shared'; count: string }>
+        statuses: Array<{ status: MediaStatus; count: string }>
+      }>(MEDIA_FACETS_SQL, [siteId])
+    ).rows[0]!
     const statuses: Record<MediaStatus, number> = { ready: 0, processing: 0, failed: 0, deleted: 0 }
-    for (const row of statusRows.rows) statuses[row.status] = Number(row.count)
+    for (const row of facets.statuses) statuses[row.status] = Number(row.count)
     const scopes = { site: 0, shared: 0 }
-    for (const row of scopeRows.rows) scopes[row.scope] = Number(row.count)
+    for (const row of facets.scopes) scopes[row.scope] = Number(row.count)
     return {
       assets: rows.rows.map(assetFrom),
       total,
@@ -174,8 +129,8 @@ export function listMediaLibrary(
       pageSize: query.pageSize,
       pageCount,
       facets: {
-        folders: folderRows.rows.map(row => ({ path: row.path, count: Number(row.count) })),
-        tags: tagRows.rows.map(row => ({ tag: row.tag, count: Number(row.count) })),
+        folders: facets.folders.map(row => ({ path: row.path, count: Number(row.count) })),
+        tags: facets.tags.map(row => ({ tag: row.tag, count: Number(row.count) })),
         scopes,
         statuses,
       },

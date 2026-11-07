@@ -243,3 +243,14 @@ are ordered by their stable slugs and IDs.
 The query returned the same ordered choices in 15 local role contexts. In
 five warm SQL samples, median execution fell from 311.91 ms to 0.22 ms.
 This is a database measurement, not hosted page load time.
+
+## Load usage for the visible Media page
+
+Media selects the requested page before looking up usage and renditions. It
+loads the unfiltered library facets in one statement so the counts see the
+same snapshot. It still uses the requesting user's database role.
+
+Eight local comparisons matched the previous rows, counts, and facets
+across sorting, filters, pagination, and permissions. The median time for
+the database reads fell from 68.3 ms to 24.5 ms across five paired samples,
+with six statements reduced to three.
