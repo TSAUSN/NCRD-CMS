@@ -157,6 +157,7 @@ export default async function PageHistory({
             pageTitle={page.title}
             revision={page.revision}
             archived={site.status === 'archived'}
+            usesResponsiveMenu={Boolean(site.national_template)}
             wholeSiteHref={
               session.principal.isSuperAdmin || session.principal.memberships.has(site.id)
                 ? '/sites/' + site.id + '/publishing?tab=history'

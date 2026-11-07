@@ -19,6 +19,8 @@ type EditorToolbarProps = {
     pageScoped?: boolean
     canPublish: boolean
     liveHref: string | null
+    visitorPreviewOrigin?: string | null
+    isolatedCanvasOrigin?: string | null
   }
   pageTitle: string
   viewTools: ReactNode
@@ -169,6 +171,9 @@ export function EditorToolbar({
                   />
                   Include hidden sections
                 </label>
+              )}
+              {!props.visitorPreviewOrigin && !props.isolatedCanvasOrigin && (
+                <p className="hint">This site has no visitor preview address. A static preview will open instead.</p>
               )}
               <Button variant="secondary" onClick={() => void openVisitorPreview()}>
                 Open preview

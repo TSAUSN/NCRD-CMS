@@ -35,6 +35,7 @@ type Props = {
   pageTitle: string
   revision: string
   archived: boolean
+  usesResponsiveMenu: boolean
   wholeSiteHref: string | null
   versions: Version[]
   selected: Version | null
@@ -212,6 +213,12 @@ export function NativeHistory(props: Props) {
               {compared && <Link href={props.closeComparisonHref}>Close comparison</Link>}
             </form>
           </Disclosure>
+          {(!onlyChanges || !compared) && props.usesResponsiveMenu && (
+            <p className={shared.meta}>
+              History shows a static version with the compact menu. To check how the current menu fits on desktop, open
+              Preview from the page editor.
+            </p>
+          )}
           {(!onlyChanges || !compared) && (
             <div data-compare={!!compared || undefined} className={shared.historyPreviews}>
               <div className={shared.panel}>
