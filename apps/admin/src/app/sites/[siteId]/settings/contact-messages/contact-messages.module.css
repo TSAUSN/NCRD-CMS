@@ -1,0 +1,8 @@
+.body,
+.details {
+  overflow-wrap: anywhere;
+}
+
+.body {
+  white-space: pre-wrap;
+}

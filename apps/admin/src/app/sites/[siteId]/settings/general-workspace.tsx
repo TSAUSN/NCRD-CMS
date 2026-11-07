@@ -2,6 +2,7 @@
 import type { SitePublicSettings } from '@cms/schema'
 import type { SiteSettingsWorkspace } from '../../../../lib/site-settings.ts'
 import { Card } from '../../../../components/ui/card.tsx'
+import { TextLink } from '../../../../components/ui/text-link.tsx'
 import { Field } from '../../../../components/ui/field.tsx'
 import { SettingsEditor, useSettingsDraft } from './settings-editor.tsx'
 import shared from '../../../../components/workspace.module.css'
@@ -149,6 +150,12 @@ export function GeneralSettingsWorkspace({
           </p>
         )}
       </Card>
+      {chapters && (
+        <Card title="Contact messages" density="editor">
+          <p>Read messages visitors sent through this site’s contact form. Email forwarding is not configured.</p>
+          <TextLink href={'/sites/' + siteId + '/settings/contact-messages'}>Read contact messages</TextLink>
+        </Card>
+      )}
     </SettingsEditor>
   )
 }

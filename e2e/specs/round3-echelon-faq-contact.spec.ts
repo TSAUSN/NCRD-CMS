@@ -6,7 +6,7 @@ import { resolve } from 'node:path'
 import { echelonFixture } from './fixtures/echelon.ts'
 import { echelonFaqContactContent } from '../../packages/seeds/src/echelon-faq-contact.ts'
 import { signIn, canvas, publish } from './helpers.ts'
-test('Echelon FAQ opens one answer without scripts and its normal-field contact panel keeps existing local message handling', async ({
+test('Echelon FAQ opens one answer without scripts and its normal-field contact panel delivers to the private site contact messages', async ({
   page,
   browser,
 }, info) => {
@@ -82,6 +82,30 @@ test('Echelon FAQ opens one answer without scripts and its normal-field contact 
       ).toBe(1)
     } finally {
       await context.close()
+    }
+    const settings = '/sites/' + f.site + '/settings'
+    await page.goto(settings)
+    await page.getByRole('link', { name: 'Read contact messages' }).click()
+    await expect(page.getByRole('heading', { name: 'Contact messages', exact: true, level: 1 })).toBeVisible()
+    await expect(page.getByText('[Local Echelon acceptance message]', { exact: true })).toBeVisible()
+    await expect(page.getByText('Email: visitor@example.test', { exact: false })).toBeVisible()
+    await page.screenshot({ path: resolve(folder, 'admin-contact-messages.png') })
+    const restricted = await browser.newContext()
+    try {
+      const visitor = await restricted.newPage()
+      const inbox = new URL(settings + '/contact-messages', page.url()).href
+      expect((await visitor.goto(inbox))?.status()).toBe(404)
+      await f.client.query('BEGIN')
+      await f.client.query('SET LOCAL ROLE cms_authenticated_user')
+      await f.client.query("SELECT set_config('app.user_id',$1,true)", [f.actor])
+      const editor = (await f.client.query("SELECT id FROM app_users WHERE email='editor@example.test'")).rows[0]!.id
+      await f.client.query("SELECT app.set_site_membership($1,$2,'editor')", [editor, f.site])
+      await f.client.query('COMMIT')
+      await signIn(visitor, 'editor@example.test')
+      expect((await visitor.goto(inbox))?.status()).toBe(404)
+      await expect(visitor.getByText('[Local Echelon acceptance message]', { exact: true })).toHaveCount(0)
+    } finally {
+      await restricted.close()
     }
     await page.goto('/pages/' + id + '?section=2')
     await page.locator('.inspector').getByLabel('Introduction', { exact: true }).fill('[Updated Echelon invitation]')
