@@ -7,7 +7,7 @@ import { asUser } from '@cms/platform'
 import { withDraftListPreview } from './draft-list-preview.ts'
 import { LINK_TARGETS_SQL } from './link-targets.ts'
 import { PAGE_HISTORY_SQL, PAGE_HISTORY_VERSION_SQL } from './page-history.ts'
-import { SITE_SUMMARY_SQL, ORDINARY_PAGE_SQL } from './site-summary.ts'
+import { SITE_SUMMARY_SQL, SIDEBAR_SITE_SUMMARY_SQL, ORDINARY_PAGE_SQL } from './site-summary.ts'
 import { REVIEWED_PAGE_CANVAS_SQL } from './reviewed-page-canvas.ts'
 import { readSitePreview, type SitePreview } from './site-preview.ts'
 import type { SitePreviewContext } from './preview-context.ts'
@@ -133,7 +133,15 @@ export type PageHistoryRow = {
 
 /** Every read runs as the user's own database role; RLS decides what comes back. */
 export function listSites(userId: string): Promise<SiteSummaryRow[]> {
-  return asUser({ userId }, async client => (await client.query<SiteSummaryRow>(SITE_SUMMARY_SQL)).rows)
+  return readSiteSummaries(userId, SITE_SUMMARY_SQL)
+}
+
+export function listSitesForSidebar(userId: string): Promise<SiteSummaryRow[]> {
+  return readSiteSummaries(userId, SIDEBAR_SITE_SUMMARY_SQL)
+}
+
+function readSiteSummaries(userId: string, sql: string): Promise<SiteSummaryRow[]> {
+  return asUser({ userId }, async client => (await client.query<SiteSummaryRow>(sql)).rows)
 }
 
 export function getSite(userId: string, siteId: string): Promise<SiteRow | null> {

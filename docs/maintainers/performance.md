@@ -202,3 +202,16 @@ after scrolling, at both widths.
 The editor uses the progress bar on the outgoing screen. The route must
 wait to send headers until it can return the correct status for an
 unauthorized or missing page.
+
+## Read the homepage preview through its owning page
+
+The dashboard uses one indexed page/version lookup per site's homepage.
+Both version pointers already have a foreign key that requires them to
+belong to that page. The query still reads under the requesting user's role
+and keeps the existing counts, preview choice and ordering.
+The sidebar keeps its existing query until its own read changes.
+
+All 15 role contexts returned the same ordered results. Five warm local SQL
+samples went from 397 to 70 ms median. A larger local fixture returned all
+60 rows in order and went from 11.78 to 0.31 s in three paired samples.
+These measure SQL execution; they do not measure the hosted service.
