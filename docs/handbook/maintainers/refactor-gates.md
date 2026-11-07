@@ -1,15 +1,16 @@
 # Prove a behavior-preserving refactor
 
-For maintainers. Last checked: November 5, 2026. Production-test deployment wins if a
-refactor cannot pass these gates. Never deploy an unmerged refactor branch.
+For maintainers. Keep refactors on a separate branch. A tested branch can go
+to an explicitly authorized personal review copy; production needs its own
+verified release and approval. Keep the test and review data separate.
 
 ## Isolation and starting evidence
 
-Use the maintainer-assigned `cms-v2-refactor` worktree, `refactor/handover`,
+Use the assigned isolated checkout and branch. For example, set
 `E2E_DATABASE=cms_e2e_refactor`, `E2E_ADMIN_PORT=3300` and `E2E_SITE_PORT=3301`.
-Defaults remain 3200/3201 for the verification checkout. Retained 3000/3001/54329
-content and processes stay unchanged. One browser suite at a time, at most two
-workers; stop heavy work if machine load stays above 12.
+Verify the ports and database before starting. Leave retained processes and
+content alone. Run one browser suite at a time with at most two workers, and
+respect the importer's machine load check.
 
 The golden harness uses separate local databases `cms_e2e_refactor_golden` and
 `cms_e2e_refactor_screens`. Restore the checksum-verified cleaned archive into
@@ -57,7 +58,7 @@ function or account. The fixture command dumps before creating it. Private ticke
 state and raw canvas HTML are credential material: keep them outside Git/logs,
 never show tokens in screenshots, and remove them when the verification ends.
 
-After each step, capture to a new `after-N` directory, reusing that private state:
+At a checkpoint, capture to a new `after-N` directory, reusing that private state:
 
 ```bash
 node --experimental-strip-types scripts/golden-render.mjs capture \
@@ -67,11 +68,11 @@ node --experimental-strip-types scripts/golden-render.mjs compare \
   --before "$TASK_GOLDEN/before" --after "$TASK_GOLDEN/after-N"
 ```
 
-A changed byte or missing/extra file fails. The first repeated baseline compared
-356 artifacts with zero differences. An expired fixture or changed build/input
-requires an explicit new baseline on the original source; never normalize a
-failure away. Current Symposium FAQ CSS is part of the baseline, including the
-pre-existing difference from the older retained renderer.
+Compare the reported bytes and missing files. Determine whether differences
+affect public markup, private preview metadata or a versioned asset. Inspect
+the rendered pages before accepting changes. An expired fixture or changed
+input needs a new baseline on the original source. Keep the raw comparison;
+do not normalize a regression away.
 
 ## Admin and editor proof
 
@@ -82,14 +83,15 @@ node --experimental-strip-types scripts/golden-admin-screens.mjs \
 ```
 
 The catalog covers every read-only route pattern plus the four real page editors
-and story views, at 1440/1024. One-time provider confirmation stays in the hosted
+and story views, at 1440, 1024 and 900 px. One-time provider confirmation stays in the hosted
 Super-admin-sign-in walk. It uses a natural browser clock, local auth/recording mail,
 no external requests and no content edits. Task-specific readiness waits for real
 preview/widget content, fonts and visible images; network-idle alone is not proof.
-Inspect all captures; investigate loaders and layout defects before calling it a
-baseline. Compare the same routes after changes, and walk the editor at both
-widths: save/reload, recovery, undo/redo, leave prompt, History restore and publish.
-Check the phone preview as well. Database snapshots precede any test reset/edit.
+Compare the affected captures and inspect changes in the browser. Check CSS
+load order and physically open and close the editor drawer at 900 px. Wait for
+the actual images and preview before judging pixels. Walk the affected editor
+actions and check the phone preview where relevant. Take database snapshots
+before any test reset or edit.
 
 For the separate worktree, use explicit test scope and bounded unit workers:
 
@@ -100,9 +102,8 @@ pnpm -r --workspace-concurrency=1 test --maxWorkers=2
 pnpm test:db --maxWorkers=2
 ```
 
-Unit and real-database tests run after each step. Before merge, run the full
-Chromium and WebKit gates on the final tip, with all retained/source opt-ins and
-at most two workers. Preserve assertions/timeouts; no skipped tests or hidden
-failures. A pre-existing retained-copy failure remains a gate failure even when
-the current app is green. If any required gate is red, leave the completed work
-on its branch, record why, and freeze the deployment line without it.
+Run relevant tests for each change. At a release checkpoint, run the full
+Chromium and WebKit suites on the exact candidate with the approved local
+source inputs. Keep assertions and timeouts intact. Record missing inputs,
+baseline failures and new failures separately. A pre-existing failure is still
+a failed check; do not use it to justify a production deployment.

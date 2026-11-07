@@ -1,8 +1,10 @@
-# Refactor gates
+# Verify a CMS change
 
-Run the original and changed builds against the same local fixture and media.
-Keep the fixture, screenshots, raw traces and ticket state outside Git. Never
-reuse a development, review or hosted database. The
+Run tests that cover your change and open the affected screens in a real
+browser. Run the complete suites and visual comparisons at release checkpoints.
+Use the same local fixture and media for before and after. Keep that fixture,
+screenshots, traces and tickets outside Git. Never run tests against a
+development, review or hosted database. The
 [fixture guide](../handbook/maintainers/refactor-gates.md) explains how to
 restore the private archive into empty databases and verify the copy.
 
@@ -73,6 +75,11 @@ Chromium on unchanged content; WebKit repeated those screens exactly. Both
 engines still run the full browser test suites. No image pixels are masked.
 Computed style hashes sort property names without changing their values.
 
-Each direct route starts with a fresh renderer. When a visible preview is
-present, compare two raw frames after the browser has had time to repaint.
-A changed pixel still fails the comparison, even in a preview.
+The comparison reports every changed pixel. Open the before and after frames:
+look for unintended changes in CSS order, clipping and the 900 px editor
+drawer. Let images decode and visible previews finish repainting. Record what
+changed and why. Intentional Admin improvements and proved raster noise can be
+accepted; public SAWSO and Echelon should keep their appearance unless a fix
+explicitly changes it. A missing screen, unexplained change or failed test stays
+open. Before production, verify the exact release commit and record unresolved
+baseline failures rather than describing the checks as green.
