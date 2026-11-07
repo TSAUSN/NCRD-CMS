@@ -146,6 +146,7 @@ export async function createNativePage(input: {
   sourceRevision?: string
   url?: string
   inMenu: boolean
+  parentId?: string | null
 }) {
   const session = await currentSession()
   if (!session) return { ok: false as const, message: 'Sign in before creating a draft.' }
@@ -253,6 +254,13 @@ export async function createNativePage(input: {
           "SELECT * FROM app.save_page_draft($1,$2,$3,$4,'checkpoint','Created a private page draft')",
           [pageId, revision, JSON.stringify(content), JSON.stringify(meta)],
         )
+        if (input.parentId !== undefined) {
+          // Existing command retains tenant, actor, cycle and revision checks.
+          await client.query('SELECT app.set_page_parent($1,(SELECT revision FROM pages WHERE id=$1),$2)', [
+            pageId,
+            input.parentId,
+          ])
+        }
         if (allowed.admin) {
           const latest = await readPageListControls(client, input.siteId)
           await saveHeaderMenuDraft(client, {

@@ -75,17 +75,45 @@ test('a new blank SAWSO page opens with its site look, a header and labelled sam
     await page.getByRole('button', { name: 'New page', exact: true }).click()
     const dialog = page.getByRole('dialog', { name: 'New page', exact: true })
     await dialog.getByLabel('Page title', { exact: true }).fill('A useful blank page')
+    await dialog.getByText('A page design', { exact: true }).click()
+    const choices = dialog.getByRole('group', { name: 'Suggested page designs', exact: true })
+    await expect(choices.getByRole('radio')).toHaveCount(4)
+    await choices.getByRole('radio', { name: /^Event home / }).check()
+    await expect(dialog.getByLabel('Page design', { exact: true })).toHaveValue('event-home')
+    for (const width of [1440, 1024]) {
+      await page.setViewportSize({ width, height: 1000 })
+      await expect
+        .poll(() =>
+          choices
+            .locator('img')
+            .evaluateAll(images =>
+              images.every(image => image instanceof HTMLImageElement && image.complete && image.naturalWidth > 0),
+            ),
+        )
+        .toBe(true)
+      expect(
+        await dialog.evaluate(node => {
+          const box = node.getBoundingClientRect()
+          return box.left >= 0 && box.right <= innerWidth && node.scrollWidth <= node.clientWidth
+        }),
+      ).toBe(true)
+      await page.screenshot({ path: '../.r8-progress/polish-page-designs-' + width + '.png', animations: 'disabled' })
+    }
     await dialog.getByText('A blank page', { exact: true }).click()
+    const parent = (await f.pool.query("SELECT id FROM pages WHERE site_id=$1 AND slug='ways-we-help'", [f.siteId]))
+      .rows[0].id
+    await dialog.getByLabel('Where it lives', { exact: true }).selectOption(parent)
     await dialog.getByRole('button', { name: 'Create draft', exact: true }).click()
     await expect(page).toHaveURL(/\/pages\/[a-f0-9-]+$/)
     const id = new URL(page.url()).pathname.split('/').at(-1)!
     const saved = (
       await f.pool.query(
-        'SELECT p.published_version_id,v.content FROM pages p JOIN page_versions v ON v.id=p.draft_version_id WHERE p.id=$1',
+        'SELECT p.parent_page_id,p.published_version_id,v.content FROM pages p JOIN page_versions v ON v.id=p.draft_version_id WHERE p.id=$1',
         [id],
       )
     ).rows[0]
     expect(saved.published_version_id).toBeNull()
+    expect(saved.parent_page_id).toBe(parent)
     expect(saved.content).toHaveLength(2)
     expect(saved.content[1].values.body.length).toBeGreaterThan(0)
     const frame = page.frameLocator('iframe[title="Page canvas"]')

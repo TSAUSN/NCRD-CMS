@@ -7,6 +7,7 @@ import { IconPlus } from '../../../components/icons.tsx'
 import { useNavigationGuard, requestClientNavigation } from '../../../components/navigation-guard.ts'
 import { createNativePage } from './page-list-actions.ts'
 import shared from '../../../components/workspace.module.css'
+import styles from './native-new-page.module.css'
 type PageChoice = { id: string; title: string; revision: string }
 export function NativeNewPage({
   siteId,
@@ -76,6 +77,7 @@ function NewPageDialog({
     [sourceId, setSourceId] = useState(pages[0]?.id ?? ''),
     [url, setUrl] = useState(''),
     [inMenu, setInMenu] = useState(false),
+    [parentId, setParentId] = useState(''),
     [pending, setPending] = useState(false),
     [error, setError] = useState(''),
     [unknown, setUnknown] = useState(false),
@@ -88,7 +90,7 @@ function NewPageDialog({
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/^-|-$/g, ''),
-    dirty = Boolean(title || description || address || url || start !== 'blank'),
+    dirty = Boolean(title || description || address || url || parentId || inMenu || start !== 'blank'),
     valid = Boolean(
       title.trim() &&
       title.length <= 90 &&
@@ -122,6 +124,7 @@ function NewPageDialog({
           sourceRevision: source?.revision,
           url,
           inMenu,
+          parentId: parentId || null,
         })
       if (!result.ok) {
         setError(result.message)
@@ -175,7 +178,7 @@ function NewPageDialog({
   return (
     <Dialog
       title="New page"
-      size="medium"
+      size="large"
       onClose={close}
       pending={pending}
       initialFocus={titleInput}
@@ -191,16 +194,30 @@ function NewPageDialog({
       }
     >
       <div className={shared.formStack}>
-        <Field id="new-page-title" label="Page title" counter={title.length + ' of 90'}>
-          <input
-            ref={titleInput}
-            required
-            maxLength={90}
-            value={title}
-            onChange={event => setTitle(event.target.value)}
-            disabled={pending}
-          />
-        </Field>
+        <p className={shared.meta}>It starts as a private draft. Nobody sees it until you publish.</p>
+        <div className={styles.identity}>
+          <Field id="new-page-title" label="Page title" counter={title.length + ' of 90'}>
+            <input
+              ref={titleInput}
+              required
+              maxLength={90}
+              value={title}
+              onChange={event => setTitle(event.target.value)}
+              disabled={pending}
+            />
+          </Field>
+          {start !== 'website' && (
+            <Field id="new-page-description" label="Description for search" counter={description.length + ' of 155'}>
+              <input
+                maxLength={155}
+                disabled={pending}
+                value={description}
+                onChange={event => setDescription(event.target.value)}
+                placeholder="One or two plain sentences about this page"
+              />
+            </Field>
+          )}
+        </div>
         {start !== 'website' && (
           <>
             <div className={shared.actions}>
@@ -227,19 +244,14 @@ function NewPageDialog({
                 />
               </Field>
             )}
-            <Field id="new-page-description" label="Description for search" counter={description.length + ' of 155'}>
-              <input
-                maxLength={155}
-                disabled={pending}
-                value={description}
-                onChange={event => setDescription(event.target.value)}
-                placeholder="One or two plain sentences about this page"
-              />
-            </Field>
           </>
         )}
         <Field id="new-page-start" label="Start from">
-          <div className={shared.choiceRows} role="radiogroup" aria-labelledby="new-page-start-label">
+          <div
+            className={shared.choiceRows + ' ' + styles.startChoices}
+            role="radiogroup"
+            aria-labelledby="new-page-start-label"
+          >
             {[
               ['blank', 'A blank page', 'A title and some text'],
               ['design', 'A page design', 'Sector page, news page, event and more'],
@@ -267,15 +279,58 @@ function NewPageDialog({
           </div>
         </Field>
         {start === 'design' && (
-          <Field id="new-page-design" label="Page design">
-            <select value={template} disabled={pending} onChange={event => setTemplate(event.target.value)}>
-              {CORE_PAGE_TEMPLATES.filter(item => item.id !== 'blank').map(item => (
-                <option key={item.id} value={item.id}>
-                  {item.name}
-                </option>
+          <>
+            <div className={styles.designGrid} role="group" aria-label="Suggested page designs">
+              {[
+                {
+                  id: 'landing',
+                  picture: 'split-hero',
+                  description: 'Hero and highlights.',
+                },
+                {
+                  id: 'event-home',
+                  picture: 'event-hero',
+                  description: 'Speakers and program.',
+                },
+                {
+                  id: 'chapter',
+                  picture: 'page-header',
+                  description: 'Photos and contacts.',
+                },
+                {
+                  id: 'resources',
+                  picture: 'text-block',
+                  description: 'Text and useful links.',
+                },
+              ].map(choice => (
+                <label key={choice.id} className={styles.designCard}>
+                  <input
+                    type="radio"
+                    name="suggested-page-design"
+                    checked={template === choice.id}
+                    disabled={pending}
+                    onChange={() => setTemplate(choice.id)}
+                  />
+                  <img src={'/cms-samples/sections/core-' + choice.picture + '.png'} alt="" width={640} height={256} />
+                  <strong>{CORE_PAGE_TEMPLATES.find(item => item.id === choice.id)!.name}</strong>
+                  <span>{choice.description}</span>
+                </label>
               ))}
-            </select>
-          </Field>
+            </div>
+            <Field
+              id="new-page-design"
+              label="Page design"
+              help="Designed sample content uses this site’s look. Replace it before publishing."
+            >
+              <select value={template} disabled={pending} onChange={event => setTemplate(event.target.value)}>
+                {CORE_PAGE_TEMPLATES.filter(item => item.id !== 'blank').map(item => (
+                  <option key={item.id} value={item.id}>
+                    {item.name}
+                  </option>
+                ))}
+              </select>
+            </Field>
+          </>
         )}
         {start === 'copy' && (
           <Field id="new-page-source" label="Page to copy">
@@ -298,6 +353,22 @@ function NewPageDialog({
               onChange={event => setUrl(event.target.value)}
               placeholder="https://example.org"
             />
+          </Field>
+        )}
+        {start !== 'website' && (
+          <Field
+            id="new-page-parent"
+            label="Where it lives"
+            help="Organizes the page on this site. The menu choice is separate."
+          >
+            <select value={parentId} disabled={pending} onChange={event => setParentId(event.target.value)}>
+              <option value="">Main pages</option>
+              {pages.map(candidate => (
+                <option key={candidate.id} value={candidate.id}>
+                  {candidate.title}
+                </option>
+              ))}
+            </select>
           </Field>
         )}
         {canAdmin && start !== 'website' && (
