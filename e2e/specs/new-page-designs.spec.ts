@@ -66,3 +66,42 @@ test('New page uses a shared design or a copied SAWSO page with its chosen priva
     await f.pool.end()
   }
 })
+
+test('a new blank SAWSO page opens with its site look, a header and labelled sample text', async ({ page }) => {
+  const f = await sawsoFixture(true, true)
+  try {
+    await signIn(page, 'root@example.test')
+    await page.goto('/sites/' + f.siteId + '/pages')
+    await page.getByRole('button', { name: 'New page', exact: true }).click()
+    const dialog = page.getByRole('dialog', { name: 'New page', exact: true })
+    await dialog.getByLabel('Page title', { exact: true }).fill('A useful blank page')
+    await dialog.getByText('A blank page', { exact: true }).click()
+    await dialog.getByRole('button', { name: 'Create draft', exact: true }).click()
+    await expect(page).toHaveURL(/\/pages\/[a-f0-9-]+$/)
+    const id = new URL(page.url()).pathname.split('/').at(-1)!
+    const saved = (
+      await f.pool.query(
+        'SELECT p.published_version_id,v.content FROM pages p JOIN page_versions v ON v.id=p.draft_version_id WHERE p.id=$1',
+        [id],
+      )
+    ).rows[0]
+    expect(saved.published_version_id).toBeNull()
+    expect(saved.content).toHaveLength(2)
+    expect(saved.content[1].values.body.length).toBeGreaterThan(0)
+    const frame = page.frameLocator('iframe[title="Page canvas"]')
+    await expect(frame.getByRole('heading', { name: 'A useful blank page', exact: true })).toBeVisible()
+    await expect(frame.locator('[data-cms-section="1"]')).toHaveCount(1)
+    for (const width of [1440, 1024]) {
+      await page.setViewportSize({ width, height: 1000 })
+      await expect(frame.locator('[data-cms-section="1"] [data-cms-slot="body"]')).not.toHaveText('')
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
+      await page.screenshot({ path: '../.r8-progress/polish-blank-page-' + width + '.png', animations: 'disabled' })
+    }
+    await page.reload()
+    await expect(frame.locator('[data-cms-section="1"]')).toHaveCount(1)
+  } finally {
+    await f.pool.query('UPDATE sites SET archived_at=now() WHERE id=$1', [f.siteId])
+    f.client.release()
+    await f.pool.end()
+  }
+})

@@ -60,7 +60,7 @@ export const CORE_PAGE_TEMPLATES = [
   { id: 'resources', name: 'Resource page', sections: ['page-header', 'text-block', 'resource-library', 'faq'] },
   { id: 'landing', name: 'Landing page', sections: ['split-hero', 'icon-cards', 'text-image', 'stats', 'cta-band'] },
   { id: 'chapter', name: 'Chapter page', sections: chapterParts.map(part => part.slug) },
-  { id: 'blank', name: 'Blank page', sections: ['page-header'] },
+  { id: 'blank', name: 'Blank page', sections: ['page-header', 'text-block'] },
 ] as const
 export type CoreTemplateId = (typeof CORE_PAGE_TEMPLATES)[number]['id']
 export type CorePageDefinition = { id: string; version: number; slug: string; name: string; slots: SlotDef[] }

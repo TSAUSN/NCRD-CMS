@@ -89,3 +89,14 @@ it('keeps an explicit hero sample in the generic Echelon starting design', () =>
   const content = coreTemplateContent('echelon-home', definitions, '[Page]')
   expect(content[0]!.values.photo).toMatchObject({ src: '/cms-samples/r8-landscape.png' })
 })
+
+it('starts a blank page with a styled header and editable, explicitly marked sample text', () => {
+  const content = coreTemplateContent('blank', definitions, 'Our information')
+  expect(
+    content.map(section => definitions.find(definition => definition.id === section.section_def_id)?.slug),
+  ).toEqual(['core-page-header', 'core-text-block'])
+  expect(content[0]!.values.heading).toBe('Our information')
+  expect(content[1]!.values.body).toEqual(expect.any(String))
+  expect(String(content[1]!.values.body).length).toBeGreaterThan(0)
+  expect(sampleFieldNames(content[1]!.values)).toContain('body')
+})
