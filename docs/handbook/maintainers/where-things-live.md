@@ -31,6 +31,11 @@ remain the executable authority; never edit a past migration or apply the refere
 | People and access | `app/people/actions.ts` → `lib/people.ts`, `people-access.ts`; `lib/session.ts` resolves the verified identity | `app.add_person`, membership/invitation commands, `app.resolve_session` | No public people directory or role checks in markup; PostgreSQL authorizes | `people`, `people-scopes`, dedicated `e2e/no-mail.spec.ts` |
 | Domains and routing | `app/sites/[siteId]/domains/actions.ts`; global `app/domains/` → domain adapters in `packages/platform` | Domain create/verify/activate and host resolution commands | `apps/site` Host routing; Firebase Hosting adapter | `domains`, `global-domains`, `public-contract`, `echelon-redirects` |
 
+Inside `app/sites/[siteId]/content/`, `collections-workspace.tsx` owns
+list draft commands and dialogs. `collection-record-list.tsx` owns the rows,
+selection and move controls; `collection-record-display.ts` formats record fields
+for the list and editor.
+
 Browser tests live under `e2e/specs/` in feature folders. Use the
 [test move map](../../maintainers/test-moves.md) to find old round names.
 Test titles and assertions are preserved. Unit tests sit beside

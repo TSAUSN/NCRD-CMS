@@ -1,8 +1,6 @@
 'use client'
 import { useReorderableList } from '../../../../components/ui/use-reorderable-list.ts'
 import { flatReorderIntent, type FlatMove } from '../../../../components/ui/flat-reorder.ts'
-import { DropIndicator, ReorderAnnouncement } from '../../../../components/ui/drop-indicator.tsx'
-import reorderStyles from '../../../../components/ui/reorderable-list.module.css'
 import { createPortal } from 'react-dom'
 import { listItemUnit } from '../../../../lib/list-items.ts'
 import styles from './lists.module.css'
@@ -35,7 +33,7 @@ import { useNavigationGuard, requestClientNavigation } from '../../../../compone
 import type { CollectionReview } from '../../../../lib/collection-review.ts'
 import { useEffect, useMemo, useRef, useState, useTransition } from 'react'
 import { GuardedLink as Link } from '../../../../components/guarded-link.tsx'
-import { CollectionFieldControl, imagePreview } from '../../../../components/collection-field-control.tsx'
+import { CollectionFieldControl } from '../../../../components/collection-field-control.tsx'
 import { useRouter } from 'next/navigation'
 import { parseCollectionEntryValues, type CollectionModel as CollectionModelValue } from '@cms/schema'
 import {
@@ -45,7 +43,7 @@ import {
   saveCollectionSchema,
 } from '../../../actions/collections.ts'
 import { type ActionResult } from '../../../../lib/action-result.ts'
-import { IconCollection, IconImage, IconMore, IconPlus } from '../../../../components/icons.tsx'
+import { IconCollection, IconMore, IconPlus } from '../../../../components/icons.tsx'
 import type { CollectionRights, CollectionWorkspace } from '../../../../lib/collection-queries.ts'
 import type { ImagePlacementValue, MediaAsset } from '../../../../lib/media-library.ts'
 import { type SiteDocument } from '../../../../lib/document-library.ts'
@@ -59,44 +57,11 @@ import { EntryState, clone, activeDrafts } from './collection-entries.ts'
 import { CreateCollectionDialog } from './create-collection-dialog.tsx'
 import { SchemaDesigner } from './schema-designer.tsx'
 import { CsvDialog } from './csv-dialog.tsx'
+import { CollectionRecordList } from './collection-record-list.tsx'
+import { entryChanged, entryIdentity, recordTitle } from './collection-record-display.ts'
 import { DocumentPickerDialog } from './document-picker-dialog.tsx'
 
-const entryIdentity = (entry: EntryState) => entry.id ?? entry.clientId ?? entry.stableKey
-
 type EntryFilter = 'active' | 'changed' | 'live' | 'archived'
-
-function recordTitle(entry: EntryState, model: CollectionModelValue): string {
-  const value = entry.values[model.presentation.titleField]
-  const text = typeof value === 'string' ? value.replace(/<[^>]*>/g, '').trim() : ''
-  return text || 'Untitled item'
-}
-
-/** The record's own picture, from the collection's chosen image field, so a
- * speaker is recognisable in the list as in V1 (reference 27). */
-function recordImage(entry: EntryState, model: CollectionModelValue): unknown {
-  const key = model.presentation.imageField
-  return key ? entry.values[key] : null
-}
-
-/** What the admin can show for a stored image. Records keep the governed
- * public delivery address, which the admin does not serve, so a library image
- * is shown through its own admin preview; an external address is shown as it
- * is, and anything else not at all. */
-
-function recordSubtitle(entry: EntryState, model: CollectionModelValue): string {
-  const key = model.presentation.subtitleField
-  const value = key ? entry.values[key] : null
-  return typeof value === 'string' ? value.replace(/<[^>]*>/g, '').trim() : ''
-}
-
-function entryChanged(entry: EntryState): boolean {
-  return (
-    entry.publishedValues === null ||
-    !collectionDraftEqual(entry.values, entry.publishedValues) ||
-    entry.sortIndex !== entry.publishedSortIndex ||
-    entry.archived !== entry.publishedArchived
-  )
-}
 
 function noticeClass(notice: ActionResult): string {
   return notice.ok ? 'notice notice-ok' : 'notice notice-error'
@@ -1116,156 +1081,25 @@ export function CollectionsWorkspace({
                   </>
                 }
               >
-                <div className={styles.recordTable} data-view={view}>
-                  {view === 'table' && visible.length > 0 && (
-                    <div className={ownedStyles.recordHeader} aria-hidden="true" data-editable={rights.editEntries}>
-                      {rights.editEntries && <span />}
-                      <span>
-                        {model.fields.find(field => field.key === model.presentation.titleField)?.label ?? 'Name'}
-                      </span>
-                      <span>
-                        {model.fields.find(field => field.key === model.presentation.subtitleField)?.label ?? 'Details'}
-                      </span>
-                      <span>Status</span>
-                      <span data-secondary>Updated</span>
-                      {rights.editEntries && <span />}
-                    </div>
-                  )}
-                  <ReorderAnnouncement>{reorder.announcement}</ReorderAnnouncement>
-                  {visible.length === 0 ? (
-                    <EmptyState title={entries.length ? 'No matching items' : 'Add the first ' + noun}>
-                      {entries.length ? 'Try another search or filter.' : 'Your list starts as a private draft.'}
-                    </EmptyState>
-                  ) : (
-                    <div
-                      className={styles.results + ' ' + ownedStyles.recordRows + ' ' + reorderStyles.list}
-                      data-reorder-list
-                      data-view={view}
-                      role="list"
-                      aria-label={selected.name + ' items'}
-                    >
-                      {visible.map(entry => {
-                        const key = entryIdentity(entry),
-                          title = recordTitle(entry, model),
-                          position = entries
-                            .filter(item => !item.archived)
-                            .findIndex(item => entryIdentity(item) === key),
-                          photo = imagePreview(recordImage(entry, model), availableMedia)
-                        const dragRow = reorder.row(key, !rights.editEntries || pending || entry.archived)
-                        return (
-                          <article
-                            key={key}
-                            role="listitem"
-                            className={styles.item + ' ' + ownedStyles.recordRow}
-                            data-selected={checked.includes(key)}
-                            {...dragRow}
-                            onDragStart={event => {
-                              if (busy()) {
-                                event.preventDefault()
-                                return
-                              }
-                              dragRow.onDragStart(event)
-                            }}
-                          >
-                            <DropIndicator marker={reorder.marker} row={key} />
-                            {(reorder.blocked ?? reorder.rejection)?.row === key && (
-                              <span className={reorderStyles.reason} aria-hidden="true">
-                                {(reorder.blocked ?? reorder.rejection)?.message}
-                              </span>
-                            )}
-                            {rights.editEntries && (
-                              <label className={styles.select + ' ' + selectionControlsStyles.checkRow}>
-                                <input
-                                  type="checkbox"
-                                  aria-label={'Select ' + title}
-                                  checked={checked.includes(key)}
-                                  onChange={event =>
-                                    setChecked(current =>
-                                      event.target.checked ? [...current, key] : current.filter(id => id !== key),
-                                    )
-                                  }
-                                />
-                              </label>
-                            )}
-                            <button
-                              type="button"
-                              className={styles.open + ' ' + ownedStyles.recordOpen}
-                              onClick={() => openEntry(entry)}
-                              aria-label={'Edit ' + title}
-                            >
-                              <span className={styles.entryName}>
-                                {model.presentation.imageField && (
-                                  <span className={styles.photo + ' ' + ownedStyles.recordPhoto}>
-                                    {photo ? <img src={photo} alt="" /> : <IconImage size={20} />}
-                                  </span>
-                                )}
-                                <span className={styles.identity}>
-                                  <strong className={ownedStyles.recordName} title={title}>
-                                    {title}
-                                  </strong>
-                                </span>
-                              </span>
-                              <span className={ownedStyles.recordValue} title={recordSubtitle(entry, model)}>
-                                {recordSubtitle(entry, model)}
-                              </span>
-                              <Badge tone={entry.archived ? 'neutral' : entryChanged(entry) ? 'pending' : 'live'}>
-                                {entry.archived
-                                  ? 'Hidden'
-                                  : entryChanged(entry)
-                                    ? entry.publishedValues === null
-                                      ? 'Draft'
-                                      : 'Changes not live'
-                                    : 'Live'}
-                              </Badge>
-                              <small
-                                data-secondary
-                                className={ownedStyles.recordValue}
-                                title={
-                                  (entry.editedBy ?? 'Not saved yet') +
-                                  (entry.editedAt ? ' · ' + new Date(entry.editedAt).toLocaleString('en-US') : '')
-                                }
-                              >
-                                {entry.editedBy ?? 'Not saved yet'}
-                                {entry.editedAt &&
-                                  ' · ' +
-                                    new Date(entry.editedAt).toLocaleDateString('en-US', {
-                                      month: 'short',
-                                      day: 'numeric',
-                                    })}
-                              </small>
-                            </button>
-                            {rights.editEntries && (
-                              <span className={ownedStyles.recordAction}>
-                                {!entry.archived && (
-                                  <Menu label={<IconMore size={16} />} accessibleLabel={'Actions for ' + title}>
-                                    <Button
-                                      variant="tertiary"
-                                      aria-label={'Move ' + title + ' up'}
-                                      disabled={pending || position <= 0}
-                                      onClick={() => moveEntry(key, -1)}
-                                    >
-                                      Move up
-                                    </Button>
-                                    <Button
-                                      variant="tertiary"
-                                      aria-label={'Move ' + title + ' down'}
-                                      disabled={
-                                        pending || position >= entries.filter(item => !item.archived).length - 1
-                                      }
-                                      onClick={() => moveEntry(key, 1)}
-                                    >
-                                      Move down
-                                    </Button>
-                                  </Menu>
-                                )}
-                              </span>
-                            )}
-                          </article>
-                        )
-                      })}
-                    </div>
-                  )}
-                </div>
+                <CollectionRecordList
+                  model={model}
+                  listName={selected.name}
+                  noun={noun}
+                  entries={entries}
+                  visible={visible}
+                  availableMedia={availableMedia}
+                  checked={checked}
+                  view={view}
+                  canEdit={rights.editEntries}
+                  pending={pending}
+                  busy={busy}
+                  reorder={reorder}
+                  openEntry={openEntry}
+                  moveEntry={moveEntry}
+                  select={(key, selected) =>
+                    setChecked(current => (selected ? [...current, key] : current.filter(id => id !== key)))
+                  }
+                />
               </RecordBoard>
             </CardContent>
           </Card>
