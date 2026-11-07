@@ -1,9 +1,12 @@
 'use client'
+import { useReorderableList } from '../../../components/ui/use-reorderable-list.ts'
+import { DropIndicator, ReorderAnnouncement } from '../../../components/ui/drop-indicator.tsx'
+import reorderStyles from '../../../components/ui/reorderable-list.module.css'
 import { Button, Menu, SearchField } from '../../../components/ui/index.ts'
 import { editorContentSlots } from '../../../lib/editor-content-slots.ts'
 import { structureFields } from '../../../lib/structure-fields.ts'
 // Section cards keep selection, field changes, and keyboard reordering together.
-import { Fragment, useEffect, useMemo, useRef, useState } from 'react'
+import { Fragment, useEffect, useMemo, useState } from 'react'
 import { isIconSlot, repeatItemSpec } from '@cms/schema'
 import { changedSlots, isSectionChanged, isSlotChanged, type EditorState } from '@cms/domain'
 import {
@@ -66,8 +69,6 @@ export function StructureTree({
       ? (state.sectionOrigins[state.selection.section] ?? null)
       : null,
   )
-  /** The row being dragged, and the gap the pointer is currently over. */
-  const dragging = useRef<number | null>(null)
   const [dropAt, setDropAt] = useState<number | null>(null)
   const sections = state.document.sections
   const selectedOrigin = state.selection.section === null ? null : state.sectionOrigins[state.selection.section]
@@ -120,37 +121,66 @@ export function StructureTree({
   // where what somebody sees is what they are rearranging.
   const reorderable = canManageSections && search.trim() === '' && !changedOnly
 
+  const origins = state.sectionOrigins
+  const sectionKey = (origin: string) => 'section:' + origin
+  const gapKey = (at: number) => 'gap:' + at
+  function moveLabel(from: number, to: number) {
+    const name = rows.find(row => row.index === from)?.label ?? 'section'
+    onMove(from, to)
+    return `Moved ${name} to position ${to + 1}.`
+  }
+  const reorder = useReorderableList<{ from: number; to: number }>({
+    mimeType: 'application/x-cms-section-order',
+    decide: ({ from: source, over, edge }) => {
+      const from = origins.findIndex(origin => sectionKey(origin) === source)
+      const target = origins.findIndex(origin => sectionKey(origin) === over)
+      const at = over.startsWith('gap:') ? Number(over.slice(4)) : target + (edge === 'after' ? 1 : 0)
+      const to = at - (from < at ? 1 : 0)
+      if (from < 0 || at < 0 || at > sections.length || (target < 0 && !over.startsWith('gap:')))
+        return { status: 'blocked', message: 'The page structure changed. Try moving the section again.' }
+      if (from === to) return { status: 'unchanged' }
+      if (locked(from) || !canInsertAt(at) || !canMove(from, to))
+        return {
+          status: 'blocked',
+          message: 'Keep shared sections in place. Move this section within the part you can edit.',
+        }
+      return { status: 'move', marker: { row: gapKey(at), edge: 'before' }, move: { from, to } }
+    },
+    apply: ({ from, to }) => moveLabel(from, to),
+  })
+  function moveByKeyboard(from: number, to: number) {
+    reorder.announce(moveLabel(from, to))
+  }
+
   function gap(at: number, label: string) {
     if (!canManageSections || !canInsertAt(at)) return null
+    const target = reorder.row(gapKey(at), false, false)
+    const isLibrary = (event: import('react').DragEvent) =>
+      event.dataTransfer.types.includes('application/x-cms-section')
     return (
       <li
-        className={`tree-gap ${dropAt === at ? 'drop-active' : ''}`}
+        className={`tree-gap ${dropAt === at || reorder.marker?.row === gapKey(at) ? 'drop-active' : ''}`}
         key={`gap-${at}`}
+        {...target}
         onDragOver={event => {
-          const fromLibrary = event.dataTransfer.types.includes('application/x-cms-section')
-          if (dragging.current === null && !fromLibrary) return
+          if (!isLibrary(event)) return target.onDragOver(event)
           event.preventDefault()
-          event.dataTransfer.dropEffect = fromLibrary ? 'copy' : 'move'
+          event.dataTransfer.dropEffect = 'copy'
           setDropAt(at)
         }}
-        onDragLeave={() => setDropAt(current => (current === at ? null : current))}
+        onDragLeave={event => {
+          target.onDragLeave(event)
+          setDropAt(current => (current === at ? null : current))
+        }}
         onDrop={event => {
+          if (!isLibrary(event)) return target.onDrop(event)
           event.preventDefault()
-          const from = dragging.current
           setDropAt(null)
-          dragging.current = null
-          if (from === null) {
-            const sectionDefId = event.dataTransfer.getData('application/x-cms-section')
-            if (sectionDefId) onDropLibrary(sectionDefId, at)
-            return
-          }
-          // Dropping into the gap *after* the row being dragged is a no-op, and
-          // dropping below it means the target index has already shifted up by
-          // one now that the row has left its old place.
-          const to = at > from ? at - 1 : at
-          if (to !== from && canMove(from, to)) onMove(from, to)
+          const sectionDefId = event.dataTransfer.getData('application/x-cms-section')
+          if (sectionDefId) onDropLibrary(sectionDefId, at)
         }}
       >
+        <DropIndicator marker={reorder.marker} row={gapKey(at)} />
         <button type="button" aria-label={label} onClick={() => onAdd(at)}>
           <span>
             <IconPlus size={11} /> Add here
@@ -279,7 +309,7 @@ export function StructureTree({
           )}
         </div>
       ) : (
-        <ul className="tree-list">
+        <ul className={'tree-list ' + reorderStyles.list} data-reorder-list>
           {reorderable && gap(0, 'Add a section here')}
           {rows.map(row => {
             const selected = state.selection.section === row.index
@@ -299,21 +329,17 @@ export function StructureTree({
                 <li className={`tree-card ${selected ? 'is-selected' : ''}`}>
                   <div
                     className={`tree-section ${row.section.hidden ? 'is-hidden' : ''} ${selected && !state.selection.slot ? 'on' : ''}`}
-                    draggable={reorderable && !locked(row.index) && canInsertAt(row.index)}
-                    onDragStart={event => {
-                      dragging.current = row.index
-                      event.dataTransfer.effectAllowed = 'move'
-                      // Firefox refuses to start a drag without data on the
-                      // transfer, and the payload is never read: the index is
-                      // held in a ref because it belongs to this document and
-                      // nothing outside it should be able to forge one.
-                      event.dataTransfer.setData('text/plain', row.label)
-                    }}
-                    onDragEnd={() => {
-                      dragging.current = null
-                      setDropAt(null)
-                    }}
+                    {...reorder.row(
+                      sectionKey(origin),
+                      !reorderable,
+                      reorderable && !locked(row.index) && canInsertAt(row.index),
+                    )}
                   >
+                    {(reorder.blocked ?? reorder.rejection)?.row === sectionKey(origin) && (
+                      <span aria-hidden="true" className={reorderStyles.reason}>
+                        {(reorder.blocked ?? reorder.rejection)?.message}
+                      </span>
+                    )}
                     {row.visibleSlots.length > 0 && (
                       <button
                         type="button"
@@ -355,14 +381,14 @@ export function StructureTree({
                         if (!canManageSections || !event.altKey || locked(row.index)) return
                         if (event.key === 'ArrowUp' && row.index > 0 && canMove(row.index, row.index - 1)) {
                           event.preventDefault()
-                          onMove(row.index, row.index - 1)
+                          moveByKeyboard(row.index, row.index - 1)
                         } else if (
                           event.key === 'ArrowDown' &&
                           row.index < sections.length - 1 &&
                           canMove(row.index, row.index + 1)
                         ) {
                           event.preventDefault()
-                          onMove(row.index, row.index + 1)
+                          moveByKeyboard(row.index, row.index + 1)
                         }
                       }}
                     >
@@ -401,7 +427,7 @@ export function StructureTree({
                               variant="tertiary"
                               aria-label={`Move ${row.label} up`}
                               disabled={row.index === 0 || locked(row.index) || !canMove(row.index, row.index - 1)}
-                              onClick={() => onMove(row.index, row.index - 1)}
+                              onClick={() => moveByKeyboard(row.index, row.index - 1)}
                             >
                               Move up
                             </Button>
@@ -413,7 +439,7 @@ export function StructureTree({
                                 locked(row.index) ||
                                 !canMove(row.index, row.index + 1)
                               }
-                              onClick={() => onMove(row.index, row.index + 1)}
+                              onClick={() => moveByKeyboard(row.index, row.index + 1)}
                             >
                               Move down
                             </Button>
@@ -439,7 +465,7 @@ export function StructureTree({
                             type="button"
                             aria-label={`Move ${row.label} up`}
                             disabled={row.index === 0 || locked(row.index) || locked(row.index - 1)}
-                            onClick={() => onMove(row.index, row.index - 1)}
+                            onClick={() => moveByKeyboard(row.index, row.index - 1)}
                           >
                             <IconArrowUp size={13} />
                           </button>
@@ -447,7 +473,7 @@ export function StructureTree({
                             type="button"
                             aria-label={`Move ${row.label} down`}
                             disabled={row.index === sections.length - 1 || locked(row.index) || locked(row.index + 1)}
-                            onClick={() => onMove(row.index, row.index + 1)}
+                            onClick={() => moveByKeyboard(row.index, row.index + 1)}
                           >
                             <IconArrowDown size={13} />
                           </button>
@@ -498,6 +524,7 @@ export function StructureTree({
           })}
         </ul>
       )}
+      <ReorderAnnouncement>{reorder.announcement}</ReorderAnnouncement>
     </aside>
   )
 }
