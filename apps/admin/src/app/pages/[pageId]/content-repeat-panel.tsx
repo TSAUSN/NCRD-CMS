@@ -1,4 +1,8 @@
 'use client'
+import { useReorderableList } from '../../../components/ui/use-reorderable-list.ts'
+import { flatReorderIntent } from '../../../components/ui/flat-reorder.ts'
+import { DropIndicator, ReorderAnnouncement } from '../../../components/ui/drop-indicator.tsx'
+import reorderStyles from '../../../components/ui/reorderable-list.module.css'
 import { renderCmsIcon } from '@cms/renderer'
 import { EditorPanelActions } from './editor-panel-navigation.tsx'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
@@ -44,7 +48,6 @@ export function ContentRepeatPanel({
 }) {
   const [active, setActive] = useState<string | null>(null),
     [newKey, setNewKey] = useState<string | null>(null),
-    drag = useRef<string | null>(null),
     boundary = useRef<HTMLDivElement>(null)
   const iconField = spec.fields.find(isIconSlot)
   const keys = repeatItemKeys(values[slot.id], spec.max),
@@ -139,9 +142,20 @@ export function ContentRepeatPanel({
     onValuesChange(removeRepeatItem(values, slot, key), null)
     if (key === active) setActive(null)
   }
-  function move(from: string, to: string) {
-    const delta = keys.indexOf(to) - keys.indexOf(from)
-    if (delta) onValuesChange(moveRepeatItem(values, slot, from, delta), selected)
+  function move(from: number, to: number) {
+    const key = keys[from]
+    if (!key || from === to || to < 0 || to >= keys.length) return
+    onValuesChange(moveRepeatItem(values, slot, key, to - from), selected)
+    return `Moved ${summary(key)} to position ${to + 1}.`
+  }
+  const reorder = useReorderableList({
+    mimeType: 'application/x-cms-card',
+    decide: point => flatReorderIntent(keys, point),
+    apply: ({ from, to }) => move(from, to),
+  })
+  function moveByKeyboard(from: number, to: number) {
+    const message = move(from, to)
+    if (message) reorder.announce(message)
   }
   if (active && keys.includes(active))
     return (
@@ -199,31 +213,19 @@ export function ContentRepeatPanel({
         </EmptyState>
       ) : (
         <ol
-          className={shared.compactItemList}
+          className={shared.compactItemList + ' ' + reorderStyles.list}
+          data-reorder-list
           aria-label={slot.label}
           aria-description={'Drag to reorder, or use the row actions. Choose ' + article + ' ' + noun + ' to edit it.'}
         >
           {keys.map((key, index) => (
-            <li
-              key={key}
-              draggable
-              onDragStart={event => {
-                drag.current = key
-                event.dataTransfer.setData('application/x-cms-card', key)
-              }}
-              onDragEnd={() => {
-                drag.current = null
-              }}
-              onDragOver={event => {
-                if (event.dataTransfer.types.includes('application/x-cms-card')) event.preventDefault()
-              }}
-              onDrop={event => {
-                event.preventDefault()
-                const from = event.dataTransfer.getData('application/x-cms-card')
-                if (drag.current === from && keys.includes(from)) move(from, key)
-                drag.current = null
-              }}
-            >
+            <li key={key} {...reorder.row(key)}>
+              <DropIndicator marker={reorder.marker} row={key} />
+              {(reorder.blocked ?? reorder.rejection)?.row === key && (
+                <span aria-hidden="true" className={reorderStyles.reason}>
+                  {(reorder.blocked ?? reorder.rejection)?.message}
+                </span>
+              )}
               <IconDrag size={10} />
               <Button
                 variant="tertiary"
@@ -254,7 +256,7 @@ export function ContentRepeatPanel({
                   variant="tertiary"
                   aria-label={'Move ' + spec.unit + ' ' + (index + 1) + ' up'}
                   disabled={index === 0}
-                  onClick={() => onValuesChange(moveRepeatItem(values, slot, key, -1), selected)}
+                  onClick={() => moveByKeyboard(index, index - 1)}
                 >
                   <IconArrowUp size={14} />
                   Move up
@@ -263,7 +265,7 @@ export function ContentRepeatPanel({
                   variant="tertiary"
                   aria-label={'Move ' + spec.unit + ' ' + (index + 1) + ' down'}
                   disabled={index === keys.length - 1}
-                  onClick={() => onValuesChange(moveRepeatItem(values, slot, key, 1), selected)}
+                  onClick={() => moveByKeyboard(index, index + 1)}
                 >
                   <IconArrowDown size={14} />
                   Move down
@@ -289,6 +291,7 @@ export function ContentRepeatPanel({
           ))}
         </ol>
       )}
+      <ReorderAnnouncement>{reorder.announcement}</ReorderAnnouncement>
       <Button fullWidth variant="secondary" disabled={keys.length >= spec.max} onClick={() => add()}>
         <IconPlus size={16} />
         Add {article} {noun}
