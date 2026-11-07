@@ -72,3 +72,7 @@ same engine version on both sides. A focused repeat reproduced pixel noise in
 Chromium on unchanged content; WebKit repeated those screens exactly. Both
 engines still run the full browser test suites. No image pixels are masked.
 Computed style hashes sort property names without changing their values.
+
+Each direct route starts with a fresh renderer. When a visible preview is
+present, compare two raw frames after the browser has had time to repaint.
+A changed pixel still fails the comparison, even in a preview.

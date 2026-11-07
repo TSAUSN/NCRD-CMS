@@ -55,13 +55,12 @@ async function main() {
         })
         return context
       }
-      const shared = await contextFor(browser)
       for (const [index, row] of catalog.cases.entries()) {
         const isEditor = /^\/pages\/[a-f0-9-]+$/.test(row.path)
-        // A scaled canvas can use a lower-quality bitmap after earlier pages
-        // have used the same WebKit renderer. Start editor captures fresh.
-        const editorBrowser = isEditor ? await webkit.launch({ headless: true }) : null
-        const context = editorBrowser ? await contextFor(editorBrowser) : shared
+        // WebKit can reuse a low-quality bitmap from an earlier scaled preview.
+        // A direct load starts with an unused renderer and an empty browser context.
+        const routeBrowser = await webkit.launch({ headless: true })
+        const context = await contextFor(routeBrowser)
         const page = await context.newPage()
         page.setDefaultTimeout(15000)
         const file = String(index).padStart(2, '0') + '-' + width + '.png'
@@ -115,7 +114,13 @@ async function main() {
           ])
           const screenshot = () => page.screenshot({ animations: 'disabled', scale: 'css' })
           let image = await screenshot()
-          if (isEditor) {
+          const hasVisiblePreview = await page.locator('iframe').evaluateAll(frames =>
+            frames.some(frame => {
+              const bounds = frame.getBoundingClientRect()
+              return bounds.width > 0 && bounds.height > 0 && bounds.bottom > 0 && bounds.top < innerHeight
+            }),
+          )
+          if (hasVisiblePreview) {
             let stable = false
             // WebKit can temporarily lower image interpolation while a frame
             // is resizing. Taking another screenshot within its 500 ms
@@ -128,7 +133,7 @@ async function main() {
               image = next
               if (stable) break
             }
-            if (!stable) throw Error('The editor canvas did not reach two identical frames.')
+            if (!stable) throw Error('The preview did not reach two identical frames.')
           }
           writeFileSync(join(out, file), image, { mode: 0o600 })
           const overflow = await page.evaluate(
@@ -154,10 +159,9 @@ async function main() {
           })
         } finally {
           await page.close()
-          await editorBrowser?.close()
+          await routeBrowser.close()
         }
       }
-      await shared.close()
     }
   } finally {
     try {
