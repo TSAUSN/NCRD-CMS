@@ -97,8 +97,10 @@ function setupProblem(path: readonly PropertyKey[]): string {
   }
 }
 
-/** A link every page shows, to a web address; the site's own pages are linked
- * after creation, when they exist (SPEC §6: “optional … shared links”). */
+/**
+ * These shared links can use web addresses. Links to pages on this site can be added after those
+ * pages exist.
+ */
 type SharedLink = { label: string; target: { type: 'url'; url: string } | { type: 'page'; page_id: string } }
 function SharedLinks({
   id,

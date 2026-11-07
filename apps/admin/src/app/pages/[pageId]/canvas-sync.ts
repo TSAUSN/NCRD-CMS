@@ -1,4 +1,4 @@
-// What the canvas has to be told, worked out from the two documents (SPEC §6.4).
+// What the canvas has to be told, worked out from the two documents.
 //
 // The editor used to decide this at the call site of each edit: typing in the
 // inspector posted a patch to the canvas, and every other transition — revert,

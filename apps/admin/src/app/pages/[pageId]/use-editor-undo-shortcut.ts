@@ -32,7 +32,7 @@ export function useEditorUndoShortcut({
       const meta = event.metaKey || event.ctrlKey
       if (!meta || event.key.toLowerCase() !== 'z') return
       event.preventDefault()
-      // ⌘Z / ⌘⇧Z across every edit operation, not only typing (SPEC §6.4).
+      // ⌘Z / ⌘⇧Z across every edit operation, not only typing.
       changeHistory(event.shiftKey)
     }
     window.addEventListener('keydown', onKey)

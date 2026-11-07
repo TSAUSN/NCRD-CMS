@@ -252,8 +252,7 @@ export function SlotField({
   }
 
   const text = String(value ?? '')
-  // Every colour decision point measures contrast, not just the wizard — v1's
-  // D14 was a picker that measured nothing (SPEC §6.4).
+  // Only report contrast when the value is a supported color.
   const verdict = /^#|^rgb/i.test(text.trim()) ? checkContrast(text, '#ffffff') : null
 
   return (

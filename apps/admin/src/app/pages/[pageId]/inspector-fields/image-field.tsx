@@ -10,20 +10,9 @@ import type { ImagePlacementValue, MediaAsset } from '../../../../lib/media-libr
 import { MediaPicker } from '../media-picker.tsx'
 
 /**
- * An image: where it is, and what it says.
- *
- * SPEC §6.11 makes alt text required at upload "unless explicitly decorative",
- * and this is the same rule at the other end of the pipe. There is no third
- * state: an image is described or it is declared decorative, and the renderer
- * treats an empty description as decorative whatever this form thinks — so the
- * checkbox is not a preference, it is the author saying out loud what the page
- * is going to do anyway.
- *
- * Intrinsic dimensions are shown and not edited, deliberately. Width and height
- * are governed on the *definition* — structured schema v2's `staticAttributes`,
- * where they reserve the space so the page does not jump while the image loads —
- * and a page instance has no say in them. Offering a box here would offer a
- * control the renderer discards.
+ * An image needs alt text unless it is decorative. The renderer treats an empty description as
+ * decorative, so this control makes that choice explicit. The section definition owns the intrinsic
+ * dimensions, which reserve layout space while the image loads.
  */
 export function ImageField({
   id,

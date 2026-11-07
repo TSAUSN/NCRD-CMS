@@ -2,7 +2,7 @@ import { measurePerfRender } from '@cms/platform/perf-trace'
 import { SiteFileProjection } from '@cms/schema'
 import { PREVIEW_FONT_STYLES, PREVIEW_FONT_FILES, PREVIEW_FONT_IMAGES } from '../../../lib/preview-font-policy.ts'
 import { storyWidgetQuery } from '@cms/renderer'
-// The editing canvas (SPEC §6.4, D1). Same-origin on purpose: the admin renders
+// The editing canvas. Same-origin on purpose: the admin renders
 // the draft with its own renderer instead of embedding the public deployment,
 // which is what makes click-to-edit reachable by ordinary browser automation
 // in M2 — v1's cross-origin canvas was untestable.

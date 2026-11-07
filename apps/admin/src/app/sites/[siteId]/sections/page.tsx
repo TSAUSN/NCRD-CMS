@@ -19,7 +19,7 @@ import { LibraryFilters, LibraryResetLink } from './library-filters.tsx'
 export const dynamic = 'force-dynamic'
 
 /**
- * The section library as a screen of its own (SPEC §6.5).
+ * The section library as a screen of its own.
  *
  * The overlay inside the editor answers "what can I put on this page right
  * now"; this answers "what does this site have, and what would change if I

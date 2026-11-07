@@ -1,4 +1,4 @@
-// Serving a stored media object back (SPEC §6.11).
+// Serving a stored media object back.
 //
 // The worker writes section thumbnails into the media store and records the
 // object key on the definition version; the library reads that key and renders

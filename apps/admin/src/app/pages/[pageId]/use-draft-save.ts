@@ -18,9 +18,8 @@ import type { PageEditorProps } from './editor-types.ts'
 type Current<T> = { current: T }
 type Set<T> = Dispatch<SetStateAction<T>>
 
-// A pause this long saves, as it ends an undo step (TYPING_PAUSE_MS). It keeps
-// an acknowledged save within SPEC §9.3's two seconds with room to spare,
-// while continuous typing still avoids a write per key.
+// After a one-second pause, autosave queues the draft. Continuous typing avoids
+// a write per key; acknowledgement still depends on the server.
 const AUTOSAVE_MS = 1000
 // Reorder, visibility, rich text, links and images need the canonical server
 // renderer before the canvas can show them. Waiting the full typing debounce

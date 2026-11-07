@@ -1,4 +1,4 @@
-// Server-side session resolution (SPEC §6.1, D12). Every admin screen awaits
+// Server-side session resolution. Every admin screen awaits
 // this before it renders anything user-specific, so there is no auth flash and
 // no client-side race to lose.
 import 'server-only'
@@ -14,9 +14,8 @@ import {
 } from '@cms/platform'
 
 /**
- * The provider seam. Supabase Auth (magic link, then Microsoft/Entra) slots in
- * here without any screen changing; SPEC §12 introduces the hosted account
- * only once the code that needs it exists.
+ * Adapt verified sessions here so screens do not depend on which provider authenticates the
+ * account.
  */
 export function authProvider(): AuthProvider {
   return configuredAuthProvider()

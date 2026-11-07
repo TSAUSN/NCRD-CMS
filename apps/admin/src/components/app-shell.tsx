@@ -1,36 +1,7 @@
 'use client'
-// The application shell: a navy CMS sidebar, and everything else to
-// the right of it.
-//
-// This is V1's shape, kept because it works. A CMS is a place you *are* rather
-// than a set of pages you visit, and a persistent rail is what makes that true:
-// it says which product this is, where you are in it, who you are signed in as,
-// and what else you could go and do — none of which a breadcrumb in a top bar
-// can say at the same time. The previous V2 admin had only the breadcrumb, so
-// every screen looked like a document that happened to be hosted next to some
-// other documents.
-//
-// WHAT IS DIFFERENT FROM V1
-//
-// V1's sidebar lists ten global destinations because V1 has ten. This one lists
-// only what V2 actually implements; new destinations appear when their full
-// command, authorization, read model, and browser journey exist.
-//
-// The rail is the same idea as V1's fold, including the reason the fold control
-// sits directly under the brand rather than at the bottom: a control that moves
-// when you use it is a control people stop trusting.
-//
-// THREE STATES, NOT TWO
-//
-//   * Desktop: the sidebar is in the layout. It can be folded to an icon rail,
-//     and the choice is remembered.
-//   * Below 60rem: it leaves the layout and becomes an overlay with a scrim,
-//     opened from a button in a slim top bar, dismissed by the scrim, by Escape
-//     or by the close control — a drawer that cannot be dismissed is the defect
-//     this is written to avoid.
-//   * Folded: labels are visually hidden rather than removed, so every link
-//     keeps its accessible name and the tab order does not change with the
-//     width of the rail.
+// The sidebar keeps the current site and the available destinations visible.
+// On narrow screens the drawer closes by button, Escape or scrim. Folding
+// the desktop rail hides labels visually without changing the tab order.
 import { GuardedLink as Link } from './guarded-link.tsx'
 import { usePathname } from 'next/navigation'
 import { useEffect, useRef, useState, type ReactNode } from 'react'

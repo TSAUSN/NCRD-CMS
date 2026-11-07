@@ -1,7 +1,7 @@
 import { checkContrast, type ContrastVerdict } from '@cms/domain'
 import { DEFAULT_THEME_TOKENS, THEME_FONT_OPTIONS, type ThemeTokens } from '@cms/schema'
 
-// The site wizard's Look step (SPEC §6.2 step 2, reference 22): a brand colour,
+// The site wizard's Look step lets the author choose a brand colour,
 // a supported type pairing and a button shape, each a choice a newcomer can
 // judge from a sample rather than a token they have to understand. Everything
 // here writes ordinary theme tokens, so Design shows and changes the same
@@ -176,7 +176,7 @@ export type LookCheck = {
 /**
  * The readability of the choices, measured on the backgrounds the text will
  * actually sit on. Ordinary-size labels need 4.5:1: V1 called a 4.2:1 button
- * label a pass, and this is the correction (SPEC §6.2, reference C).
+ * label a pass, and this is the correction.
  */
 export function lookChecks(theme: ThemeTokens): LookCheck[] {
   const { colors, buttons } = theme

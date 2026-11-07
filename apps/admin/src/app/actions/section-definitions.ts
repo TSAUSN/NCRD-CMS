@@ -11,15 +11,9 @@ import { sitePreviewContext, type SitePreviewContext } from '../../lib/preview-c
 import { ActionResult, requireSession, toActionResult, UUID } from '../../lib/action-result.ts'
 
 /**
- * What the creator sends, and the only things it is allowed to decide.
- *
- * Notice what is *not* here: the compiled AST, the scoped stylesheet, the render
- * hash, the policy versions, and `carries_trusted_code`. Every one of those is
- * re-derived on this side from the two authored strings, because a client that
- * could name its own `carries_trusted_code` would be a client that could publish
- * a script by saying it had not (SPEC §6.4: "the publish command independently
- * recomputes the marker and never trusts the client flag" — this is the same
- * rule one step earlier, at authoring).
+ * Only accept authored markup and CSS. Recompute the compiled AST, scoped stylesheet, render hash,
+ * policy versions and trusted-code flag on the server. A client cannot clear a flag to bypass
+ * review.
  */
 export type SectionDraft = {
   slug: string
@@ -64,7 +58,7 @@ export type SectionCompileReport = {
  * Compile a draft definition and say what is wrong with it, without storing
  * anything.
  *
- * The creator's mandatory preview step (SPEC §6.5) is this function's output: an
+ * The creator's mandatory preview step is this function's output: an
  * author sees the section rendered by the real renderer from the real compiled
  * artifacts, not by a second approximation written for the creator screen. If
  * this and the save disagreed about anything, the preview would be a picture of
@@ -169,7 +163,7 @@ export async function compileSectionDraft(draft: SectionDraft): Promise<SectionC
 }
 
 /**
- * Save a section definition — the creator's last step (SPEC §6.5).
+ * Save a section definition — the creator's last step.
  *
  * Compiled a second time here rather than trusting the report the preview
  * returned, because the report went to the browser and came back. The database
@@ -313,7 +307,7 @@ export async function checkCustomCss(css: string, index: number): Promise<CssChe
 }
 
 /**
- * A super admin clearing the custom code on one draft version (SPEC §6.4, §8).
+ * A super admin clearing the custom code on one draft version.
  *
  * The version id is the *draft* the editor is looking at, and approval is
  * deliberately per-version rather than per-page: a page that was approved once

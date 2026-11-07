@@ -22,7 +22,7 @@ export async function savePageDraft(formData: FormData): Promise<ActionResult> {
   if (identity !== undefined && !validPageIdentity(identity))
     return { ok: false, kind: 'error', message: 'Enter a page name and a valid page address.' }
   // The one server-side boundary page metadata passes through. `SeoMeta` was
-  // exported and never called (finding S-02), so every constraint it declared
+  // exported but never called, so every constraint it declared
   // was aspirational; validating in the form component instead would put the
   // check on the side of the wire the author controls.
   const parsedMeta = readEditedPageMeta(formData)
@@ -39,7 +39,7 @@ export async function savePageDraft(formData: FormData): Promise<ActionResult> {
   }
   const meta = parsedMeta.fields
   // Autosaves are rolling and prunable; a deliberate Save draft is a checkpoint
-  // and is permanent (SPEC §6.3).
+  // and is permanent.
   const kind = formData.get('kind') === 'autosave' ? 'autosave' : 'checkpoint'
 
   try {

@@ -1,4 +1,4 @@
-// The picture on a section card (SPEC §6.5, D3).
+// The picture on a section card.
 //
 // Two rules, and both are about what a library screen costs to open. It is a
 // *static* image, never a live iframe, because the acceptance line is "library

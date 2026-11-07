@@ -24,7 +24,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
   const session = await currentSession()
 
   // Authenticated is not authorized: a verified sign-in with no product record
-  // sees no tenant data at all (SPEC §6.1).
+  // sees no tenant data at all.
   if (!session) {
     return (
       <EntryPanel heading="You are not signed in" lede="Sign in to see the sites you have been given access to.">
@@ -300,7 +300,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
 
         {activeSites.length === 0 ? (
           // Empty states teach: what the thing is, and what happens next
-          // (SPEC §7). There is no primary action here on purpose — being given
+          //. There is no primary action here on purpose — being given
           // access is somebody else's action, and offering a button that cannot
           // work is worse than saying so.
           <div className="empty-state">
@@ -366,7 +366,7 @@ type Heartbeat = { worker_id: string; last_seen_at: Date; version: string }
  * The operator's answer to "is anything stuck". Every number here is a real
  * queue fact, and a stopped worker is stated rather than implied by silence —
  * v1's scheduling queue was inert and only honest labelling saved it from
- * being a lie (SPEC §6.8, D7).
+ * being a lie.
  *
  * It is a disclosure rather than a panel, and closed by default when the queue
  * is healthy. An editor signing in to change a headline was being shown eight

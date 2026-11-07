@@ -49,8 +49,10 @@ type Props = {
   /** Page recipes, offered as the library's second view (V1 reference 12). */
   pasteControl?: ReactNode
   recipeControl?: ReactNode
-  /** `replace` chooses a different layout for an existing section (SPEC §6.4
-   * “Change layout”). The choice opens a mapping review; nothing changes yet. */
+  /**
+   * Replacing a layout opens the field mapping review. The draft changes only after the author
+   * accepts it.
+   */
   mode?: 'insert' | 'replace' | undefined
   /** The layout the section already uses, which cannot be its replacement. */
   excludeDefinitionId?: string | undefined

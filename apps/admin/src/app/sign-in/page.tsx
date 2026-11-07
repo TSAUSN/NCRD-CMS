@@ -15,7 +15,7 @@ export default async function SignInPage({
   searchParams: Promise<{ error?: string; sent?: string; reauth?: string }>
 }) {
   // Resolved server-side before anything renders, so there is no signed-out
-  // flash and no client-side race (SPEC §6.1, D12).
+  // flash and no client-side race.
   const { error, sent, reauth } = await searchParams
   if (reauth !== '1' && !error && !sent && (await currentSession())) redirect('/')
   let local = false

@@ -141,7 +141,7 @@ export function LinkField({
       )}
       {!destinationOnly && (
         <div className="link-choices">
-          {/* Choices that travel with this one link (SPEC §6.4). Cleared choices
+          {/* Choices that travel with this one link. Cleared choices
             are removed rather than stored as false, so an untouched link stays
             byte-identical. */}
           <label className="checkbox">

@@ -30,7 +30,7 @@ export async function publishPage(formData: FormData): Promise<ActionResult> {
     if (!page?.draft_version_id) {
       return { ok: false, kind: 'error', message: 'There is nothing to publish yet.' }
     }
-    // One readiness policy, run before every publish path (SPEC §6.8). Run
+    // One readiness policy, run before every publish path. Run
     // here, on the server, from the version id — never from anything the
     // browser sent. The database re-checks what it can (a report was supplied,
     // its shape and policy version are valid, blocking findings need an
@@ -191,7 +191,7 @@ export async function publishPageTogether(formData: FormData): Promise<ActionRes
  * The editor's door to the shared evaluation (@cms/platform). The scheduler
  * calls the same function with the worker's manifest access, which is what
  * makes "the same invalid draft is refused everywhere" true rather than
- * aspirational (SPEC §6.8).
+ * aspirational.
  */
 export async function runReadiness(versionId: string): Promise<ReadinessReport> {
   return versionReadiness(versionId, 'member')

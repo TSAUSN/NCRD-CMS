@@ -40,7 +40,7 @@ export default async function EditPage({
   searchParams: Promise<{ section?: string; site?: string; field?: string; settings?: string; focus?: string }>
 }) {
   // The session is resolved before anything user-specific renders, so there is
-  // no auth flash and no client-side race (SPEC §6.1, D12).
+  // no auth flash and no client-side race.
   const session = await currentSession()
   if (!session) notFound()
   const { pageId } = await params

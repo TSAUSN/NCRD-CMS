@@ -35,7 +35,7 @@ export function getSiteImagePreviews(
 /**
  * The preview manifest comes from the same SQL builder the publish command
  * uses, so preview cannot drift from what publishing would produce — the
- * byte-identity problem v1 solved with sync scripts (SPEC §3.3).
+ * byte-identity problem v1 solved with sync scripts.
  */
 export function buildPreview(
   userId: string,

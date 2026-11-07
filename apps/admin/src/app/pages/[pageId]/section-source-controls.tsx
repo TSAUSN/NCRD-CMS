@@ -6,7 +6,7 @@ import { checkCustomCss, type CssCheck } from '../../actions/section-definitions
 import { IconAlert, IconBrush, IconCheck, IconCode } from '../../../components/icons.tsx'
 
 /**
- * Custom CSS and Edit HTML (SPEC §6.4), each stating what it costs before it
+ * Custom CSS and Edit HTML, each stating what it costs before it
  * opens.
  *
  * The consequence is written above the box rather than beside the Save button,
