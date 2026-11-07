@@ -38,7 +38,9 @@ export async function adminRoutes(t, data) {
         path: pattern
           .replace(
             '[siteId]',
-            pattern.includes('/chapters') || pattern.endsWith('/outbox') ? echelon.site_id : sawso.site_id,
+            pattern.includes('/chapters') || pattern.endsWith('/outbox') || pattern.endsWith('/contact-messages')
+              ? echelon.site_id
+              : sawso.site_id,
           )
           .replace('[pageId]', sawso.page_id)
           .replace('[definitionId]', definition)
