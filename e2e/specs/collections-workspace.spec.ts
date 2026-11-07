@@ -591,3 +591,43 @@ test.describe.serial('Collections admin workspace', () => {
     })
   })
 })
+
+test.describe('Lists save requests', () => {
+  test.beforeAll(prepareWorkspaceFixtures)
+  test.afterAll(removeWorkspaceFixtures)
+  test('saves a Lists edit once and shows the persisted item after reload', async ({ page }, info) => {
+    await openCollections(page)
+    await page.getByRole('button', { name: 'New list' }).click()
+    const create = page.getByRole('dialog', { name: 'Create a list' })
+    await create.getByRole('button', { name: /News & stories/ }).click()
+    await create.getByLabel('List name').fill('E2E Newsroom')
+    await create.getByText('Advanced · addresses and keys', { exact: true }).click()
+    await create.getByLabel('List address').fill(COLLECTION_SLUG)
+    await create.getByLabel('Reader key').fill('e2e_newsroom')
+    await create.getByRole('button', { name: 'Create list' }).click()
+    await expect(page.getByRole('heading', { name: 'E2E Newsroom', level: 2 })).toBeVisible()
+    await page.getByRole('button', { name: 'Add item' }).click()
+    await fillStory(page, {
+      title: 'Private saved item proof',
+      summary: '<p>A private fixture item.</p>',
+      date: '2026-08-24',
+      url: '/stories/private-saved-item-proof',
+    })
+    await page.waitForLoadState('networkidle')
+    const pathname = new URL(page.url()).pathname
+    const observed: string[] = []
+    page.on('request', request => {
+      if (new URL(request.url()).pathname !== pathname) return
+      if (request.method() === 'POST') observed.push('action')
+      else if (request.headers()['rsc']) observed.push('rsc')
+    })
+    await saveItem(page)
+    await page.waitForLoadState('networkidle')
+    expect(observed.filter(kind => kind === 'action')).toHaveLength(1)
+    await info.attach('list-save-requests', { body: JSON.stringify(observed), contentType: 'application/json' })
+    await expect(record(page, 'Private saved item proof')).toBeVisible()
+    await page.reload()
+    await page.getByRole('group', { name: 'Filter items' }).getByRole('button', { name: 'All', exact: true }).click()
+    await expect(record(page, 'Private saved item proof')).toBeVisible()
+  })
+})

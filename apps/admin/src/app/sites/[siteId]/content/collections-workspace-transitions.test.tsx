@@ -316,7 +316,7 @@ describe('collection workspace pending mutation boundary', () => {
     ).toBe(false)
     save.resolve(success)
     await Promise.all(harness.tasks)
-    expect(harness.refresh).toHaveBeenCalledOnce()
+    expect(harness.refresh).not.toHaveBeenCalled()
   })
 
   it('ignores a completed save after the route changes to another collection', async () => {

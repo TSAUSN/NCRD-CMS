@@ -469,7 +469,6 @@ export function CollectionsWorkspace({
       setSavedEntries(clone(saved))
       setExpanded(null)
       setChecked([])
-      router.refresh()
       return { ok: true }
     } catch {
       const message =
@@ -501,7 +500,6 @@ export function CollectionsWorkspace({
         setSavedEntries(clone(saved))
         setExpanded(null)
         setChecked([])
-        router.refresh()
       }
     })
   }
@@ -553,7 +551,6 @@ export function CollectionsWorkspace({
                 },
           ),
         )
-        router.refresh()
       }
     })
   }
@@ -592,7 +589,6 @@ export function CollectionsWorkspace({
           })),
         )
         setSchemaOpen(false)
-        router.refresh()
       }
       return result
     })
@@ -612,7 +608,6 @@ export function CollectionsWorkspace({
         setRevision(result.revision)
         setDraftSchemaId(result.versionId)
         setPublishedSchemaId(result.versionId)
-        router.refresh()
       }
     })
   }
