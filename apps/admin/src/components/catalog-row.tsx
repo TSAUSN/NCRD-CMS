@@ -1,7 +1,7 @@
 import type { HTMLAttributes, ReactNode } from 'react'
 import styles from './catalog-row.module.css'
-export function CatalogList(props: HTMLAttributes<HTMLUListElement>) {
-  return <ul {...props} className={styles.list} />
+export function CatalogList({ className, ...props }: HTMLAttributes<HTMLUListElement>) {
+  return <ul {...props} className={className ? styles.list + ' ' + className : styles.list} />
 }
 /** A shared compact catalog row, with stable columns at both admin widths. */
 export function CatalogRow({

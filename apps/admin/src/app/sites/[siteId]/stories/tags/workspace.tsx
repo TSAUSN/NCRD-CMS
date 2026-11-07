@@ -1,4 +1,8 @@
 'use client'
+import { useReorderableList } from '../../../../../components/ui/use-reorderable-list.ts'
+import { flatReorderIntent } from '../../../../../components/ui/flat-reorder.ts'
+import { DropIndicator, ReorderAnnouncement } from '../../../../../components/ui/drop-indicator.tsx'
+import reorderStyles from '../../../../../components/ui/reorderable-list.module.css'
 import { useEffect, useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { STORY_MAP_AREAS, storyTagIds, type StoriesSettings, type StoryTagGroup } from '@cms/schema'
@@ -69,7 +73,6 @@ export function TagManager({
       replacement: string | null
     } | null>(null),
     [confirmSuggestions, setConfirmSuggestions] = useState(false),
-    [dragged, setDragged] = useState<{ group: StoryTagGroup; id: string } | null>(null),
     [message, setMessage] = useState(''),
     [error, setError] = useState(false),
     [pending, start] = useTransition(),
@@ -102,6 +105,26 @@ export function TagManager({
     }
   }, [pending, settings])
   const tags = (group: StoryTagGroup) => (group === 'main' ? settings.mainTags : settings.secondaryTags)
+  const tagKey = (group: StoryTagGroup, id: string) => group + ':' + id
+  const reorder = useReorderableList<{ group: StoryTagGroup; id: string; before: string | null }>({
+    mimeType: 'application/x-cms-story-tag',
+    decide: point => {
+      if (saving.current) return { status: 'blocked', message: 'Wait for the current tag save to finish.' }
+      const group = point.from.startsWith('main:') ? 'main' : 'secondary'
+      if (!point.over.startsWith(group + ':')) return { status: 'blocked', message: 'Move a tag within its own level.' }
+      const rows = tags(group)
+      const result = flatReorderIntent(
+        rows.map(tag => tagKey(group, tag.id)),
+        point,
+      )
+      if (result.status !== 'move') return result
+      const { from, to } = result.move
+      const id = rows[from]!.id
+      const remaining = rows.filter(row => row.id !== id)
+      return { ...result, move: { group, id, before: remaining[to]?.id ?? null } }
+    },
+    apply: ({ group, id, before }) => move(group, id, before),
+  })
   const count = (group: StoryTagGroup, id: string) =>
     entries.filter(e => storyTagIds(e.values, group).includes(id)).length
   const persist = async (operation: StoriesTagOperation): Promise<{ ok: boolean; message?: string }> => {
@@ -160,11 +183,27 @@ export function TagManager({
     if (rename) return persist({ action: 'rename-group', ...rename })
     return { ok: true }
   }
-  const move = (group: StoryTagGroup, id: string, before: string | null) => {
-    if (id !== before && !saving.current) {
-      focusAfterMove.current = { group, id }
-      save({ action: 'move', group, id, before })
-    }
+  function move(group: StoryTagGroup, id: string, before: string | null) {
+    if (id === before || saving.current) return
+    const rows = tags(group)
+    const source = rows.find(tag => tag.id === id)
+    if (!source) return
+    const reordered = rows.filter(tag => tag.id !== id)
+    const to = before === null ? reordered.length : reordered.findIndex(tag => tag.id === before)
+    if (to < 0 || to === rows.indexOf(source)) return
+    reordered.splice(to, 0, source)
+    const previous = settings
+    const name = group === 'main' ? 'mainTags' : 'secondaryTags'
+    setSettings(current => ({ ...current, [name]: reordered }))
+    focusAfterMove.current = { group, id }
+    start(async () => {
+      const result = await persist({ action: 'move', group, id, before })
+      if (!result.ok) {
+        setSettings(previous)
+        reorder.announce(result.message ?? 'Tag move could not be saved.')
+      }
+    })
+    return `Moved ${source.label} to position ${to + 1}.`
   }
   const close = () => {
     if (!saving.current) {
@@ -291,16 +330,8 @@ export function TagManager({
           {tags(group).length ? (
             <CatalogList
               aria-label={group === 'main' ? settings.mainLabel : settings.secondaryLabel}
-              onDragOver={event => {
-                if (dragged?.group === group) event.preventDefault()
-              }}
-              onDrop={event => {
-                if (event.target === event.currentTarget && dragged?.group === group) {
-                  event.preventDefault()
-                  move(group, dragged.id, null)
-                  setDragged(null)
-                }
-              }}
+              className={reorderStyles.list}
+              data-reorder-list
             >
               {tags(group).map((tag, index) => (
                 <CatalogRow
@@ -308,50 +339,39 @@ export function TagManager({
                   key={tag.id}
                   data-group={group}
                   data-tag-id={tag.id}
-                  data-dragging={(dragged?.id === tag.id && dragged.group === group) || undefined}
-                  onDragOver={event => {
-                    if (dragged?.group === group) event.preventDefault()
-                  }}
-                  onDrop={event => {
-                    if (dragged?.group === group) {
-                      event.preventDefault()
-                      event.stopPropagation()
-                      const box = event.currentTarget.getBoundingClientRect(),
-                        before =
-                          event.clientY > box.top + box.height / 2 ? (tags(group)[index + 1]?.id ?? null) : tag.id
-                      move(group, dragged.id, before)
-                      setDragged(null)
-                    }
-                  }}
+                  {...reorder.row(tagKey(group, tag.id), pending, false)}
                   leading={
-                    <IconButton
-                      tooltip={'Reorder ' + tag.label}
-                      variant="tertiary"
-                      size="s"
-                      disabled={pending}
-                      draggable={!pending}
-                      aria-keyshortcuts="Alt+ArrowUp Alt+ArrowDown"
-                      onDragStart={event => {
-                        event.dataTransfer.setData('text/plain', tag.id)
-                        event.dataTransfer.effectAllowed = 'move'
-                        setDragged({ group, id: tag.id })
-                      }}
-                      onDragEnd={() => setDragged(null)}
-                      onKeyDown={event => {
-                        if (event.altKey && (event.key === 'ArrowUp' || event.key === 'ArrowDown')) {
-                          event.preventDefault()
-                          const next = event.key === 'ArrowUp' ? index - 1 : index + 2
-                          if (
-                            (event.key === 'ArrowUp' && index === 0) ||
-                            (event.key === 'ArrowDown' && index === tags(group).length - 1)
-                          )
-                            return
-                          move(group, tag.id, tags(group)[next]?.id ?? null)
-                        }
-                      }}
-                    >
-                      <IconDrag size={16} />
-                    </IconButton>
+                    <>
+                      <DropIndicator marker={reorder.marker} row={tagKey(group, tag.id)} />
+                      {(reorder.blocked ?? reorder.rejection)?.row === tagKey(group, tag.id) && (
+                        <span className={reorderStyles.reason} aria-hidden="true">
+                          {(reorder.blocked ?? reorder.rejection)?.message}
+                        </span>
+                      )}
+                      <IconButton
+                        tooltip={'Reorder ' + tag.label}
+                        variant="tertiary"
+                        size="s"
+                        disabled={pending}
+                        aria-keyshortcuts="Alt+ArrowUp Alt+ArrowDown"
+                        {...reorder.grip(tagKey(group, tag.id), pending)}
+                        onKeyDown={event => {
+                          if (event.altKey && (event.key === 'ArrowUp' || event.key === 'ArrowDown')) {
+                            event.preventDefault()
+                            const next = event.key === 'ArrowUp' ? index - 1 : index + 2
+                            if (
+                              (event.key === 'ArrowUp' && index === 0) ||
+                              (event.key === 'ArrowDown' && index === tags(group).length - 1)
+                            )
+                              return
+                            const moved = move(group, tag.id, tags(group)[next]?.id ?? null)
+                            if (moved) reorder.announce(moved)
+                          }
+                        }}
+                      >
+                        <IconDrag size={16} />
+                      </IconButton>
+                    </>
                   }
                   title={
                     <>
@@ -410,6 +430,7 @@ export function TagManager({
         </ButtonLink>
         <span className={shared.meta}>Drag the grip to reorder. With the grip focused, use Alt + Up or Down.</span>
       </div>
+      <ReorderAnnouncement>{reorder.announcement}</ReorderAnnouncement>
       {edit && (
         <Dialog
           density="compact"
