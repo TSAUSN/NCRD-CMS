@@ -4,10 +4,10 @@ import type { SectionBodyBehavior } from './types.ts'
 
 export const reportTemplate: SectionBodyBehavior = (body, { def, values, options }) => {
   body = reportTemplateMarkup(
-      reportLinksMarkup(body, def.slug),
-      def.slug,
-      values,
-      options.annualReportTemplate === true,
-    )
+    reportLinksMarkup(body, def.slug),
+    def.slug,
+    values,
+    options.annualReportTemplate === true,
+  )
   return body
 }

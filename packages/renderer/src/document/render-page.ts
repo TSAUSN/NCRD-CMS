@@ -17,7 +17,13 @@ import { CORE_SECTION_LAYOUT_CSS } from '../national-panels.ts'
 import { SITE_WIDGET_CSS } from '../site-widgets.ts'
 import { renderSiteFiles } from '../site-files.ts'
 import { renderOriginalNavigation } from '../original-navigation.ts'
-import { originalLayout, originalDefinition, originalTemplateHeader, documentAttributes, themeCssWithinSections } from '../original-layout.ts'
+import {
+  originalLayout,
+  originalDefinition,
+  originalTemplateHeader,
+  documentAttributes,
+  themeCssWithinSections,
+} from '../original-layout.ts'
 import { siteWidget, type FooterConfigV2 } from '@cms/schema'
 import { resolveCanonical, type CanonicalDecision } from '../canonical.ts'
 import { escapeAttribute, escapeText, safeUrl } from '../escape.ts'
@@ -30,7 +36,18 @@ import { REVIEWED_ORIGINAL_NAVIGATION, type RenderManifest, type SiteShell, type
 import { renderSection } from '../section/render-section.ts'
 import { collectCss } from '../section/stylesheet.ts'
 import { themeCss } from '../theme/theme-css.ts'
-import { renderNavigation, parsedHeaderConfig, parsedFooterConfig, renderFrameComponent, frameComponentCss, renderConfiguredHeader, renderBaselineHeader, renderConfiguredFooter, renderBaselineFooter, globalElementsCss } from '../frame/site-frame.ts'
+import {
+  renderNavigation,
+  parsedHeaderConfig,
+  parsedFooterConfig,
+  renderFrameComponent,
+  frameComponentCss,
+  renderConfiguredHeader,
+  renderBaselineHeader,
+  renderConfiguredFooter,
+  renderBaselineFooter,
+  globalElementsCss,
+} from '../frame/site-frame.ts'
 
 export type PageDocument = {
   html: string

@@ -1,5 +1,13 @@
 import { originalLayout, originalDefinition, originalRoot } from '../original-layout.ts'
-import { FooterConfig, HeaderConfig, type FooterConfigV1 as FooterConfigView, type FooterConfigV2, type GlobalElementLink as GlobalLinkView, type HeaderConfigV1 as HeaderConfigView, type HeaderConfigV2 } from '@cms/schema'
+import {
+  FooterConfig,
+  HeaderConfig,
+  type FooterConfigV1 as FooterConfigView,
+  type FooterConfigV2,
+  type GlobalElementLink as GlobalLinkView,
+  type HeaderConfigV1 as HeaderConfigView,
+  type HeaderConfigV2,
+} from '@cms/schema'
 import { sectionScopeSelector } from '../compile.ts'
 import { escapeAttribute, escapeText, safeUrl } from '../escape.ts'
 import { REVIEWED_ORIGINAL_NAVIGATION, type SectionDefView, type NavigationNode, type RenderOptions } from '../types.ts'

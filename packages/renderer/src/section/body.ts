@@ -1,5 +1,21 @@
-import { renderCollectionTemplate, markCollectionTemplateParents, collectionTemplateMarker, type CollectionTemplateMark } from '../collection-template.ts'
-import { isDrawingSlot, isIconSlot, MATERIAL_ICON_PRESENTATION, isSourceDrawing, repeatItemKeys, SOURCE_DRAWINGS, repeatItemSlotId, repeatItemSpec, collectionTemplateSpec, type SlotDef } from '@cms/schema'
+import {
+  renderCollectionTemplate,
+  markCollectionTemplateParents,
+  collectionTemplateMarker,
+  type CollectionTemplateMark,
+} from '../collection-template.ts'
+import {
+  isDrawingSlot,
+  isIconSlot,
+  MATERIAL_ICON_PRESENTATION,
+  isSourceDrawing,
+  repeatItemKeys,
+  SOURCE_DRAWINGS,
+  repeatItemSlotId,
+  repeatItemSpec,
+  collectionTemplateSpec,
+  type SlotDef,
+} from '@cms/schema'
 import { upgradeCompiledSection, isTypedAttributeBinding, repeatRanges, type AstNode } from '../compile.ts'
 import { renderCmsIcon, renderMaterialIcon } from '../icons.ts'
 import { scanSlotSites } from '../context.ts'
