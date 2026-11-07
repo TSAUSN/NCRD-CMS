@@ -95,3 +95,38 @@ test('a stalled inline preview offers a standalone view and can be retried', asy
     await f.pool.end()
   }
 })
+
+test('Header & menu can ask a loaded preview to repeat its size after missing the first announcement', async ({
+  page,
+}) => {
+  const f = await sawsoFixture(true, true)
+  try {
+    await page.addInitScript(() => {
+      if (window === window.top) {
+        // Ignore early announcements until the same frame acknowledges a size request.
+        const requested = new Set<MessageEvent['source']>()
+        window.addEventListener(
+          'message',
+          event => {
+            if (event.data === 'test:frame-size-requested') requested.add(event.source)
+            if (event.data?.type === 'cms:frame-size' && !requested.has(event.source)) event.stopImmediatePropagation()
+          },
+          true,
+        )
+      } else {
+        window.addEventListener('message', event => {
+          if (event.source === window.parent && event.data?.type === 'cms:request-frame-size')
+            window.parent.postMessage('test:frame-size-requested', event.origin)
+        })
+      }
+    })
+    await signIn(page, 'root@example.test')
+    await page.goto('/sites/' + f.siteId + '/header')
+    await expect(page.frameLocator('iframe[title="Header preview"]').locator('header')).toBeVisible()
+    await expect(page.getByText('Opening preview…', { exact: true })).toHaveCount(0)
+  } finally {
+    await f.pool.query('UPDATE sites SET archived_at=now() WHERE id=$1', [f.siteId])
+    f.client.release()
+    await f.pool.end()
+  }
+})

@@ -1,3 +1,4 @@
+import { PREVIEW_MESSAGE } from '@cms/renderer/preview-messages'
 import { reportPreviewFonts } from './isolated-font-check.ts'
 import { reportFramePreviewSize } from './report-frame-preview-size.ts'
 import { revealPreviewArea } from './preview-scroll.ts'
@@ -197,6 +198,18 @@ if (token && /^[a-f0-9]{64}$/.test(token)) {
     }
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', ready, { once: true })
     else ready()
+    const parentOrigin = document.documentElement.getAttribute('data-cms-parent-origin')
+    const channel = document.documentElement.getAttribute('data-cms-channel')
+    if (parentOrigin && channel && window.parent !== window)
+      window.addEventListener('message', event => {
+        if (
+          event.source === window.parent &&
+          event.origin === parentOrigin &&
+          event.data?.type === PREVIEW_MESSAGE.requestFrameSize &&
+          event.data.channel === channel
+        )
+          reveal()
+      })
     window.addEventListener('load', reveal, { once: true })
     window.addEventListener('hashchange', reveal)
     window.addEventListener('resize', () => raf(reveal))

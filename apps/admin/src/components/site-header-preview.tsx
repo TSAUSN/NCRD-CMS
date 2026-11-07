@@ -1,5 +1,6 @@
 'use client'
 
+import { PREVIEW_MESSAGE } from '@cms/renderer/preview-messages'
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react'
 import { framePreviewHeight } from '../lib/frame-preview-size.ts'
 import { Button, TextLink } from './ui/index.ts'
@@ -119,16 +120,17 @@ export function SiteHeaderPreview({
                 if (frame) frames.current.set(preview.href, frame)
                 else frames.current.delete(preview.href)
               }}
-              onLoad={() => {
-                // The owned ticket sends its verified size after the frame is
-                // ready. A generic iframe load also fires on error pages.
-                if (
-                  preview.channel ||
-                  latest.current?.href !== preview.href ||
-                  displayed.current?.href === preview.href
-                )
-                  return
-                setShown(preview)
+              onLoad={event => {
+                if (latest.current?.href !== preview.href || displayed.current?.href === preview.href) return
+                if (preview.channel) {
+                  // The child may have sent its initial size before the editor attached its listener.
+                  // Ask again; load itself also fires for an error page and doesn't make a ticket ready.
+                  const origin = new URL(preview.href, window.location.href).origin
+                  event.currentTarget.contentWindow?.postMessage(
+                    { type: PREVIEW_MESSAGE.requestFrameSize, channel: preview.channel },
+                    origin,
+                  )
+                } else setShown(preview)
               }}
               aria-hidden={!active || undefined}
               inert={!active || !expanded}

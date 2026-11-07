@@ -45,6 +45,8 @@ export const PREVIEW_MESSAGE = {
   fontStatus: 'cms:font-status',
   /** canvas → editor: bounded read-only frame size, with the same ticket channel */
   frameSize: 'cms:frame-size',
+  /** editor → canvas: request the owned frame size again after load */
+  requestFrameSize: 'cms:request-frame-size',
   /** editor → canvas: repeat readiness after hydration or a frame load */
   requestReady: 'cms:request-ready',
   /**
