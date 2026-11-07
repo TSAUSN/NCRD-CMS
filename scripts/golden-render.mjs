@@ -3,7 +3,7 @@
 import { writeFileSync, readFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { spawnSync } from 'node:child_process'
-import { target, privateDirectory, fixture, applications, schemaSnapshot, localCookie } from './golden/local.mjs'
+import { target, privateDirectory, fixture, applications, schemaSnapshot, localCookie, root } from './golden/local.mjs'
 import { publicPages, directPreviews } from './golden/http.mjs'
 import { canvasPreviews } from './golden/canvas.mjs'
 import { compareSnapshots } from './golden/compare.mjs'
@@ -41,13 +41,13 @@ async function main() {
   try {
     const manifest = {},
       functions = await schemaSnapshot(t, out)
-    const assets = await publicPages(t, out, data.routes, manifest)
+    const assets = await publicPages(t, out, data, manifest)
     const cookie = localCookie(data.owner.email)
     await directPreviews(t, out, data.routes, cookie, manifest)
     const canvases = await canvasPreviews(t, out, data.routes, cookie, manifest, resolve(option('--canvas-state')))
     const summary = {
       at: new Date().toISOString(),
-      source: spawnSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).stdout.trim(),
+      source: spawnSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).stdout.trim(),
       database: t.database,
       ports: t.ports,
       pages: data.routes.length,

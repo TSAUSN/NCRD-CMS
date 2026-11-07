@@ -7,7 +7,7 @@ import { resolve, join } from 'node:path'
 import { createHmac } from 'node:crypto'
 import { setTimeout as pause } from 'node:timers/promises'
 import { e2ePorts } from '../../e2e/test-ports.ts'
-export const root = resolve(import.meta.dirname, '../..')
+export const root = resolve(process.env.CMS_GOLDEN_CHECKOUT ?? resolve(import.meta.dirname, '../..'))
 export const { Client } = createRequire(join(root, 'packages/schema/package.json'))('pg')
 export const AUTH_SECRET = 'isolated-golden-local-only-not-a-hosted-credential'
 export function target(env = process.env) {
@@ -172,8 +172,17 @@ export async function fixture(t) {
       )
     ).rows
     if (owner.length !== 1) throw Error('Golden fixture must have exactly one active Super admin.')
+    const nonStaging = (
+      await db.query(
+        `SELECT d.hostname_normalized AS host, r.path
+         FROM domains d JOIN published_routes r ON r.site_id=d.site_id
+        WHERE d.kind='primary' AND d.status='live' AND d.site_id=ANY($1::uuid[])
+        ORDER BY d.hostname_normalized, r.path LIMIT 1`,
+        [[...new Set(routes.map(route => route.site_id))]],
+      )
+    ).rows[0]
     await db.query('COMMIT')
-    return { routes, owner: owner[0] }
+    return { routes, owner: owner[0], nonStaging }
   } finally {
     await db.end()
   }
