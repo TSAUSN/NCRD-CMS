@@ -3,6 +3,20 @@
 For the maintainer and IT.
 Last checked: November 5, 2026, on personal review build `6c20751`.
 
+## Startup probe trial
+
+A probe-only trial on a review Admin service used two-second checks and a
+two-second timeout. A cold health request returned its first byte at 11.3 seconds
+with the original probe. Two trials of the same image with the new probe took
+22.3 and 21.7 seconds. Each measurement followed an idle window and the platform
+logged a new instance. The trial was rolled back. These samples show what happened
+on that service; they do not establish a general relationship between probe
+frequency and Cloud Run cold starts.
+
+Startup CPU boost stays off because [Google bills the additional allocated CPU](https://docs.cloud.google.com/run/docs/configuring/services/cpu).
+Verify database connection usage per process before increasing either the
+database pool size or the Admin instance limit.
+
 ## What was measured
 
 Independent Playwright Chromium, signed in as the maintainer, without Chrome's debugging
