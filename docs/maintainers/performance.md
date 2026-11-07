@@ -192,3 +192,7 @@ keeps its original loading behavior.
 The picker comparison used 48 distinct sample image URLs. The browser
 was scrolled through the full result list. All 48 images decoded
 after scrolling, at both widths.
+
+The editor uses the progress bar on the outgoing screen. The route must
+wait to send headers until it can return the correct status for an
+unauthorized or missing page.
