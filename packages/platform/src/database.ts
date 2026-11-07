@@ -24,7 +24,11 @@ const ENV_VAR: Record<DatabaseRole, string> = {
   migration: 'DATABASE_URL',
 }
 
-const pools = new Map<DatabaseRole, Pool>()
+// Next can bundle the server module separately for different routes. Keep
+// one connection budget per role and process, even across those copies.
+const poolRegistryKey = Symbol.for('cms.database-pools')
+const processGlobals = globalThis as typeof globalThis & { [poolRegistryKey]?: Map<DatabaseRole, Pool> }
+const pools = (processGlobals[poolRegistryKey] ??= new Map<DatabaseRole, Pool>())
 
 export function connectionStringFor(role: DatabaseRole): string {
   const url = process.env[ENV_VAR[role]]
@@ -53,7 +57,16 @@ export function poolSizeFor(role: DatabaseRole, env: Record<string, string | und
 export function poolFor(role: DatabaseRole): Pool {
   let pool = pools.get(role)
   if (!pool) {
-    pool = new Pool({ connectionString: connectionStringFor(role), max: poolSizeFor(role) })
+    pool = new Pool({
+      connectionString: connectionStringFor(role),
+      max: poolSizeFor(role),
+      connectionTimeoutMillis: 15000,
+      idleTimeoutMillis: 120000,
+      application_name: `cms-${role}`,
+    })
+    // pg removes a failed idle client. Handle the event so a dropped socket
+    // cannot crash the process, and avoid logging database or query details.
+    pool.on('error', () => console.error(JSON.stringify({ event: 'cms.database.idle-client-error', role })))
     pools.set(role, pool)
   }
   return pool

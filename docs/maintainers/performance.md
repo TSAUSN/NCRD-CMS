@@ -63,3 +63,36 @@ Five warm samples per route. The work columns include requests initiated by the 
 | People | 353 | 381 | 0 | 1 | 6 | 24 |
 | Inbox | 60 | 83 | 0 | 1 | 6 | 24 |
 | Editor | 314 | 434 | 0 | 1 | 38 | 164 |
+
+## Bound the database connection wait
+
+Two independently loaded server modules previously opened four authenticated
+connections at a configured limit of two. The process now shares the two
+connections, without merging database roles. An exhausted original pool was
+still waiting after 16 seconds; the new checkout timed out in 15.001 seconds.
+After the test closed an idle connection, the pool opened a replacement.
+Long-running statements still have no new timeout.
+
+These warm local journeys show the cost of enforcing the configured limit:
+Site overview, Header and Footer waited longer for connections. The change
+bounds a stalled checkout and avoids multiplying the connection count; it
+does not make those individual screens faster. Connection wait is summed
+across concurrent journey requests and can exceed elapsed screen time.
+
+| Route | Controls before (ms) | Controls after (ms) | Connection wait before (ms) | Connection wait after (ms) |
+| --- | ---: | ---: | ---: | ---: |
+| Home | 382 | 376 | 202 | 202 |
+| All sites | 352 | 364 | 0 | 0 |
+| Site overview | 242 | 337 | 190 | 622 |
+| Pages | 185 | 185 | 77 | 75 |
+| Stories | 131 | 133 | 216 | 188 |
+| Story editor | 220 | 226 | 1 | 1 |
+| Media | 411 | 412 | 141 | 138 |
+| Lists | 175 | 179 | 297 | 294 |
+| Header | 468 | 538 | 552 | 1040 |
+| Footer | 518 | 591 | 575 | 1048 |
+| Site look | 236 | 249 | 468 | 464 |
+| Publishing | 280 | 280 | 23 | 21 |
+| People | 353 | 353 | 3 | 3 |
+| Inbox | 60 | 60 | 2 | 4 |
+| Editor | 314 | 328 | 1136 | 1159 |
