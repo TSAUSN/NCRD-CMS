@@ -42,15 +42,16 @@ export async function savePageDraft(formData: FormData): Promise<ActionResult> {
   // and is permanent.
   const kind = formData.get('kind') === 'autosave' ? 'autosave' : 'checkpoint'
 
+  let parsedContent: unknown
   try {
-    JSON.parse(content)
+    parsedContent = JSON.parse(content)
   } catch {
     return { ok: false, kind: 'error', message: 'The section content is not valid JSON.' }
   }
 
   try {
     const saved = await asUser({ userId: session.principal.userId, requestId: randomUUID() }, async client => {
-      await validateAppearanceEdits(client, JSON.parse(content))
+      await validateAppearanceEdits(client, parsedContent)
       const previous = (
         await client.query<{ meta: unknown }>(
           'SELECT v.meta FROM pages p LEFT JOIN page_versions v ON v.id=p.draft_version_id WHERE p.id=$1',

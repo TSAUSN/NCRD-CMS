@@ -278,3 +278,14 @@ on the measured release. Instance-start logs confirmed both cold samples;
 they do not show a gain. One-off hosted save and publish observations were
 not a matched workload. Repeat the same edit on the same disposable page
 under both builds to draw a publishing performance conclusion.
+
+## Save section appearance by exact definition version
+
+For a save with appearance choices, the lookup now uses the existing
+`(section_def_id, version)` index. An empty or reset appearance needs no lookup.
+The old query concatenated both columns and visited the catalogue to find the
+section. In 15 warm paired reads under the same Admin database role, the
+identical definitions returned in 78.4 → 1.08 ms on a local SAWSO page and
+77.3 → 0.79 ms on the local Echelon home page. These are lookup times, not
+hosted or end-to-end save times. The Echelon browser saved a spacing choice,
+reloaded it and showed the same published heading to a separate visitor.
