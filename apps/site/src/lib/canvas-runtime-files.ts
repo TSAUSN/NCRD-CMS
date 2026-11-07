@@ -9,12 +9,15 @@ let loaded: Promise<{ editing: Runtime; visitor: Runtime }> | undefined
 export async function canvasRuntimeFiles(visitor = false): Promise<Runtime> {
   const files = await (loaded ??= Promise.all(
     ['prelude.js', 'preview.js', 'preview.css'].map(async name => {
-      const bytes = await readFile(join(process.cwd(), 'public', '__cms', 'editor', name)),
-        hash = 'sha256-' + createHash('sha256').update(bytes).digest('base64')
+      const bytes = await readFile(join(process.cwd(), 'public', '__cms', 'editor', name))
+      const digest = createHash('sha256').update(bytes).digest()
+      const hash = 'sha256-' + digest.toString('base64')
+      // A cached response from a previous release cannot satisfy today's SRI.
+      const path = '/__cms/editor/' + name + '?v=' + digest.toString('hex')
       return {
         tag: name.endsWith('.css')
-          ? `<link rel="stylesheet" href="/__cms/editor/${name}" integrity="${hash}">`
-          : `<script src="/__cms/editor/${name}" integrity="${hash}"></script>`,
+          ? `<link rel="stylesheet" href="${path}" integrity="${hash}">`
+          : `<script src="${path}" integrity="${hash}"></script>`,
         hash,
       }
     }),
