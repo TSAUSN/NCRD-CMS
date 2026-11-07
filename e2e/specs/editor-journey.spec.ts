@@ -57,8 +57,8 @@ async function createPage(page: Page, name: string): Promise<{ slug: string }> {
   const slug = `journey-${Date.now()}-${Math.floor(Math.random() * 1000)}`
   await page.getByRole('main').getByRole('link', { name: 'Demo site', exact: true }).click()
   await page.waitForURL(/\/sites\/[0-9a-f-]{36}$/)
-  // Blank begins with a real Page header in revision 8. Verify it first, then
-  // deliberately remove it so these journeys still cover a person emptying a page.
+  // Blank begins with a real Page header and designed Text block. Verify both,
+  // then remove both so these journeys still cover a person emptying a page.
   await page.getByRole('button', { name: 'Add a page' }).click()
   const draft = page.getByRole('dialog', { name: 'New page', exact: true })
   await draft.getByLabel('Page title', { exact: true }).fill(name)
@@ -80,9 +80,14 @@ async function createPage(page: Page, name: string): Promise<{ slug: string }> {
   }
   await expect(page.getByRole('complementary', { name: 'Page structure' })).toBeVisible()
   await expect(canvas(page).locator('h1')).toHaveText(name)
-  await expect(treeLabels(page)).toHaveCount(1)
-  await treeLabels(page).first().click()
-  await deleteSelectedSection(page)
+  await expect(treeLabels(page)).toHaveCount(2)
+  await expect(canvas(page).locator('[data-cms-section="0"] h1')).toHaveText(name)
+  await expect(canvas(page).locator('[data-cms-section="1"]')).toContainText('A shared purpose.')
+  for (const remaining of [1, 0]) {
+    await treeLabels(page).first().click()
+    await deleteSelectedSection(page)
+    await expect(treeLabels(page)).toHaveCount(remaining)
+  }
   await saveDraft(page)
   await page.reload()
   await expect(page.getByRole('heading', { name: 'This page is empty', exact: true })).toBeVisible()
