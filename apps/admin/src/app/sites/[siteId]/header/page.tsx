@@ -8,10 +8,10 @@ import {
   getNavigationWorkspace,
   getDraftTheme,
   canManageTheme,
-  listMediaAssets,
   roleLabel,
 } from '../../../../lib/queries.ts'
 import { publicSiteOrigin } from '../../../../lib/public-site-url.ts'
+import { readHeaderLogoChoices } from './logo-choices.ts'
 import { HeaderMenuWorkspace } from './workspace.tsx'
 import styles from '../../../../components/workspace.module.css'
 export const dynamic = 'force-dynamic'
@@ -22,15 +22,15 @@ export default async function HeaderPage({ params }: { params: Promise<{ siteId:
     site = await getSite(session.principal.userId, siteId)
   if (!site || site.original_design) notFound()
   const user = session.principal.userId
-  const [frame, menu, theme, allowed, media, role] = await Promise.all([
+  const [frame, menu, theme, allowed, role] = await Promise.all([
     getGlobalElementsWorkspace(user, siteId),
     getNavigationWorkspace(user, siteId),
     getDraftTheme(user, siteId),
     canManageTheme(user, siteId),
-    listMediaAssets(user, siteId),
     roleLabel(user),
   ])
   if (!frame || !menu || !theme || !allowed) notFound()
+  const media = await readHeaderLogoChoices(user, siteId, frame.header.draft)
   return (
     <AppShell email={session.email} role={role} groups={navigationFor(site, session.principal)}>
       <main id="main" className={'wrap wrap-wide ' + styles.page + ' ' + styles.compactForm}>
@@ -41,7 +41,7 @@ export default async function HeaderPage({ params }: { params: Promise<{ siteId:
           initial={frame}
           navigation={menu}
           theme={theme}
-          media={media.filter(item => item.status === 'ready' && !item.deletedAt)}
+          media={media}
           superAdmin={session.principal.isSuperAdmin}
           origin={publicSiteOrigin(site.staging_hostname)}
         />

@@ -12,7 +12,7 @@ import {
   type SlotDef,
 } from '@cms/schema'
 import type { GlobalElementsWorkspace, NavigationWorkspace } from '../../../../lib/queries.ts'
-import type { MediaAsset } from '../../../../lib/media-library.ts'
+import type { HeaderLogoChoice } from './logo-choices.ts'
 import { carryFrameValues } from '../../../../lib/frame-field-values.ts'
 import { useNavigationGuard } from '../../../../components/navigation-guard.ts'
 import {
@@ -59,7 +59,7 @@ export function HeaderMenuWorkspace({
   initial: GlobalElementsWorkspace
   navigation: NavigationWorkspace
   theme: ThemeTokens
-  media: MediaAsset[]
+  media: HeaderLogoChoice[]
   superAdmin: boolean
   origin: string | null
 }) {
@@ -683,7 +683,7 @@ export function HeaderMenuWorkspace({
           siteId={siteId}
           mode="placement"
           confirmLabel="Use this logo"
-          initialAssets={media}
+          initialAssets={[]}
           currentValue={logo}
           onChoose={image => {
             value('logo', { ...image, decorative: false })
