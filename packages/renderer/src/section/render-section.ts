@@ -1,30 +1,24 @@
 import { reportIndexValues } from '../report-index.ts'
-import { reportTemplateMarkup, reportPhoto } from '../report-template.ts'
-import { reportPart, nationalTileLayout } from '@cms/schema'
-import { reportLinksMarkup } from '../report-links.ts'
+import { reportPhoto } from '../report-template.ts'
+import { reportPart } from '@cms/schema'
 import { reportPageLinkValues } from '@cms/schema'
-import { reportStoryMarkup } from '../report-story.ts'
-import { reportFinancialMarkup } from '../report-financial.ts'
-import { renderEchelonSocialMarks } from '../echelon-social-marks.ts'
 import { resolveDataValueFields, dataValueBindings } from '@cms/schema'
 import { siteSocialSectionValues, siteSocialGroup, usesSiteSocialAccounts } from '@cms/schema'
-import { storySplitValues, renderStorySplit } from '../story-split.ts'
-import { storyWorldValues, renderStoryWorld } from '../story-world.ts'
+import { storySplitValues } from '../story-split.ts'
+import { storyWorldValues } from '../story-world.ts'
 import { renderHeroSlides } from '../hero-slides.ts'
 import { isHeroSlides } from '@cms/schema'
 import { nationalSectionPanel } from '../national-panels.ts'
 import { newsroomValues } from '../newsroom.ts'
 import { withStoryFeedDates, withStoryVisibility, isStoryFeedSlot } from '../story-feed-dates.ts'
-import { renderStoryGrid } from '../story-grid.ts'
-import { renderStoryAuthor, renderStoryArchive, renderStoryDetail } from '../story-archive.ts'
 import { originalLayout, originalDefinition, originalRoot } from '../original-layout.ts'
 import { repeatItemKeys, sampleFieldNames, repeatItemSpec } from '@cms/schema'
 import { escapeAttribute } from '../escape.ts'
-import { resolvedCollection } from '../structured.ts'
 import { validSectionAnchor, sectionAnchorNames } from '@cms/schema'
 import { type ManifestSection, type RenderOptions } from '../types.ts'
-import { BREAKPOINT_MAX_WIDTH, STORY_FEED_SLUGS, compiledCssProblems } from './stylesheet.ts'
+import { BREAKPOINT_MAX_WIDTH, compiledCssProblems } from './stylesheet.ts'
 import { renderSectionBody } from './body.ts'
+import { applySectionBodyBehaviors } from '../behaviors/registry.ts'
 
 export function renderSection(section: ManifestSection, index: number, options: RenderOptions = {}): string {
   const { instance, def } = section
@@ -168,35 +162,7 @@ export function renderSection(section: ManifestSection, index: number, options: 
       Object.hasOwn(bindings, key) ? `data-cms-slot="${key}" data-cms-kind="saved-number" tabindex="0"` : attributes,
     )
   }
-  if (!raw && def.slug === 'core-feature-tiles')
-    body = body.replace(
-      'class="national-tiles"',
-      'class="national-tiles" data-national-tile-layout="' +
-        nationalTileLayout(values, resolvedCollection(values.cards)?.entries.length) +
-        '"',
-    )
-  if (!raw) body = renderEchelonSocialMarks(body, def.slug)
-  if (!raw)
-    body = reportTemplateMarkup(
-      reportLinksMarkup(body, def.slug),
-      def.slug,
-      values,
-      options.annualReportTemplate === true,
-    )
-  if (!raw)
-    body = reportStoryMarkup(
-      reportFinancialMarkup(body, def.slug, values),
-      def.slug,
-      values,
-      options.annualReportTemplate === true,
-    )
-  if (!raw && def.slug === 'core-story-detail') body = renderStoryDetail(renderStoryAuthor(body, values.story))
-  if (!raw && world) body = renderStoryWorld(body, index, world)
-  if (!raw && split) body = renderStorySplit(body, index, split)
-  if (!raw && def.slug === 'core-stories' && Object.hasOwn(values, 'newsroom'))
-    body = renderStoryArchive(body, values.newsroom)
-  if (!raw && STORY_FEED_SLUGS.has(def.slug ?? '') && (def.slots ?? []).some(slot => isStoryFeedSlot(slot, def.slug)))
-    body = renderStoryGrid(body)
+  if (!raw) body = applySectionBodyBehaviors(body, { def, values, options, index, world, split })
   const report = reportPart(def.slug, values)
   if (options.nationalPanels && !report) body = nationalSectionPanel(body, def.slug, values)
   const blockId = `s${index}`
