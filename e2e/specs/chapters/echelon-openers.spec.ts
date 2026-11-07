@@ -204,7 +204,7 @@ test('Echelon shared opener uses fixed navy columns, a visible logo, normal edit
     await expect(page.getByRole('heading', { name: '[Updated Echelon page]', exact: true })).toBeVisible()
   } finally {
     await f.client.query('ROLLBACK').catch(() => {})
-    await f.pool.query('UPDATE sites SET archived_at=now() WHERE id=$1', [f.site])
+    await f.archive()
     f.client.release()
     await f.pool.end()
     const store = createFilesystemMediaStore(defaultMediaRoot())

@@ -325,7 +325,7 @@ test('national map uses published chapter identities, native search and links, s
   } finally {
     await f.client.query('ROLLBACK').catch(() => {})
     for (const fixture of [f, other]) {
-      await fixture.pool.query('UPDATE sites SET archived_at=now() WHERE id=$1', [fixture.site])
+      await fixture.archive()
       fixture.client.release()
       await fixture.pool.end()
     }

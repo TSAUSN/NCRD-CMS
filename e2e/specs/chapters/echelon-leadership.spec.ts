@@ -143,7 +143,7 @@ test('national leadership keeps its group photo and editable council portraits t
     await expect(page.getByText('[Updated leadership introduction]', { exact: true })).toBeVisible()
   } finally {
     await f.client.query('ROLLBACK').catch(() => {})
-    await f.pool.query('UPDATE sites SET archived_at=now() WHERE id=$1', [f.site])
+    await f.archive()
     f.client.release()
     await f.pool.end()
     const store = createFilesystemMediaStore(defaultMediaRoot())

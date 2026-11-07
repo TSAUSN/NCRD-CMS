@@ -299,7 +299,7 @@ test('picture focus drags once into page history, previews crops and publishes o
     }
     expect(errors).toEqual([])
   } finally {
-    await f.pool.query('UPDATE sites SET archived_at=now() WHERE id=$1', [f.site])
+    await f.archive()
     f.client.release()
     await f.pool.end()
     const store = createFilesystemMediaStore(defaultMediaRoot())

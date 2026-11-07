@@ -35,7 +35,13 @@ export async function echelonFixture(withChapters = false, withSetups = true, of
     if (withChapters) await ensureChapterDemoPages(client, site.siteId)
     const pages = (await client.query('SELECT id,slug FROM pages WHERE site_id=$1', [site.siteId])).rows
     await client.query('COMMIT')
-    return { pool, client, actor, site: site.siteId, hostname: site.hostname, pages }
+    // Removing fixture image files must not leave an active Home card pointing at them.
+    async function archive() {
+      await pool.query("UPDATE sites SET status='archived',archived_at=COALESCE(archived_at,now()) WHERE id=$1", [
+        site.siteId,
+      ])
+    }
+    return { pool, client, actor, site: site.siteId, hostname: site.hostname, pages, archive }
   } catch (error) {
     await client.query('ROLLBACK')
     client.release()

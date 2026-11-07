@@ -66,7 +66,7 @@ test('Echelon reference import uses normal Media uploads, keeps focus/descriptio
       await page.screenshot({ path: resolve(folder, 'imported-' + width + '.png') })
     }
   } finally {
-    await f.pool.query('UPDATE sites SET archived_at=now() WHERE id=$1', [f.site])
+    await f.archive()
     f.client.release()
     await f.pool.end()
     for (const key of objects) await store.remove(key)

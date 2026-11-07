@@ -219,7 +219,7 @@ test('chapter event dates and no-script details work while Follow can use saved 
     await expect(page.locator('.saved-state')).toContainText('All changes saved')
   } finally {
     await f.client.query('ROLLBACK').catch(() => {})
-    await f.pool.query('UPDATE sites SET archived_at=now() WHERE id=$1', [f.site])
+    await f.archive()
     f.client.release()
     await f.pool.end()
     const store = createFilesystemMediaStore(defaultMediaRoot())

@@ -195,7 +195,7 @@ test('reviewed chapter composition uses shared sections and supplied Media field
     ).toBe(live)
   } finally {
     await f.client.query('ROLLBACK').catch(() => {})
-    await f.pool.query('UPDATE sites SET archived_at=now() WHERE id=$1', [f.site])
+    await f.archive()
     f.client.release()
     await f.pool.end()
     const store = createFilesystemMediaStore(defaultMediaRoot())
