@@ -465,6 +465,16 @@
   min-height: 0;
   overflow: auto;
 }
+/* Focus outlines need paint space inside a scrolling dialog. Compensating
+   margins retain the existing field alignment with the heading and footer.
+   Compact dialogs already supply their own larger body padding. */
+.modal:not([data-density='compact']) .modalBody {
+  padding-inline: var(--space-2);
+  padding-block: var(--space-2);
+  margin-inline: calc(var(--space-2) * -1);
+  scroll-padding-block: var(--space-2);
+}
+
 .modalFooter {
   display: flex;
   flex: none;
