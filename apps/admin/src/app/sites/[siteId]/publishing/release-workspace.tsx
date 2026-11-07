@@ -91,11 +91,13 @@ export function ReleaseWorkspace({
 }) {
   const [headerTarget, setHeaderTarget] = useState<HTMLElement | null>(null)
   useEffect(() => setHeaderTarget(headerActionsId ? document.getElementById(headerActionsId) : null), [headerActionsId])
-  const [selected, setSelected] = useState<string[]>(() =>
-    selectedReleaseKeys(items, canAdminister, initialArea, initialPick),
-  )
   const [current, setCurrent] = useState<ListedRelease | null>(
     () => releases.find(release => release.id === initialReleaseId) ?? null,
+  )
+  const [selected, setSelected] = useState<string[]>(() =>
+    current?.status === 'planned'
+      ? current.snapshot.map(item => item.key)
+      : selectedReleaseKeys(items, canAdminister, initialArea, initialPick),
   )
   const [result, setResult] = useState<ReleaseResult | null>(null)
   const [override, setOverride] = useState(''),
@@ -246,7 +248,9 @@ export function ReleaseWorkspace({
       zone === 'your device time zone' ? Intl.DateTimeFormat().resolvedOptions().timeZone : zone,
     ),
     scheduleHint = localScheduleHint(time, scheduleTime)
-  const picked = items.filter(item => selected.includes(item.key))
+  // The saved review is authoritative. An edit to its selection starts a new review.
+  const checkedItems = new Set(current?.status === 'planned' ? current.snapshot.map(item => item.key) : selected)
+  const picked = items.filter(item => checkedItems.has(item.key) && (!item.requiresAdmin || canAdminister))
   const hasSamples =
     current?.preview_report.some(check => check.report.blocking.some(finding => finding.rule === 'sample_content')) ??
     false
@@ -291,6 +295,16 @@ export function ReleaseWorkspace({
     setResult(null)
     setOverride('')
     setSamplesConfirmed(false)
+  }
+  function chooseItem(key: string, checked: boolean) {
+    const change = () => {
+      const next = new Set(picked.map(item => item.key))
+      if (checked) next.add(key)
+      else next.delete(key)
+      resetReview()
+      setSelected([...next])
+    }
+    if (requestLocalDraftNavigation(leaveIntent, change)) change()
   }
   function prepare(later: boolean) {
     requestId.current ??= crypto.randomUUID()
@@ -542,18 +556,9 @@ export function ReleaseWorkspace({
                             <input
                               type="checkbox"
                               aria-label={releaseLabel(item)}
-                              checked={selected.includes(item.key)}
+                              checked={checkedItems.has(item.key)}
                               disabled={pending || archived}
-                              onChange={event => {
-                                const checked = event.target.checked,
-                                  change = () => {
-                                    resetReview()
-                                    setSelected(old =>
-                                      checked ? [...old, item.key] : old.filter(key => key !== item.key),
-                                    )
-                                  }
-                                if (requestLocalDraftNavigation(leaveIntent, change)) change()
-                              }}
+                              onChange={event => chooseItem(item.key, event.target.checked)}
                             />
                           </label>
                         )}
@@ -639,20 +644,11 @@ export function ReleaseWorkspace({
                             {canPublish && (
                               <input
                                 type="checkbox"
-                                checked={selected.includes(item.key)}
+                                checked={checkedItems.has(item.key)}
                                 disabled={
                                   pending || !canPublish || archived || (!!item.requiresAdmin && !canAdminister)
                                 }
-                                onChange={event => {
-                                  const checked = event.target.checked,
-                                    change = () => {
-                                      resetReview()
-                                      setSelected(old =>
-                                        checked ? [...old, item.key] : old.filter(key => key !== item.key),
-                                      )
-                                    }
-                                  if (requestLocalDraftNavigation(leaveIntent, change)) change()
-                                }}
+                                onChange={event => chooseItem(item.key, event.target.checked)}
                               />
                             )}
                             <span>
