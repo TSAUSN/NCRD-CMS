@@ -3,6 +3,7 @@ import { asUser, evaluateVersionReadiness, evaluateVersionsReadiness, type Query
 import { DomainError, READINESS_POLICY_VERSION, type ReadinessReport } from '@cms/domain'
 import { renderPage, type RenderManifest, type SiteShell } from '@cms/renderer'
 import { releaseReadinessFixLinks } from './readiness-targets.ts'
+import { changedNumberIds, numbersOnlySettingsChange } from './number-release-scope.ts'
 import { SCRIPTLESS_RENDER_OPTIONS } from './scriptless-preview.ts'
 
 export type ReleaseType =
@@ -121,16 +122,8 @@ export async function releaseCandidates(client: Queryable, siteId: string): Prom
       )
     ).rows[0]
     if (row) {
-      let title: string = label
-      if (type === 'site_settings') {
-        const onlyNumbers = (
-          await client.query(
-            "SELECT d.settings-'dataValues'=(jsonb_build_object('schemaVersion',1)||COALESCE(l.settings,'{}'::jsonb))-'dataValues' AND d.settings->'dataValues' IS DISTINCT FROM l.settings->'dataValues' AS numbers FROM site_settings h JOIN site_setting_versions d ON d.id=h.draft_version_id LEFT JOIN site_setting_versions l ON l.id=h.published_version_id WHERE h.site_id=$1",
-            [siteId],
-          )
-        ).rows[0]?.numbers
-        if (onlyNumbers) title = 'Data values'
-      }
+      const title =
+        type === 'site_settings' && (await numbersOnlySettingsChange(client, siteId, row.draft)) ? 'Data values' : label
       items.push({
         key: `${type}:${row.id}`,
         type,
@@ -544,6 +537,12 @@ async function simulateRelease(
   preparedChecks?: ReleaseCheck[],
 ): Promise<{ checks: ReleaseCheck[]; afterHash: string; scopeHash: string | null; html?: string }> {
   await checkInitialRelease(client, siteId, items)
+  const [only] = items
+  // Other settings, multi-item releases and recovery can affect the whole site.
+  const numberIds =
+    items.length === 1 && only?.type === 'site_settings' && only.versionId && !only.recoveryId && !only.action
+      ? await changedNumberIds(client, siteId, only.versionId)
+      : null
   const plannedPaths = (
     await client.query<{ path: string }>(
       `SELECT path FROM published_routes WHERE site_id=$1 AND page_id<>ALL($3::uuid[])
@@ -583,8 +582,10 @@ async function simulateRelease(
         `
       SELECT p.id,v.id AS version_id,v.page_title AS title FROM pages p JOIN page_versions v ON v.id=p.published_version_id
       WHERE p.site_id=$1 AND p.archived_at IS NULL
-        AND p.id IN (SELECT page_id FROM app.release_readiness_pages($1)) ORDER BY p.id`,
-        [siteId],
+        AND p.id IN (SELECT page_id FROM app.release_readiness_pages($1))
+        AND ($2::text[] IS NULL OR jsonb_path_query_array(v.content, '$[*].values.__cms_data_values.*.parts[*].valueId') ?| $2)
+      ORDER BY p.id`,
+        [siteId, numberIds],
       )
     ).rows
     const reportsAfterPublication = await evaluateVersionsReadiness(

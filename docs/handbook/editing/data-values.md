@@ -11,6 +11,10 @@ saved old and new values and the number of distinct pages that use it. History
 uses the existing settings recovery path. Other saved Settings changes are
 included in that settings review; check every listed change.
 
+When the release contains only changed numbers, readiness checks the published
+pages that use those numbers. An unused number can be published for future use
+without asking you to approve unrelated page content.
+
 On a stat's Number field, an Editor chooses Use a saved number. The number list
 is read-only there. Words before or after the number and the stat's own label
 remain page content. Choosing a number just on this page disconnects it while
