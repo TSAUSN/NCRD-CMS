@@ -21,7 +21,7 @@ async function database<T>(run: (client: Client) => Promise<T>): Promise<T> {
 
 async function openCollections(page: Page) {
   await signIn(page, 'root@example.test')
-  await page.getByRole('link', { name: 'Demo site', exact: true }).click()
+  await page.getByRole('main').getByRole('link', { name: 'Demo site', exact: true }).click()
   await page.getByRole('link', { name: 'Lists', exact: true }).click()
 }
 
