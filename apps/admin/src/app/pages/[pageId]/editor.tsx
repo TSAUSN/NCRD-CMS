@@ -175,6 +175,7 @@ import type { LibraryEntry, LinkTarget } from '../../../lib/queries.ts'
 import type { MediaAsset } from '../../../lib/media-library.ts'
 import { sitePreviewContext, type SitePreviewContext } from '../../../lib/preview-context.ts'
 import { publishTogetherReviewHref } from '../../../lib/publish-together-copy.ts'
+import { EditorToolbar } from './editor-toolbar.tsx'
 
 type Props = {
   chapterPage?: boolean
@@ -2942,6 +2943,16 @@ export function PageEditor(props: Props) {
     </>
   )
 
+  function checkpoint() {
+    // Like Publish, clear the last notice so the one that follows
+    // is this save's, not an earlier one still on screen.
+    setResult(null)
+    setCheckpointing(true)
+    void withCanvasValues(async () => {
+      await latestSave.current('checkpoint')
+    }).finally(() => setCheckpointing(false))
+  }
+
   return (
     <div
       className={'editor' + (!props.originalDesign ? ' ' + foundationStyles.nativeEditor : '')}
@@ -2952,182 +2963,39 @@ export function PageEditor(props: Props) {
           The clusters are separated by a hairline rather than by spacing alone,
           because a row of eight equally spaced controls is a row nobody can
           scan — which is what this was. */}
-      <header className={`editor-bar ${foundationStyles.bar}`}>
-        {/* Leaving is the first control, because the editor is the one screen
-            with no sidebar: it takes the whole viewport, so the way back has to
-            be somewhere obvious rather than in a breadcrumb somebody has to
-            find. */}
-        <BackLink fallback={props.siteHref} appearance={!props.originalDesign ? 'button' : undefined} />
-        {props.originalDesign && (
-          <Link prefetch={false} className="editor-exit" href="/sites" aria-label="All sites">
-            All sites
-          </Link>
-        )}
-        <div className={`editor-title ${foundationStyles.title}`}>
-          <div className={foundationStyles.copy}>
-            <a href={props.siteHref} title={props.siteName}>
-              {props.siteName}
-            </a>
-            <strong title={pageIdentity.title}>{pageIdentity.title}</strong>
-          </div>
-          <StatusPill
-            compact={!props.originalDesign}
-            status={
-              submittedCurrent
-                ? 'In review'
-                : publishedVersionId
-                  ? hasWorkNotLive
-                    ? 'Live · changes not published'
-                    : 'Live'
-                  : 'Draft'
-            }
-          />
-        </div>
-
-        <div className="bar-tools">
-          {props.originalDesign && <LargeScreenEditing>{viewTools}</LargeScreenEditing>}
-
-          {!siteWide?.editing && (
-            <div className="cluster">
-              {/* Truthful: it reflects an acknowledged save, not elapsed time. */}
-              <span className={`saved-state ${saving ? 'is-saving' : dirty ? 'is-dirty' : ''}`} aria-live="polite">
-                <span className="saved-words">
-                  {saving ? 'Saving…' : dirty ? 'Unsaved changes' : 'All changes saved'}
-                </span>
-              </span>
-              <RecoveryStatus recovery={recovery} limitedHistory={limitedHistory} />
-            </div>
-          )}
-
-          <div className="cluster" inert={Boolean(sectionTool) || Boolean(libraryPreview) || libraryPreparing}>
-            <LargeScreenEditing>
-              {!siteWide?.editing && (
-                <ButtonLink variant="secondary" aria-label="Page history" href={`/pages/${props.pageId}/history`}>
-                  History
-                </ButtonLink>
-              )}
-              <Menu appearance="button" label="Preview" accessibleLabel="Preview">
-                {canManageSections && !props.pageScoped && (
-                  <label className={foundationStyles.menuChoice}>
-                    <input
-                      type="checkbox"
-                      checked={sitePreview === 'draft'}
-                      disabled={siteWide?.editing}
-                      onChange={event => changeSitePreview(event.target.checked ? 'draft' : 'published')}
-                    />
-                    {props.originalDesign
-                      ? 'Preview with saved menu & footer changes'
-                      : 'Preview with saved site-look changes'}
-                  </label>
-                )}
-                {canManageSections && (
-                  <label className={foundationStyles.menuChoice}>
-                    <input
-                      type="checkbox"
-                      checked={previewHidden}
-                      onChange={event => setPreviewHidden(event.target.checked)}
-                    />
-                    Include hidden sections
-                  </label>
-                )}
-                <Button variant="secondary" onClick={() => void openVisitorPreview()}>
-                  Open preview
-                </Button>
-              </Menu>
-              {!siteWide?.editing && (
-                <Menu label={<IconMore size={18} />} accessibleLabel="More page actions">
-                  {!props.originalDesign && (
-                    <Link prefetch={false} href="/sites" aria-label="All sites">
-                      All sites
-                    </Link>
-                  )}
-                  {props.canPublish && !props.pageScoped && (
-                    <Button variant="tertiary" disabled={transitionPending} onClick={() => void duplicateCurrentPage()}>
-                      Duplicate page
-                    </Button>
-                  )}
-                  {publishedVersionId && (
-                    <Button variant="tertiary" onClick={() => setDiscardConfirmation(true)}>
-                      Discard all unpublished changes
-                    </Button>
-                  )}
-                  <Button variant="tertiary" onClick={openPageSettings}>
-                    <IconSettings size={16} />
-                    Page settings
-                  </Button>
-                  <Link href={`/pages/${props.pageId}/history`}>
-                    <IconClock size={16} />
-                    History
-                  </Link>
-                  {props.liveHref && (
-                    <a href={props.liveHref} target="_blank" rel="noopener">
-                      <IconExternal size={16} />
-                      View live page
-                    </a>
-                  )}
-                </Menu>
-              )}
-            </LargeScreenEditing>
-            {!siteWide?.editing && (
-              <>
-                <Button
-                  variant="secondary"
-                  disabled={requiresReload || checkpointing || transitionPending}
-                  onClick={() => {
-                    // Like Publish, clear the last notice so the one that follows
-                    // is this save's, not an earlier one still on screen.
-                    setResult(null)
-                    setCheckpointing(true)
-                    void withCanvasValues(async () => {
-                      await latestSave.current('checkpoint')
-                    }).finally(() => setCheckpointing(false))
-                  }}
-                >
-                  Save draft
-                </Button>
-                <LargeScreenEditing>
-                  {props.canPublish && (
-                    <Button
-                      variant="secondary"
-                      disabled={requiresReload || checkpointing || transitionPending || saving}
-                      onClick={schedulePageReview}
-                    >
-                      {scheduling ? 'Preparing review…' : 'Schedule'}
-                    </Button>
-                  )}
-                  {props.canPublish ? (
-                    submittedCurrent ? (
-                      <a className="btn" href={review?.id ? `/inbox?review=${review.id}` : '/inbox'}>
-                        <IconMail size={15} /> Review submission
-                      </a>
-                    ) : (
-                      <Button
-                        variant="publish"
-                        disabled={requiresReload || transitionPending}
-                        onClick={openPagePublishReview}
-                      >
-                        {transitionPending
-                          ? scheduling || reviewBusy
-                            ? 'Preparing review…'
-                            : 'Publishing…'
-                          : 'Publish'}
-                      </Button>
-                    )
-                  ) : (
-                    <button
-                      type="button"
-                      disabled={requiresReload || saving || transitionPending || submittedCurrent}
-                      onClick={() => setSubmitOpen(true)}
-                    >
-                      <IconMail size={15} /> {submittedCurrent ? 'Submitted' : 'Submit for review'}
-                    </button>
-                  )}
-                </LargeScreenEditing>
-              </>
-            )}
-          </div>
-        </div>
-      </header>
+      <EditorToolbar
+        page={props}
+        pageTitle={pageIdentity.title}
+        viewTools={viewTools}
+        publication={{
+          submittedCurrent,
+          publishedVersionId,
+          hasWorkNotLive,
+          reviewId: review?.id,
+          scheduling,
+          reviewBusy,
+        }}
+        draft={{ saving, dirty, recovery, limitedHistory, requiresReload, checkpointing, transitionPending }}
+        preview={{
+          editingFrame: siteWide?.editing,
+          previewBlocked: Boolean(sectionTool) || Boolean(libraryPreview) || libraryPreparing,
+          canManageSections,
+          sitePreview,
+          previewHidden,
+          changeSitePreview,
+          setPreviewHidden,
+          openVisitorPreview,
+        }}
+        commands={{
+          checkpoint,
+          duplicateCurrentPage,
+          discardUnpublished: () => setDiscardConfirmation(true),
+          openPageSettings,
+          schedulePageReview,
+          openPagePublishReview,
+          submitForReview: () => setSubmitOpen(true),
+        }}
+      />
 
       <LargeScreenEditing>
         <PageRecoveryPanel recovery={recovery} />
