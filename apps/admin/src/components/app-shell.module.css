@@ -98,7 +98,8 @@
   inset-inline: 100% auto;
 }
 @media (max-width: 60rem) {
-  .fold {
+  /* Hide the desktop fold button so the drawer close control receives clicks. */
+  .brand .fold[data-variant] {
     display: none;
   }
 }
