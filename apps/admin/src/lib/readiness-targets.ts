@@ -20,28 +20,52 @@ function missingPictureDescription(value: unknown, source: string | null): boole
     return true
   return Object.values(object).some(child => missingPictureDescription(child, source))
 }
-/** Resolve only fields in the pinned page; no source HTML is exposed to the UI. */
-export async function readinessFixLinks(
+type ReadinessTarget = { pageId: string; versionId: string; findings: ReadinessFinding[] }
+const fieldRules = new Set(['sample_content', 'image_without_alt', 'broken_internal_link', 'missing_h1'])
+const targetKey = (target: Pick<ReadinessTarget, 'pageId' | 'versionId'>) => target.pageId + ':' + target.versionId
+
+/** Load only the pinned page versions needed to give a finding a field link. */
+export async function releaseReadinessFixLinks(
   client: Queryable,
-  pageId: string,
-  versionId: string,
   siteId: string,
-  findings: ReadinessFinding[],
-): Promise<string[]> {
-  const row = (
-    await client.query<{ content: Section[] }>('SELECT content FROM page_versions WHERE id=$1 AND page_id=$2', [
-      versionId,
-      pageId,
-    ])
-  ).rows[0]
-  const sections = row?.content ?? []
-  const names = Object.fromEntries(
-    (
-      await client.query<{ id: string; name: string }>(`SELECT id,name FROM section_defs WHERE id=ANY($1::uuid[])`, [
-        sections.map(section => section.section_def_id),
-      ])
-    ).rows.map(row => [row.id, row.name]),
-  )
+  targets: ReadinessTarget[],
+): Promise<string[][]> {
+  const fieldTargets = targets.filter(target => target.findings.some(finding => fieldRules.has(finding.rule)))
+  const byTarget = new Map<string, Section[]>()
+  const sampleSectionIds = new Set<string>()
+  if (fieldTargets.length) {
+    const { rows } = await client.query<{ page_id: string; id: string; content: Section[] }>(
+      `SELECT v.id,v.page_id,v.content FROM unnest($1::uuid[],$2::uuid[]) AS pin(version_id,page_id)
+       CROSS JOIN LATERAL (
+         SELECT id,page_id,content FROM page_versions
+         WHERE id=pin.version_id AND page_id=pin.page_id LIMIT 1
+       ) v`,
+      [fieldTargets.map(target => target.versionId), fieldTargets.map(target => target.pageId)],
+    )
+    for (const row of rows) byTarget.set(targetKey({ pageId: row.page_id, versionId: row.id }), row.content)
+    for (const target of fieldTargets)
+      if (target.findings.some(finding => finding.rule === 'sample_content'))
+        for (const section of byTarget.get(targetKey(target)) ?? []) sampleSectionIds.add(section.section_def_id)
+  }
+  const names = sampleSectionIds.size
+    ? Object.fromEntries(
+        (
+          await client.query<{ id: string; name: string }>(
+            'SELECT id,name FROM section_defs WHERE id=ANY($1::uuid[])',
+            [[...sampleSectionIds]],
+          )
+        ).rows.map(row => [row.id, row.name]),
+      )
+    : {}
+  return targets.map(target => fixLinks(target, siteId, byTarget.get(targetKey(target)) ?? [], names))
+}
+
+function fixLinks(
+  { pageId, findings }: ReadinessTarget,
+  siteId: string,
+  sections: Section[],
+  names: Record<string, string>,
+): string[] {
   const base = `/pages/${pageId}`
   return findings.map(finding => {
     if (['missing_title', 'missing_meta_description', 'refused_canonical'].includes(finding.rule))

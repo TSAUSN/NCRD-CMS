@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto'
 import { asUser, evaluateVersionReadiness, evaluateVersionsReadiness, type Queryable } from '@cms/platform'
 import { DomainError, READINESS_POLICY_VERSION, type ReadinessReport } from '@cms/domain'
 import { renderPage, type RenderManifest, type SiteShell } from '@cms/renderer'
-import { readinessFixLinks } from './readiness-targets.ts'
+import { releaseReadinessFixLinks } from './readiness-targets.ts'
 import { SCRIPTLESS_RENDER_OPTIONS } from './scriptless-preview.ts'
 
 export type ReleaseType =
@@ -587,7 +587,6 @@ async function simulateRelease(
         [siteId],
       )
     ).rows
-    const checks: ReleaseCheck[] = []
     const reportsAfterPublication = await evaluateVersionsReadiness(
       client,
       pages.map(page => ({
@@ -595,16 +594,19 @@ async function simulateRelease(
         access: 'published',
       })),
     )
-    for (const [index, page] of pages.entries()) {
-      const report = reportsAfterPublication[index]!
-      checks.push({
-        pageId: page.id,
-        versionId: page.version_id,
-        title: page.title,
-        report,
-        fixLinks: await readinessFixLinks(client, page.id, page.version_id, siteId, report.findings),
-      })
-    }
+    const targets = pages.map((page, index) => ({
+      pageId: page.id,
+      versionId: page.version_id,
+      findings: reportsAfterPublication[index]!.findings,
+    }))
+    const links = await releaseReadinessFixLinks(client, siteId, targets)
+    const checks: ReleaseCheck[] = pages.map((page, index) => ({
+      pageId: page.id,
+      versionId: page.version_id,
+      title: page.title,
+      report: reportsAfterPublication[index]!,
+      fixLinks: links[index]!,
+    }))
     let html: string | undefined
     if (previewPageId) {
       const route = (
