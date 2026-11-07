@@ -10,6 +10,7 @@ import { useNavigationGuard } from '../../../../../components/navigation-guard.t
 import { saveThemeDraft } from '../../../../actions/site-look.ts'
 import { type ActionResult } from '../../../../../lib/action-result.ts'
 import { useSiteLookCanvas } from '../use-site-look-canvas.ts'
+import { FontPreviewStage } from './font-preview-stage.tsx'
 import styles from '../../../../../components/workspace.module.css'
 const heading = THEME_FONT_OPTIONS.find(font => font.label === 'Trajan Pro 3 (Adobe)')!.value
 const body = THEME_FONT_OPTIONS.find(font => font.label === 'Proxima Nova (Adobe)')!.value
@@ -43,6 +44,7 @@ export function FontLibrary({
     [status, setStatus] = useState<'unchecked' | 'checking' | 'loaded' | 'unavailable'>('unchecked')
   const busy = useRef(false),
     iframe = useRef<HTMLIFrameElement>(null),
+    newestFrame = useRef<HTMLIFrameElement>(null),
     connected = tokens.fonts.adobeKit?.enabled === true,
     dirty = JSON.stringify(tokens) !== saved || kit !== ADOBE_KIT_URL,
     page = frame.pages.find(page => page.published) ?? frame.pages[0],
@@ -86,7 +88,7 @@ export function FontLibrary({
     const ticket = canvas.ticket
     function receive(event: MessageEvent) {
       if (
-        event.source !== iframe.current?.contentWindow ||
+        event.source !== newestFrame.current?.contentWindow ||
         event.origin !== origin ||
         event.data?.type !== PREVIEW_MESSAGE.fontStatus ||
         event.data.channel !== ticket.channel ||
@@ -179,20 +181,17 @@ export function FontLibrary({
     font => font.label.endsWith('(Adobe)') || font.value === tokens.fonts.heading,
   )
   const headingOptions = chapter ? options.filter(font => font.value !== heading) : options
-  const previewFrame = canvas.ticket ? (
-    <iframe
-      ref={iframe}
-      title="Fonts on the real page"
-      sandbox="allow-scripts allow-same-origin"
-      referrerPolicy="no-referrer"
-      className={styles.previewFrame}
-      src={canvas.ticket.href + '?visit=1&fonts=1'}
-    />
-  ) : (
-    <EmptyState title={canvas.loading ? 'Opening the font preview…' : 'No font preview yet'}>
-      {canvas.error || 'Press Check kit to try the fonts at the site’s staging address.'}
-    </EmptyState>
-  )
+  const previewFrame =
+    canvas.error && !canvas.ticket ? (
+      <EmptyState title="No font preview yet">{canvas.error}</EmptyState>
+    ) : (
+      <FontPreviewStage
+        href={canvas.ticket ? canvas.ticket.href + '?visit=1&fonts=1' : null}
+        loading={canvas.loading}
+        visibleFrame={iframe}
+        newestFrame={newestFrame}
+      />
+    )
   return (
     <>
       <PageHeader

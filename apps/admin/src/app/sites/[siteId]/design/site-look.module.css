@@ -115,3 +115,18 @@
   overflow: clip;
   --site-look-height: max(var(--size-340), calc(100dvh - var(--site-look-top) - var(--space-4)));
 }
+
+.refreshing {
+  position: absolute;
+  inset: var(--space-2) var(--space-2) auto auto;
+  padding: var(--space-1) var(--space-2);
+  color: var(--text-muted);
+  background: var(--surface);
+  border-radius: var(--radius-control);
+  font-size: var(--text-meta);
+  pointer-events: none;
+}
+
+.fontPreview {
+  position: relative;
+}

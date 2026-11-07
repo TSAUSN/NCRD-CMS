@@ -13,7 +13,7 @@ import type { ThemeWorkspace, GlobalElementsWorkspace } from '../../../../lib/qu
 import type { MediaAsset } from '../../../../lib/media-library.ts'
 import { ThemeEditor } from './theme-editor.tsx'
 import { SiteLookPanel } from '../../../../components/site-look-panel.tsx'
-import { ScriptlessPreview } from '../../../../components/scriptless-preview.tsx'
+import { SiteLookPreviewStage } from './site-look-preview-stage.tsx'
 import {
   Button,
   ButtonLink,
@@ -349,41 +349,20 @@ export function SiteLookWorkspace({
               </Button>
             </div>
           ) : (
-            <div className={styles.stage} style={{ width: width * scale }}>
-              {isolatedOrigin ? (
-                isolated.ticket && (
-                  <iframe
-                    ref={frameRef}
-                    title="Site look page preview"
-                    sandbox="allow-scripts allow-same-origin"
-                    referrerPolicy="no-referrer"
-                    src={isolated.ticket.href + '?visit=1#cms-preview-' + (tab === 'footer' ? 'footer' : 'header')}
-                    style={{
-                      width,
-                      transform: 'scale(' + scale + ')',
-                      height: 'calc(var(--site-look-preview-height) / ' + scale + ')',
-                    }}
-                  />
-                )
-              ) : (
-                <ScriptlessPreview
-                  ref={frameRef}
-                  title="Site look page preview"
-                  onLoad={event => showArea(event.currentTarget)}
-                  srcDoc={html}
-                  style={{
-                    width,
-                    transform: 'scale(' + scale + ')',
-                    height: 'calc(var(--site-look-preview-height) / ' + scale + ')',
-                  }}
-                />
-              )}
-              {previewLoading && (
-                <p className={styles.loading} role="status">
-                  Updating site preview…
-                </p>
-              )}
-            </div>
+            <SiteLookPreviewStage
+              isolated={Boolean(isolatedOrigin)}
+              href={
+                isolated.ticket
+                  ? isolated.ticket.href + '?visit=1#cms-preview-' + (tab === 'footer' ? 'footer' : 'header')
+                  : null
+              }
+              html={html}
+              loading={previewLoading}
+              width={width}
+              scale={scale}
+              frame={frameRef}
+              showArea={showArea}
+            />
           )}
         </div>
       </div>
