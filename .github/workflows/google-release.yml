@@ -1,0 +1,99 @@
+name: Publish verified CMS release
+
+on:
+  workflow_call:
+    inputs:
+      target:
+        type: string
+        required: true
+
+jobs:
+  publish:
+    if: >-
+      github.event_name == 'push' &&
+      ((github.ref == 'refs/heads/staging' && inputs.target == 'staging') ||
+       (github.ref == 'refs/heads/main' && inputs.target == 'production'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    permissions:
+      contents: read
+      id-token: write
+    environment: ${{ inputs.target }}
+    concurrency:
+      group: cms-release-${{ inputs.target }}
+      cancel-in-progress: false
+    env:
+      CMS_DEPLOY_PROJECT: ${{ vars.CMS_DEPLOY_PROJECT }}
+      CMS_DEPLOY_PROJECT_NUMBER: ${{ vars.CMS_DEPLOY_PROJECT_NUMBER }}
+      CMS_DEPLOY_REGION: ${{ vars.CMS_DEPLOY_REGION }}
+      CMS_DEPLOY_IMAGE: ${{ vars.CMS_DEPLOY_IMAGE }}
+      CMS_DEPLOY_SOURCE_BUCKET: ${{ vars.CMS_DEPLOY_SOURCE_BUCKET }}
+      CMS_DEPLOY_BUILDER: ${{ vars.CMS_DEPLOY_BUILDER }}
+      CMS_DEPLOY_ADMIN: ${{ vars.CMS_DEPLOY_ADMIN }}
+      CMS_DEPLOY_SITE: ${{ vars.CMS_DEPLOY_SITE }}
+      CMS_DEPLOY_WORKER: ${{ vars.CMS_DEPLOY_WORKER }}
+      CMS_DEPLOY_ADMIN_ORIGIN: ${{ vars.CMS_DEPLOY_ADMIN_ORIGIN }}
+      CMS_DEPLOY_SITE_ORIGIN: ${{ vars.CMS_DEPLOY_SITE_ORIGIN }}
+      CMS_DEPLOY_SCHEMA_REF: ${{ vars.CMS_DEPLOY_SCHEMA_REF }}
+      RELEASE_DIR: ${{ runner.temp }}/cms-release
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3
+
+      - name: Sign in to the target project for the build
+        id: build-auth
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3
+        with:
+          project_id: ${{ vars.CMS_DEPLOY_PROJECT }}
+          workload_identity_provider: ${{ vars.CMS_DEPLOY_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.CMS_DEPLOY_SERVICE_ACCOUNT }}
+          token_format: access_token
+          create_credentials_file: false
+          export_environment_variables: false
+
+      - name: Check scope and build the tested commit
+        env:
+          CLOUDSDK_AUTH_ACCESS_TOKEN: ${{ steps.build-auth.outputs.access_token }}
+        run: |
+          bash scripts/deploy-google-release.sh plan "$GITHUB_SHA" "$RELEASE_DIR"
+          bash scripts/deploy-google-release.sh build "$GITHUB_SHA" "$RELEASE_DIR"
+
+      - name: Refresh the deploy token
+        id: deploy-auth
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3
+        with:
+          project_id: ${{ vars.CMS_DEPLOY_PROJECT }}
+          workload_identity_provider: ${{ vars.CMS_DEPLOY_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.CMS_DEPLOY_SERVICE_ACCOUNT }}
+          token_format: access_token
+          create_credentials_file: false
+          export_environment_variables: false
+
+      - name: Deploy only if this is still the branch head
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CLOUDSDK_AUTH_ACCESS_TOKEN: ${{ steps.deploy-auth.outputs.access_token }}
+        run: |
+          head="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/$GITHUB_REF_NAME" --jq '.object.sha')"
+          if [[ "$head" != "$GITHUB_SHA" ]]; then
+            echo "A newer commit is on the branch; leaving the current release in service."
+            exit 0
+          fi
+          bash scripts/deploy-google-release.sh deploy "$GITHUB_SHA" "$RELEASE_DIR"
+
+      - name: Save image, deployed revisions and rollback receipt
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: release-${{ inputs.target }}-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/cms-release/image.json
+            ${{ runner.temp }}/cms-release/previous.json
+            ${{ runner.temp }}/cms-release/deployed.json
+          if-no-files-found: ignore
+          retention-days: 30

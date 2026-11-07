@@ -5,6 +5,8 @@ organization GitHub repository at a reviewed release ref. The first deployment
 uses [bootstrap](../../docs/handbook/hosting/bootstrap.md) and the ordered
 [Friday go-live](../../docs/handbook/hosting/friday-go-live.md) runbook.
 Existing deployments use [ship an update](../../docs/handbook/upgrades/ship-an-update.md).
+For opted-in branch deployments to existing services, use
+[automatic releases](../../docs/handbook/upgrades/automatic-releases.md).
 The existing personal review identifiers are in
 [review-environment.md](../../docs/handbook/hosting/review-environment.md).
 

@@ -51,6 +51,7 @@ Permissions are enforced by the database, not only by the screens.
 | --- | --- |
 | Run the demo on your own computer | `pnpm install` then `pnpm demo` (see [README](../../README.md)); a clean install from GitHub is in [hosting/local-demo.md](hosting/local-demo.md) |
 | Follow a feature from screen to SQL, renderer and tests | [maintainers/where-things-live.md](maintainers/where-things-live.md) |
+| Enable staged and production releases or recover a previous revision | [upgrades/automatic-releases.md](upgrades/automatic-releases.md) |
 | Understand how the code fits together | [docs/architecture.md](../architecture.md) |
 | Read a database command as it exists today | [Current SQL reference](../../packages/schema/current/README.md) |
 | Prove a behavior-preserving refactor | [maintainers/refactor-gates.md](maintainers/refactor-gates.md) |

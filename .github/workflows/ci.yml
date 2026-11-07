@@ -2,15 +2,16 @@ name: CI
 
 # One run per change: a push to a branch with an open pull request used to run
 # the whole workflow twice (push and pull_request), and every push kept running
-# after a newer one superseded it. The Actions allowance is shared and capped.
+# after a newer one superseded it. Keep deployments on protected branches
+# running to completion once they start.
 #
 # The quick checks (types, styles, formatting, unit, database, build) run on
 # every pull request. The browser suite takes much longer, so it runs on pushes
-# to main, on manual runs, and on pull requests labelled run-e2e. The reference
-# images build on main and on manual runs only.
+# to staging and main, on manual runs, and on pull requests labelled run-e2e.
+# The reference images build on branch pushes and manual runs.
 on:
   push:
-    branches: [main]
+    branches: [staging, main]
     paths-ignore: ['**/*.md', 'docs/**']
   pull_request:
     paths-ignore: ['**/*.md', 'docs/**']
@@ -18,7 +19,7 @@ on:
 
 concurrency:
   group: ci-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 # SPEC §9's stages: typecheck → unit/golden → database/policy → build/image.
 # The database stage is not optional: the tenancy, publication, and isolation
@@ -100,7 +101,7 @@ jobs:
         run: pnpm -r build
         timeout-minutes: 20
 
-      # The browser suite: Chromium, on main, on manual runs, or when a pull
+      # The browser suite: Chromium, on staging/main, on manual runs, or when a pull
       # request carries the run-e2e label. Firefox and WebKit stay in the
       # release gate (SPEC §9).
       - name: Cache Playwright browsers
@@ -150,3 +151,16 @@ jobs:
 
       - name: Offline runtime and recovery packaging smoke
         run: sh scripts/smoke-images.sh cms-v2:${{ github.sha }} cms-v2-recovery:${{ github.sha }}
+
+  deploy:
+    needs: [checks, image]
+    if: >-
+      github.event_name == 'push' &&
+      ((github.ref == 'refs/heads/staging' && vars.CMS_AUTODEPLOY_STAGING == 'true') ||
+       (github.ref == 'refs/heads/main' && vars.CMS_AUTODEPLOY_PRODUCTION == 'true'))
+    uses: ./.github/workflows/google-release.yml
+    permissions:
+      contents: read
+      id-token: write
+    with:
+      target: ${{ github.ref == 'refs/heads/staging' && 'staging' || 'production' }}
