@@ -25,6 +25,12 @@ existing safeguards remain. Brought-in original-design sites keep their previous
 Settings screen. Google hosting is planned separately; this screen does not
 configure hosting or change DNS.
 
+**Contact messages** appears on sites with a CMS contact form. Site admins and
+Super admins can read the submitted message, reply address and received time.
+The CMS saves these messages to this inbox; it does not forward them by email.
+Assign an admin to check the inbox and respond through the site's normal process.
+The inbox contains visitor information, so do not share screenshots or exports.
+
 Archive is under Settings → Advanced. After archiving, native Settings shows
 “This site is archived.” Content and settings history remain available. Its
 public addresses stop serving; saved page bookmarks open in a read-only view.

@@ -7,7 +7,7 @@ acceptance belong in the top handoff and SPEC. Do not deploy a moving branch tip
 
 | Area | Observed behavior | What to do |
 | --- | --- | --- |
-| Previews | Fully visible Header/Footer previews took about 7 seconds on the review micro; the earlier measurements are single runs. | Wait for real page content and the loading overlay to clear. Do not keep clicking. |
+| Previews | The earlier personal build sometimes loaded the page but did not open the inline frame. | Wait for real content. If the inline preview offers **Try preview again**, use it once, or open the same preview in a new tab. Your draft is separate. |
 | Story scheduling | After the phase-scoped readiness fix, server requests took 11.588 seconds to prepare, 12.814 seconds to schedule and 3.072 seconds to cancel. | Allow about 15 seconds per server step; wait for its final receipt. Do not run bulk content checks while timing it. Cancel a QA schedule before it can run. |
 | Chrome debugging | Attaching browser debugging stalled some previews; cancelling Chrome's debugging banner let them load. | Review in ordinary Chrome. An ordinary-browser stall remains a defect and takes priority; do not dismiss it based only on the debugging observation. |
 
@@ -18,10 +18,10 @@ it needs later budget approval and is outside this cleanup’s scope.
 
 ## Accepted Friday scope and Google project administrator/IT gates
 
-Only a site editor signs in, using the existing personal Supabase project. No SMTP or
-real-editor rollout is included. The tested Add person feature is retained, but
-CMS membership does not solve the provider's email-delivery restrictions. the platform lead's
-long-term provider/identity-linking decision is in
+The personal review copy uses the existing Supabase sign-in. No SMTP or
+real-editor rollout is included. Adding a person can record CMS access; it does
+not send an invitation when delivery is unavailable. For the platform lead’s
+long-term identity decision, see
 [sign-in options](../hosting/sign-in-options.md).
 
 The empty organization-project deployment remains unverified.
@@ -63,10 +63,26 @@ These are unresolved baseline observations, not approval to ignore a failing dem
 step. New failures on the final candidate must be resolved or the refactor left
 on its branch.
 
-## Refactor held for next week
+## Refactor branch and handover
 
-`refactor/handover` retains the editor split, dead-CSS groups and named global
-stylesheet files. They are not included in Friday: final integration exposed
-CSS-module precedence changes and a tablet drawer control overlap. The selected
-release takes only the earlier runtime-identical test-isolation/oracle/SQL-reference
-and maintainer-map prefix. Do not deploy the held branch.
+The Friday tag is the frozen baseline. The separate refactor branch contains
+the editor and renderer splits, named stylesheets, preview recovery and the
+personal release workflow. Compare the exact candidate against the Friday
+baseline. Check direct loads, links between screens, and the 900 px navigation
+drawer before accepting stylesheet changes. See [where things live](../maintainers/where-things-live.md)
+and the [automatic release procedure](../upgrades/automatic-releases.md).
+
+- **Contact forms:** On sites with a public CMS contact form, site administrators
+  can read saved submissions in **Settings → Contact messages**. The CMS does
+  not email these messages. Assign someone to monitor the inbox.
+- **Chapter invitations:** The local demo can issue a test invitation link.
+  Hosted chapter invitations are unavailable until a delivery provider is
+  configured; the Chapters screen explains this. Keep site-wide access separate
+  from chapter access.
+- **Stories source:** A successful check stages new and changed stories for review
+  and flags entries missing from the source. It does not publish automatically.
+  Test the live source separately from local synthetic-feed checks.
+- **Echelon Symposium import:** Its current Speakers and Agenda sections expose
+  text fields. They do not have speaker records or schedule rows, and the
+  imported page has no FAQ section. Editing that text is possible. Record-based
+  editing needs a configured People or Program list and a suitable page section.
