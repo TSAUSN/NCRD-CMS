@@ -176,3 +176,19 @@ returned 404. The median conditional request was
 on loopback; this removed transfer and storage work without measuring a
 local latency win. Authorization still runs on every request. Tests
 observe one storage read becoming zero on a matching validator.
+
+Picker result thumbnails now defer loading where the browser can do so.
+The Media grid keeps eager thumbnails because its intrinsic image sizes
+affect computed styles before images load. The selected picker image
+keeps its original loading behavior.
+
+| Picker view | Width | Requests at open, before → after | Decoded after scrolling |
+| --- | ---: | ---: | ---: |
+| Grid | 1440 px | 48 → 48 | 48 |
+| Grid | 1024 px | 48 → 48 | 48 |
+| List | 1440 px | 48 → 48 | 48 |
+| List | 1024 px | 48 → 48 | 48 |
+
+The picker comparison used 48 distinct sample image URLs. The browser
+was scrolled through the full result list. All 48 images decoded
+after scrolling, at both widths.

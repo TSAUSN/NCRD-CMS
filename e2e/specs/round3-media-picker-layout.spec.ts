@@ -66,6 +66,37 @@ test('a full media picker keeps thumbnail cards and scrolls inside its dialog at
     await mkdir(folder, { recursive: true })
     for (const width of [1440, 1024]) {
       await page.setViewportSize({ width, height: 1000 })
+      const visibleImagesDecoded = () =>
+        gallery.evaluate(node => {
+          const bounds = node.getBoundingClientRect()
+          return [...node.querySelectorAll('img')]
+            .filter(image => {
+              const imageBounds = image.getBoundingClientRect()
+              return imageBounds.top < bounds.bottom && imageBounds.bottom > bounds.top
+            })
+            .every(image => image.complete && image.naturalWidth > 0)
+        })
+      await expect.poll(visibleImagesDecoded).toBe(true)
+      const card = gallery.getByRole('option').first()
+      expect((await card.boundingBox())!.height).toBeGreaterThan(100)
+      expect((await card.locator('.media-thumb').boundingBox())!.height).toBeGreaterThan(60)
+      expect(await gallery.evaluate(node => node.scrollHeight > node.clientHeight)).toBe(true)
+      await card.click()
+      await expect(card).toHaveAttribute('aria-selected', 'true')
+      await expect(picker.getByRole('button', { name: 'Use this logo', exact: true })).toBeEnabled()
+      await page.screenshot({ path: resolve(folder, 'selected-' + width + '.png') })
+      await gallery.hover()
+      const segments = await gallery.evaluate(node => ({
+        size: Math.floor(node.clientHeight * 0.8),
+        max: node.scrollHeight - node.clientHeight,
+      }))
+      expect(segments.size).toBeGreaterThan(0)
+      for (let top = segments.size; top - segments.size < segments.max; top += segments.size) {
+        const previous = await gallery.evaluate(node => node.scrollTop)
+        await page.mouse.wheel(0, segments.size)
+        await expect.poll(() => gallery.evaluate(node => node.scrollTop)).toBeGreaterThan(previous)
+        await expect.poll(visibleImagesDecoded).toBe(true)
+      }
       await expect
         .poll(() =>
           gallery
@@ -77,17 +108,6 @@ test('a full media picker keeps thumbnail cards and scrolls inside its dialog at
             ),
         )
         .toBe(true)
-      const card = gallery.getByRole('option').first()
-      expect((await card.boundingBox())!.height).toBeGreaterThan(100)
-      expect((await card.locator('.media-thumb').boundingBox())!.height).toBeGreaterThan(60)
-      expect(await gallery.evaluate(node => node.scrollHeight > node.clientHeight)).toBe(true)
-      await card.click()
-      await expect(card).toHaveAttribute('aria-selected', 'true')
-      await expect(picker.getByRole('button', { name: 'Use this logo', exact: true })).toBeEnabled()
-      await page.screenshot({ path: resolve(folder, 'selected-' + width + '.png') })
-      await gallery.evaluate(node => {
-        node.scrollTop = node.scrollHeight
-      })
       await expect(gallery.getByRole('option').last()).toBeInViewport()
       await page.screenshot({ path: resolve(folder, 'scrolled-' + width + '.png') })
       await gallery.evaluate(node => {

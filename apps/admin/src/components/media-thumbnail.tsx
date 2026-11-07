@@ -8,10 +8,12 @@ export function MediaThumbnail({
   asset,
   large = false,
   readyOnly = false,
+  lazy = false,
 }: {
   asset: MediaAsset
   large?: boolean
   readyOnly?: boolean
+  lazy?: boolean
 }) {
   const [failedPreview, setFailedPreview] = useState<string | null>(null)
   const preview =
@@ -26,7 +28,7 @@ export function MediaThumbnail({
       aria-label={preview ? undefined : processing ? 'Image preview processing' : 'Image preview unavailable'}
     >
       {preview ? (
-        <img src={preview} alt="" onError={() => setFailedPreview(preview)} />
+        <img loading={lazy ? 'lazy' : undefined} src={preview} alt="" onError={() => setFailedPreview(preview)} />
       ) : processing ? (
         <span className="media-spinner" aria-hidden="true" />
       ) : (

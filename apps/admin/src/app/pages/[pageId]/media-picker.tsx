@@ -502,7 +502,7 @@ export function MediaPicker({
                     }
                   }}
                 >
-                  <MediaThumbnail readyOnly asset={asset} />
+                  <MediaThumbnail readyOnly lazy asset={asset} />
                   <span className={'media-asset-copy ' + mediaUi.copy}>
                     <strong title={asset.name}>{asset.name}</strong>
                     <small>
