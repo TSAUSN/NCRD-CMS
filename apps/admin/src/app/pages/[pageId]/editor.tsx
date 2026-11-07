@@ -83,7 +83,7 @@ import {
   type ReadinessReport,
   type SaveQueue,
 } from '@cms/domain'
-import { PREVIEW_MESSAGE, type CanonicalInput } from '@cms/renderer'
+import { PREVIEW_MESSAGE } from '@cms/renderer'
 import { archivePage, unpublishPage } from '../../actions/page-lifecycle.ts'
 import { approveTrustedCode } from '../../actions/section-definitions.ts'
 import { publishPage, publishPageTogether } from '../../actions/page-publish.ts'
@@ -95,15 +95,11 @@ import { ConfirmDialog, ReasonDialog } from '../../../components/confirm.tsx'
 import {
   IconChevronLeft,
   IconClock,
-  IconDesktop,
   IconExternal,
-  IconMobile,
   IconPlus,
   IconMore,
   IconRedo,
-  IconSections,
   IconSettings,
-  IconTablet,
   IconUndo,
 } from '../../../components/icons.tsx'
 
@@ -173,65 +169,10 @@ import type { MediaAsset } from '../../../lib/media-library.ts'
 import { sitePreviewContext, type SitePreviewContext } from '../../../lib/preview-context.ts'
 import { EditorNotices } from './editor-notices.tsx'
 import { EditorToolbar } from './editor-toolbar.tsx'
+import type { PageEditorProps, EditorPane as Pane } from './editor-types.ts'
+import { VIEWPORTS, type Viewport } from './editor-viewports.ts'
+import { EditorStructure } from './editor-structure.tsx'
 
-type Props = {
-  chapterPage?: boolean
-  isolatedCanvasOrigin?: string | null
-  visitorPreviewOrigin?: string | null
-  userId: string
-  pageId: string
-  siteId: string
-  siteName: string
-  sitePublicOrigin?: string | null
-  originalDesign?: boolean
-  pageScoped?: boolean
-  lockChapterShared?: boolean
-  siteHref: string
-  liveHref: string | null
-  /** The address shown on the canvas frame's chrome. Decoration, never a link. */
-  previewUrl: string
-  metadataContext: Omit<CanonicalInput, 'authored'>
-  title: string
-  revision: number
-  /** Exact live version, so saved work and live work cannot share one label. */
-  liveSections: EditorSection[]
-  publishedVersionId: string | null
-  previewVersionId: string | null
-  document: EditorDocument
-  library: LibraryEntry[]
-  pinnedSections: LibraryEntry[]
-  linkTargets: LinkTarget[]
-  mediaAssets: MediaAsset[]
-  imagePreviews?: Record<string, string>
-  publishedImagePreviews?: Record<string, string>
-  themeColors: Record<string, string>
-  draftThemeColors: Record<string, string>
-  trustedCodeApproved: boolean
-  /** Super admins see the approval control beside the warning, not in a queue. */
-  canApproveTrustedCode: boolean
-  canAdvanced: boolean
-  /** Contributors submit; editors and admins may publish directly. */
-  canPublish: boolean
-  openReview: { id: string; versionId: string } | null
-  latestReviewFeedback: string | null
-  initialReadiness: ReadinessReport | null
-  initialSitePreview?: SitePreviewContext
-  initialField?: string
-  initialSettings?: boolean
-  initialFocus?: string
-  initialSection?: number | null
-  initialReleaseRequired?: boolean
-}
-
-// Fixed device sizes remain available alongside an unscaled workspace view.
-const VIEWPORTS = {
-  desktop: { width: 1280, label: 'Desktop', Icon: IconDesktop },
-  tablet: { width: 768, label: 'Tablet', Icon: IconTablet },
-  mobile: { width: 390, label: 'Phone', Icon: IconMobile },
-} as const
-type Viewport = keyof typeof VIEWPORTS
-
-type Pane = 'tree' | 'canvas' | 'inspector' | 'library'
 const PANES: readonly { id: Pane; label: string }[] = [
   { id: 'tree', label: 'Structure' },
   { id: 'canvas', label: 'Page' },
@@ -249,7 +190,7 @@ const AUTOSAVE_MS = 1000
 const CANVAS_RENDER_MS = 350
 type SaveSnapshot = { document: EditorDocument; sectionOrigins: string[] }
 
-export function PageEditor(props: Props) {
+export function PageEditor(props: PageEditorProps) {
   const router = useRouter(),
     scheduleFlight = useRef(false),
     scheduleRequest = useRef<{ signature: string; id: string } | null>(null),
@@ -3084,58 +3025,34 @@ export function PageEditor(props: Props) {
           data-native={!props.originalDesign}
           style={{ '--right-width': `${rightWidth}px`, '--structure-width': `${structureWidth}px` } as CSSProperties}
         >
-          <div
-            className={panelStyles.structure}
-            inert={Boolean(sectionTool) || Boolean(libraryPreview) || libraryPreparing}
-            data-open={structureOpen || pane === 'tree'}
-          >
-            {structureCollapsed && (
-              <IconButton
-                variant="tertiary"
-                className={panelStyles.structureToggle}
-                tooltip={structureOpen || pane === 'tree' ? 'Close Structure' : 'Open Structure'}
-                aria-expanded={structureOpen || pane === 'tree'}
-                onClick={() => {
-                  if (pane === 'tree') setPane('canvas')
-                  setStructureOpen(!(structureOpen || pane === 'tree'))
-                }}
-              >
-                <IconSections size={16} />
-              </IconButton>
-            )}
-            <ResizablePanel
-              storageKey="cms-r8-structure-width"
-              label="Structure"
-              min={240}
-              max={360}
-              initial={240}
-              edge="right"
-              onWidthChange={setStructureWidth}
-              className={panelStyles.structurePanel}
-            >
-              <StructureTree
-                canManageSections={canManageSections}
-                oneSectionAtATime={!props.originalDesign}
-                state={state}
-                locked={sectionLocked}
-                canInsertAt={canInsertAt}
-                canMove={canMoveSection}
-                library={slotsByDef}
-                onSelect={(section, slot) => {
-                  if (siteWide?.editing) return
-                  setSiteWide(null)
-                  setState(setSelection(state, { section, slot }))
-                  setStructureOpen(false)
-                  setPane('inspector')
-                }}
-                onMove={(from, to) => setState(setSelection(moveSection(state, from, to), { section: to, slot: null }))}
-                onAdd={openLibrary}
-                onDropLibrary={placeLibraryEntry}
-                onToggleHidden={section => setState(toggleHidden(state, section))}
-                onPageSettings={openPageSettings}
-              />
-            </ResizablePanel>
-          </div>
+          <EditorStructure
+            layout={{
+              sectionTool,
+              libraryPreview,
+              libraryPreparing,
+              structureOpen,
+              pane,
+              structureCollapsed,
+              setPane,
+              setStructureOpen,
+              setStructureWidth,
+            }}
+            sections={{
+              canManageSections,
+              props,
+              state,
+              sectionLocked,
+              canInsertAt,
+              canMoveSection,
+              slotsByDef,
+              siteWide,
+              setSiteWide,
+              setState,
+              openLibrary,
+              placeLibraryEntry,
+              openPageSettings,
+            }}
+          />
 
           {/* The page sits on a recessed desk with a shadow, which is enough to
             say that what is inside is the website and what is outside is the
