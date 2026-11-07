@@ -9,7 +9,8 @@ and [local setup](../hosting/local-demo.md). Product task instructions are in th
 
 Paths below are repository-relative. `app/` means `apps/admin/src/app/` and
 `lib/` means `apps/admin/src/lib/`. Start at the named route, follow its server
-action and command module, then read the current SQL definition. The
+action and command module, then read the current SQL definition. Admin read
+models live in `apps/admin/src/server/queries/`, by data type. The
 [current SQL index](../../../packages/schema/current/README.md) links one file per
 function, grouped by area, plus a table/RLS/grant catalog. Numbered migrations
 remain the executable authority; never edit a past migration or apply the reference.
@@ -30,9 +31,9 @@ remain the executable authority; never edit a past migration or apply the refere
 | People and access | `app/people/actions.ts` → `lib/people.ts`, `people-access.ts`; `lib/session.ts` resolves the verified identity | `app.add_person`, membership/invitation commands, `app.resolve_session` | No public people directory or role checks in markup; PostgreSQL authorizes | `people`, `people-scopes`, dedicated `e2e/no-mail.spec.ts` |
 | Domains and routing | `app/sites/[siteId]/domains/actions.ts`; global `app/domains/` → domain adapters in `packages/platform` | Domain create/verify/activate and host resolution commands | `apps/site` Host routing; Firebase Hosting adapter | `domains`, `global-domains`, `public-contract`, `echelon-redirects` |
 
-Browser names above mean `e2e/specs/NAME.spec.ts`. The delivered-round prefixes
-are historical names; they do not change which feature owns the test. Full
-filenames and assertions stay intact during this handover. Unit tests sit beside
+Browser tests live under `e2e/specs/` in feature folders. Use the
+[test move map](../../maintainers/test-moves.md) to find old round names.
+Test titles and assertions are preserved. Unit tests sit beside
 code; real database tests are `packages/schema/test/*.db.test.ts` and package/app
 `test/` folders. Permission claims need the real-role tests, not only unit mocks.
 
