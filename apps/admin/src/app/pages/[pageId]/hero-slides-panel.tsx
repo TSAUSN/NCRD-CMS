@@ -1,4 +1,8 @@
 'use client'
+import { useReorderableList } from '../../../components/ui/use-reorderable-list.ts'
+import { flatReorderIntent } from '../../../components/ui/flat-reorder.ts'
+import { DropIndicator, ReorderAnnouncement } from '../../../components/ui/drop-indicator.tsx'
+import reorderStyles from '../../../components/ui/reorderable-list.module.css'
 import { EditorPanelActions } from './editor-panel-navigation.tsx'
 import { useEffect, useRef, useState, type ReactNode, type KeyboardEvent } from 'react'
 import {
@@ -72,7 +76,6 @@ export function HeroSlidesPanel({
     [retry, setRetry] = useState(0),
     [dates, setDates] = useState<Set<string>>(() => new Set()),
     [copying, setCopying] = useState<string | null>(null),
-    dragged = useRef<string | null>(null),
     boundary = useRef<HTMLDivElement>(null)
   const photoThumbnail = (value: unknown) => {
     if (!value || typeof value !== 'object') return null
@@ -187,9 +190,20 @@ export function HeroSlidesPanel({
     setChoosing(false)
     onValuesChange(next, first(added.key))
   }
-  function move(from: string, to: string) {
-    const delta = keys.indexOf(to) - keys.indexOf(from)
-    if (delta) onValuesChange(moveRepeatItem(values, slot, from, delta), selected)
+  function move(from: number, to: number) {
+    const key = keys[from]
+    if (!key || from === to || to < 0 || to >= keys.length) return
+    onValuesChange(moveRepeatItem(values, slot, key, to - from), selected)
+    return `Moved ${title(key)} to position ${to + 1}.`
+  }
+  const reorder = useReorderableList({
+    mimeType: 'application/x-cms-slide',
+    decide: point => flatReorderIntent(keys, point),
+    apply: ({ from, to }) => move(from, to),
+  })
+  function moveByKeyboard(from: number, to: number) {
+    const message = move(from, to)
+    if (message) reorder.announce(message)
   }
   function update(key: string, id: string, value: unknown) {
     onValuesChange({ ...values, [field(key, id)]: value }, selected)
@@ -386,31 +400,17 @@ export function HeroSlidesPanel({
       {!keys.length ? (
         <EmptyState title="No slides yet">Add a slide to put a feature on the page.</EmptyState>
       ) : (
-        <ol className={shared.compactItemList}>
+        <ol className={shared.compactItemList + ' ' + reorderStyles.list} data-reorder-list>
           {keys.map((key, at) => {
             const thumbnail = photoThumbnail(values[field(key, 'photo')])
             return (
-              <li
-                key={key}
-                draggable
-                onDragStart={event => {
-                  dragged.current = key
-                  event.dataTransfer.setData('application/x-cms-slide', key)
-                  event.dataTransfer.effectAllowed = 'move'
-                }}
-                onDragEnd={() => {
-                  dragged.current = null
-                }}
-                onDragOver={event => {
-                  if (event.dataTransfer.types.includes('application/x-cms-slide')) event.preventDefault()
-                }}
-                onDrop={event => {
-                  event.preventDefault()
-                  const from = event.dataTransfer.getData('application/x-cms-slide')
-                  if (dragged.current === from && keys.includes(from)) move(from, key)
-                  dragged.current = null
-                }}
-              >
+              <li key={key} {...reorder.row(key)}>
+                <DropIndicator marker={reorder.marker} row={key} />
+                {(reorder.blocked ?? reorder.rejection)?.row === key && (
+                  <span aria-hidden="true" className={reorderStyles.reason}>
+                    {(reorder.blocked ?? reorder.rejection)?.message}
+                  </span>
+                )}
                 <Button
                   className={shared.itemButton}
                   title={title(key)}
@@ -441,7 +441,7 @@ export function HeroSlidesPanel({
                     size="s"
                     disabled={at === 0}
                     aria-label={'Move slide ' + (at + 1) + ' up'}
-                    onClick={() => onValuesChange(moveRepeatItem(values, slot, key, -1), selected)}
+                    onClick={() => moveByKeyboard(at, at - 1)}
                   >
                     <IconArrowUp size={16} />
                   </Button>
@@ -450,7 +450,7 @@ export function HeroSlidesPanel({
                     size="s"
                     disabled={at === keys.length - 1}
                     aria-label={'Move slide ' + (at + 1) + ' down'}
-                    onClick={() => onValuesChange(moveRepeatItem(values, slot, key, 1), selected)}
+                    onClick={() => moveByKeyboard(at, at + 1)}
                   >
                     <IconArrowDown size={16} />
                   </Button>
@@ -492,6 +492,7 @@ export function HeroSlidesPanel({
           })}
         </ol>
       )}
+      <ReorderAnnouncement>{reorder.announcement}</ReorderAnnouncement>
       <Button
         fullWidth
         variant="secondary"
