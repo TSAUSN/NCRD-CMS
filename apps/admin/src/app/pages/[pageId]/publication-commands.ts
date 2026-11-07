@@ -23,7 +23,6 @@ type Inputs = {
     startTransition: Start
   }
   publishState: {
-    remainingSamples: readonly unknown[]
     setSampleConfirmation: Set<SampleConfirmation | null>
     latestSave: Current<(kind: 'checkpoint') => Promise<ActionResult | null>>
     state: EditorState
@@ -47,7 +46,6 @@ type Inputs = {
 export function publicationCommands({ draft, publishState, canvas }: Inputs) {
   const { props, currentEditor, queue, savedVersionId, setResult, startTransition } = draft
   const {
-    remainingSamples,
     setSampleConfirmation,
     latestSave,
     state,
@@ -60,10 +58,6 @@ export function publicationCommands({ draft, publishState, canvas }: Inputs) {
   } = publishState
   const { isolatedCurrent, canvasRefreshBlocked, needsRender, renderCanvas, changeSitePreview } = canvas
   const publish = (overrideReason?: string, together = false, siteWide = false, samplesConfirmed = false) => {
-    if (remainingSamples.length && !samplesConfirmed) {
-      setSampleConfirmation({ ...(overrideReason ? { overrideReason } : {}), together, siteWide })
-      return
-    }
     setResult(null)
     startTransition(async () => {
       try {
@@ -98,7 +92,16 @@ export function publicationCommands({ draft, publishState, canvas }: Inputs) {
             if (samplesConfirmed) data.set('sampleContentConfirmed', 'true')
 
             const outcome = together ? await publishPageTogether(data) : await publishPage(data)
-            setResult(outcome)
+            if (!outcome.ok && outcome.kind === 'blocked' && outcome.needsSampleConfirmation) {
+              setSampleConfirmation({
+                ...(overrideReason ? { overrideReason } : {}),
+                together,
+                siteWide,
+                findings: outcome.report.blocking
+                  .filter(finding => finding.rule === 'sample_content')
+                  .map(finding => finding.message),
+              })
+            } else setResult(outcome)
             return outcome.ok
               ? { ok: true, revision: outcome.revision }
               : { ok: false, conflict: outcome.kind === 'conflict' }

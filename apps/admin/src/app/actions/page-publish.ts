@@ -41,17 +41,10 @@ export async function publishPage(formData: FormData): Promise<ActionResult> {
     return toActionResult(error)
   }
 
-  if (report.blocking.some(finding => finding.rule === 'sample_content')) {
-    if (formData.get('sampleContentConfirmed') !== 'true')
-      return {
-        ok: false,
-        kind: 'blocked',
-        report,
-        message: 'Replace the remaining examples, or choose Publish with sample content.',
-      }
-    if (report.blocking.every(finding => finding.rule === 'sample_content'))
-      override ||= 'Confirmed: Publish with sample content.'
-  }
+  const hasSamples = report.blocking.some(finding => finding.rule === 'sample_content')
+  const samplesConfirmed = formData.get('sampleContentConfirmed') === 'true'
+  if (hasSamples && samplesConfirmed && report.blocking.every(finding => finding.rule === 'sample_content'))
+    override ||= 'Confirmed: Publish with sample content.'
 
   // Links to pages that are not live yet, and a site's first publish, are
   // fixed by publishing more at once: offer that as one step.
@@ -67,6 +60,17 @@ export async function publishPage(formData: FormData): Promise<ActionResult> {
     }
     if (together) return { ok: false, kind: 'blocked', report, together, message: publishTogetherMessage(together) }
   }
+
+  // A group needs one decision covering every affected page. A one-page
+  // sample confirmation is only useful after ruling out that group.
+  if (hasSamples && !samplesConfirmed)
+    return {
+      ok: false,
+      kind: 'blocked',
+      report,
+      message: 'Replace the remaining examples, or choose Publish with sample content.',
+      needsSampleConfirmation: true,
+    }
 
   if (!report.ok && !override) {
     return {

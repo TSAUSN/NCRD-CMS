@@ -19,7 +19,14 @@ export type ActionResult =
    */
   | { ok: true; revision: number; versionId: string | null; message: string }
   | { ok: false; kind: 'conflict'; currentRevision: number | undefined; message: string }
-  | { ok: false; kind: 'blocked'; report: ReadinessReport; message: string; together?: PublishTogether }
+  | {
+      ok: false
+      kind: 'blocked'
+      report: ReadinessReport
+      message: string
+      together?: PublishTogether
+      needsSampleConfirmation?: true
+    }
   | { ok: false; kind: 'error'; message: string }
 
 export type GlobalElementsActionResult =

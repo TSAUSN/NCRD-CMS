@@ -18,6 +18,7 @@ export type SampleConfirmation = {
   overrideReason?: string
   together: boolean
   siteWide: boolean
+  findings: string[]
 }
 
 type Props = {
@@ -130,12 +131,14 @@ export function EditorPublishDialogs({
         >
           <p>These sections still contain the examples that came with them. Visitors will see them.</p>
           <ul>
-            {remainingSamples.map((sample, index) => (
-              <li key={index}>
-                {sample.section} · {sample.fields.length}{' '}
-                {sample.fields.length === 1 ? 'sample field' : 'sample fields'}
-              </li>
-            ))}
+            {remainingSamples.length
+              ? remainingSamples.map((sample, index) => (
+                  <li key={index}>
+                    {sample.section} · {sample.fields.length}{' '}
+                    {sample.fields.length === 1 ? 'sample field' : 'sample fields'}
+                  </li>
+                ))
+              : sampleConfirmation.findings.map((message, index) => <li key={index}>{message}</li>)}
           </ul>
           <div className="actions">
             <Button variant="secondary" onClick={() => setSampleConfirmation(null)}>
