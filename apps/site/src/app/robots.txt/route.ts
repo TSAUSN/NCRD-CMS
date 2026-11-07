@@ -11,7 +11,7 @@ export async function GET(request: Request): Promise<Response> {
   const body = !site
     ? 'User-agent: *\nDisallow: /\n'
     : site.isStaging
-      ? // Staging hosts serve immediately and stay out of the index (SPEC §6.2).
+      ? // Staging hosts serve immediately and stay out of the index.
         'User-agent: *\nDisallow: /\n'
       : `User-agent: *\nAllow: /\nSitemap: https://${host}/sitemap.xml\n`
 

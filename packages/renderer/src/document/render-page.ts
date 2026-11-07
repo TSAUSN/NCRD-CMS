@@ -69,7 +69,7 @@ export type PageDocument = {
 
 /**
  * A complete HTML document with no client JavaScript required for its content,
- * navigation, metadata, or primary interaction (SPEC §6.8, D10).
+ * navigation, metadata, or primary interaction.
  */
 /** Social crawlers require an absolute image URL; staging uses the live canonical origin. */
 function socialImageUrl(value: string | undefined, canonical: string): string {
@@ -117,7 +117,7 @@ export function renderPage(input: {
   const canonical = canonicalDecision.url
   const sharingImage = socialImageUrl(manifest.meta.social_image, canonical)
 
-  // A staging host never asks to be indexed, whatever the page says (SPEC §6.10).
+  // A staging host never asks to be indexed, whatever the page says.
   const noindex = isStaging || manifest.meta.noindex === true
 
   // Theme hooks are a page-shell concern. Keeping them out of a standalone

@@ -1,5 +1,5 @@
 // Rich text is stored as authored and sanitized on the way out, against a
-// closed allowlist (SPEC §8). Anything not named here is dropped, including
+// closed allowlist. Anything not named here is dropped, including
 // its attributes — the default is "remove", never "keep and hope".
 import { escapeAttribute, escapeText, safeUrl } from './escape.ts'
 import { decodeHTML, decodeHTMLAttribute } from 'entities'

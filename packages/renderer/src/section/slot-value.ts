@@ -183,7 +183,7 @@ export function renderSlot(
       }
       const url = safeUrl(trackedLinkUrl(safeUrl(String(value['url'] ?? '')), value['trackingCode']))
       const label = escapeText(String(value['label'] ?? ''))
-      // An editor's per-link choices (SPEC §6.4): a new tab, which always gets
+      // An editor's per-link choices: a new tab, which always gets
       // `noopener` so the page it opens cannot reach back, and `nofollow`.
       const newTab = value['newTab'] === true
       const tokens = [

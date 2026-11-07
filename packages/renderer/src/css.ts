@@ -1,4 +1,4 @@
-// Custom CSS policy (SPEC §3.3, §6.5, §8).
+// Custom CSS policy.
 //
 // Two things this has to get right, and version 2 of the policy got only the
 // first one.

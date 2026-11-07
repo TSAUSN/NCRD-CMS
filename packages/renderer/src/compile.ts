@@ -1,5 +1,5 @@
 // Section definitions are compiled once, at authoring time, into a checked AST
-// (SPEC §6.5). Public rendering consumes the AST; it never reparses authored
+//. Public rendering consumes the AST; it never reparses authored
 // markup on a request. The source is kept for editing and audit only.
 //
 // Policy version 2 changed both the AST shape and the rendering contract: every
@@ -157,23 +157,9 @@ function insideAny(ranges: Map<string, [number, number]>, at: number): boolean {
 }
 
 /**
- * SCRIPT_AND_SLOTS — why a script-bearing template may not have slots at all.
- *
- * SPEC §6.5 requires active content to be rejected, and §8 makes raw markup a
- * super-admin decision. Neither of those is a licence to interpolate a typed
- * field into JavaScript, and the two kept getting confused: a template with a
- * script was marked "trusted code, needs approval", and approval then let a
- * data slot inside it become executable.
- *
- * The alternative was to model HTML's script-data escaped and double-escaped
- * states so a slot's position inside a script could be judged precisely. That
- * is a language implementation, this is the third time a hand-rolled corner of
- * one has been wrong, and the value of getting it right is a feature nobody
- * asked for: a section template that mixes editable content into a script.
- *
- * So the rule is structural rather than positional. Static raw code still ships
- * through the governed escape hatch — it is just static, with no slots in the
- * template that carries it.
+ * A script-bearing template cannot contain editable slots. Approval permits the static script, but
+ * must not make authored field values executable. Rejecting the combination structurally keeps the
+ * rule independent of script position and escaping.
  */
 export const SCRIPT_AND_SLOTS =
   'this template contains a script element, so it cannot also contain editable slots — ' +

@@ -1,4 +1,4 @@
-// Sink-specific escaping (SPEC §3.3). One function per sink, because "escape
+// Sink-specific escaping. One function per sink, because "escape
 // the value" is not one operation: what is safe in text is not safe in an
 // attribute, and neither is safe in a URL position.
 

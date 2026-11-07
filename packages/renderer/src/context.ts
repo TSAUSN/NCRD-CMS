@@ -1,5 +1,5 @@
 // Where a slot sits in its template, decided by an HTML tokenizer rather than
-// by looking around for angle brackets (SPEC §6.5, §8).
+// by looking around for angle brackets.
 //
 // "Content or attribute" is not enough information to escape with. A value
 // bound for `href` needs the URL policy; one bound for `style` needs the CSS

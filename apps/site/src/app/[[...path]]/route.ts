@@ -5,7 +5,7 @@ import { publicPageResponse } from '../../lib/public-page.ts'
 // renderer already produces a complete document, and returning it verbatim
 // means the public output contains exactly what packages/renderer emits — no
 // framework wrapper, no hydration bundle, nothing required for the content to
-// be there (SPEC §6.8, D10).
+// be there.
 import { observePublicResponse } from '../../lib/observability.ts'
 import {
   htmlAddressTarget,
@@ -51,7 +51,7 @@ async function serve(request: Request): Promise<Response> {
   }
 
   // www ⇄ apex: a redirect domain says where it points, and we send the reader
-  // there rather than serving the same content on two hostnames (SPEC §6.10).
+  // there rather than serving the same content on two hostnames.
   if (route.redirectTo && route.redirectTo !== host) {
     return new Response(null, {
       status: 308,

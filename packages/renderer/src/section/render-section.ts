@@ -186,7 +186,7 @@ export function renderSection(section: ManifestSection, index: number, options: 
     if (!revealHidden) classes.push(`cms-hide-${breakpoint}`)
   }
 
-  // Preview-only instrumentation. Public output carries none of it (SPEC §8).
+  // Preview-only instrumentation. Public output carries none of it.
   const instrumentation = options.preview
     ? ` data-cms-section="${escapeAttribute(String(index))}"` +
       `${instance.hidden ? ' data-cms-hidden' : ''}${hiddenAt.length ? ` data-cms-hidden-at="${hiddenAt.join(' ')}"` : ''}` +

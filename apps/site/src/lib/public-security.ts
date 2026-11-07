@@ -28,10 +28,10 @@ export type PageSecurityNeeds = {
   adobeFonts?: boolean
 }
 
-/** SPEC §8: default-deny. A page gets the exact hash of each fixed runtime it
- * uses (navigation, chapter directory, story widgets, hero slides, chart
- * fullscreen, FAQ and schedule filters), its site's reviewed script hashes,
- * and frame sources only for the governed embeds it shows. */
+/**
+ * Allow only the fixed runtimes a page uses, the site’s reviewed script hashes, and the frame
+ * sources needed by its governed embeds.
+ */
 export function publicSecurityHeaders({
   providerFullscreen: hasProviderEmbed = false,
   embedSources = [],

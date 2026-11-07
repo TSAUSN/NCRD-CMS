@@ -104,7 +104,7 @@ export function collectCss(sections: readonly ManifestSection[]): string {
       parts.push(sectionAppearanceCss(section.def, section.instance.appearance, index))
     }
     // Per-block custom CSS is scoped to that block's id, so one section's
-    // escape hatch can never restyle another (SPEC §6.4).
+    // escape hatch can never restyle another.
     if (section.instance.custom_css) {
       // Refused whole when the policy blocks any of it, for the same reason a
       // definition's stylesheet is: a section shown with half its styling is a
@@ -138,7 +138,7 @@ export function collectCss(sections: readonly ManifestSection[]): string {
     parts.push(STORY_SPLIT_CSS)
 
   // Breakpoint visibility is a bounded, declared control — not free
-  // per-viewport layout (SPEC §6.4, D5).
+  // per-viewport layout.
   parts.push(`@media (max-width:${BREAKPOINT_MAX_WIDTH['sm']}){.cms-hide-sm{display:none !important}}`)
   parts.push(
     `@media (min-width:768px) and (max-width:${BREAKPOINT_MAX_WIDTH['md']}){.cms-hide-md{display:none !important}}`,

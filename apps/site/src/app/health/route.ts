@@ -1,4 +1,4 @@
-// Liveness and readiness for the `site` role (SPEC §3.1, §6.15).
+// Liveness and readiness for the `site` role.
 import { asPublic } from '@cms/platform'
 
 export const dynamic = 'force-dynamic'

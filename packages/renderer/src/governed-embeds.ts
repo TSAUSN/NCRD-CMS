@@ -1,6 +1,6 @@
 import { renderedFeatures } from './feature-markers.ts'
-// Governed video, map and form embeds (SPEC §8: no arbitrary object
-// embedding; source applications mapped/adapted explicitly). An editor pastes
+// Governed video, map and form embeds. Allow only known
+// providers and adapt their URLs explicitly. An editor pastes
 // the ordinary link a provider gives them; only YouTube and Vimeo videos,
 // Google Maps embeds and Microsoft or Google Forms are accepted, each rebuilt
 // from its identifiers into the provider's own embed address. Nothing else

@@ -1,5 +1,5 @@
 // Selector scoping and validation, done with a selector parser rather than with
-// string arithmetic (SPEC §3.3, §6.5, §8).
+// string arithmetic.
 //
 // The rule a definition's stylesheet has to obey is simple to state — every
 // selector branch must be rooted at that definition's own scope class — and it

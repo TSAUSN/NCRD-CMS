@@ -1,4 +1,4 @@
-// The canonical URL policy (SPEC §6.8, §6.10).
+// The canonical URL policy.
 //
 // A canonical link is the one piece of a page that tells every search engine
 // which address *is* this document. Everything else in the head describes the
@@ -16,7 +16,7 @@
 // verified is not a weaker version of the feature, it is the attack.
 //
 // Cross-domain canonical (syndication) is a real product need and is not built
-// here. SPEC §6.8 records what it will require — super-admin permission, a
+// here. That operation would require super-admin permission, a
 // verified external host, a stated reason, an audit event, and invalidation of
 // the approval when the canonical changes — because none of that is a default
 // anyone should be able to reach by typing a URL into a metadata field.
@@ -31,7 +31,7 @@ export type CanonicalRefusalRule = 'unparsable' | 'not_https' | 'embedded_creden
 
 export type CanonicalRefusal = {
   rule: CanonicalRefusalRule
-  /** Plain language, editor-facing. No jargon (SPEC §7). */
+  /** Plain language, editor-facing. No jargon. */
   message: string
   /** What the author actually wrote, so the message can be acted on. */
   authored: string

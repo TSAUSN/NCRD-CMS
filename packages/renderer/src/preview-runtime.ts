@@ -1,7 +1,7 @@
 import { HERO_SLIDES_RUNTIME } from './hero-slides-runtime.ts'
 import { sha256Base64 } from './sha256.ts'
 
-// The canvas runtime (SPEC §6.4, D1).
+// The canvas runtime.
 //
 // It lives in the renderer because the renderer owns the `data-cms-*` contract
 // it reads. It is injected **only** when `preview: true`, so nothing here can
@@ -437,28 +437,10 @@ export const PREVIEW_RUNTIME = `(() => {
 ${HERO_SLIDES_RUNTIME}`
 
 /**
- * The slot kinds whose rendered form is exactly one element, whatever the field
- * holds: `link` and `button` are an `<a>`, `image` is an `<img>`.
- *
- * They are named here because of what that fact costs. The wrapper the
- * renderers put around an editable region is a `<span>`, and a `<span>` is a
- * box. When the definition's own stylesheet makes the slot's position a flex or
- * grid item — `display:flex` and a `gap` on the parent, `flex:1` or a
- * `grid-template-columns` track on the child — the span became the item and the
- * `<a>` or `<img>` became an ordinary in-flow child of it, so `flex:1` matched
- * nothing that could grow and the section laid out one way in the canvas and
- * another way on the published page. That is the preview/live divergence SPEC
- * §9 forbids, and it appeared only in preview, which is the worst place for the
- * two paths to disagree. `display:contents` makes the wrapper generate no box,
- * so its single child is the flex or grid item, exactly as in public output.
- *
- * `text` and `richtext` are deliberately absent, and not by oversight. Rich text
- * is however many blocks the author wrote, so there is no one child to promote
- * and removing the wrapper's box would change which element the section's own
- * rules apply to. A text slot is the one the canvas runtime puts a caret into,
- * and `contenteditable` on an element that generates no box is a caret with
- * nowhere to sit. A repeat has its own `display:contents` class because it may
- * render several item roots rather than the single element these kinds promise.
+ * Promote the one rendered element of a link, button or image through its editing wrapper with
+ * display:contents. That preserves the flex or grid item used on the public page. Rich text can
+ * have several blocks; plain text needs a box for the caret. Repeating items use their own wrapper
+ * rule.
  */
 const CONTENTS_KINDS = ['link', 'button', 'image', 'icon'] as const
 
@@ -566,12 +548,8 @@ ${CONTENTS_SLOT}[data-cms-selected]>*{outline:calc(var(--cms-line-focus,.125rem)
 `
 
 /**
- * Remove everything preview adds, so preview and public output of the same
- * fixture can be compared directly (SPEC §9's preview/live parity check).
- *
- * Keeping this beside the code that *adds* the instrumentation is deliberate:
- * if a future preview affordance is added and this is not updated, the parity
- * test fails and says so, rather than a regex in a test file quietly drifting.
+ * Remove the editor’s instrumentation for the preview and public parity check. Keep this beside the
+ * code that adds the instrumentation so new editor markers cannot silently escape the comparison.
  */
 export function stripPreviewInstrumentation(html: string): string {
   return (

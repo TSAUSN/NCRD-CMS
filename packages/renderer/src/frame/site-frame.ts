@@ -28,7 +28,7 @@ export function renderNavigation(
       const itemPath = path ? path + '.' + index : String(index)
       const href = node.target.type === 'url' ? safeUrl(node.target.url) : pathForPage(node.target.page_id)
       // A nav entry whose page is no longer published is dropped rather than
-      // rendered as a dead link (SPEC §6.7).
+      // rendered as a dead link.
       if (!href && !node.dropdownGroup) return ''
       const children = node.children?.length
         ? renderNavigation(node.children, pathForPage, depth + 1, currentPath, instrumentMenu, itemPath)

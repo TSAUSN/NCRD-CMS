@@ -1,13 +1,7 @@
 /**
- * SHA-256 (FIPS 180-4) over a string's UTF-8 bytes, synchronous and
- * dependency-free.
- *
- * The renderer runs in the browser too (the editor, the site wizard, Header &
- * footer). Importing `node:crypto` there made the bundler ship a 565 KB
- * crypto polyfill to those pages, whose own probes tripped the admin's
- * Content Security Policy (AUTH-05, QA-04). Render hashes and script hashes
- * need only this one digest; `sha256.test.ts` checks it byte-for-byte against
- * Node's.
+ * Hash the UTF-8 bytes with SHA-256 (FIPS 180-4) without dependencies. This code also runs in the
+ * editor browser, where Node crypto would add a large polyfill and probe APIs blocked by the
+ * Content Security Policy. The test compares the result against Node.
  */
 const K = new Uint32Array([
   0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5, 0xd807aa98,

@@ -1,4 +1,4 @@
-// Public routing (SPEC §6.10, §8). One deployment serves every tenant, and the
+// Public routing. One deployment serves every tenant, and the
 // only thing that decides which one is the normalized Host — matched against
 // verified domains and staging hostnames through the public_api functions.
 //
@@ -120,7 +120,7 @@ export async function resolveHost(
 /**
  * A cache key that includes tenant, path, and the published revision, so a
  * publish makes the old entry unreachable even before invalidation arrives
- * (SPEC §6.8). Also the ETag.
+ *. Also the ETag.
  */
 export function cacheKey(route: ResolvedRoute): string {
   return (
