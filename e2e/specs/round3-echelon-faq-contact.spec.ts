@@ -6,7 +6,7 @@ import { resolve } from 'node:path'
 import { echelonFixture } from './fixtures/echelon.ts'
 import { echelonFaqContactContent } from '../../packages/seeds/src/echelon-faq-contact.ts'
 import { signIn, canvas, publish } from './helpers.ts'
-test('Echelon FAQ opens one answer without scripts and its normal-field contact panel delivers to the private site contact messages', async ({
+test('Echelon FAQ opens one answer without scripts and its normal-field contact panel keeps existing local message handling', async ({
   page,
   browser,
 }, info) => {

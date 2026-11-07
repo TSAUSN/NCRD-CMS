@@ -27,7 +27,8 @@ test('header and footer reserve error wording and retry for a failed preview, th
         } else await route.continue()
       })
       await page.goto('/sites/' + f.siteId + '/' + part)
-      await expect(page.getByRole('heading', { name: 'Opening the ' + part + ' preview…', exact: true })).toBeVisible()
+      await expect.poll(() => started).toBe(true)
+      await expect(page.getByRole('status').filter({ hasText: /^Opening preview…$/ })).toBeVisible()
       await expect(page.getByText('Your saved choices are safe. Try the preview again.', { exact: true })).toHaveCount(
         0,
       )
