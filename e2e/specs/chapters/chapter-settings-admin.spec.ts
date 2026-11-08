@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import { randomUUID } from 'node:crypto'
 import { mkdir } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { echelonFixture } from '../fixtures/echelon.ts'
@@ -67,12 +68,25 @@ test('chapter Settings shows the real default choices and both reminder previews
         ])
       ).rows,
     ).toEqual(heads)
-    await f.pool.query(
-      "INSERT INTO site_memberships(site_id,user_id,role) SELECT $1,id,'site_admin' FROM app_users WHERE email='editor@example.test'",
-      [f.site],
-    )
+    const staffEmail = `chapter-settings-admin-${randomUUID()}@example.test`
+    await f.client.query('BEGIN')
+    try {
+      await f.client.query("SELECT set_config('app.user_id',$1,true)", [f.actor])
+      const user = (
+        await f.client.query<{ id: string }>('SELECT app.provision_user($1,$2) AS id', [
+          staffEmail,
+          'Chapter settings administrator',
+        ])
+      ).rows[0]!
+      await f.client.query('UPDATE app_users SET auth_subject=$1 WHERE id=$2', [`local|${staffEmail}`, user.id])
+      await f.client.query("SELECT app.set_site_membership($1,$2,'site_admin')", [user.id, f.site])
+      await f.client.query('COMMIT')
+    } catch (error) {
+      await f.client.query('ROLLBACK')
+      throw error
+    }
     const staff = await staffContext.newPage()
-    await signIn(staff, 'editor@example.test')
+    await signIn(staff, staffEmail)
     await staff.goto('/sites/' + f.site + '/settings?tab=reviews')
     await expect(staff.getByRole('switch', { name: 'January and July contact checks', exact: true })).toBeVisible()
     await expect(staff.getByText('Test tools (this computer only)', { exact: true })).toHaveCount(0)
@@ -80,6 +94,10 @@ test('chapter Settings shows the real default choices and both reminder previews
   } finally {
     await staffContext.close()
     f.client.release()
-    await f.pool.end()
+    try {
+      await f.archive()
+    } finally {
+      await f.pool.end()
+    }
   }
 })

@@ -17,11 +17,11 @@ test('site-first navigation groups administration, preserves advanced access and
     const sidebar = page.getByRole('complementary', { name: 'CMS navigation', exact: true }),
       nav = page.getByRole('navigation', { name: 'Sections of the CMS', exact: true }),
       switcher = sidebar.getByRole('button', { name: 'Switch site · Shared site look', exact: true }),
-      capture = async (name: string) => {
+      capture = async (name: string, screen = page) => {
         for (const width of [1440, 1024]) {
-          await page.setViewportSize({ width, height: 950 })
-          expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
-          await page.screenshot({ path: resolve(folder, name + '-' + width + '.png') })
+          await screen.setViewportSize({ width, height: 950 })
+          expect(await screen.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
+          await screen.screenshot({ path: resolve(folder, name + '-' + width + '.png') })
         }
       }
     await expect(nav.getByRole('heading', { name: 'Site-wide', exact: true })).toBeVisible()
@@ -80,15 +80,30 @@ test('site-first navigation groups administration, preserves advanced access and
         await context.close()
       }
     }
-    await page.route('**/api/sites', route =>
-      route.fulfill({ status: 503, contentType: 'application/json', body: '{}' }),
-    )
-    await page.goto('/sites/' + f.site + '/pages')
-    await switcher.click()
-    await expect(sidebar.getByRole('status')).toContainText('Couldn’t load sites. Open All sites to try again.')
-    await capture('site-switcher-error')
-    await popup.getByRole('link', { name: 'All sites', exact: true }).click()
-    await expect(page).toHaveURL('/sites')
+    // Start without cached site choices so this journey exercises an actual failed read.
+    const offlineContext = await browser.newContext()
+    try {
+      const offline = await offlineContext.newPage()
+      await offline.route('**/api/sites', route =>
+        route.fulfill({ status: 503, contentType: 'application/json', body: '{}' }),
+      )
+      await signIn(offline, 'root@example.test')
+      await offline.goto('/sites/' + f.site + '/pages')
+      const offlineSidebar = offline.getByRole('complementary', { name: 'CMS navigation', exact: true })
+      const offlineSwitcher = offlineSidebar.getByRole('button', {
+        name: 'Switch site · Shared site look',
+        exact: true,
+      })
+      await offlineSwitcher.click()
+      await expect(offlineSidebar.getByRole('status')).toContainText(
+        'Couldn’t load sites. Open All sites to try again.',
+      )
+      await capture('site-switcher-error', offline)
+      await offlineSwitcher.locator('..').getByRole('link', { name: 'All sites', exact: true }).click()
+      await expect(offline).toHaveURL('/sites')
+    } finally {
+      await offlineContext.close()
+    }
   } finally {
     await f.pool.query('UPDATE sites SET archived_at=now() WHERE id=$1', [f.site])
     await f.pool.end()
