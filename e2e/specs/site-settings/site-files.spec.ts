@@ -3,7 +3,7 @@ import { randomUUID, createHash } from 'node:crypto'
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { join, resolve } from 'node:path'
 import { Pool } from 'pg'
-import { test, expect, type Page, type Locator } from '@playwright/test'
+import { test, expect, type Page, type Locator, type Request } from '@playwright/test'
 import { compileSection, sectionScopeSelector } from '../../../packages/renderer/src/index.ts'
 import { registerReviewedSiteFile } from '../../../packages/platform/src/site-files.ts'
 import { importFrozenSiteAsset } from '../../../packages/platform/src/site-assets.ts'
@@ -1105,10 +1105,25 @@ test('unchanged reviewed files retain native image and PDF addresses through two
       const originalAddress = '/site-files/' + scriptId + '/' + scriptHash + '/native-original.js'
       expect((await rawRequest({ host: target.host, path: originalAddress })).body).toBe(jsSource)
     }
-    await page.goto('/sites/' + first.id + '/scripts')
+    const filesPath = '/sites/' + first.id + '/scripts'
+    await page.goto(filesPath)
     await page.getByRole('button', { name: 'Remove native-original.js', exact: true }).click()
+    const refreshes: string[] = []
+    const observeRefresh = (request: Request) => {
+      const headers = request.headers()
+      if (
+        request.method() === 'GET' &&
+        new URL(request.url()).pathname === filesPath &&
+        headers.rsc === '1' &&
+        headers['next-router-prefetch'] !== '1'
+      )
+        refreshes.push(request.url())
+    }
+    page.on('request', observeRefresh)
     await approve(page)
     await page.goto('/pages/' + copiedPage + '?site=draft')
+    page.off('request', observeRefresh)
+    expect(refreshes).toEqual([])
     await expect(page.frameLocator('iframe[title="Page canvas"]').locator('main')).toHaveCSS(
       'background-image',
       /__cms\/read\/.+\/media\//,

@@ -1,5 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { SiteFileView, type SiteFileBundle, type SiteFileKind } from '@cms/schema'
 import { useNavigationGuard } from '../../../../components/navigation-guard.ts'
 import { addReviewedFile, fileMoveTarget } from '../../../../lib/site-file-bundle.ts'
@@ -22,7 +21,6 @@ export type SiteFilesProps = {
 }
 
 export function useSiteFiles(props: SiteFilesProps) {
-  const router = useRouter()
   const [bundle, setBundle] = useState(props.bundle)
   const [baseline, setBaseline] = useState(props.bundle)
   const [revision, setRevision] = useState(props.revision)
@@ -40,21 +38,25 @@ export function useSiteFiles(props: SiteFilesProps) {
   const fileInput = useRef<HTMLInputElement>(null)
   const alert = useRef<HTMLParagraphElement>(null)
   const dirty = JSON.stringify(bundle) !== JSON.stringify(baseline)
+  const unsaved = useRef(dirty || !!localFile)
+  useLayoutEffect(() => {
+    unsaved.current = dirty || !!localFile
+  }, [dirty, localFile])
   const byId = new Map(files.map(file => [file.id, file]))
-  useNavigationGuard(() => ({ dirty: dirty || !!localFile, pending: inFlight.current }))
+  useNavigationGuard(() => ({ dirty: unsaved.current, pending: inFlight.current }))
   useEffect(() => {
     if (notice?.error) alert.current?.focus()
   }, [notice])
   useEffect(() => {
     const guard = (event: BeforeUnloadEvent) => {
-      if (dirty || localFile || inFlight.current) {
+      if (unsaved.current || inFlight.current) {
         event.preventDefault()
         event.returnValue = ''
       }
     }
     window.addEventListener('beforeunload', guard)
     return () => window.removeEventListener('beforeunload', guard)
-  }, [dirty, localFile])
+  }, [])
   function beginReview() {
     setAck(false)
     setNotice(null)
@@ -109,10 +111,10 @@ export function useSiteFiles(props: SiteFilesProps) {
       }
       setRevision(result.revision)
       setSavedVersion(result.versionId)
+      unsaved.current = !!localFile
       setBaseline(structuredClone(bundle))
       setReview(false)
       setNotice({ error: false, text: 'Reviewed version saved. Publish it through the site release when ready.' })
-      router.refresh()
     } catch {
       setNotice({
         error: true,
