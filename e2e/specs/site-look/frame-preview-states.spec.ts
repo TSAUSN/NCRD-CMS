@@ -191,3 +191,53 @@ test('Header & menu reopens an unresponsive frame once without asking for anothe
     await f.pool.end()
   }
 })
+
+test('an unfinished preview document can recover before its load event', async ({ page }) => {
+  const f = await sawsoFixture(true, true)
+  try {
+    await signIn(page, 'root@example.test')
+    const frames = await observeHeaderPreviewFrames(page)
+    const canvasAddresses = new Set<string>()
+    let heldScript = false
+    let firstDocument = true
+    let releaseScript: () => void = () => {}
+    const scriptGate = new Promise<void>(resolve => {
+      releaseScript = resolve
+    })
+    await page.route('**/__cms-test-hold-preview-load.js', async route => {
+      heldScript = true
+      await scriptGate
+      await route.abort().catch(() => {})
+    })
+    await page.route(
+      url => url.pathname.startsWith('/__cms/canvas/') && url.searchParams.get('visit') === '1',
+      async route => {
+        canvasAddresses.add(route.request().url())
+        if (!firstDocument) return route.continue()
+        firstDocument = false
+        await route.fulfill({
+          status: 200,
+          contentType: 'text/html',
+          body: '<!doctype html><script src="/__cms-test-hold-preview-load.js"></script>',
+        })
+      },
+    )
+    try {
+      await page.goto('/sites/' + f.siteId + '/header', { waitUntil: 'domcontentloaded' })
+      await expect.poll(() => heldScript).toBe(true)
+      await expect(frames).toHaveAttribute('data-test-header-preview-frames', '1')
+      await expect(page.frameLocator('iframe[title="Header preview"]').locator('header')).toBeVisible({
+        timeout: 14000,
+      })
+      await expect(frames).toHaveAttribute('data-test-header-preview-frames', '2')
+      await expect(page.getByRole('button', { name: 'Try preview again', exact: true })).toHaveCount(0)
+      expect(canvasAddresses.size).toBe(1)
+    } finally {
+      releaseScript()
+    }
+  } finally {
+    await f.pool.query("UPDATE sites SET status='archived',archived_at=now() WHERE id=$1", [f.siteId])
+    f.client.release()
+    await f.pool.end()
+  }
+})

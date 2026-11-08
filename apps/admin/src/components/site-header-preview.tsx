@@ -10,7 +10,7 @@ import frameStyles from './site-header-preview.module.css'
 
 export type FramePreviewTicket = { href: string; channel?: string }
 type Preview = FramePreviewTicket & { key: string }
-const RETRY_AFTER_UNVERIFIED_LOAD_MS = 4000
+const RETRY_WITHOUT_READY_MS = 6500
 const PREVIEW_DEADLINE_MS = 15000
 
 /** Load a new authorized preview alongside the current one. Keep the loaded
@@ -38,7 +38,6 @@ export function SiteHeaderPreview({
   const [frameHeight, setFrameHeight] = useState(part === 'footer' ? 260 : 120)
   const [width, setWidth] = useState(0)
   const [failedHref, setFailedHref] = useState<string | null>(null)
-  const [unverifiedLoad, setUnverifiedLoad] = useState<string | null>(null)
   const [reopenedHref, setReopenedHref] = useState<string | null>(null)
   const nextKey = href ? href + (reopenedHref === href ? ':reopened' : '') : null
   useLayoutEffect(() => {
@@ -80,12 +79,12 @@ export function SiteHeaderPreview({
     return () => window.clearTimeout(timer)
   }, [href, updating])
   useEffect(() => {
-    if (!href || !nextKey || !updating || failed || reopenedHref === href || unverifiedLoad !== nextKey) return
-    // A browser load event can represent an error document or a frame that
-    // never answers the size request. Reopen it once within the same deadline.
-    const timer = window.setTimeout(() => setReopenedHref(href), RETRY_AFTER_UNVERIFIED_LOAD_MS)
+    if (!href || !updating || failed || reopenedHref === href) return
+    // Start with the ticket, not the iframe's load event. A navigation can
+    // return a document but never finish loading it or answer the size request.
+    const timer = window.setTimeout(() => setReopenedHref(href), RETRY_WITHOUT_READY_MS)
     return () => window.clearTimeout(timer)
-  }, [href, nextKey, updating, failed, reopenedHref, unverifiedLoad])
+  }, [href, updating, failed, reopenedHref])
   const previewUrl = (url: string) =>
     url + '?visit=1' + (part === 'footer' ? '#cms-preview-footer' : '#cms-preview-header')
   const previews = [
@@ -143,7 +142,6 @@ export function SiteHeaderPreview({
                 )
                   return
                 if (preview.channel) {
-                  setUnverifiedLoad(preview.key)
                   // The child may have sent its initial size before the editor attached its listener.
                   // Ask again; load itself also fires for an error page and doesn't make a ticket ready.
                   const origin = new URL(preview.href, window.location.href).origin
