@@ -1,7 +1,8 @@
 import { NativeHistory } from './native-history.tsx'
 import { historyPresentation } from '../../../../lib/history-presentation.ts'
 import shared from '../../../../components/workspace.module.css'
-import versionHistoryStyles from '../../../../components/workspace-styles/version-history.module.css'
+import { OriginalHistoryTimeline } from './original-history-timeline.tsx'
+import { historyHref, historyLabel, historyTime } from './history-display.ts'
 import workspacePreviewStyles from '../../../../components/workspace-styles/workspace-preview.module.css'
 import ownedStyles from './page-styles.module.css'
 import { ScriptlessPreview } from '../../../../components/scriptless-preview.tsx'
@@ -21,46 +22,10 @@ import {
   type PageHistoryRow,
 } from '../../../../lib/queries.ts'
 import { currentSession } from '../../../../lib/session.ts'
-import { compareVersions, comparisonText } from '../../../../lib/version-comparison.ts'
+import { compareVersions, comparisonText, type VersionChange } from '../../../../lib/version-comparison.ts'
 import { RestoreButton } from './restore-button.tsx'
 
 export const dynamic = 'force-dynamic'
-
-function historyLabel(version: PageHistoryRow): string {
-  if (version.is_live_now) return 'Live now'
-  if (version.is_current_draft) return 'Current draft'
-  if (version.was_published) return 'Published before'
-  if (version.was_restored) return 'Restored version'
-  if (version.kind === 'checkpoint') return 'Saved draft'
-  if (version.kind === 'autosave') return 'Automatic save'
-  return 'Saved version'
-}
-
-function when(date: Date): string {
-  return new Intl.DateTimeFormat('en-US', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-    timeZone: 'America/New_York',
-  }).format(date)
-}
-
-function historyHref(
-  pageId: string,
-  options: {
-    version?: string
-    compare?: string | undefined
-    includeAutosaves: boolean
-    before?: string | null
-  },
-): string {
-  const params = new URLSearchParams()
-  if (options.version) params.set('version', options.version)
-  if (options.compare && options.compare !== options.version) params.set('compare', options.compare)
-  if (options.includeAutosaves) params.set('automatic', '1')
-  if (options.before) params.set('before', String(options.before))
-  const query = params.toString()
-  return `/pages/${pageId}/history${query ? `?${query}` : ''}`
-}
 
 const MAX_REVISION = 9_223_372_036_854_775_807n
 
@@ -138,7 +103,7 @@ export default async function PageHistory({
       id: row.id,
       revision: row.revision,
       label: historyLabel(row),
-      when: when(row.created_at),
+      when: historyTime(row.created_at),
       kind: row.kind,
       note: row.note,
       mine: row.authored_by_me,
@@ -238,60 +203,22 @@ export default async function PageHistory({
 
         {selected ? (
           <div className={'history-layout ' + ownedStyles.timelineLayout}>
-            <aside className={'history-list ' + versionHistoryStyles.timelineRail} aria-label="Versions">
-              {before !== null && (
-                <Link className="btn secondary small history-newer" href={historyHref(pageId, { includeAutosaves })}>
-                  Newer versions
-                </Link>
-              )}
-              <ol>
-                {history.items.map(version => {
-                  const active = version.id === selected.id
-                  return (
-                    <li key={version.id}>
-                      <Link
-                        className={active ? 'is-active' : ''}
-                        aria-current={active ? 'page' : undefined}
-                        href={historyHref(pageId, {
-                          version: version.id,
-                          compare: compared?.id,
-                          includeAutosaves,
-                          before,
-                        })}
-                      >
-                        <span className="history-version-head">
-                          <strong>Version {version.revision}</strong>
-                          <span className={`chip ${version.is_live_now ? 'chip-published' : 'chip-draft'}`}>
-                            {historyLabel(version)}
-                          </span>
-                        </span>
-                        <span>{when(version.created_at)}</span>
-                        <small>{version.authored_by_me ? 'You' : 'Another editor'}</small>
-                      </Link>
-                    </li>
-                  )
-                })}
-              </ol>
-              {history.nextBefore !== null && (
-                <Link
-                  className="btn secondary small history-older"
-                  href={historyHref(pageId, {
-                    includeAutosaves,
-                    before: history.nextBefore,
-                  })}
-                >
-                  Older versions
-                </Link>
-              )}
-            </aside>
-
+            <OriginalHistoryTimeline
+              pageId={pageId}
+              selectedId={selected.id}
+              comparedId={compared?.id}
+              versions={history.items}
+              includeAutosaves={includeAutosaves}
+              before={before}
+              nextBefore={history.nextBefore}
+            />
             <section className={'history-detail ' + shared.workspaceContent} aria-labelledby="selected-version-title">
               <div className="history-detail-head">
                 <div>
                   <p className="eyebrow">{historyLabel(selected)}</p>
                   <h2 id="selected-version-title">Version {selected.revision}</h2>
                   <p className="muted">
-                    {when(selected.created_at)} · {selected.authored_by_me ? 'You' : 'Another editor'}
+                    {historyTime(selected.created_at)} · {selected.authored_by_me ? 'You' : 'Another editor'}
                   </p>
                 </div>
                 {site.status === 'archived' ? (
@@ -314,7 +241,7 @@ export default async function PageHistory({
                   </option>
                   {comparisonOptions.map(version => (
                     <option key={version.id} value={version.id}>
-                      Version {version.revision} · {historyLabel(version)} · {when(version.created_at)}
+                      Version {version.revision} · {historyLabel(version)} · {historyTime(version.created_at)}
                     </option>
                   ))}
                 </select>
@@ -358,43 +285,11 @@ export default async function PageHistory({
                 </div>
               </div>
               {compared && (
-                <section aria-labelledby="version-changes-title" className="version-changes">
-                  <h3 id="version-changes-title">
-                    Version {compared.revision} → Version {selected.revision}
-                  </h3>
-                  <p>
-                    {changes.length === 0
-                      ? 'These versions have the same page details and section content.'
-                      : `${changes.length} changed ${changes.length === 1 ? 'field' : 'fields'}. Sections are compared by position, so moving a section can also appear as field changes.`}
-                  </p>
-                  {changes.length > 0 && (
-                    <div className="version-table-scroll">
-                      <table>
-                        <caption className="sr-only">Saved field values in the two selected versions</caption>
-                        <thead>
-                          <tr>
-                            <th scope="col">Field</th>
-                            <th scope="col">Version {compared.revision}</th>
-                            <th scope="col">Version {selected.revision}</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {changes.map((change, index) => (
-                            <tr key={`${index}-${change.label}`}>
-                              <th scope="row">{change.label}</th>
-                              <td>
-                                <pre>{comparisonText(change.before)}</pre>
-                              </td>
-                              <td>
-                                <pre>{comparisonText(change.after)}</pre>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
-                </section>
+                <OriginalHistoryChanges
+                  beforeRevision={compared.revision}
+                  afterRevision={selected.revision}
+                  changes={changes}
+                />
               )}
             </section>
           </div>
@@ -416,5 +311,55 @@ export default async function PageHistory({
         )}
       </main>
     </AppShell>
+  )
+}
+
+function OriginalHistoryChanges({
+  beforeRevision,
+  afterRevision,
+  changes,
+}: {
+  beforeRevision: string
+  afterRevision: string
+  changes: VersionChange[]
+}) {
+  return (
+    <section aria-labelledby="version-changes-title" className="version-changes">
+      <h3 id="version-changes-title">
+        Version {beforeRevision} → Version {afterRevision}
+      </h3>
+      <p>
+        {changes.length === 0
+          ? 'These versions have the same page details and section content.'
+          : `${changes.length} changed ${changes.length === 1 ? 'field' : 'fields'}. Sections are compared by position, so moving a section can also appear as field changes.`}
+      </p>
+      {changes.length > 0 && (
+        <div className="version-table-scroll">
+          <table>
+            <caption className="sr-only">Saved field values in the two selected versions</caption>
+            <thead>
+              <tr>
+                <th scope="col">Field</th>
+                <th scope="col">Version {beforeRevision}</th>
+                <th scope="col">Version {afterRevision}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {changes.map((change, index) => (
+                <tr key={`${index}-${change.label}`}>
+                  <th scope="row">{change.label}</th>
+                  <td>
+                    <pre>{comparisonText(change.before)}</pre>
+                  </td>
+                  <td>
+                    <pre>{comparisonText(change.after)}</pre>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </section>
   )
 }
