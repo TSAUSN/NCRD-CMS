@@ -157,8 +157,6 @@ export function ThemeEditor({
             setTokens={setTokens}
             canManage={canManage}
             pending={pending}
-            controlsOnly={controlsOnly}
-            usage={initial.usage}
             onStartingDesign={() => setConfirming('defaults')}
           />
           {controlsOnly && relatedControls}

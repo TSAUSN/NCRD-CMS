@@ -11,16 +11,12 @@ export function ThemeAppearanceFields({
   setTokens,
   canManage,
   pending,
-  controlsOnly,
-  usage,
   onStartingDesign,
 }: {
   tokens: ThemeTokens
   setTokens: Dispatch<SetStateAction<ThemeTokens>>
   canManage: boolean
   pending: boolean
-  controlsOnly: boolean
-  usage: Record<string, number>
   onStartingDesign: () => void
 }) {
   return (

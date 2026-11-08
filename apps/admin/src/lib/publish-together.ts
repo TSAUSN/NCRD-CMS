@@ -14,10 +14,8 @@ import type { PublishTogether, TogetherPage } from './publish-together-copy.ts'
 export {
   administratorNeededMessage,
   needsAdministrator,
-  publishTogetherLabel,
   publishTogetherMessage,
   type PublishTogether,
-  type TogetherPage,
 } from './publish-together-copy.ts'
 
 const SITE_WIDE: ReleaseItem['type'][] = ['theme', 'navigation', 'frame']

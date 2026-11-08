@@ -317,37 +317,6 @@ function checkUrls(declarations: string): { text: string; offSite: boolean; malf
   return { text, offSite: false, malformed: false }
 }
 
-/** Split a selector list on commas outside strings and brackets. */
-function splitSelectors(prelude: string): string[] {
-  const out: string[] = []
-  let depth = 0
-  let quote: string | null = null
-  let start = 0
-  for (let i = 0; i < prelude.length; i += 1) {
-    const ch = prelude[i]!
-    if (quote) {
-      if (ch === '\\') {
-        i += 1
-        continue
-      }
-      if (ch === quote) quote = null
-      continue
-    }
-    if (ch === '"' || ch === "'") {
-      quote = ch
-      continue
-    }
-    if (ch === '(' || ch === '[') depth += 1
-    else if (ch === ')' || ch === ']') depth = Math.max(0, depth - 1)
-    else if (ch === ',' && depth === 0) {
-      out.push(prelude.slice(start, i).trim())
-      start = i + 1
-    }
-  }
-  out.push(prelude.slice(start).trim())
-  return out.filter(Boolean)
-}
-
 /**
  * Scope a selector list, or refuse it.
  *

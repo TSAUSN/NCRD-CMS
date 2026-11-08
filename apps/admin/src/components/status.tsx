@@ -1,6 +1,5 @@
 // Revision 8 status vocabulary, shared by dashboard, pages and publishing.
 import { StatusPill, type StatusLabel } from './ui/status-pill.tsx'
-export { STATUS_LABELS } from './ui/status-pill.tsx'
 export type { StatusLabel } from './ui/status-pill.tsx'
 const HEALTH_LABELS = ['Healthy', 'Delayed', 'Error'] as const
 export type HealthLabel = (typeof HEALTH_LABELS)[number]

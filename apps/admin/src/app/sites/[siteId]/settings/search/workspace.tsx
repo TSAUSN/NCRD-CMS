@@ -18,13 +18,11 @@ function input(payload: unknown): SearchInput {
 export function SearchSharingWorkspace({
   siteId,
   siteName,
-  chapters,
   archived,
   initial,
 }: {
   siteId: string
   siteName: string
-  chapters: boolean
   archived: boolean
   initial: SiteSettingsWorkspace
 }) {
@@ -47,7 +45,6 @@ export function SearchSharingWorkspace({
     <SettingsEditor
       siteId={siteId}
       siteName={siteName}
-      chapters={chapters}
       archived={archived}
       current="Search & sharing"
       path="/search"

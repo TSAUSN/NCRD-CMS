@@ -26,7 +26,7 @@ import { ensureEchelonSite, prepareEchelonDemoPhotos } from '../src/lib/echelon-
 import { ensureChapterDemoPages } from '../src/lib/chapters.ts'
 
 const ARCHIVES = join(dirname(fileURLToPath(import.meta.url)), '../../../demo/sites')
-export const DEMO_PEOPLE = [
+const DEMO_PEOPLE = [
   { email: 'admin@example.test', name: '[Super admin]', role: 'super_admin' },
   { email: 'editor@example.test', name: '[Site editor]', role: 'editor' },
   { email: 'contributor@example.test', name: '[Content creator]', role: 'contributor' },

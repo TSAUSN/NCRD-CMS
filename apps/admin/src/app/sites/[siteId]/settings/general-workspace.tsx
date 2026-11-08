@@ -61,15 +61,7 @@ export function GeneralSettingsWorkspace({
     languages.push([value.general.language, name])
   }
   return (
-    <SettingsEditor
-      siteId={siteId}
-      siteName={siteName}
-      chapters={chapters}
-      archived={archived}
-      current="General"
-      path=""
-      draft={draft}
-    >
+    <SettingsEditor siteId={siteId} siteName={siteName} archived={archived} current="General" path="" draft={draft}>
       <div className={shared.denseStack}>
         <Card title="General" density="editor">
           <Field id="site-general-name" label="Site name">

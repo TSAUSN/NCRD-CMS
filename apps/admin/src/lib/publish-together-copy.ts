@@ -34,13 +34,6 @@ export function publishTogetherMessage(plan: PublishTogether): string {
   return `This page links to ${named}, which ${titles.length === 1 ? "isn't" : "aren't"} live yet. Publish ${titles.length === 1 ? 'both' : 'them'} together so visitors never meet a missing page.${lists}`
 }
 
-/** The button that does it. */
-export function publishTogetherLabel(plan: PublishTogether): string {
-  const pages = plan.pages.length + 1
-  if (plan.siteWide) return pages === 1 ? 'Publish the site' : `Publish the site with ${pages} pages`
-  return pages === 2 ? 'Publish both pages' : `Publish all ${pages} pages`
-}
-
 /** Review every affected page, including its samples, through the shared Publish workspace. */
 export function publishTogetherReviewHref(pageId: string, plan: PublishTogether): string {
   const params = new URLSearchParams({ pages: [pageId, ...plan.pages.map(page => page.id)].join(',') })

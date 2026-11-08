@@ -1,7 +1,6 @@
 import { type StoryWidgetContext } from './story-world.ts'
 import { type NewsroomQuery } from './newsroom.ts'
 import { type SiteWidgetContext } from './site-widgets.ts'
-import { originalLayout } from './original-layout.ts'
 import { type SlotDef, type SectionAppearance, type SiteOriginalLayout } from '@cms/schema'
 import { type CompiledSection } from './compile.ts'
 import { type ManifestFont } from './site-fonts.ts'

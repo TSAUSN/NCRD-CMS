@@ -12,12 +12,10 @@ import listInspectorStyles from '../../../../components/workspace-styles/list-in
 /** Record a local volunteer invitation with the current chapter revision. */
 export function ChapterInvite({
   row,
-  siteId,
   onClose,
   onSaved,
 }: {
   row: ChapterRow
-  siteId: string
   onClose: () => void
   onSaved: (message: string) => void
 }) {

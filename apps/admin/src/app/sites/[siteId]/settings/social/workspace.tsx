@@ -8,13 +8,11 @@ import selectionControlsStyles from '../../../../../components/workspace-styles/
 export function SocialAccountsWorkspace({
   siteId,
   siteName,
-  chapters,
   archived,
   initial,
 }: {
   siteId: string
   siteName: string
-  chapters: boolean
   archived: boolean
   initial: SiteSettingsWorkspace
 }) {
@@ -39,7 +37,6 @@ export function SocialAccountsWorkspace({
     <SettingsEditor
       siteId={siteId}
       siteName={siteName}
-      chapters={chapters}
       archived={archived}
       current="Social accounts"
       path="/social"

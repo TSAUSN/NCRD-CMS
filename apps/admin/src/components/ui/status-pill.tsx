@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import styles from './status-pill-styles.module.css'
-export const STATUS_LABELS = [
+const STATUS_LABELS = [
   'Draft',
   'Live',
   'Live · changes not published',

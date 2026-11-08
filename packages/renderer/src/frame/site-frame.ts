@@ -1,4 +1,4 @@
-import { originalLayout, originalDefinition, originalRoot } from '../original-layout.ts'
+import { originalDefinition, originalRoot } from '../original-layout.ts'
 import {
   FooterConfig,
   HeaderConfig,

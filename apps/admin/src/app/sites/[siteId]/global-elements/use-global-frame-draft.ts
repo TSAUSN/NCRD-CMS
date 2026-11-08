@@ -210,8 +210,6 @@ export function useGlobalFrameDraft({ siteId, siteName, initial, canManage }: Gl
     editFooter(next: FooterConfig) {
       if (!actionInFlight.current) setFooter(next)
     },
-    publishedHeader,
-    publishedFooter,
     pending,
     notice,
     confirming,

@@ -11,7 +11,7 @@ import { navigationFor } from '../../../components/nav.ts'
 import { PageHeader } from '../../../components/shell.tsx'
 import { ButtonLink, TextLink } from '../../../components/ui/index.ts'
 import { StatusChip, siteStatus } from '../../../components/status.tsx'
-import { IconAlert, IconBrush, IconCollection, IconExternal, IconPage } from '../../../components/icons.tsx'
+import { IconBrush, IconCollection, IconExternal, IconPage } from '../../../components/icons.tsx'
 import { SiteHostingNotice } from '../../../components/site-hosting-notice.tsx'
 import { NativeSiteSummary } from './native-site-summary.tsx'
 import { ArchivedPages } from './archived-pages.tsx'
@@ -23,7 +23,6 @@ import recordTableStyles from '../../../components/workspace-styles/record-table
 import siteSummaryStyles from '../../../components/workspace-styles/site-summary.module.css'
 import selectionControlsStyles from '../../../components/workspace-styles/selection-controls.module.css'
 import versionHistoryStyles from '../../../components/workspace-styles/version-history.module.css'
-import ownedStyles from './native-site-overview-styles.module.css'
 
 type Props = {
   site: SiteRow

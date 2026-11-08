@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react'
-import { IconButton } from './button.tsx'
 import styles from './feedback-styles.module.css'
 import state from '../state.module.css'
 import { IconPage } from '../icons.tsx'
@@ -15,17 +14,6 @@ export function EmptyState({ title, children, action }: { title: string; childre
     </section>
   )
 }
-export function Toast({ children, error, onDismiss }: { children: ReactNode; error?: boolean; onDismiss: () => void }) {
-  return (
-    <div className={styles.toast} role={error ? 'alert' : 'status'}>
-      {children}
-      <IconButton tooltip="Dismiss notification" variant="tertiary" onClick={onDismiss}>
-        ×
-      </IconButton>
-    </div>
-  )
-}
-
 export function Note({
   children,
   icon,

@@ -174,7 +174,7 @@ export function reportTemplateMarkup(
   if (part === 'country')
     body = body.replace(
       /<div class="ar-report-list">([\s\S]*?)<\/div>/,
-      (whole, inside: string) =>
+      (_whole, inside: string) =>
         '<div class="ar-impact-list">' + inside.replace('<ul>', '<ul class="ar-report-list">') + '</div>',
     )
   if (part === 'give') {

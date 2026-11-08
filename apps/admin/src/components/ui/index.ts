@@ -7,7 +7,7 @@ export { Badge, StatusPill, type StatusLabel } from './status-pill.tsx'
 export { SegmentedControl, Tabs, ChoiceGroup } from './controls.tsx'
 export { Dialog, Drawer } from './dialog.tsx'
 export { Menu } from './menu.tsx'
-export { Toast, EmptyState, Note } from './feedback.tsx'
+export { EmptyState, Note } from './feedback.tsx'
 export { ResizablePanel } from './resizable-panel.tsx'
 
 export { SearchField } from './search-field.tsx'

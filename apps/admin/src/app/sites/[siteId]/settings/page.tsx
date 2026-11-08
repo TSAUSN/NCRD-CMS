@@ -225,9 +225,7 @@ export default async function SiteSettings({
           lede="The site's name, its addresses and a downloadable copy of its content."
           tabs={siteAreaTabs(siteId, 'settings', 'settings')}
         />
-        {canManage && !site.original_design && (
-          <SettingsNavigation siteId={siteId} current="General" chapters={site.chapters_enabled} />
-        )}
+        {canManage && !site.original_design && <SettingsNavigation siteId={siteId} current="General" />}
         <SiteSettingsForm
           siteId={siteId}
           name={site.name}

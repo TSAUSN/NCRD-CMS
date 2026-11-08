@@ -30,7 +30,6 @@ export default async function SearchSharing({ params }: { params: Promise<{ site
           key={siteId}
           siteId={siteId}
           siteName={site.name}
-          chapters={Boolean(site.chapters_enabled)}
           archived={site.status === 'archived'}
           initial={initial}
         />

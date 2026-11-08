@@ -2,7 +2,6 @@
 import { useNavigationGuard, requestClientNavigation } from '../../../../components/navigation-guard.ts'
 import { ImageFocusControl } from '../../../../components/image-focus-control.tsx'
 import styles from './media-workspace.module.css'
-import state from '../../../../components/state.module.css'
 import mediaUi from '../../../../components/media-ui.module.css'
 import { MediaThumbnail as MediaThumb } from '../../../../components/media-thumbnail.tsx'
 import { Button, Disclosure, Field, Badge, Tabs, TextLink } from '../../../../components/ui/index.ts'

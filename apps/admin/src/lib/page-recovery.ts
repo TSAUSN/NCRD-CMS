@@ -39,7 +39,7 @@ function storedForm(document: EditorDocument): EditorDocument {
 export function recoveryScopeKey(scope: RecoveryScope): string {
   return JSON.stringify([scope.userId, scope.siteId, scope.pageId])
 }
-export function recoveryKey(scope: RecoveryScope, journalId: string): string {
+function recoveryKey(scope: RecoveryScope, journalId: string): string {
   return JSON.stringify([scope.userId, scope.siteId, scope.pageId, journalId])
 }
 

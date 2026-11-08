@@ -145,7 +145,6 @@ type DraftState = {
 export function SettingsEditor({
   siteId,
   siteName,
-  chapters,
   archived,
   current,
   path,
@@ -154,7 +153,6 @@ export function SettingsEditor({
 }: {
   siteId: string
   siteName: string
-  chapters: boolean
   archived: boolean
   current: string
   path: string
@@ -214,7 +212,7 @@ export function SettingsEditor({
         </p>
       )}
       <div className={shared.workspaceSplit} data-layout="compact">
-        <SettingsNavigation siteId={siteId} current={current} chapters={chapters} />
+        <SettingsNavigation siteId={siteId} current={current} />
         {children}
       </div>
     </div>

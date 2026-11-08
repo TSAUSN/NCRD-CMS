@@ -230,7 +230,6 @@ export function ChaptersWorkspace({
       {inviting && (
         <ChapterInvite
           row={inviting}
-          siteId={siteId}
           onClose={() => setInviting(null)}
           onSaved={text => {
             setMessage(text)

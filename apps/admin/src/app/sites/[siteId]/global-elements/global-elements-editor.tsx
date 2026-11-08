@@ -57,8 +57,6 @@ export function GlobalElementsEditor(props: GlobalElementsProps) {
     editHeader,
     footer,
     editFooter,
-    publishedHeader,
-    publishedFooter,
     pending,
     notice,
     confirming,

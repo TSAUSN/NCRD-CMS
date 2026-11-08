@@ -132,7 +132,7 @@ export function pageContentChanges(
     order: number[] = []
   const nameOf = (section: ReviewSection) =>
     section.label || forms[`${section.section_def_id}:${section.section_def_version ?? 1}`]?.name || 'Section'
-  for (const [index, section] of after.entries()) {
+  for (const section of after) {
     let previous = before.findIndex((old, at) => !used.has(at) && same(old, section))
     if (previous < 0)
       previous = before.findIndex(

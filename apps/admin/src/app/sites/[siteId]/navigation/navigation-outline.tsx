@@ -6,7 +6,6 @@ import {
   IconArrowUp,
   IconDrag,
   IconExternal,
-  IconLink,
   IconMenu,
   IconPage,
   IconTrash,

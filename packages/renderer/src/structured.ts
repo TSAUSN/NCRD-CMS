@@ -40,7 +40,6 @@ import {
   type StructuredLinkFieldNode,
   type StructuredLinkRel,
   type StructuredProblem,
-  type StructuredShapeCode,
   type StructuredFieldNode,
   type StructuredNode,
   type StructuredRepeatFieldNode,

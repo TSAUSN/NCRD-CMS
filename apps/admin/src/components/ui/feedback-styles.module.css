@@ -1,17 +1,3 @@
-.toast {
-  position: fixed;
-  inset: auto var(--space-5) var(--space-5) auto;
-  z-index: var(--z-dialog);
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  padding: var(--space-4);
-  max-width: calc(100% - var(--space-7));
-  background: var(--surface);
-  border: var(--line-thin) solid var(--border);
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-2);
-}
 .empty {
   display: grid;
   justify-items: center;
