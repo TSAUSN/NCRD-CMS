@@ -1,4 +1,5 @@
-/** Current placements only: an unpublished addition and a still-live removal both matter. */
+/** Count draft and live placements. Each head refers to at most one version;
+ * the lateral limit keeps its RLS check on that version even before ANALYZE. */
 export const CURRENT_SECTION_USES_SQL = `
   SELECT p.id AS page_id, p.site_id, p.title AS page_title, s.name AS site_name,
          s.status AS site_status, current.mode, v.id AS page_version_id,
@@ -9,7 +10,12 @@ export const CURRENT_SECTION_USES_SQL = `
     FROM pages p
     JOIN sites s ON s.id = p.site_id
     CROSS JOIN LATERAL (VALUES ('draft', p.draft_version_id), ('live', p.published_version_id)) current(mode, version_id)
-    JOIN page_versions v ON v.id = current.version_id AND v.page_id = p.id AND v.site_id = p.site_id
+    JOIN LATERAL (
+      SELECT v.id, v.content
+        FROM page_versions v
+       WHERE v.id = current.version_id AND v.page_id = p.id AND v.site_id = p.site_id
+       LIMIT 1
+    ) v ON true
     CROSS JOIN LATERAL jsonb_array_elements(
       CASE WHEN jsonb_typeof(v.content) = 'array' THEN v.content ELSE '[]'::jsonb END
     ) WITH ORDINALITY section(value, ordinality)

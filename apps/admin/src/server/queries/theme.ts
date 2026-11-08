@@ -57,13 +57,22 @@ export function getThemeWorkspace(userId: string, siteId: string): Promise<Theme
 
     // Count only the current version of each visible page. The shell itself
     // always consumes primary/surface/ink, both fonts and radius; section CSS
-    // adds truthful page counts beside the less universal tokens.
+    // adds truthful page counts beside the less universal tokens. The
+    // lateral limit keeps the RLS lookup on the one selected version.
+    // Cast only canonical UUIDs so malformed old values stay unmatched.
     const usageRows = await client.query<{ token: string; pages: string }>(
       `WITH current_sections AS (
-         SELECT DISTINCT p.id AS page_id, section->>'section_def_id' AS def_id,
+         SELECT DISTINCT p.id AS page_id,
+                CASE WHEN section->>'section_def_id' ~ '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+                     THEN (section->>'section_def_id')::uuid END AS def_id,
                 (section->>'section_def_version')::integer AS def_version
            FROM pages p
-           JOIN page_versions pv ON pv.id = COALESCE(p.published_version_id, p.draft_version_id)
+           JOIN LATERAL (
+             SELECT pv.content FROM page_versions pv
+              WHERE pv.id = COALESCE(p.published_version_id, p.draft_version_id)
+                AND pv.site_id = p.site_id AND pv.page_id = p.id
+              LIMIT 1
+           ) pv ON true
            CROSS JOIN LATERAL jsonb_array_elements(
              CASE WHEN jsonb_typeof(pv.content) = 'array' THEN pv.content ELSE '[]'::jsonb END) section
           WHERE p.site_id = $1 AND p.archived_at IS NULL
@@ -79,7 +88,7 @@ export function getThemeWorkspace(userId: string, siteId: string): Promise<Theme
          FROM token_names
          LEFT JOIN current_sections ON true
          LEFT JOIN section_def_versions sdv
-           ON sdv.section_def_id::text = current_sections.def_id
+           ON sdv.section_def_id = current_sections.def_id
           AND sdv.version = current_sections.def_version
         GROUP BY token_names.token`,
       [siteId],
