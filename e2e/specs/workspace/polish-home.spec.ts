@@ -94,6 +94,9 @@ test('Home matches the Main card hierarchy and shared navigation keeps visible i
       .filter({ has: page.getByText('Test tools (this computer only)', { exact: true }) })
     await expect(tools).not.toHaveAttribute('open', '')
     await expect(main.getByText('The worker is not running', { exact: true })).not.toBeVisible()
+    const archived = main.getByText(/^Archived sites \(\d+\)$/, { exact: true })
+    const hasArchived = (await archived.count()) > 0
+    if (hasArchived) await archived.click()
     const unfinished = await main.locator('article.site-card').evaluateAll(async cards => {
       const failures: number[] = []
       for (const [index, card] of cards.entries()) {
@@ -106,6 +109,7 @@ test('Home matches the Main card hierarchy and shared navigation keeps visible i
       return failures
     })
     expect(unfinished).toEqual([])
+    if (hasArchived) await archived.click()
     await page.evaluate(() => scrollTo(0, 0))
     await expect(main.getByText('Loading saved preview…', { exact: true })).toHaveCount(0)
     await capture('home')
