@@ -94,10 +94,18 @@ test('Home matches the Main card hierarchy and shared navigation keeps visible i
       .filter({ has: page.getByText('Test tools (this computer only)', { exact: true }) })
     await expect(tools).not.toHaveAttribute('open', '')
     await expect(main.getByText('The worker is not running', { exact: true })).not.toBeVisible()
-    for (const card of await main.locator('article.site-card').all()) {
-      await card.scrollIntoViewIfNeeded()
-      await expect(card.getByText('Loading saved preview…', { exact: true })).toHaveCount(0)
-    }
+    const unfinished = await main.locator('article.site-card').evaluateAll(async cards => {
+      const failures: number[] = []
+      for (const [index, card] of cards.entries()) {
+        card.scrollIntoView({ block: 'center', behavior: 'instant' })
+        await new Promise<void>(resolve => requestAnimationFrame(() => resolve()))
+        const { top, bottom } = card.getBoundingClientRect()
+        if (bottom <= 0 || top >= innerHeight || card.textContent?.includes('Loading saved preview…'))
+          failures.push(index)
+      }
+      return failures
+    })
+    expect(unfinished).toEqual([])
     await page.evaluate(() => scrollTo(0, 0))
     await expect(main.getByText('Loading saved preview…', { exact: true })).toHaveCount(0)
     await capture('home')
