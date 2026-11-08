@@ -15,13 +15,21 @@ import {
 
 export function StoryEditor(props: StoryEditorProps) {
   const model = useStoryDraft(props)
-  const { site, value, pending, dirty, newDraft, back, notice, firstSiteReview } = model
+  const { site, value, pending, dirty, newDraft, savedEditor, back, notice, firstSiteReview } = model
   return (
     <>
       <ContentEditor
         locationLabel={site.name + ' / Stories'}
         title={value.title || (newDraft ? 'New story' : 'Untitled story')}
-        status={pending ? 'Saving…' : dirty ? 'Unsaved changes' : newDraft ? 'Not saved yet' : 'All changes saved'}
+        status={
+          pending
+            ? 'Saving…'
+            : dirty
+              ? 'Unsaved changes'
+              : newDraft && !savedEditor
+                ? 'Not saved yet'
+                : 'All changes saved'
+        }
         pending={pending}
         onBack={back}
         actions={<StoryEditorActions model={model} />}
