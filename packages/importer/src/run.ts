@@ -22,7 +22,7 @@ import { reason, IMPORT_STATUSES, REASON_ORDER, type ImportStatus, type Reason }
 import { readV1Catalogue, type ReadOptions, type SourceManifest, type V1Definition } from './source.ts'
 import { IMPORTER_VERSION } from './version.ts'
 
-export type Provenance = {
+type Provenance = {
   id: string
   /** Relative to the V1 root. An absolute path is a fact about one laptop. */
   sourceFile: string
