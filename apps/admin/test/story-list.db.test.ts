@@ -119,16 +119,9 @@ it('filters hidden/removed/unreviewed feeds while preserving private drafts, rec
     first = eligible[0]!
   expect(before.rows).toHaveLength(34)
   expect(eligible.length).toBeGreaterThan(0)
-  let changed = await db.asUser(s.superAdmin, async c => {
-    const model = (
-      await c.query(
-        'SELECT v.fields,v.sort FROM collections c JOIN collection_schema_versions v ON v.id=c.draft_schema_version_id WHERE c.id=$1',
-        [f.collectionId],
-      )
-    ).rows[0]!
+  await db.asUser(s.superAdmin, async c => {
     await c.query('SELECT * FROM app.publish_collection_schema($1,$2)', [f.collectionId, before.revision])
     await c.query('SELECT * FROM app.publish_collection_entries($1,$2)', [f.collectionId, before.entryRevision])
-    return model
   })
   const count = (draft = false) =>
     db.as(

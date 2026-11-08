@@ -38,7 +38,7 @@ export function pg(config, connection, program, args) {
   return result.stdout
 }
 
-export async function fingerprints(connection) {
+async function fingerprints(connection) {
   const c = new Client({ ...connection, connectionTimeoutMillis: 10_000 })
   await c.connect()
   try {

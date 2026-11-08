@@ -100,7 +100,7 @@ function sha256(text: string): string {
   return createHash('sha256').update(text).digest('hex')
 }
 
-function describe(root: string, relative: string, text: string): SourceFile {
+function describe(relative: string, text: string): SourceFile {
   return {
     path: relative,
     sha256: sha256(text),
@@ -205,7 +205,7 @@ export function readV1Catalogue(options: ReadOptions, parseCss: (css: string) =>
 
   const read = (root: string, relative: string): string => {
     const text = readFileSync(containedFile(root, relative), 'utf8')
-    files.push(describe(root, relative, text))
+    files.push(describe(relative, text))
     return text
   }
 

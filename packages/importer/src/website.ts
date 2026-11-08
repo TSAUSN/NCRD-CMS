@@ -9,9 +9,9 @@ import {
   SITE_ARCHIVE_VERSION,
 } from '@cms/schema'
 import { realpathSync, readdirSync } from 'node:fs'
-import { resolve, basename, relative } from 'node:path'
+import { resolve, relative } from 'node:path'
 import { localWebsiteFile, PAGE_EXTENSIONS, SiteFiles } from './website-files.ts'
-import { readPage, type PageSource } from './website-page-source.ts'
+import { readPage } from './website-page-source.ts'
 import { walk, attr, textOf, find, visibleText } from './website-tree.ts'
 import { createPageStylesheetReader } from './website-styles.ts'
 import { randomUUID } from 'node:crypto'

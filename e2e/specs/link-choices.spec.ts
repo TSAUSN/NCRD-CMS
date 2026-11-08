@@ -129,7 +129,7 @@ test('a customized button can be large, regular weight and as wide as its column
 })
 
 test('native Editors can change link content and behavior without appearance controls', async ({ page }) => {
-  const pageId = await fixture(page, 'editor@example.test')
+  await fixture(page, 'editor@example.test')
   await canvas(page).getByRole('link', { name: 'Read the guide', exact: true }).click()
   const inspector = page.getByRole('complementary', { name: 'Inspector' })
   await expect(inspector.getByLabel(/Open in a new tab/)).toHaveCount(0)

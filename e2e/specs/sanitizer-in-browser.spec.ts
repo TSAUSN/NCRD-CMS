@@ -343,7 +343,7 @@ test.describe('the four reported reproductions, judged by Chromium', () => {
     }
   })
 
-  test('a same-origin background still loads', async ({ page: browserPage }) => {
+  test('a same-origin background still loads', () => {
     // The counterpart assertion: refusing everything would also pass the test
     // above, and that is not the behaviour anyone wants.
     const { css } = scopeCss('.a{background:url(/ok.png)}', '.s')

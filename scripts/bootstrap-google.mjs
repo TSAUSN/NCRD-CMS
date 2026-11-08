@@ -142,7 +142,7 @@ export function bootstrapPlan(config, target) {
   }
 }
 
-export async function main(argv = process.argv.slice(2)) {
+async function main(argv = process.argv.slice(2)) {
   const get = flag => {
     const i = argv.indexOf(flag)
     return i < 0 ? undefined : argv[i + 1]

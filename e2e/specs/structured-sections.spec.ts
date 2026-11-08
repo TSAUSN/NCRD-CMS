@@ -203,7 +203,7 @@ test.describe('structured output, judged by Chromium', () => {
     }
   })
 
-  test('a stored attribute value cannot become an attribute at all', async ({ page }) => {
+  test('a stored attribute value cannot become an attribute at all', () => {
     // The case with no analogue in the interpolation model. Attributes are
     // static, so a payload can only reach one by being written into the stored
     // document — and the whole definition is refused rather than escaped into

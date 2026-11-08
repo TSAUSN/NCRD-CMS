@@ -6,8 +6,7 @@ import { isImportedDefinition, planImportedFieldUpdate, type ImportedDefinition 
 
 const PRESENTED = 'class="lead" style="font-family: var(--font-secondary);"'
 const A = `v1-${'a'.repeat(24)}`,
-  B = `v1-${'b'.repeat(24)}`,
-  C = `v1-${'c'.repeat(24)}`
+  B = `v1-${'b'.repeat(24)}`
 
 function legacy(slug: string, sourceHtml: string, slots: SlotDef[]): ImportedDefinition {
   const compiled = compileSection({ sourceHtml, sourceCss: '', slots, scopeSelector: `.cms-section--${slug}` })

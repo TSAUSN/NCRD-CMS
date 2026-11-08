@@ -5,7 +5,6 @@ import { resolve } from 'node:path'
 import { sawsoFixture } from '../fixtures/sawso.ts'
 import { signIn } from '../helpers.ts'
 test('native content Home starts from saved tasks, keeps site context and exposes only role-allowed controls without a source refresh', async ({
-  page,
   browser,
 }, info) => {
   test.setTimeout(150000)

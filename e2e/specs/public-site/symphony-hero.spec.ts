@@ -77,12 +77,7 @@ test('Symphony hero controls use normal drafts, separate button links, phone pho
       photos.push(id)
     }
     const source = f.pages[0]!,
-      destination = f.pages[1]!,
-      before = (
-        await c.query('SELECT id,draft_version_id,published_version_id FROM pages WHERE site_id=$1 ORDER BY id', [
-          f.site,
-        ])
-      ).rows
+      destination = f.pages[1]!
     await c.query('BEGIN')
     await c.query('SET LOCAL ROLE cms_authenticated_user')
     await c.query("SELECT set_config('app.user_id',$1,true)", [actor])

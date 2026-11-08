@@ -2,7 +2,7 @@ import { readdir, readFile, stat } from 'node:fs/promises'
 import { createHash } from 'node:crypto'
 import { google, assertActiveScope, cloud } from './scope.mjs'
 
-export async function mediaFiles(root, prefix = '') {
+async function mediaFiles(root, prefix = '') {
   const result = []
   for (const entry of await readdir(root, { withFileTypes: true })) {
     if (entry.isSymbolicLink()) throw Error('Media inventory cannot contain symlinks.')

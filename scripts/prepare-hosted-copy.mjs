@@ -25,7 +25,7 @@ export function hostedCopyTarget(raw) {
   }
   return url
 }
-export async function prepareHostedCopy({ databaseUrl, ownerEmail, ownerName, backupRoot }) {
+async function prepareHostedCopy({ databaseUrl, ownerEmail, ownerName, backupRoot }) {
   const url = hostedCopyTarget(databaseUrl)
   if (
     !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(ownerEmail) ||

@@ -6,7 +6,7 @@ import { isIP } from 'node:net'
 const CLOUD_SQL_SOCKET = /^\/cloudsql\/[a-z][a-z0-9-]{4,28}[a-z0-9]:[a-z]+-[a-z]+\d+:[a-z][a-z0-9-]{0,96}$/
 const LOOPBACK = new Set(['127.0.0.1', 'localhost', '::1'])
 
-export function isCloudSqlSocket(value) {
+function isCloudSqlSocket(value) {
   return typeof value === 'string' && CLOUD_SQL_SOCKET.test(value)
 }
 

@@ -25,26 +25,24 @@ test('rich saved numbers preserve paragraphs and bold text, replace one binding 
     await c.query('SET LOCAL ROLE cms_authenticated_user')
     await c.query("SELECT set_config('app.user_id',$1,true)", [actor])
     const numbers = [
-        [id, 'Projects', '152'],
-        [other, 'Countries', '69'],
-        [third, 'Other projects', '158'],
-      ].map(([id, label, value]) => ({
-        id,
-        label,
-        value,
-        unit: '',
-        source: '[Local report, p. 4]',
-        sourcePageId: null,
-        asOf: 'FY2025',
-        status: 'matches-report',
-        showSource: false,
-      })),
-      saved = (
-        await c.query('SELECT * FROM app.save_site_settings_draft($1,0,$2)', [
-          f.site,
-          JSON.stringify({ schemaVersion: 1, name: 'Shared site look', dataValues: numbers }),
-        ])
-      ).rows[0]!
+      [id, 'Projects', '152'],
+      [other, 'Countries', '69'],
+      [third, 'Other projects', '158'],
+    ].map(([id, label, value]) => ({
+      id,
+      label,
+      value,
+      unit: '',
+      source: '[Local report, p. 4]',
+      sourcePageId: null,
+      asOf: 'FY2025',
+      status: 'matches-report',
+      showSource: false,
+    }))
+    await c.query('SELECT * FROM app.save_site_settings_draft($1,0,$2)', [
+      f.site,
+      JSON.stringify({ schemaVersion: 1, name: 'Shared site look', dataValues: numbers }),
+    ])
     await c.query('SELECT app.publish_site_settings($1,$2)', [
       f.site,
       (await c.query('SELECT revision FROM site_settings WHERE site_id=$1', [f.site])).rows[0]!.revision,

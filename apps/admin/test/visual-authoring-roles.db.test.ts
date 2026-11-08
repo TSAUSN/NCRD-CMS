@@ -12,7 +12,7 @@ import {
   removeBuilderNode,
 } from '../src/lib/structured-builder.ts'
 import { visualSourceCss } from '../src/lib/visual-authoring.ts'
-import { compileDefinitionDraft, type AuthoredCompilation } from '../src/lib/definition-compiler.ts'
+import { compileDefinitionDraft } from '../src/lib/definition-compiler.ts'
 
 let db: TestDatabase, s: Scenario, actor: string, siteAdmin: string
 vi.mock('server-only', () => ({}))

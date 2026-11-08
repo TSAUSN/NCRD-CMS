@@ -1,5 +1,4 @@
 import { E2E_PORTS } from '../test-ports.ts'
-import { setPreviewSiteLook } from './helpers.ts'
 import { expect, test } from '@playwright/test'
 import { signIn, publish, canvas, treeLabels, saveDraft } from './helpers.ts'
 import { siteLookFixture } from './fixtures/r8-site-look.ts'

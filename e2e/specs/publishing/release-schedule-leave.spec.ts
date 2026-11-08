@@ -49,8 +49,7 @@ test('Publish later preserves private intent on leave without implicitly schedul
         ])
       ).rows,
       queue = async () =>
-        (await f.pool.query('SELECT * FROM scheduled_actions WHERE site_id=$1 ORDER BY id', [f.site])).rows,
-      base = '/sites/' + f.site + '/publishing'
+        (await f.pool.query('SELECT * FROM scheduled_actions WHERE site_id=$1 ORDER BY id', [f.site])).rows
     const capture = async (name: string) => {
       for (const width of [1440, 1024]) {
         await page.setViewportSize({ width, height: 900 })

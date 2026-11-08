@@ -19,7 +19,6 @@ import {
   listReleaseCandidates,
   planSiteRelease,
   previewSiteReleasePage,
-  type ReleaseItem,
 } from '../src/lib/releases.ts'
 import {
   getPreparedReleaseRecovery,

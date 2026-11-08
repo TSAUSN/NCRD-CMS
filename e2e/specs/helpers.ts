@@ -5,7 +5,7 @@ import { rawRequest, type RawResponse } from './http.ts'
 // to the loopback address with an explicit Host header. Chromium *does* map
 // *.localhost to loopback (RFC 6761), so browser navigations can use the real
 // hostname — which is the only way to exercise Host-based routing in a browser.
-import { SITE_ORIGIN, STAGING_ORIGIN, SITE_PORT } from '../test-ports.ts'
+import { SITE_PORT } from '../test-ports.ts'
 export { SITE_ORIGIN, STAGING_ORIGIN, SITE_PORT } from '../test-ports.ts'
 export const STAGING_HOST = 'demo.staging.localhost'
 

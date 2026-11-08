@@ -18,7 +18,7 @@ const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 
 let loaded = false
 
-export function loadRepoEnv(): void {
+function loadRepoEnv(): void {
   if (loaded) return
   loaded = true
   const envFile = join(REPO_ROOT, '.env')
