@@ -17,6 +17,14 @@ test('PDF library organizes, replaces, archives and restores without changing ex
     await client.end()
   }
   await signIn(page, 'contributor@example.test')
+  const documentApi = `/api/sites/${siteId}/documents`
+  let readsBeforeUpload = 0
+  let uploadStarted = false
+  page.on('request', request => {
+    if (new URL(request.url()).pathname !== documentApi) return
+    if (request.method() === 'POST') uploadStarted = true
+    else if (request.method() === 'GET' && !uploadStarted) readsBeforeUpload++
+  })
   await page.goto(`/sites/${siteId}/documents`)
   await expect(page.getByRole('link', { name: 'Documents', exact: true })).toHaveAttribute('aria-current', 'page')
   const name = `Acceptance report ${Date.now()}.pdf`
@@ -24,6 +32,8 @@ test('PDF library organizes, replaces, archives and restores without changing ex
     .getByLabel('Upload a PDF', { exact: true })
     .setInputFiles({ name, mimeType: 'application/pdf', buffer: PDF })
   await page.getByRole('button', { name: new RegExp(name.replace('.pdf', '\\.pdf')) }).click()
+  expect(uploadStarted).toBe(true)
+  expect(readsBeforeUpload).toBe(0)
   const original = await page.getByLabel('Document link', { exact: true }).inputValue()
   await page.getByRole('textbox', { name: 'Document category', exact: true }).fill('Acceptance reports')
   await page.getByRole('button', { name: 'Save category', exact: true }).click()

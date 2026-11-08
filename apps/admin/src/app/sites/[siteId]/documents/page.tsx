@@ -6,6 +6,7 @@ import { navigationFor } from '../../../../components/nav.ts'
 import { PageHeader, siteAreaTabs } from '../../../../components/shell.tsx'
 import { getSite, roleLabel } from '../../../../lib/queries.ts'
 import { collectionRights } from '../../../../lib/collection-queries.ts'
+import { DEFAULT_DOCUMENT_LIBRARY_QUERY } from '../../../../lib/document-library.ts'
 import { listDocuments } from '../../../../lib/document-repository.ts'
 import { currentSession } from '../../../../lib/session.ts'
 import { DocumentsWorkspace } from './workspace.tsx'
@@ -20,7 +21,7 @@ export default async function DocumentsPage({ params }: { params: Promise<{ site
   const site = await getSite(userId, siteId)
   if (!site) notFound()
   const [initial, role, rights] = await Promise.all([
-    listDocuments(userId, siteId, { search: '', category: '', archived: false, page: 1 }),
+    listDocuments(userId, siteId, DEFAULT_DOCUMENT_LIBRARY_QUERY),
     roleLabel(userId),
     collectionRights(userId, siteId),
   ])

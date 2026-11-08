@@ -1,6 +1,11 @@
 import 'server-only'
 import { asUser } from '@cms/platform'
-import type { DocumentLibraryQuery, DocumentLibraryResult, ManagedDocument } from './document-library.ts'
+import {
+  DOCUMENT_LIBRARY_PAGE_SIZE,
+  type DocumentLibraryQuery,
+  type DocumentLibraryResult,
+  type ManagedDocument,
+} from './document-library.ts'
 
 export async function listDocuments(
   userId: string,
@@ -34,8 +39,15 @@ export async function listDocuments(
       WHERE a.site_id=$1 AND a.kind='document' AND m.archived=$2
         AND (strpos(lower(a.original_name),lower($3))>0 OR strpos(lower(m.category),lower($3))>0)
         AND ($4='' OR m.category=$4)
-      ORDER BY lower(a.original_name),a.id LIMIT 50 OFFSET $5`,
-        [siteId, query.archived, query.search, query.category, (query.page - 1) * 50],
+      ORDER BY lower(a.original_name),a.id LIMIT $5 OFFSET $6`,
+        [
+          siteId,
+          query.archived,
+          query.search,
+          query.category,
+          DOCUMENT_LIBRARY_PAGE_SIZE,
+          (query.page - 1) * DOCUMENT_LIBRARY_PAGE_SIZE,
+        ],
       )
       const categories = await client.query<{ category: string }>(
         `SELECT DISTINCT category FROM site_document_metadata WHERE site_id=$1 AND category<>'' ORDER BY category`,

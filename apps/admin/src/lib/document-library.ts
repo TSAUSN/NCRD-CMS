@@ -4,6 +4,14 @@ export type ManagedDocument = SiteDocument & { category: string; archived: boole
 export type DocumentLibraryQuery = { search: string; category: string; archived: boolean; page: number }
 export type DocumentLibraryResult = { documents: ManagedDocument[]; total: number; categories: string[] }
 
+export const DOCUMENT_LIBRARY_PAGE_SIZE = 50
+export const DEFAULT_DOCUMENT_LIBRARY_QUERY: DocumentLibraryQuery = {
+  search: '',
+  category: '',
+  archived: false,
+  page: 1,
+}
+
 export async function fetchDocuments(siteId: string, query: DocumentLibraryQuery): Promise<DocumentLibraryResult> {
   const params = new URLSearchParams({
     search: query.search,
