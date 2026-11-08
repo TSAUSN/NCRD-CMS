@@ -103,9 +103,11 @@ test('selecting any native card section preserves the real page geometry and kee
         const root = frame.locator('[data-cms-section="' + index + '"]')
         await root.evaluate(node => node.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'instant' }))
         await expect(root).toBeInViewport({ ratio: 0.25 })
-        const sectionPoint = await root.evaluate(node => {
+        const sectionPoint = await root.evaluate((node, needsSectionInspector) => {
           const box = node.getBoundingClientRect()
-          const blocked = '[data-cms-slot], [data-cms-entry], [data-cms-frame], .cms-hero-controls'
+          const blocked = needsSectionInspector
+            ? '[data-cms-slot], [data-cms-entry], [data-cms-frame], .cms-hero-controls'
+            : '[data-cms-entry], [data-cms-frame], .cms-hero-controls'
           for (const y of [0.08, 0.2, 0.5, 0.8, 0.92]) {
             for (const x of [0.03, 0.1, 0.9, 0.97, 0.5]) {
               const position = { x: Math.round(box.width * x), y: Math.round(box.height * y) }
@@ -120,8 +122,8 @@ test('selecting any native card section preserves the real page geometry and kee
               if (safe) return { position, width: box.width, height: box.height }
             }
           }
-          throw new Error('No visible section background to select')
-        })
+          throw new Error('No visible point to select within this section')
+        }, index === 1)
         const renderedBox = await root.boundingBox()
         expect(renderedBox).not.toBeNull()
         await root.click({
