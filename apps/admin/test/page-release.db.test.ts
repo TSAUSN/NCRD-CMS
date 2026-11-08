@@ -55,6 +55,26 @@ it('refuses stale pins, foreign pages and non-publishers', async () => {
     db.asUser(s.contributorA, c => pageReleaseSelection(c, s.pageA, revision, versionId)),
   ).rejects.toMatchObject({ kind: 'not_authorized' })
 })
+it('selects an unpublished draft but rejects the same head once published', async () => {
+  await db.asUser(s.editorA, async c => {
+    const pageId = (await c.query('SELECT app.create_page($1,$2,$3) AS id', [s.siteA, 'only-saved', '[Only saved]']))
+      .rows[0]!.id
+    const saved = (
+      await c.query('SELECT * FROM app.save_page_draft($1,0,$2,$3)', [
+        pageId,
+        heroContent(s.heroDefId, '[Fresh page]'),
+        JSON.stringify({ description: '[Page description]' }),
+      ])
+    ).rows[0]!
+    const draft = await pageReleaseSelection(c, pageId, String(saved.revision), saved.version_id)
+    expect(draft).toMatchObject({ firstSiteReview: false, page: { id: pageId, unpublished: true } })
+    await c.query('SELECT app.publish_page($1,$2,$3,$4,$5)', [pageId, saved.revision, ...CHECKED_CLEAN])
+    const live = (await c.query('SELECT revision,draft_version_id FROM pages WHERE id=$1', [pageId])).rows[0]!
+    await expect(pageReleaseSelection(c, pageId, String(live.revision), live.draft_version_id)).rejects.toMatchObject({
+      kind: 'invalid_state',
+    })
+  })
+})
 it('returns the first-site review requirement without selecting site-wide changes', async () => {
   await db.as('owner', c => c.query('UPDATE sites SET initial_release_required=true WHERE id=$1', [s.siteA]))
   try {

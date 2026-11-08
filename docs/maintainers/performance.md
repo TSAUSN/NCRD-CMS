@@ -289,3 +289,17 @@ identical definitions returned in 78.4 → 1.08 ms on a local SAWSO page and
 77.3 → 0.79 ms on the local Echelon home page. These are lookup times, not
 hosted or end-to-end save times. The Echelon browser saved a spacing choice,
 reloaded it and showed the same published heading to a separate visitor.
+
+## Choose the saved page before opening its scheduling review
+
+The editor used to enumerate every pending site change to find the one saved
+page it already had authority to read. The selection now reads that one page
+head. The planner still locks the site, verifies the requested revision and
+version, checks the complete publication result, and writes the normal review.
+
+Thirty alternating pairs on disposable SAWSO and Echelon pages returned
+identical selected records. This one step went from 9–10 statements and a
+67.84 ms median to one statement and 0.61 ms. This measures the local selection,
+not the whole schedule or publish. One local browser walk prepared its review
+in 332 ms and acknowledged the queue in 217 ms. It checked that the page stayed
+private, a contributor could not schedule, and the queued request cancelled.
