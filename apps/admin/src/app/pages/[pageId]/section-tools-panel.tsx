@@ -1,202 +1,41 @@
 'use client'
-import { useEffect, useRef, useState, useTransition } from 'react'
-import type { SectionToolSource, SectionLinkReview } from '../../../lib/section-tools-commands.ts'
 import { validSectionAnchor } from '@cms/schema'
 import { Button, Field, EmptyState, Disclosure, TextLink } from '../../../components/ui/index.ts'
 import { IconChevronLeft } from '../../../components/icons.tsx'
-import { useNavigationGuard, requestLocalDraftNavigation } from '../../../components/navigation-guard.ts'
-import {
-  loadSectionLink,
-  loadSectionCopyChoices,
-  saveSectionCopy,
-  type saveSectionLink,
-} from './section-tools-actions.ts'
+import { useSectionTools, type SectionToolsProps } from './use-section-tools.ts'
 import workspaceFormsStyles from '../../../components/workspace-styles/workspace-forms.module.css'
 import recordTableStyles from '../../../components/workspace-styles/record-table.module.css'
 import siteSummaryStyles from '../../../components/workspace-styles/site-summary.module.css'
 import listInspectorStyles from '../../../components/workspace-styles/list-inspector.module.css'
 import reviewWorkbenchStyles from '../../../components/workspace-styles/review-workbench.module.css'
 import styles from './inspector.module.css'
-type CopyPage = { id: string; title: string; revision: string; sections: { label: string }[] }
-export function SectionToolsPanel({
-  kind,
-  source,
-  origin,
-  siteId,
-  onClose,
-  onRename,
-}: {
-  kind: 'link' | 'copy'
-  source: SectionToolSource | null
-  origin: string | null
-  siteId: string
-  onClose: (reload?: boolean) => void
-  onRename: (
-    input: SectionToolSource & { name: string; fingerprint: string },
-  ) => Promise<Awaited<ReturnType<typeof saveSectionLink>>>
-}) {
-  const [review, setReview] = useState<SectionLinkReview | null>(null),
-    [pages, setPages] = useState<CopyPage[]>([]),
-    [name, setName] = useState(''),
-    [targetId, setTargetId] = useState(''),
-    [at, setAt] = useState(''),
-    [loading, setLoading] = useState(true),
-    [actionPending, setPending] = useState(false),
-    [transitionPending, startTransition] = useTransition(),
-    [error, setError] = useState(''),
-    [notice, setNotice] = useState(''),
-    [retry, setRetry] = useState(0),
-    [copied, setCopied] = useState<{ pageId: string; title: string } | null>(null),
-    [done, setDone] = useState(false),
-    busy = useRef(false),
-    applied = useRef(false),
-    touched = useRef(false),
-    nameInput = useRef<HTMLInputElement>(null),
-    addressInput = useRef<HTMLInputElement>(null),
-    reloadSource = useRef(false)
-  const pending = actionPending || transitionPending
-  const target = pages.find(page => page.id === targetId),
-    dirty = !done && (kind === 'link' ? Boolean(review && name !== review.name) : Boolean(targetId)),
-    valid =
-      kind === 'link'
-        ? Boolean(review && !review.unsafe && validSectionAnchor(name))
-        : Boolean(
-            target &&
-            at !== '' &&
-            Number.isInteger(Number(at)) &&
-            Number(at) >= 0 &&
-            Number(at) <= target.sections.length,
-          ),
-    address = review ? (origin ?? '') + review.path + '#' + name : ''
-  useEffect(() => {
-    let active = true
-    if (!source) return
-    setLoading(true)
-    setError('')
-    setNotice('')
-    const request = kind === 'link' ? loadSectionLink(source) : loadSectionCopyChoices(source)
-    void request
-      .then(result => {
-        if (!active) return
-        if (!result.ok) {
-          if (result.kind === 'conflict') reloadSource.current = true
-          setError(result.message)
-          return
-        }
-        if ('fingerprint' in result) {
-          setReview(result)
-          if (!touched.current) setName(result.name || result.suggested)
-        } else {
-          setPages(result.pages)
-          setAt('')
-        }
-      })
-      .catch(() => {
-        if (active) setError('This section step could not be loaded. Try again, or return to the section.')
-      })
-      .finally(() => {
-        if (active) setLoading(false)
-      })
-    return () => {
-      active = false
-    }
-  }, [source, kind, retry])
-  function save(): Promise<{ ok: boolean; message?: string }> {
-    return new Promise(resolve =>
-      startTransition(async () => {
-        resolve(await performSave())
-      }),
-    )
-  }
-  async function performSave() {
-    if (done || applied.current) return { ok: true }
-    if (!source || busy.current) return { ok: false, message: 'Wait for this section step to finish.' }
-    if (!valid) {
-      const message =
-        kind === 'link'
-          ? 'Use a unique link name starting with a letter, with lowercase letters, numbers and hyphens.'
-          : 'Choose a page and a place for the copy.'
-      setError(message)
-      return { ok: false, message }
-    }
-    busy.current = true
-    setPending(true)
-    setError('')
-    try {
-      if (kind === 'link') {
-        const result = await onRename({ ...source, name, fingerprint: review!.fingerprint })
-        if (!result.ok) {
-          if (result.kind === 'conflict') reloadSource.current = true
-          setError(result.message)
-          return { ok: false, message: result.message }
-        }
-        applied.current = true
-        setDone(true)
-        setNotice(result.message)
-        return { ok: true }
-      }
-      const result = await saveSectionCopy({
-        ...source,
-        targetPageId: target!.id,
-        targetRevision: target!.revision,
-        at: Number(at),
-      })
-      if (!result.ok) {
-        if (result.kind === 'conflict') reloadSource.current = true
-        setError(result.message)
-        return { ok: false, message: result.message }
-      }
-      applied.current = true
-      setCopied({ pageId: result.pageId, title: result.title })
-      setDone(true)
-      setNotice(result.message)
-      return { ok: true }
-    } catch {
-      const message = 'The result could not be confirmed. Check the affected page drafts before trying again.'
-      setError(message)
-      return { ok: false, message }
-    } finally {
-      busy.current = false
-      setPending(false)
-    }
-  }
-  const read = () => ({
-    dirty: dirty && !applied.current,
-    pending: pending || busy.current,
-    draft: {
-      label: kind === 'link' ? 'Section link name' : 'Section copy',
-      saved: false,
-      saveDraft: save,
-      discard: () => {
-        setName(review?.name ?? '')
-        setTargetId('')
-        setAt('')
-      },
-    },
-  })
-  useNavigationGuard(read)
-  useEffect(() => {
-    const warn = (event: BeforeUnloadEvent) => {
-      if ((dirty && !applied.current) || busy.current) event.preventDefault()
-    }
-    window.addEventListener('beforeunload', warn)
-    return () => window.removeEventListener('beforeunload', warn)
-  }, [dirty])
-  function close() {
-    const leave = () => onClose(reloadSource.current || (kind === 'link' && applied.current))
-    if (requestLocalDraftNavigation(read, leave)) leave()
-  }
-  async function copyLink() {
-    if (!address || (name !== review?.name && !done)) return
-    try {
-      await navigator.clipboard.writeText(address)
-      setNotice('Section link copied. Publish any changes before sharing it.')
-    } catch {
-      addressInput.current?.focus()
-      addressInput.current?.select()
-      setError('The link could not be copied automatically. Select the link address and copy it.')
-    }
-  }
+export function SectionToolsPanel(props: SectionToolsProps) {
+  const { kind, siteId } = props
+  const {
+    review,
+    pages,
+    name,
+    targetId,
+    target,
+    at,
+    setAt,
+    loading,
+    pending,
+    error,
+    notice,
+    copied,
+    done,
+    addressInput,
+    valid,
+    address,
+    close,
+    save,
+    copyLink,
+    changeName,
+    chooseTarget,
+    retryStep,
+    cancel,
+  } = useSectionTools(props)
   return (
     <aside
       id="editor-panel-inspector"
@@ -243,14 +82,10 @@ export function SectionToolsPanel({
               <input
                 autoFocus
                 required
-                ref={nameInput}
                 maxLength={64}
                 disabled={pending || done}
                 value={name}
-                onChange={event => {
-                  touched.current = true
-                  setName(event.target.value.toLowerCase())
-                }}
+                onChange={event => changeName(event.target.value)}
               />
             </Field>
             <Field id="section-link-address" label="Link address">
@@ -297,10 +132,7 @@ export function SectionToolsPanel({
                 autoFocus
                 value={targetId}
                 disabled={pending || done}
-                onChange={event => {
-                  setTargetId(event.target.value)
-                  setAt('')
-                }}
+                onChange={event => chooseTarget(event.target.value)}
               >
                 <option value="">Choose a page</option>
                 {pages.map(page => (
@@ -353,7 +185,7 @@ export function SectionToolsPanel({
           <div role="alert">
             <p>{error}</p>
             {!pending && !done && (
-              <Button variant="secondary" onClick={() => setRetry(value => value + 1)}>
+              <Button variant="secondary" onClick={retryStep}>
                 Reload this step
               </Button>
             )}
@@ -381,7 +213,7 @@ export function SectionToolsPanel({
       {!done && (
         <div className={styles.addBelow}>
           <div className={workspaceFormsStyles.actions}>
-            <Button variant="secondary" disabled={pending} onClick={() => onClose(reloadSource.current)}>
+            <Button variant="secondary" disabled={pending} onClick={cancel}>
               Cancel
             </Button>
             <Button disabled={!valid || pending || loading} onClick={() => void save()}>
