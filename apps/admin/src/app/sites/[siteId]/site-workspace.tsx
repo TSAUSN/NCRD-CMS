@@ -3,7 +3,6 @@ import { GuardedLink as Link } from '../../../components/guarded-link.tsx'
 import { getCollectionWorkspace } from '../../../lib/collection-queries.ts'
 import { listWorkspacePages } from '../../../lib/workspace-queries.ts'
 import { listReviewSubmissions } from '../../../lib/review-queries.ts'
-import { Disclosure } from '../../../components/ui/index.ts'
 import { getPageListControls } from '../../../lib/page-list-workspace.ts'
 import { NativePagesTable } from './native-pages-table.tsx'
 import { NativeNewPage } from './native-new-page.tsx'
@@ -21,7 +20,7 @@ import { StatusChip, siteStatus } from '../../../components/status.tsx'
 import { NewPageForm } from './new-page.tsx'
 import { editorialPosture } from '../../../lib/editorial-posture.ts'
 import { IconAlert, IconCheck, IconExternal } from '../../../components/icons.tsx'
-import { PageManagement } from './page-management.tsx'
+import { ArchivedPages } from './archived-pages.tsx'
 import { SiteHostingNotice } from '../../../components/site-hosting-notice.tsx'
 
 import { OriginalSiteOverviewSections } from './original-site-overview-sections.tsx'
@@ -286,32 +285,7 @@ export async function SiteWorkspace({
           </section>
         </div>
 
-        {canManagePages && archivedPages.length > 0 && (
-          // Kept out of the way: archived pages are for putting back, not for work.
-          <Disclosure className="archived-pages" title={<>Archived pages ({archivedPages.length})</>}>
-            <p>These pages can be restored with their full history.</p>
-            <ul className="archived-list">
-              {archivedPages.map(page => (
-                <li className="archived-row" key={page.id}>
-                  <div>
-                    <strong>{page.title}</strong>
-                    <p>
-                      <span className="mono">{page.slug ? `/${page.slug}` : '/'}</span> · Full history retained
-                    </p>
-                  </div>
-                  <PageManagement
-                    pageId={page.id}
-                    title={page.title}
-                    slug={page.slug}
-                    revision={page.revision}
-                    live={false}
-                    archived
-                  />
-                </li>
-              ))}
-            </ul>
-          </Disclosure>
-        )}
+        {canManagePages && <ArchivedPages pages={archivedPages} />}
       </main>
     </AppShell>
   )
