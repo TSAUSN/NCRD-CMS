@@ -247,37 +247,19 @@ export function MenuTreeEditor({
         {tree.map((node, index) => row(node, String(index), index, tree.length))}
       </ul>
       <ReorderAnnouncement>{reorder.announcement}</ReorderAnnouncement>
-      <div className={styles.addMenu}>
-        <label htmlFor={addId}>Add page to menu</label>
-        <select
-          id={addId}
-          value=""
-          disabled={disabled || !canAdd || !available.length}
-          onChange={event => {
-            const page = available.find(page => page.id === event.target.value)
-            if (page)
-              onChange([
-                ...tree,
-                { label: page.title.slice(0, 80), target: { type: 'page', page_id: page.id }, visible: true },
-              ])
-          }}
-        >
-          <option value="">{available.length ? 'Choose a page…' : 'No more pages to add'}</option>
-          {available.map(page => (
-            <option key={page.id} value={page.id}>
-              {page.title}
-            </option>
-          ))}
-        </select>
-        <Button
-          variant="secondary"
-          disabled={disabled || !canAdd}
-          onClick={() => onChange([...tree, { label: 'New link', target: { type: 'url', url: '' }, visible: true }])}
-        >
-          Add web link to menu
-        </Button>
-        {!canAdd && <p className={styles.hiddenHelp}>This menu is full. Remove a link before adding another.</p>}
-      </div>
+      <AddMenuItem
+        addId={addId}
+        available={available}
+        canAdd={canAdd}
+        disabled={disabled}
+        onAddPage={page =>
+          onChange([
+            ...tree,
+            { label: page.title.slice(0, 80), target: { type: 'page', page_id: page.id }, visible: true },
+          ])
+        }
+        onAddLink={() => onChange([...tree, { label: 'New link', target: { type: 'url', url: '' }, visible: true }])}
+      />
       {removing && (
         <Dialog
           title="Remove menu item?"
@@ -310,6 +292,48 @@ export function MenuTreeEditor({
           </p>
         </Dialog>
       )}
+    </div>
+  )
+}
+
+function AddMenuItem({
+  addId,
+  available,
+  canAdd,
+  disabled,
+  onAddPage,
+  onAddLink,
+}: {
+  addId: string
+  available: PageChoice[]
+  canAdd: boolean
+  disabled: boolean
+  onAddPage: (page: PageChoice) => void
+  onAddLink: () => void
+}) {
+  return (
+    <div className={styles.addMenu}>
+      <label htmlFor={addId}>Add page to menu</label>
+      <select
+        id={addId}
+        value=""
+        disabled={disabled || !canAdd || !available.length}
+        onChange={event => {
+          const page = available.find(page => page.id === event.target.value)
+          if (page) onAddPage(page)
+        }}
+      >
+        <option value="">{available.length ? 'Choose a page…' : 'No more pages to add'}</option>
+        {available.map(page => (
+          <option key={page.id} value={page.id}>
+            {page.title}
+          </option>
+        ))}
+      </select>
+      <Button variant="secondary" disabled={disabled || !canAdd} onClick={onAddLink}>
+        Add web link to menu
+      </Button>
+      {!canAdd && <p className={styles.hiddenHelp}>This menu is full. Remove a link before adding another.</p>}
     </div>
   )
 }
