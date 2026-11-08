@@ -82,18 +82,25 @@ export async function publishPage(formData: FormData): Promise<ActionResult> {
   }
 
   try {
-    const revision = await asUser({ userId: session.principal.userId, requestId: randomUUID() }, async client => {
-      const { rows } = await client.query<{ revision: string }>(
-        'SELECT revision FROM app.publish_page($1,$2,$3,$4,$5)',
-        [pageId, expectedRevision, report.policyVersion, override || null, JSON.stringify(report.findings)],
-      )
-      return Number(rows[0]!.revision)
-    })
-    revalidatePath(`/pages/${pageId}`)
-    // Publishing copies the draft version onto the published pointer rather
-    // than writing a new one, so the draft the canvas is rendering is still the
-    // current one.
-    return { ok: true, revision, versionId: null, message: 'Published. The live page now shows these changes.' }
+    const { revision, path } = await asUser(
+      { userId: session.principal.userId, requestId: randomUUID() },
+      async client => {
+        const { rows } = await client.query<{ revision: string; path: string }>(
+          'SELECT revision,path FROM app.publish_page($1,$2,$3,$4,$5)',
+          [pageId, expectedRevision, report.policyVersion, override || null, JSON.stringify(report.findings)],
+        )
+        return rows[0]!
+      },
+    )
+    // The editor applies publication to its saved version. Reload route props
+    // only when its visitor link must appear or change.
+    if (path !== page.live_path) revalidatePath(`/pages/${pageId}`)
+    return {
+      ok: true,
+      revision: Number(revision),
+      versionId: null,
+      message: 'Published. The live page now shows these changes.',
+    }
   } catch (error) {
     return toActionResult(error)
   }

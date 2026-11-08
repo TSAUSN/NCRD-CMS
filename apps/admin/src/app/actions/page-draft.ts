@@ -53,19 +53,22 @@ export async function savePageDraft(formData: FormData): Promise<ActionResult> {
     const saved = await asUser({ userId: session.principal.userId, requestId: randomUUID() }, async client => {
       await validateAppearanceEdits(client, parsedContent)
       const previous = (
-        await client.query<{ meta: unknown }>(
-          'SELECT v.meta FROM pages p LEFT JOIN page_versions v ON v.id=p.draft_version_id WHERE p.id=$1',
+        await client.query<{ title: string; slug: string; meta: unknown }>(
+          'SELECT p.title,p.slug,v.meta FROM pages p LEFT JOIN page_versions v ON v.id=p.draft_version_id WHERE p.id=$1',
           [pageId],
         )
-      ).rows[0]?.meta
-      const merged = mergeEditedPageMeta(previous, meta)
+      ).rows[0]
+      const merged = mergeEditedPageMeta(previous?.meta, meta)
       if (!merged.ok)
         throw new DomainError(
           'invalid_state',
           merged.problems.map(problem => `${problem.field}: ${problem.message}`).join(' '),
         )
-      const revision =
-        identity === undefined ? expectedRevision : await savePageIdentity(client, pageId, expectedRevision, identity)
+      const renamed =
+        identity !== undefined && (previous?.title !== identity.title || previous?.slug !== identity.address)
+          ? identity
+          : undefined
+      const revision = renamed ? await savePageIdentity(client, pageId, expectedRevision, renamed) : expectedRevision
       const { rows } = await client.query<{ version_id: string; revision: string }>(
         'SELECT version_id, revision FROM app.save_page_draft($1,$2,$3,$4,$5,$6)',
         [
@@ -77,10 +80,15 @@ export async function savePageDraft(formData: FormData): Promise<ActionResult> {
           kind === 'autosave' ? '' : 'Saved from the editor',
         ],
       )
-      return { versionId: rows[0]!.version_id, revision: Number(rows[0]!.revision) }
+      return {
+        versionId: rows[0]!.version_id,
+        revision: Number(rows[0]!.revision),
+        identityChanged: renamed !== undefined,
+      }
     })
-    // An autosave must not re-render the page under the editor's feet.
-    if (kind === 'checkpoint') revalidatePath(`/pages/${pageId}`)
+    // The editor applies the receipt and refreshes its canvas. Only an explicit
+    // address or title change needs new route props.
+    if (kind === 'checkpoint' && saved.identityChanged) revalidatePath(`/pages/${pageId}`)
     return {
       ok: true,
       revision: saved.revision,
