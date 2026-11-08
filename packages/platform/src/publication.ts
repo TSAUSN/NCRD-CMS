@@ -10,40 +10,10 @@ import {
 } from '@cms/schema'
 import { decodeSourceText } from '@cms/renderer/source-html'
 import { sampleFieldNames, boundSampleFieldNames } from '@cms/schema'
-// One readiness evaluation, shared by every publish path (SPEC §6.8).
-//
-// The rules themselves are pure functions in @cms/domain. What lives here is
-// the orchestration around them — build the manifest, render it, gather the
-// site's published paths — which is the part that was duplicated as "the admin
-// does it and the scheduler does not". A scheduled publish went out with a
-// hard-coded policy version and an empty report, so a version the editor
-// refused for having no H1, no sections, or a link to a page that does not
-// exist published anyway. SPEC §6.8 says the same invalid draft is refused
-// everywhere; that is only true if one piece of code decides.
-//
-// Two things this deliberately does NOT do:
-//
-//   * accept a report from a browser. The caller passes a version id; the
-//     verdict is computed here, server-side, from the database.
-//   * evaluate the current draft. A schedule pins a version, and between
-//     scheduling and firing the draft moves. The immutable version is what
-//     goes live, so the immutable version is what is judged.
-//
-// WHERE THE TRUST BOUNDARY ACTUALLY SITS
-//
-// The database validates that a report was supplied, that its policy version
-// and structure are valid, and that declared blocking findings carry an
-// override reason; and it enforces authorization, pinned-version ownership,
-// trusted-code approval, the revision CAS, audit, the projection, and
-// atomicity regardless of what any report says. It cannot verify that the
-// findings are the ones this function would produce — the rules need a rendered
-// page, which SQL cannot produce. So this module is not a convenience: it is
-// the boundary. Every process that holds a publishing credential — the admin
-// server, the worker, the seed — computes its report here, and the browser
-// holds no such credential and never supplies a report. A publication surface
-// that computed readiness some other way would be trusted exactly as much and
-// checked exactly as little, which is the failure mode this replaced.
 import type { PoolClient } from 'pg'
+
+import { DomainError, runReadinessChecks, READINESS_POLICY_VERSION, type ReadinessReport } from '@cms/domain'
+import { renderPage, type PageDocument, type RenderManifest, type SiteShell } from '@cms/renderer'
 
 /**
  * Any connection already carrying the right identity. The evaluation reads and
@@ -52,8 +22,6 @@ import type { PoolClient } from 'pg'
  * pooled clients are the same caller.
  */
 export type Queryable = Pick<PoolClient, 'query'>
-import { DomainError, runReadinessChecks, READINESS_POLICY_VERSION, type ReadinessReport } from '@cms/domain'
-import { renderPage, type PageDocument, type RenderManifest, type SiteShell } from '@cms/renderer'
 
 /**
  * Which door this caller uses to build a render manifest.
@@ -143,6 +111,40 @@ export async function evaluateVersionReadiness(
   return evaluateReadiness(client, versionId, access, plannedPaths)
 }
 
+const linkRules = {
+  document: {
+    pattern:
+      /<a\b[^>]*\bhref\s*=\s*"\/assets\/([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})(?:[?#][^"]*)?"/gi,
+    member: 'app.readiness_document_paths',
+    worker: 'app.readiness_document_paths_internal',
+  },
+  media: {
+    pattern:
+      /<a\b[^>]*\bhref\s*=\s*"\/media\/([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})\/(?:original|thumbnail|card|wide)(?:[?#][^"]*)?"/gi,
+    member: 'app.readiness_media_paths',
+    worker: 'app.readiness_media_paths_internal',
+  },
+} as const
+
+/** Only delivery paths authorized for this exact version count as internal links. */
+async function linkedAssetPaths(
+  client: Queryable,
+  versionId: string,
+  access: ManifestAccess,
+  html: string,
+  kind: keyof typeof linkRules,
+): Promise<string[]> {
+  const rule = linkRules[kind]
+  const ids = [...new Set([...html.matchAll(rule.pattern)].map(match => match[1]!.toLowerCase()))]
+  if (!ids.length) return []
+  const functionName = access === 'worker' ? rule.worker : rule.member
+  const { rows } = await client.query<{ path: string }>(`SELECT path FROM ${functionName}($1,$2::uuid[])`, [
+    versionId,
+    ids,
+  ])
+  return rows.map(row => row.path)
+}
+
 async function evaluateReadiness(
   client: Queryable,
   versionId: string,
@@ -160,10 +162,7 @@ async function evaluateReadiness(
   )
   const page = owner.rows[0]
   if (!page) {
-    // Deliberately not a readiness finding. "This version is gone" is a
-    // different failure from "this version is not ready", and conflating them
-    // would file a deleted page under a content-quality heading. The caller
-    // classifies not_found as permanent, which is what it is.
+    // A missing version is a permanent command failure, separate from content readiness.
     throw new DomainError('not_found', `page version ${versionId} no longer exists`)
   }
 
@@ -281,24 +280,8 @@ async function evaluateReadiness(
     [manifest.page.id, manifest.page.path] as const,
   ])
 
-  // isStaging: readiness judges the document, and the staging flag only changes
-  // indexing directives. Rendering it the same way for both callers matters
-  // more than which of the two modes it is.
-  //
-  // canonicalBase is the staging origin, which is what the public renderer
-  // passes when a staging host serves the response. It is a fallback and not an
-  // override — a verified `canonical_host` still wins inside `resolveCanonical`
-  // — so a site with a live domain is still judged against its live address
-  // (SPEC §6.8, §6.10). Supplying it matters for the site that has no verified
-  // domain yet: without it this evaluation has no site identity to compare an
-  // authored canonical against, reaches no verdict, and stays silent about a
-  // value the staging render will refuse. That is the two-surfaces-disagreeing
-  // shape this module exists to remove.
-  //
-  // A render that throws is a verdict, not an outage. Letting it escape would
-  // reach the worker as an unclassified error and be retried as infrastructure
-  // — forever, since the version is immutable and will throw identically every
-  // time. A version that cannot be rendered cannot go live.
+  // Use the staging origin only when there is no verified canonical host.
+  // An immutable rendering failure blocks publication; it is not a retryable outage.
   let document: PageDocument
   try {
     document = renderPage({
@@ -312,52 +295,13 @@ async function evaluateReadiness(
     return unrenderable(`This page could not be rendered: ${(error as Error).message}`)
   }
 
-  // Governed PDFs are real link destinations, but only when this immutable
-  // candidate (or its published frame/selected records) authorizes delivery.
-  // Keep the same exact, normalized path contract as the internal-link rule;
-  // malformed paths, other tenants' receipts and font URLs remain findings.
-  const documentIds = [
-    ...new Set(
-      [
-        ...document.html.matchAll(
-          /<a\b[^>]*\bhref\s*=\s*"\/assets\/([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})(?:[?#][^"]*)?"/gi,
-        ),
-      ].map(match => match[1]!.toLowerCase()),
-    ),
-  ]
-  const documentPaths = documentIds.length
-    ? (
-        await client.query<{ path: string }>(
-          `SELECT path FROM ${access === 'worker' ? 'app.readiness_document_paths_internal' : 'app.readiness_document_paths'}($1,$2::uuid[])`,
-          [versionId, documentIds],
-        )
-      ).rows.map(row => row.path)
-    : []
+  const documentPaths = await linkedAssetPaths(client, versionId, access, document.html, 'document')
+  const mediaPaths = await linkedAssetPaths(client, versionId, access, document.html, 'media')
 
-  // The site's own pictures are link destinations too (0111): a gallery
-  // thumbnail opening the full-size image, a downloadable poster.
-  const mediaIds = [
-    ...new Set(
-      [
-        ...document.html.matchAll(
-          /<a\b[^>]*\bhref\s*=\s*"\/media\/([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})\/(?:original|thumbnail|card|wide)(?:[?#][^"]*)?"/gi,
-        ),
-      ].map(match => match[1]!.toLowerCase()),
-    ),
-  ]
-  const mediaPaths = mediaIds.length
-    ? (
-        await client.query<{ path: string }>(
-          `SELECT path FROM ${access === 'worker' ? 'app.readiness_media_paths_internal' : 'app.readiness_media_paths'}($1,$2::uuid[])`,
-          [versionId, mediaIds],
-        )
-      ).rows.map(row => row.path)
-    : []
-
-  const knownAnchors = new Map(paths.map(route => [route.path, new Set(route.anchors ?? [])])),
-    ownAnchors = manifest.sections.flatMap(section =>
-      section.instance.hidden ? [] : sectionAnchorNames(section.instance.values),
-    )
+  const knownAnchors = new Map(paths.map(route => [route.path, new Set(route.anchors ?? [])]))
+  const ownAnchors = manifest.sections.flatMap(section =>
+    section.instance.hidden ? [] : sectionAnchorNames(section.instance.values),
+  )
   knownAnchors.set(manifest.page.path, new Set(ownAnchors))
   const sectionLinks = manifest.sections.flatMap(section =>
     section.instance.hidden
@@ -452,12 +396,7 @@ async function evaluateReadiness(
     metaDescription: manifest.meta.description,
     html: document.html,
     sectionCount: manifest.sections.length,
-    // The page's own path counts as known. published_routes is what is live
-    // *now*, and this version is being judged for going live — so without this
-    // a page that links to itself, or a site's first page whose call to action
-    // points at `/`, is refused for linking to a page that does not exist,
-    // naming itself. Found by making the seed publish through this function:
-    // the demo home page links to `/` and is `/`.
+    // The candidate can link to itself before its route is live.
     knownPaths: new Set([
       ...paths.map(r => r.path),
       ...plannedPaths,
@@ -465,10 +404,7 @@ async function evaluateReadiness(
       ...mediaPaths,
       manifest.page.path,
     ]),
-    // The one thing the rendered page cannot supply. By the time `html` exists
-    // the refused canonical has been replaced by the page's own address, so the
-    // decision object is the only place the author's value survives — which is
-    // why `renderPage` returns it (SPEC §6.8).
+    // Rendered HTML omits a refused canonical value; preserve the renderer's decision.
     canonicalRefusal: document.canonical.refusal,
   })
 }
