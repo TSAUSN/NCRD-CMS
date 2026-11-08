@@ -27,6 +27,30 @@ release sequence](friday-go-live.md) and [recovery](../upgrades/backup-recovery.
 Do not transfer service-role keys, account passwords, or session links in this packet.
 The receiving administrator manages the environment’s secrets through its own approved store.
 
+## Record hosted role acceptance
+
+Use the personal review copy and keep the completed account inventory and
+walk receipts in the private operator packet. Use a distinct approved sign-in
+address for each scope. These are placeholders for the operator's checklist.
+
+| Role | Private identity placeholder | Scope to verify |
+| --- | --- | --- |
+| Super admin | `SUPER_ADMIN_EMAIL` | Both sites and People & access |
+| SAWSO site editor | `QA_SAWSO_EDITOR_EMAIL` | Assigned site, including draft review and publication |
+| SAWSO content creator | `QA_SAWSO_CONTRIBUTOR_EMAIL` | Assigned authoring and submit for review |
+| Echelon division editor | `QA_ECHELON_DIVISION_EMAIL` | Assigned division and chapter publication |
+| Echelon chapter contributor | `QA_ECHELON_CHAPTER_EMAIL` | Assigned chapter and submit for review |
+
+Verify sign-in delivery before provisioning these accounts. In Supabase, check
+**Authentication → Emails → SMTP Settings**. The default sender can only reach
+project-team addresses. Record any role you could only walk locally as local.
+Use the CMS's [access controls](../people/adding-a-person.md) to assign the
+smallest scope and confirm the visible role after sign-in. Check both the
+permitted actions and direct access to an unassigned site, division or chapter.
+Archive or remove disposable drafts after the walk and record where the test
+accounts remain. Keep passwords, authentication links and session data out of
+the handoff notes. [Supabase email delivery documentation](https://supabase.com/docs/guides/auth/auth-smtp).
+
 ## Move sign-in ownership
 
 1. Inventory the provider project’s apps, callbacks, roles, billing and recovery

@@ -30,7 +30,7 @@ Deployment uses the reviewed release ref and private verification receipts.
 | RO-2 | Role-based Home follow-up | Preserve current site/role isolation |
 | RO-3 | Organization sign-in / Microsoft SSO | Provider ownership, tenant policy, explicit existing-user linking and rollback |
 | RO-4 | Utilities hub | Separate product scope |
-| Maintenance | Split the large editor, reduce `globals.css`, remove site-specific renderer branches | Separate branch, reviewed commits and complete behavior/visual gates |
+| Maintenance | The refactor branch separates the editor, renderer and styles by responsibility. `globals.css` lists the shared imports. | Verify the candidate's complete browser, Friday-data and hosted role checks before release. |
 
 For code and visual verification, see the [maintainer gates](maintainers/gates.md).
 For a new installation, use the [private release handoff](handbook/hosting/private-release-handoff.md).

@@ -1,6 +1,6 @@
 # Where things live
 
-For a maintainer opening CMS V2 for the first time. Last checked: November 7, 2026.
+For a maintainer opening CMS V2 for the first time. Last checked November 8, 2026.
 Start with [architecture](../../architecture.md), the current [SPEC status](../../../SPEC.md)
 and [local setup](../hosting/local-demo.md). Product task instructions are in the
 [handbook index](../INDEX.md); the Friday deployment procedure is separate.
@@ -10,7 +10,8 @@ and [local setup](../hosting/local-demo.md). Product task instructions are in th
 Paths below are repository-relative. `app/` means `apps/admin/src/app/` and
 `lib/` means `apps/admin/src/lib/`. Start at the named route, follow its server
 action and command module, then read the current SQL definition. Admin read
-models live in `apps/admin/src/server/queries/`, by data type. The
+models live in `apps/admin/src/server/queries/`, by data type. Shared server
+commands live in `apps/admin/src/server/commands/`. The
 [current SQL index](../../../packages/schema/current/README.md) links one file per
 function, grouped by area, plus a table/RLS/grant catalog. Numbered migrations
 remain the executable authority; never edit a past migration or apply the reference.
@@ -33,8 +34,14 @@ remain the executable authority; never edit a past migration or apply the refere
 
 Inside `app/sites/[siteId]/content/`, `collections-workspace.tsx` owns
 list draft commands and dialogs. `collection-record-list.tsx` owns the rows,
-selection and move controls; `collection-record-display.ts` formats record fields
-for the list and editor.
+selection and move controls. `collection-record-display.ts` formats record fields
+for the list and editor. An inline List save uses the same private entry command
+as Lists, then refreshes the canvas. The Lists route loads fresh records on entry.
+
+The report's stylesheet is composed in `packages/renderer/src/report-page-presentation.ts`.
+The `report-presentation/` modules own the foundations, content bands, page
+layout, narrative layout and native sections. The stylesheet hash test checks
+the final cascade bytes.
 
 Inside `app/sites/[siteId]/media/`, `media-workspace.tsx` keeps the library state,
 uploads, detail edits and mutation guards together. `media-library-browser.tsx`
