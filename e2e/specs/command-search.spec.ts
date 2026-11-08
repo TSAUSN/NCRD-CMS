@@ -45,6 +45,7 @@ test('search supports keyboard, scoped pages, item drawers, errors and guarded n
   }
   try {
     await mkdir(folder, { recursive: true })
+    const peoriaSearchName = 'Peoria Chapter search ' + randomBytes(4).toString('hex')
     const longName = 'Long speaker ' + 'an extended name and role '.repeat(12) + '(sample)'
     const token = randomBytes(32).toString('base64url'),
       email = 'search-' + token.slice(0, 8).toLowerCase() + '@example.test'
@@ -56,6 +57,17 @@ test('search supports keyboard, scoped pages, item drawers, errors and guarded n
     const chapter = (await f.client.query("SELECT id FROM chapters WHERE site_id=$1 AND slug='peoria'", [f.site]))
       .rows[0]!.id
     await f.client.query('SELECT app.assign_chapter_editor($1,$2,true)', [chapter, user])
+    // Other scenarios can have an active Echelon copy. Give this page its own
+    // searchable CMS name, while keeping the actual chapter heading and scope.
+    const peoria = (
+      await f.client.query("SELECT id,revision,slug FROM pages WHERE site_id=$1 AND slug='chapters/peoria'", [f.site])
+    ).rows[0]!
+    await f.client.query('SELECT app.rename_page($1,$2,$3,$4)', [
+      peoria.id,
+      peoria.revision,
+      peoriaSearchName,
+      peoria.slug,
+    ])
     const list = (
       await f.client.query('SELECT * FROM app.create_collection($1,$2,$3,$4,$5,$6)', [
         f.site,
@@ -105,8 +117,9 @@ test('search supports keyboard, scoped pages, item drawers, errors and guarded n
     await page.keyboard.press('Control+k')
     dialog = page.getByRole('dialog', { name: 'Search or jump to', exact: true })
     input = dialog.getByRole('combobox')
-    await input.fill('Peoria')
+    await input.fill(peoriaSearchName)
     await expect(dialog.getByRole('option')).toHaveCount(1)
+    await expect(dialog.getByRole('option').getByText(peoriaSearchName, { exact: true })).toBeVisible()
     await input.press('Enter')
     const leave = page.getByRole('alertdialog', { name: 'Before you leave', exact: true })
     await expect(leave).toBeVisible()
@@ -116,8 +129,9 @@ test('search supports keyboard, scoped pages, item drawers, errors and guarded n
     await drawer.getByRole('button', { name: 'Cancel', exact: true }).click()
     await page.keyboard.press('Control+k')
     input = page.getByRole('dialog', { name: 'Search or jump to', exact: true }).getByRole('combobox')
-    await input.fill('Peoria')
+    await input.fill(peoriaSearchName)
     await expect(dialog.getByRole('option')).toHaveCount(1)
+    await expect(dialog.getByRole('option').getByText(peoriaSearchName, { exact: true })).toBeVisible()
     await input.press('ArrowDown')
     await input.press('Enter')
     await expect(canvas(page).locator('h1')).toHaveText('Peoria Chapter')
@@ -160,7 +174,7 @@ test('search supports keyboard, scoped pages, item drawers, errors and guarded n
     expect(errors).toEqual([])
   } finally {
     await f.client.query('ROLLBACK').catch(() => {})
-    await f.pool.query('UPDATE sites SET archived_at=now() WHERE id=$1', [f.site])
+    await f.archive()
     f.client.release()
     await f.pool.end()
   }
