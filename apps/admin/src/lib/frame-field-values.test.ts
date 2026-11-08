@@ -1,6 +1,6 @@
 import { expect, it } from 'vitest'
 import { SlotDef } from '@cms/schema'
-import { carryFrameValues } from './frame-field-values.ts'
+import { carryFrameValues, frameLogoPreset } from './frame-field-values.ts'
 const slot = (id: string, kind: string, constraints = {}) => SlotDef.parse({ id, kind, label: id, constraints })
 it('carries only fields whose ID and kind survive, never menu data or renamed/removed fields', () => {
   const source = [slot('title', 'text'), slot('body', 'richtext'), slot('action', 'text'), slot('removed', 'text')]
@@ -49,6 +49,19 @@ it('adds the approved initial site logo on upgrade and never replaces an existin
   })
   const own = { src: '/media/own/original', alt: 'Own logo', decorative: false }
   expect(carryFrameValues({ logo: own }, [field], [field])).toEqual({ logo: own })
+})
+
+it('offers the pinned component’s valid logo preset only for a declared logo field', () => {
+  const value = { src: '/default-logo.svg', alt: 'Organization', decorative: false }
+  expect(frameLogoPreset(slot('brand-image', 'image', { siteLogo: true, sourceSample: value }))).toEqual({
+    label: 'Use the default logo',
+    value,
+  })
+  expect(
+    frameLogoPreset(slot('brand-image', 'image', { siteLogo: true, sourceSample: { ...value, alt: '' } })),
+  ).toBeNull()
+  expect(frameLogoPreset(slot('brand-image', 'image', { sourceSample: value }))).toBeNull()
+  expect(frameLogoPreset(slot('brand-image', 'image', { siteLogo: true }))).toBeNull()
 })
 
 it('leaves an inherited footer logo absent on upgrade, while preserving an existing custom image', () => {

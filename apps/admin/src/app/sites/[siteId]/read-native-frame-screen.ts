@@ -13,12 +13,10 @@ import type { GlobalElementsWorkspace } from '../../../server/queries/site-frame
 function savedLogoIds(frame: GlobalElementsWorkspace, part: 'header' | 'footer'): unknown[] {
   if (part === 'header') {
     const header = frame.header.draft
-    return header.schemaVersion === 1
-      ? [header.brand.logoMediaId, header.brand.compactLogoMediaId]
-      : [frameValueRecord(header.component.values.logo).media_id]
+    if (header.schemaVersion === 1) return [header.brand.logoMediaId, header.brand.compactLogoMediaId]
   }
-  const footer = frame.footer.draft
-  const config = footer.schemaVersion === 2 ? footer.component : null
+  const draft = frame[part].draft
+  const config = draft.schemaVersion === 2 ? draft.component : null
   const { pin } = frameComponentDefinition(frame.components, config)
   const field = frameLogoField(pin?.slots ?? [])
   return [frameValueRecord(field ? config?.values[field.id] : null).media_id]

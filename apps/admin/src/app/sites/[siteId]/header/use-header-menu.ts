@@ -9,7 +9,13 @@ import {
 } from '@cms/schema'
 import type { GlobalElementsWorkspace, NavigationWorkspace } from '../../../../lib/queries.ts'
 import type { FrameLogoChoice } from '../frame-logo-choices.ts'
-import { carryFrameValues, frameValueRecord as record } from '../../../../lib/frame-field-values.ts'
+import {
+  carryFrameValues,
+  frameComponentDefinition,
+  frameLogoField,
+  frameLogoPreset,
+  frameValueRecord as record,
+} from '../../../../lib/frame-field-values.ts'
 import { useNavigationGuard } from '../../../../components/navigation-guard.ts'
 import { validHeaderButtonUrl } from '../../../../lib/header-button-link.ts'
 import { prepareNationalHeader, saveHeaderMenu } from './actions.ts'
@@ -47,19 +53,19 @@ export function useHeaderMenu({ siteId, initial, navigation, theme, media, origi
   const serial = JSON.stringify([header, tree, mode])
   const dirty = serial !== saved
   const config = header.schemaVersion === 2 ? header.component : null
-  const component = config ? components.find(item => item.id === config.section_def_id) : null
-  const pin = component?.versions.find(version => version.version === config?.section_def_version)
+  const { component, pin } = frameComponentDefinition(components, config)
   const latest = component?.versions.at(-1)
   const fields = pin?.slots ?? []
   const values = config?.values ?? {}
-  const logo = record(values.logo)
-  const logoSlot = fields.find(slot => slot.constraints?.siteLogo === true)
+  const logoSlot = frameLogoField(fields)
+  const logo = record(logoSlot ? values[logoSlot.id] : undefined)
+  const logoPreset = frameLogoPreset(logoSlot, component?.slug)
   const buttons = fields.filter(slot => slot.kind === 'button')
   const otherFields = fields.filter(
-    slot => !['logo', 'menu', 'name', 'tagline'].includes(slot.id) && slot.kind !== 'button',
+    slot =>
+      slot.id !== logoSlot?.id && !['logo', 'menu', 'name', 'tagline'].includes(slot.id) && slot.kind !== 'button',
   )
   const logoUrl = media.find(asset => asset.id === logo.media_id)?.previewUrl ?? String(logo.src ?? '')
-  const shield = '/cms-themes/sawso/salvation-army-shield.svg'
   const logoProblem =
     header.schemaVersion === 1 && (header.brand.logoMediaId || header.brand.compactLogoMediaId)
       ? !header.brand.siteName.trim()
@@ -226,7 +232,7 @@ export function useHeaderMenu({ siteId, initial, navigation, theme, media, origi
     buttons,
     otherFields,
     logoUrl,
-    shield,
+    logoPreset,
     logoProblem,
     buttonProblem,
     valid,

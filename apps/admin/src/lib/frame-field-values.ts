@@ -19,6 +19,18 @@ export function frameValueRecord(value: unknown): Record<string, unknown> {
   return value && typeof value === 'object' && !Array.isArray(value) ? (value as Record<string, unknown>) : {}
 }
 
+/** A frame may offer the default image declared by its pinned logo field. */
+export function frameLogoPreset(field: SlotDef | undefined, componentSlug?: string) {
+  if (field?.kind !== 'image' || field.constraints?.siteLogo !== true) return null
+  const value = frameValueRecord(sourceSampleValue(field, field.constraints.sourceSample))
+  if (typeof value.src !== 'string' || !value.src.trim() || typeof value.alt !== 'string' || !value.alt.trim())
+    return null
+  return {
+    value: { src: value.src, alt: value.alt, decorative: false },
+    label: componentSlug === 'national-header' ? 'Use the Salvation Army shield' : 'Use the default logo',
+  }
+}
+
 /** Carry compatible authored fields using the same rules as page upgrades.
  * Navigation is governed separately; frames have no collection bindings. */
 export function carryFrameValues(

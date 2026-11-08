@@ -34,7 +34,7 @@ export function HeaderLogoTab({
     logo,
     logoSlot,
     logoUrl,
-    shield,
+    logoPreset,
     logoProblem,
     value,
     prepare,
@@ -64,13 +64,13 @@ export function HeaderLogoTab({
                     <Button variant="secondary" disabled={pending} onClick={() => setPicker(true)}>
                       Replace
                     </Button>
-                    {logo.src !== shield && (
+                    {logoPreset && logo.src !== logoPreset.value.src && (
                       <Button
                         variant="tertiary"
                         disabled={pending}
-                        onClick={() => value('logo', { src: shield, alt: 'The Salvation Army', decorative: false })}
+                        onClick={() => value(logoSlot.id, logoPreset.value)}
                       >
-                        Use the Salvation Army shield
+                        {logoPreset.label}
                       </Button>
                     )}
                   </div>
@@ -81,7 +81,7 @@ export function HeaderLogoTab({
                   value={String(logo.alt ?? '')}
                   maxLength={300}
                   disabled={pending}
-                  onChange={event => value('logo', { ...logo, alt: event.target.value, decorative: false })}
+                  onChange={event => value(logoSlot.id, { ...logo, alt: event.target.value, decorative: false })}
                 />
               </Field>
               <Field id="header-logo-home" label="Clicking the logo goes to">
@@ -264,10 +264,10 @@ export function HeaderLogoPicker({
 }: {
   model: HeaderMenuModel
 } & Pick<HeaderMenuProps, 'siteId'>) {
-  const { picker, setPicker, logo, value } = model
+  const { picker, setPicker, logo, logoSlot, value } = model
   return (
     <>
-      {picker && (
+      {picker && logoSlot && (
         <MediaPicker
           siteId={siteId}
           mode="placement"
@@ -275,7 +275,7 @@ export function HeaderLogoPicker({
           initialAssets={[]}
           currentValue={logo}
           onChoose={image => {
-            value('logo', { ...image, decorative: false })
+            value(logoSlot.id, { ...image, decorative: false })
             setPicker(false)
           }}
           onClose={() => setPicker(false)}
