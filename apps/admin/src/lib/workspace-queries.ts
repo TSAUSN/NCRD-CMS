@@ -14,7 +14,7 @@ export type WorkspacePage = PageRow & {
   live_samples: boolean
   no_visible_changes?: boolean
 }
-export const WORKSPACE_PAGES_SQL = `SELECT p.id,p.site_id,s.name AS site_name,p.slug,p.title,p.status,p.revision,p.parent_page_id,
+const WORKSPACE_PAGES_SQL = `SELECT p.id,p.site_id,s.name AS site_name,p.slug,p.title,p.status,p.revision,p.parent_page_id,
  p.draft_version_id,p.published_version_id,p.archived_at,
  (SELECT path FROM published_routes WHERE page_id=p.id ORDER BY updated_at DESC LIMIT 1) AS live_path,
  COALESCE(v.created_at,p.created_at)::text AS edited_at,

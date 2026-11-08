@@ -1,7 +1,7 @@
 import { asUser } from '@cms/platform'
 import type { ReleaseItem, ReleaseType } from './releases.ts'
 
-export type RecoveryCheckpoint = {
+type RecoveryCheckpoint = {
   key: string
   type: ReleaseType
   id: string
@@ -12,7 +12,7 @@ export type RecoveryCheckpoint = {
   entryVersionIds?: string[]
 }
 
-export type RecoveryReviewItem = {
+type RecoveryReviewItem = {
   key: string
   type: ReleaseType
   id: string

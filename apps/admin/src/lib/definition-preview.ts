@@ -9,7 +9,7 @@ import {
 import { CORE_LIBRARY, corePreviewValues } from '@cms/seeds/core-library'
 import { escapeText } from '@cms/renderer'
 
-export function sampleFieldValue(kind: string, label: string): unknown {
+function sampleFieldValue(kind: string, label: string): unknown {
   if (kind === 'richtext') return `<p>${escapeText(label)} goes here. Replace this with your own words.</p>`
   if (kind === 'link' || kind === 'button') return { label, url: '/' }
   if (kind === 'url') return 'https://example.test/resource'

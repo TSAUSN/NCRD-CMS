@@ -1,6 +1,6 @@
 import type { RecipeSection } from './page-recipes.ts'
 
-export type RecipeBinding = {
+type RecipeBinding = {
   readerKey: string
   selection: { mode: 'automatic'; limit: number } | { mode: 'manual'; stableKeys: string[] }
 }

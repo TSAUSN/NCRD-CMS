@@ -12,7 +12,7 @@ export type ReplacementField = {
   sourceId: string | null
   choices: { id: string; label: string }[]
 }
-export function compatibleReplacementFields(before: Field, after: Field): boolean {
+function compatibleReplacementFields(before: Field, after: Field): boolean {
   return (
     isIconSlot(before) === isIconSlot(after) &&
     (before.kind === after.kind ||

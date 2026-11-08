@@ -5,12 +5,7 @@ import { loadSectionUpgrade, renderUpgradeSet, type UpgradeRequest } from './sec
 export type SectionPagePin = { pageId: string; sourceVersionId: string; revision: number }
 export type SectionUpdatePage = SectionPagePin & { title: string; siteName: string; placements: number }
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
-export async function sectionUpdateAccess(
-  client: Queryable,
-  siteId: string,
-  definitionId: string,
-  targetVersion: number,
-) {
+async function sectionUpdateAccess(client: Queryable, siteId: string, definitionId: string, targetVersion: number) {
   if (!uuid.test(siteId) || !uuid.test(definitionId) || !Number.isSafeInteger(targetVersion) || targetVersion < 1)
     throw new DomainError('invalid_state', 'Choose a section from this site’s library.')
   const row = (

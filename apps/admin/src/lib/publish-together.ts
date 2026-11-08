@@ -23,7 +23,7 @@ export {
 const SITE_WIDE: ReleaseItem['type'][] = ['theme', 'navigation', 'frame']
 
 /** The path a readiness finding's link names, as the readiness rule compares it. */
-export function linkedPath(href: string): string {
+function linkedPath(href: string): string {
   const path = href
     .split('?')[0]!
     .split('#')[0]!

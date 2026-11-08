@@ -2,9 +2,9 @@ import { type MediaStore } from '@cms/platform'
 import type { MediaAsset } from './media-library.ts'
 import { isSameOriginRequest } from './request-origin.ts'
 
-export const MAX_MEDIA_UPLOAD_BYTES = 10 * 1024 * 1024
-export const MEDIA_UPLOAD_JSON_BYTES = 16 * 1024
-export const ALLOWED_MEDIA_MIME = ['image/jpeg', 'image/png', 'image/webp'] as const
+const MAX_MEDIA_UPLOAD_BYTES = 10 * 1024 * 1024
+const MEDIA_UPLOAD_JSON_BYTES = 16 * 1024
+const ALLOWED_MEDIA_MIME = ['image/jpeg', 'image/png', 'image/webp'] as const
 type AllowedMediaMime = (typeof ALLOWED_MEDIA_MIME)[number]
 
 export type BeginMediaUploadInput = {

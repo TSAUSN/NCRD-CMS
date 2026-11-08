@@ -6,7 +6,7 @@ import { SAWSO_THEME } from '@cms/seeds/core-themes'
 import { SAWSO_APPROVED, STORIES_MODEL, sawsoStoryRows } from '@cms/seeds/sawso-stories'
 import { createSiteFromSetupInTransaction } from './site-creation.ts'
 
-export function sawsoSiteSetup(slug = 'sawso'): SiteSetup {
+function sawsoSiteSetup(slug = 'sawso'): SiteSetup {
   const base = starterSiteSetup('resource'),
     wordmark = 'The Salvation Army World Service Office'
   return SiteSetup.parse({

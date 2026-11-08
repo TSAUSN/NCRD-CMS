@@ -27,7 +27,7 @@ export function listCollectionDocuments(userId: string, siteId: string): Promise
   )
 }
 
-export type CollectionSummary = {
+type CollectionSummary = {
   id: string
   slug: string
   readerKey: string

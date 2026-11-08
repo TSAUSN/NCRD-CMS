@@ -6,7 +6,7 @@
  * this UI can be exercised against mocked responses now, while the eventual
  * MediaStore implementation can keep storage credentials out of the browser.
  */
-export const MEDIA_STATUSES = ['ready', 'processing', 'failed', 'deleted'] as const
+const MEDIA_STATUSES = ['ready', 'processing', 'failed', 'deleted'] as const
 export type MediaStatus = (typeof MEDIA_STATUSES)[number]
 
 export type MediaAsset = {
@@ -104,7 +104,7 @@ export type MediaLibraryQuery = {
   page: number
   pageSize: number
 }
-export type MediaLibraryFacets = {
+type MediaLibraryFacets = {
   folders: Array<{ path: string; count: number }>
   tags: Array<{ tag: string; count: number }>
   scopes: { site: number; shared: number }

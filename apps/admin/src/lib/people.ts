@@ -1,8 +1,8 @@
 import { asUser } from '@cms/platform'
 
 export type SiteAssignment = { siteId: string; role: 'contributor' | 'editor' | 'site_admin' }
-export type PageAssignment = { pageId: string; siteId: string; chapterId: string; title: string; enabled: boolean }
-export type DivisionAssignment = { divisionId: string; siteId: string; name: string }
+type PageAssignment = { pageId: string; siteId: string; chapterId: string; title: string; enabled: boolean }
+type DivisionAssignment = { divisionId: string; siteId: string; name: string }
 export type PersonRow = {
   id: string
   email: string

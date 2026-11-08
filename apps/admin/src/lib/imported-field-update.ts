@@ -36,7 +36,7 @@ export type ImportedDefinition = {
 }
 export type FieldSummary = { id: string; label: string; kind: string }
 export type FieldRename = { id: string; kind: string; from: string; to: string }
-export type ImportedFieldPlan = {
+type ImportedFieldPlan = {
   sourceHtml: string
   compiled: ReturnType<typeof editableReference>['compiled']
   slots: SlotDef[]

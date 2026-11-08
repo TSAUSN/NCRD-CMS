@@ -52,7 +52,7 @@ export function sawsoFeed(defs: CorePageDefinition[], sector: string | null, lim
     newsroom: { label: 'Visit our newsroom', url },
   })
 }
-export function sawsoOverview(defs: CorePageDefinition[], sector: string): SectionInstance[] {
+function sawsoOverview(defs: CorePageDefinition[], sector: string): SectionInstance[] {
   const source = sectorSources[sector]!,
     copy = SAWSO_APPROVED.pages[(source + '-overview') as keyof typeof SAWSO_APPROVED.pages] as {
       heading: string
@@ -64,7 +64,7 @@ export function sawsoOverview(defs: CorePageDefinition[], sector: string): Secti
     sawsoSection(defs, 'text-block', 'Overview', { heading: copy.heading, body: paragraphs(copy.paragraphs) }),
   ]
 }
-export function sawsoPrograms(defs: CorePageDefinition[], sector: string): SectionInstance[] {
+function sawsoPrograms(defs: CorePageDefinition[], sector: string): SectionInstance[] {
   const source = sectorSources[sector]!,
     copy = SAWSO_APPROVED.pages[(source + '-programs') as keyof typeof SAWSO_APPROVED.pages] as {
       cards: readonly { title: string; paragraphs: readonly string[] }[]
@@ -228,7 +228,7 @@ export async function ensureSawsoCorePages(client: Queryable, siteId: string) {
 
 export const SAWSO_NEWSROOM_INTRO =
   'See how The Salvation Army World Service Office works alongside communities around the world. Browse our latest stories, explore them by project sector, or find them on the map.'
-export function sawsoSplitNewsroom(defs: CorePageDefinition[]): SectionInstance {
+function sawsoSplitNewsroom(defs: CorePageDefinition[]): SectionInstance {
   return sawsoSection(defs, 'story-split', 'Split View', {
     heading: 'News and Stories',
     introduction: SAWSO_NEWSROOM_INTRO,
@@ -323,10 +323,7 @@ function newsroom(defs: CorePageDefinition[], home = false) {
     home: home ? 'home' : 'newsroom',
   })
 }
-export function completeSawsoPages(
-  defs: CorePageDefinition[],
-  media: SawsoMediaMap = {},
-): Map<string, SectionInstance[]> {
+function completeSawsoPages(defs: CorePageDefinition[], media: SawsoMediaMap = {}): Map<string, SectionInstance[]> {
   const result = new Map<string, SectionInstance[]>(),
     hub = SAWSO_APPROVED.pages['hub-overview'],
     copy = SAWSO_HOME_APPROVED.sections

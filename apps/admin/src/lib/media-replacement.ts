@@ -3,7 +3,7 @@ import { createHash } from 'node:crypto'
 import { asUser, type Queryable } from '@cms/platform'
 import { DomainError, mapErrors } from '@cms/domain'
 import { replaceImageReferences } from './media-replacement-values.ts'
-export type ImageReplacementTarget = {
+type ImageReplacementTarget = {
   key: string
   name: string
   area: 'Page' | 'List' | 'Site look'

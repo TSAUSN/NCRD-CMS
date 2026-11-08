@@ -265,7 +265,7 @@ export const IconText = (p: Omit<IconProps, 'children'>) => (
     <path d="M9 19h6" />
   </Icon>
 )
-export const IconParagraph = (p: Omit<IconProps, 'children'>) => (
+const IconParagraph = (p: Omit<IconProps, 'children'>) => (
   <Icon {...p}>
     <path d="M4.5 6h15M4.5 10.5h15M4.5 15h11M4.5 19.5h7" />
   </Icon>
@@ -289,7 +289,7 @@ export const IconButton = (p: Omit<IconProps, 'children'>) => (
     <path d="M8.5 12h7" />
   </Icon>
 )
-export const IconRepeat = (p: Omit<IconProps, 'children'>) => (
+const IconRepeat = (p: Omit<IconProps, 'children'>) => (
   <Icon {...p}>
     <rect x="3.5" y="4.5" width="17" height="5" rx="1.5" />
     <rect x="3.5" y="14.5" width="17" height="5" rx="1.5" />

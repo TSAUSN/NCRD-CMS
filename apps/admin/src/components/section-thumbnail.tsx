@@ -32,7 +32,7 @@ import type { LibraryEntry } from '../lib/queries.ts'
 import { IconImage } from './icons.tsx'
 
 /** Where the media route serves a stored object from. */
-export function thumbnailUrl(path: string): string {
+function thumbnailUrl(path: string): string {
   return `/media/${path.replace(/^\/+/, '')}`
 }
 

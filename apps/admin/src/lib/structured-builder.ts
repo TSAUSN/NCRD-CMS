@@ -65,7 +65,7 @@ export function childrenOf(node: StructuredNode): StructuredNode[] {
   return node.type === 'element' ? (node.children ?? []) : node.type === 'repeat' ? node.item : []
 }
 
-export function changeNode(
+function changeNode(
   doc: StructuredDocument,
   path: number[],
   change: (node: StructuredNode) => StructuredNode,

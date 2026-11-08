@@ -2,7 +2,7 @@
 import { StatusPill, type StatusLabel } from './ui/status-pill.tsx'
 export { STATUS_LABELS } from './ui/status-pill.tsx'
 export type { StatusLabel } from './ui/status-pill.tsx'
-export const HEALTH_LABELS = ['Healthy', 'Delayed', 'Error'] as const
+const HEALTH_LABELS = ['Healthy', 'Delayed', 'Error'] as const
 export type HealthLabel = (typeof HEALTH_LABELS)[number]
 export function pageStatus(page: {
   published_version_id: string | null

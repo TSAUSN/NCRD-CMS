@@ -75,7 +75,7 @@ export async function readStorySourceStatus(client: Queryable, collectionId: str
   }
 }
 /** Always reread and lock the current drafts after the network returns. */
-export async function applyStorySourceCheck(
+async function applyStorySourceCheck(
   client: Queryable,
   siteId: string,
   collectionId: string,

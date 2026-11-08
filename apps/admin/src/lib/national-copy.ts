@@ -51,7 +51,7 @@ function sampleLayoutValues(slots: SlotDef[], source: Record<string, unknown>) {
 }
 
 /** Copy choices transform content before the existing guarded import command. */
-export function nationalCopyContent(input: SiteArchive, bringWords: boolean, bringStories: boolean): SiteArchive {
+function nationalCopyContent(input: SiteArchive, bringWords: boolean, bringStories: boolean): SiteArchive {
   const archive = structuredClone(input),
     c = archive.content
   // A new site starts from active pages. Backups still retain archived pages.

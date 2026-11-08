@@ -48,7 +48,7 @@ export type StoryPlacementContext = {
   fields: string[]
   hasArticle: boolean
 }
-export const STORY_PLACEMENT_FIELDS = [
+const STORY_PLACEMENT_FIELDS = [
   'tags',
   'regions',
   'region',

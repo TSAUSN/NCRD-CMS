@@ -14,6 +14,6 @@ export function chapterRowsAfterSave(rows: ChapterRow[], saved: ChapterRow[]): C
   )
 }
 
-export function isSampleChapter(name: string): boolean {
+function isSampleChapter(name: string): boolean {
   return /^\s*\[/.test(name) || /\(sample\)/i.test(name)
 }
