@@ -85,3 +85,5 @@ export function fileMoveTarget(
     if (type === 'styles' || bundle.scripts[at]!.position === bundle.scripts[index]!.position) return at
   return -1
 }
+
+export const formatFileBytes = (size: number) => size.toLocaleString('en-US') + ' bytes'
