@@ -1,61 +1,14 @@
 'use client'
+import { useState } from 'react'
+import { DEFAULT_FOOTER_CONFIG, DEFAULT_HEADER_CONFIG, type FooterConfig, type HeaderConfig } from '@cms/schema'
 import { contentCountsForPages } from '../../../../lib/content-counts.ts'
-
 import { PresetFrameFields } from '../../../../components/preset-frame-fields.tsx'
-import { ScriptlessPreview } from '../../../../components/scriptless-preview.tsx'
-
-import { useEffect, useRef, useState, useTransition } from 'react'
-import { useRouter } from 'next/navigation'
-import {
-  sourceSampleValues,
-  DEFAULT_FOOTER_CONFIG,
-  DEFAULT_HEADER_CONFIG,
-  type FooterConfig,
-  type HeaderConfig,
-} from '@cms/schema'
-import type { FrameComponentChoice } from '../../../../lib/queries.ts'
-import { useNavigationGuard } from '../../../../components/navigation-guard.ts'
-import { queueFramePreview, requestFramePreview } from '../../../../lib/frame-preview-request.ts'
-import { sitePreviewLabel, type SitePreviewContext } from '../../../../lib/preview-context.ts'
 import { FrameComponentPanel } from './frame-component-panel.tsx'
-import {
-  IconAlert,
-  IconCheck,
-  IconDesktop,
-  IconEye,
-  IconFrame,
-  IconInfo,
-  IconMobile,
-  IconTablet,
-} from '../../../../components/icons.tsx'
+import { IconAlert, IconCheck, IconEye, IconFrame, IconInfo } from '../../../../components/icons.tsx'
 import { ConfirmDialog } from '../../../../components/confirm.tsx'
-import {
-  publishGlobalElements,
-  revertGlobalElementsToLive,
-  saveGlobalElementsDraft,
-} from '../../../actions/site-look.ts'
-import { type GlobalElementsActionResult } from '../../../../lib/action-result.ts'
+import { useGlobalFrameDraft, type GlobalElementsProps } from './use-global-frame-draft.ts'
+import { GlobalElementsPreview } from './global-elements-preview.tsx'
 
-type PageChoice = { kind?: string; id: string; title: string; path: string; published: boolean; versionId: string }
-type ElementHead<T> = {
-  id: string
-  revision: number
-  draftVersionId: string
-  publishedVersionId: string | null
-  draft: T
-  published: T
-}
-type InitialWorkspace = {
-  contentSummary?: string
-  header: ElementHead<HeaderConfig>
-  footer: ElementHead<FooterConfig>
-  pages: PageChoice[]
-  previewPages: { title: string; versionId: string }[]
-  components: FrameComponentChoice[]
-}
-type MediaChoice = { id: string; name: string; url: string; alt: string }
-const clone = <T,>(value: T): T => structuredClone(value)
-const serial = (header: HeaderConfig, footer: FooterConfig) => JSON.stringify({ header, footer })
 function FrameSourceSwitch({
   kind,
   authored,
@@ -96,219 +49,28 @@ function FrameSourceSwitch({
   )
 }
 
-export function GlobalElementsEditor({
-  siteId,
-  siteName,
-  initial,
-  canManage,
-  superAdmin,
-  media,
-  initialSitePreview = 'published',
-}: {
-  siteId: string
-  siteName: string
-  initial: InitialWorkspace
-  canManage: boolean
-  superAdmin: boolean
-  media: MediaChoice[]
-  /** The menu and design around the frame: saved drafts or what is live. As in
-   * the page editor, a site with nothing live starts on its saved drafts. */
-  initialSitePreview?: SitePreviewContext
-}) {
-  const router = useRouter()
-  const [header, setHeader] = useState<HeaderConfig>(() => clone(initial.header.draft))
-  const [footer, setFooter] = useState<FooterConfig>(() => clone(initial.footer.draft))
-  const actionInFlight = useRef(false)
-  const sourceDrafts = useRef<{
-    header: Partial<Record<1 | 2, HeaderConfig>>
-    footer: Partial<Record<1 | 2, FooterConfig>>
-  }>({ header: {}, footer: {} })
-  const [publishedHeader, setPublishedHeader] = useState(() => clone(initial.header.published))
-  const [publishedFooter, setPublishedFooter] = useState(() => clone(initial.footer.published))
-  const [saved, setSaved] = useState(() => serial(initial.header.draft, initial.footer.draft))
-  const [headerRevision, setHeaderRevision] = useState(initial.header.revision)
-  const [footerRevision, setFooterRevision] = useState(initial.footer.revision)
+export function GlobalElementsEditor(props: GlobalElementsProps) {
+  const { siteId, siteName, initial, canManage, superAdmin, media, initialSitePreview = 'published' } = props
   const [active, setActive] = useState<'header' | 'footer'>('header')
-  // The preview is scaled to the space it has, and shows the part being edited:
-  // the top of the page for the header, the bottom for the footer.
-  const stage = useRef<HTMLDivElement>(null)
-  const [stageWidth, setStageWidth] = useState(0)
-  const [notice, setNotice] = useState<GlobalElementsActionResult | null>(null)
-  const [confirming, setConfirming] = useState<'publish' | 'revert' | null>(null)
-  const [previewVersion, setPreviewVersion] = useState(initial.previewPages[0]?.versionId ?? '')
-  const [previewWidth, setPreviewWidth] = useState<'desktop' | 'tablet' | 'phone'>('desktop')
-  const [sitePreview, setSitePreview] = useState<SitePreviewContext>(initialSitePreview)
-  const [previewHtml, setPreviewHtml] = useState('')
-  const [previewError, setPreviewError] = useState('')
-  const [previewAttempt, setPreviewAttempt] = useState(0)
-  const [previewLoading, setPreviewLoading] = useState(initial.previewPages.length > 0)
-  const [pending, startTransition] = useTransition()
-
-  useEffect(() => {
-    sourceDrafts.current = { header: {}, footer: {} }
-    setHeader(clone(initial.header.draft))
-    setFooter(clone(initial.footer.draft))
-    setPublishedHeader(clone(initial.header.published))
-    setPublishedFooter(clone(initial.footer.published))
-    setSaved(serial(initial.header.draft, initial.footer.draft))
-    setHeaderRevision(initial.header.revision)
-    setFooterRevision(initial.footer.revision)
-  }, [
-    initial.header.revision,
-    initial.footer.revision,
-    initial.header.draftVersionId,
-    initial.footer.draftVersionId,
-    initial.header.publishedVersionId,
-    initial.footer.publishedVersionId,
-  ])
-
-  const currentSerial = serial(header, footer)
-  const dirty = currentSerial !== saved
-  useNavigationGuard(() => ({ dirty, pending: pending || actionInFlight.current }))
-  const hasLiveVersion = initial.header.publishedVersionId !== null && initial.footer.publishedVersionId !== null
-  const draftIsLive = hasLiveVersion && currentSerial === serial(publishedHeader, publishedFooter) && !dirty
-
-  useEffect(() => {
-    function warn(event: BeforeUnloadEvent) {
-      if (dirty || pending || actionInFlight.current) event.preventDefault()
-    }
-    window.addEventListener('beforeunload', warn)
-    return () => window.removeEventListener('beforeunload', warn)
-  }, [dirty, pending])
-
-  useEffect(() => {
-    if (!previewVersion) return
-    setPreviewLoading(true)
-    setPreviewError('')
-    setPreviewHtml('')
-    return queueFramePreview(async signal => {
-      const result = await requestFramePreview(
-        `/api/sites/${siteId}/global-elements/preview`,
-        { versionId: previewVersion, header, footer, previewContext: sitePreview },
-        signal,
-      )
-      if (signal.aborted || result.kind === 'aborted') return
-      if (result.kind === 'ready') setPreviewHtml(result.html)
-      else setPreviewError(result.message)
-      setPreviewLoading(false)
-    })
-  }, [previewVersion, currentSerial, siteId, previewAttempt, sitePreview])
-
-  /** Keep each source's local work while comparing them; only the selected source is saved. */
-  function chooseSource(kind: 'header' | 'footer', authored: boolean) {
-    if (actionInFlight.current) return
-    const targetVersion = authored ? 2 : 1
-    const first = initial.components.find(component => component.placement === kind && component.status === 'active')
-    const version = first?.versions.at(-1)
-    if (kind === 'header') {
-      if (header.schemaVersion === targetVersion) return
-      sourceDrafts.current.header[header.schemaVersion] = clone(header)
-      const previous = sourceDrafts.current.header[targetVersion]
-      if (previous) setHeader(clone(previous))
-      else if (authored && first && version)
-        setHeader({
-          schemaVersion: 2,
-          enabled: header.enabled,
-          sticky: header.sticky,
-          component: {
-            section_def_id: first.id,
-            section_def_version: version.version,
-            values: sourceSampleValues(version.slots),
-          },
-        })
-      else if (!authored)
-        setHeader({
-          ...clone(DEFAULT_HEADER_CONFIG),
-          enabled: header.enabled,
-          sticky: header.sticky,
-          brand: { ...DEFAULT_HEADER_CONFIG.brand, siteName },
-        })
-    } else {
-      if (footer.schemaVersion === targetVersion) return
-      sourceDrafts.current.footer[footer.schemaVersion] = clone(footer)
-      const previous = sourceDrafts.current.footer[targetVersion]
-      if (previous) setFooter(clone(previous))
-      else if (authored && first && version)
-        setFooter({
-          schemaVersion: 2,
-          enabled: footer.enabled,
-          component: {
-            section_def_id: first.id,
-            section_def_version: version.version,
-            values: sourceSampleValues(version.slots),
-          },
-        })
-      else if (!authored)
-        setFooter({
-          ...clone(DEFAULT_FOOTER_CONFIG),
-          enabled: footer.enabled,
-          brand: { ...DEFAULT_FOOTER_CONFIG.brand, siteName },
-        })
-    }
-  }
-
-  function act(kind: 'save' | 'publish' | 'revert') {
-    if (actionInFlight.current || !canManage) return
-    actionInFlight.current = true
-    setNotice(null)
-    const data = new FormData()
-    data.set('siteId', siteId)
-    data.set('headerRevision', String(headerRevision))
-    data.set('footerRevision', String(footerRevision))
-    data.set('header', JSON.stringify(header))
-    data.set('footer', JSON.stringify(footer))
-    startTransition(async () => {
-      try {
-        const result =
-          kind === 'save'
-            ? await saveGlobalElementsDraft(data)
-            : kind === 'publish'
-              ? await publishGlobalElements(data)
-              : await revertGlobalElementsToLive(data)
-        setNotice(result)
-        setConfirming(null)
-        if (result.ok) {
-          setHeaderRevision(result.headerRevision)
-          setFooterRevision(result.footerRevision)
-          if (kind === 'save') setSaved(serial(header, footer))
-          else if (kind === 'publish') {
-            setPublishedHeader(clone(header))
-            setPublishedFooter(clone(footer))
-            router.refresh()
-          } else {
-            setHeader(clone(publishedHeader))
-            setFooter(clone(publishedFooter))
-            setSaved(serial(publishedHeader, publishedFooter))
-            router.refresh()
-          }
-        }
-      } catch {
-        setNotice({
-          ok: false,
-          kind: 'error',
-          message:
-            'The result could not be confirmed. Your edits are still here, but the server may have completed the request. Reload and check the saved and live state before trying again.',
-        })
-        setConfirming(null)
-      } finally {
-        actionInFlight.current = false
-      }
-    })
-  }
-
-  useEffect(() => {
-    const node = stage.current
-    if (!node) return
-    const observer = new ResizeObserver(() => setStageWidth(node.clientWidth))
-    observer.observe(node)
-    return () => observer.disconnect()
-  }, [previewVersion])
-  const frameWidth = { desktop: 1280, tablet: 768, phone: 390 }[previewWidth]
-  const frameScale =
-    stageWidth > 0 ? Math.min((stageWidth - 24) / frameWidth, previewWidth === 'phone' ? 1.2 : 1) : null
-  useEffect(() => {
-    showFrameArea(stage.current?.querySelector('iframe') ?? null, active, frameScale)
-  }, [active, previewHtml, frameScale])
+  const {
+    header,
+    editHeader,
+    footer,
+    editFooter,
+    publishedHeader,
+    publishedFooter,
+    pending,
+    notice,
+    confirming,
+    setConfirming,
+    chooseSource,
+    act,
+    cancelConfirmation,
+    currentSerial,
+    dirty,
+    hasLiveVersion,
+    draftIsLive,
+  } = useGlobalFrameDraft(props)
 
   return (
     <div className="global-elements-workspace">
@@ -435,9 +197,7 @@ export function GlobalElementsEditor({
                 pageCountLabel={initial.contentSummary ?? contentCountsForPages(initial.pages)}
                 canManage={canManage && !pending}
                 siteId={siteId}
-                onChange={next => {
-                  if (!actionInFlight.current) setHeader(next as HeaderConfig)
-                }}
+                onChange={next => editHeader(next as HeaderConfig)}
               />
             ) : (
               <PresetFrameFields
@@ -450,12 +210,8 @@ export function GlobalElementsEditor({
                 superAdmin={superAdmin}
                 media={media}
                 pages={initial.pages}
-                onHeader={next => {
-                  if (!actionInFlight.current) setHeader(next)
-                }}
-                onFooter={next => {
-                  if (!actionInFlight.current) setFooter(next)
-                }}
+                onHeader={editHeader}
+                onFooter={editFooter}
               />
             )
           ) : footer.schemaVersion === 2 ? (
@@ -468,9 +224,7 @@ export function GlobalElementsEditor({
               pageCountLabel={initial.contentSummary ?? contentCountsForPages(initial.pages)}
               canManage={canManage && !pending}
               siteId={siteId}
-              onChange={next => {
-                if (!actionInFlight.current) setFooter(next as FooterConfig)
-              }}
+              onChange={next => editFooter(next as FooterConfig)}
             />
           ) : (
             <PresetFrameFields
@@ -483,112 +237,22 @@ export function GlobalElementsEditor({
               superAdmin={superAdmin}
               media={media}
               pages={initial.pages}
-              onHeader={next => {
-                if (!actionInFlight.current) setHeader(next)
-              }}
-              onFooter={next => {
-                if (!actionInFlight.current) setFooter(next)
-              }}
+              onHeader={editHeader}
+              onFooter={editFooter}
             />
           )}
         </fieldset>
 
-        <aside className="global-preview" aria-label="Real page preview">
-          <div className="global-preview-head">
-            <div>
-              <p className="eyebrow">Rendered page</p>
-              <h2>Preview</h2>
-            </div>
-            <span>
-              <IconEye size={15} />
-              Draft
-            </span>
-          </div>
-          <div className="global-preview-toolbar">
-            <label htmlFor="global-preview-page">Page</label>
-            <select
-              id="global-preview-page"
-              value={previewVersion}
-              onChange={event => setPreviewVersion(event.target.value)}
-            >
-              {initial.previewPages.map(page => (
-                <option value={page.versionId} key={page.versionId}>
-                  {page.title}
-                </option>
-              ))}
-            </select>
-            <label htmlFor="global-preview-site">Site design</label>
-            <select
-              id="global-preview-site"
-              value={sitePreview}
-              onChange={event => setSitePreview(event.target.value === 'draft' ? 'draft' : 'published')}
-            >
-              <option value="draft">{sitePreviewLabel('draft')}</option>
-              <option value="published">{sitePreviewLabel('published')}</option>
-            </select>
-            <div className="global-preview-widths" aria-label="Preview width">
-              {(
-                [
-                  ['desktop', 'Desktop', IconDesktop],
-                  ['tablet', 'Tablet', IconTablet],
-                  ['phone', 'Phone', IconMobile],
-                ] as const
-              ).map(([width, label, Mark]) => (
-                <button
-                  type="button"
-                  className={previewWidth === width ? 'on' : ''}
-                  aria-pressed={previewWidth === width}
-                  key={width}
-                  onClick={() => setPreviewWidth(width)}
-                >
-                  <Mark size={14} />
-                  {label}
-                </button>
-              ))}
-            </div>
-          </div>
-          {previewVersion ? (
-            <div
-              ref={stage}
-              className={`global-real-preview is-${previewWidth} ${previewLoading ? 'is-loading' : ''}`}
-              style={frameScale ? { ['--frame-scale' as string]: String(frameScale) } : undefined}
-            >
-              {previewError ? (
-                <div className="notice notice-error" role="alert">
-                  <span>{previewError}</span>
-                  <button
-                    type="button"
-                    className="small secondary"
-                    onClick={() => setPreviewAttempt(value => value + 1)}
-                  >
-                    Retry preview
-                  </button>
-                </div>
-              ) : (
-                <ScriptlessPreview
-                  title={`${siteName} header and footer preview`}
-                  srcDoc={previewHtml}
-                  onLoad={event => showFrameArea(event.currentTarget, active, frameScale)}
-                />
-              )}
-              <span>
-                {previewLoading ? 'Rendering…' : previewError ? 'Preview unavailable' : `${previewWidth} preview`}
-              </span>
-            </div>
-          ) : (
-            <div className="global-preview-empty">
-              <IconFrame size={24} />
-              <strong>Create a page to preview the frame</strong>
-              <span>The editor will render actual page content here.</span>
-            </div>
-          )}
-          <p className="global-preview-note">
-            <IconInfo size={15} />
-            The public renderer is used here, with this{' '}
-            {sitePreview === 'draft' ? 'site’s saved menu and design' : 'site’s live menu and design'} around the header
-            and footer you are editing. Page content and media are not mocked.
-          </p>
-        </aside>
+        <GlobalElementsPreview
+          siteId={siteId}
+          siteName={siteName}
+          previewPages={initial.previewPages}
+          initialSitePreview={initialSitePreview}
+          currentSerial={currentSerial}
+          header={header}
+          footer={footer}
+          active={active}
+        />
       </div>
 
       {confirming === 'publish' && (
@@ -600,9 +264,7 @@ export function GlobalElementsEditor({
           pending={pending}
           tone="primary"
           onConfirm={() => act('publish')}
-          onCancel={() => {
-            if (!actionInFlight.current) setConfirming(null)
-          }}
+          onCancel={cancelConfirmation}
         />
       )}
       {confirming === 'revert' && (
@@ -613,33 +275,9 @@ export function GlobalElementsEditor({
           confirmLabel="Revert both drafts"
           pending={pending}
           onConfirm={() => act('revert')}
-          onCancel={() => {
-            if (!actionInFlight.current) setConfirming(null)
-          }}
+          onCancel={cancelConfirmation}
         />
       )}
     </div>
   )
-}
-
-/**
- * Bring the frame being edited into the preview: the page top for the header,
- * the footer for the footer. The preview's own window scrolls first; when the
- * page is shorter than the frame there is nothing to scroll, so the scaled
- * frame is also moved up within its box until the footer shows.
- */
-function showFrameArea(frame: HTMLIFrameElement | null, area: 'header' | 'footer', scale: number | null) {
-  const view = frame?.contentWindow,
-    doc = frame?.contentDocument,
-    box = frame?.parentElement
-  if (!frame || !view || !doc || !box) return
-  const footer = area === 'footer' ? doc.querySelector('footer') : null
-  view.scrollTo({
-    top: footer ? Math.max(0, footer.getBoundingClientRect().top + view.scrollY - 24) : 0,
-    behavior: 'instant',
-  })
-  const factor = scale ?? (frame.getBoundingClientRect().width / frame.offsetWidth || 1)
-  const remaining = footer ? Math.max(0, footer.getBoundingClientRect().top - 24) * factor : 0
-  const room = Math.max(0, frame.offsetHeight * factor + 16 - box.clientHeight)
-  frame.style.setProperty('--frame-offset', `${Math.round(Math.min(remaining, room))}px`)
 }
