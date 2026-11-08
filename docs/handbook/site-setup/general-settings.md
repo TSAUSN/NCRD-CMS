@@ -9,8 +9,9 @@ language, contact email, phone and mailing address. Description allows155
 characters. A blank country or contact field makes no claim about the site.
 The language changes the language declared by the public page; it does not
 translate the words. A page's own description takes priority over the site
-fallback. Header & menu owns the logo, menu and Donate button. Footer owns its
-text; contact fields do not replace it automatically.
+fallback. Header & menu owns the logo, menu and Donate button. Contact fields
+are stored with the site; they do not replace text on public pages or route
+contact form messages. Edit the page or Footer to change what visitors see.
 
 Save draft keeps the current site unchanged. Schedule and Publish open the
 normal saved-change review. Leaving with unsaved fields offers Keep editing,

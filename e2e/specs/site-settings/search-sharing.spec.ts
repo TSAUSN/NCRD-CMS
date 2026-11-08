@@ -31,7 +31,7 @@ test('Search & sharing keeps tags private until review, rejects scripts, provide
     await c.query('COMMIT')
     const base = '/sites/' + f.site + '/settings/search',
       tags = page.getByLabel('Site verification tags', { exact: true }),
-      hints = page.getByLabel('Hints for search engines (optional)', { exact: true }),
+      hints = page.getByLabel('Search keywords (optional)', { exact: true }),
       leave = page.getByRole('alertdialog', { name: 'Before you leave', exact: true }),
       before = (await rawRequest({ host: f.host, path: '/' })).body,
       capture = async (name: string) => {

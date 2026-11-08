@@ -258,7 +258,7 @@ export async function releasePresentations(
           }),
           ...changedCells(row.live?.search ?? {}, row.draft.search ?? {}, {
             verification: 'Site verification tags',
-            hints: 'Hints for search engines',
+            hints: 'Search keywords',
           }),
         ]
         for (const account of row.draft.social ?? []) {

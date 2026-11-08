@@ -5,6 +5,7 @@ import { Card } from '../../../../components/ui/card.tsx'
 import { TextLink } from '../../../../components/ui/text-link.tsx'
 import { Field } from '../../../../components/ui/field.tsx'
 import { SettingsEditor, useSettingsDraft } from './settings-editor.tsx'
+import shared from '../../../../components/workspace.module.css'
 import workspaceFormsStyles from '../../../../components/workspace-styles/workspace-forms.module.css'
 type GeneralInput = { name: string; general: NonNullable<SitePublicSettings['general']> }
 function input(payload: unknown): GeneralInput {
@@ -69,93 +70,103 @@ export function GeneralSettingsWorkspace({
       path=""
       draft={draft}
     >
-      <Card title="General" density="editor">
-        <Field id="site-general-name" label="Site name">
-          <input
-            value={value.name}
-            maxLength={120}
-            disabled={disabled}
-            onChange={event => draft.change(current => ({ ...current, name: event.target.value }))}
-          />
-        </Field>
-        <Field
-          id="site-general-description"
-          label="Description for search"
-          counter={value.general.description.length + ' of 155'}
-        >
-          <input
-            value={value.general.description}
-            maxLength={155}
-            disabled={disabled}
-            placeholder="[One or two plain sentences about this site]"
-            onChange={event => change('description', event.target.value)}
-          />
-        </Field>
-        <div className={workspaceFormsStyles.formRow}>
-          <Field id="site-general-country" label="Country">
+      <div className={shared.denseStack}>
+        <Card title="General" density="editor">
+          <Field id="site-general-name" label="Site name">
             <input
-              value={value.general.country}
-              maxLength={100}
+              value={value.name}
+              maxLength={120}
               disabled={disabled}
-              onChange={event => change('country', event.target.value)}
+              onChange={event => draft.change(current => ({ ...current, name: event.target.value }))}
             />
           </Field>
-          <Field id="site-general-language" label="Language">
-            <select
-              value={value.general.language}
+          <Field
+            id="site-general-description"
+            label="Description for search"
+            counter={value.general.description.length + ' of 155'}
+          >
+            <input
+              value={value.general.description}
+              maxLength={155}
               disabled={disabled}
-              onChange={event => change('language', event.target.value)}
-            >
-              {languages.map(([code, name]) => (
-                <option key={code} value={code}>
-                  {name}
-                </option>
-              ))}
-            </select>
+              placeholder="[One or two plain sentences about this site]"
+              onChange={event => change('description', event.target.value)}
+            />
           </Field>
-        </div>
-        <Field id="site-general-email" label="Contact email">
-          <input
-            type="email"
-            value={value.general.email}
-            maxLength={254}
-            disabled={disabled}
-            placeholder="[email address]"
-            onChange={event => change('email', event.target.value)}
-          />
-        </Field>
-        <Field id="site-general-phone" label="Contact phone">
-          <input
-            type="tel"
-            value={value.general.phone}
-            maxLength={80}
-            disabled={disabled}
-            placeholder="[phone number]"
-            onChange={event => change('phone', event.target.value)}
-          />
-        </Field>
-        <Field id="site-general-address" label="Mailing address">
-          <input
-            value={value.general.address}
-            maxLength={1000}
-            disabled={disabled}
-            placeholder="[address]"
-            onChange={event => change('address', event.target.value)}
-          />
-        </Field>
-        <p className="hint">The logo, menu and Donate button are in Header &amp; menu. Footer text is in Footer.</p>
-        {!draft.valid && (
-          <p role="alert">
-            Enter a site name and a valid contact email. The description can have up to 155 characters.
+          <div className={workspaceFormsStyles.formRow}>
+            <Field id="site-general-country" label="Country">
+              <input
+                value={value.general.country}
+                maxLength={100}
+                disabled={disabled}
+                onChange={event => change('country', event.target.value)}
+              />
+            </Field>
+            <Field id="site-general-language" label="Language">
+              <select
+                value={value.general.language}
+                disabled={disabled}
+                onChange={event => change('language', event.target.value)}
+              >
+                {languages.map(([code, name]) => (
+                  <option key={code} value={code}>
+                    {name}
+                  </option>
+                ))}
+              </select>
+            </Field>
+          </div>
+          <Field
+            id="site-general-email"
+            label="Contact email"
+            help="Saved with this site's details. This address does not receive messages from a contact form."
+            helpAfter
+          >
+            <input
+              type="email"
+              value={value.general.email}
+              maxLength={254}
+              disabled={disabled}
+              placeholder="[email address]"
+              onChange={event => change('email', event.target.value)}
+            />
+          </Field>
+          <Field id="site-general-phone" label="Contact phone">
+            <input
+              type="tel"
+              value={value.general.phone}
+              maxLength={80}
+              disabled={disabled}
+              placeholder="[phone number]"
+              onChange={event => change('phone', event.target.value)}
+            />
+          </Field>
+          <Field id="site-general-address" label="Mailing address">
+            <input
+              value={value.general.address}
+              maxLength={1000}
+              disabled={disabled}
+              placeholder="[address]"
+              onChange={event => change('address', event.target.value)}
+            />
+          </Field>
+          <p className="hint">
+            These contact details do not replace text on public pages. To change what visitors see, edit the page or
+            Footer. The logo, menu and Donate button are in Header &amp; menu.
           </p>
-        )}
-      </Card>
-      {chapters && (
-        <Card title="Contact messages" density="editor">
-          <p>Read messages visitors sent through this site’s contact form. Email forwarding is not configured.</p>
-          <TextLink href={'/sites/' + siteId + '/settings/contact-messages'}>Read contact messages</TextLink>
+          {!draft.valid && (
+            <p role="alert">
+              Enter a site name and a valid contact email. The description can have up to 155 characters.
+            </p>
+          )}
         </Card>
-      )}
+        {chapters && (
+          <Card title="Contact messages" density="editor">
+            <p>Read messages visitors sent through this site’s contact form. Email forwarding is not configured.</p>
+            <TextLink href={'/sites/' + siteId + '/settings/contact-messages'}>Read contact messages</TextLink>
+          </Card>
+        )}
+      </div>
     </SettingsEditor>
   )
 }

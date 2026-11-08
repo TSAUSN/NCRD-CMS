@@ -65,10 +65,15 @@ export function SearchSharingWorkspace({
             onChange={event => draft.change(current => ({ ...current, tags: event.target.value }))}
           />
           <p className="hint" id="site-verification-tags-help">
-            Proves to search engines that you own this site.
+            Paste the tag supplied by your search service. It verifies ownership separately.
           </p>
         </Field>
-        <Field id="site-search-hints" label="Hints for search engines (optional)">
+        <Field
+          id="site-search-hints"
+          label="Search keywords (optional)"
+          help="Adds a keywords tag to published pages. Google Search ignores this tag."
+          helpAfter
+        >
           <input
             id="site-search-hints"
             placeholder="[optional]"

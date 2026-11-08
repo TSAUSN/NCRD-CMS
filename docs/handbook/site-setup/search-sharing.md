@@ -1,18 +1,18 @@
 # Search & sharing
 
-Review verification tags and search hints before putting them on every page.
+Review verification tags and search keywords before putting them on every page.
 
 For: Admins and Super admins. Last checked: 2026-11-01.
 
 Open Settings → Search & sharing. Paste the verification meta tag supplied by
 Google, Bing, Yandex or Pinterest. Supported tags have a quoted name and content;
-use each service once. Other markup is refused. Hints for search engines are
-optional plain words. They are saved as metadata, without a promise that search
-engines use them for ranking.
+use each service once. Other markup is refused. Search keywords are optional.
+They add a keywords meta tag to published pages.
+[Google Search ignores this tag](https://developers.google.com/search/docs/crawling-indexing/special-tags#unsupported-tags-and-attributes).
 
 Save draft keeps these values private. Schedule and Publish open the normal
 review of the saved Settings version. Confirm before the public head changes.
-Clear a tag or the hints and publish the reviewed change to remove that metadata.
+Clear a tag or the keywords and publish the reviewed change to remove that metadata.
 Leaving unsaved fields uses the same three choices as other Settings tabs. An
 invalid paste stays on screen if saving is refused. A conflicting save preserves
 your fields; check the saved settings in another tab before reloading.
