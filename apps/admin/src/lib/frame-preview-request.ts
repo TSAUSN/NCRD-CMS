@@ -29,6 +29,11 @@ export async function requestFramePreview(
   }
 }
 
+/** Site-wide previews use the fixed frame setup and anchor to the chosen area. */
+export function framePreviewAddress(ticketHref: string, part: 'header' | 'footer'): string {
+  return ticketHref + '?visit=1&frame=1#cms-preview-' + part
+}
+
 /** Stop queued and active previews before navigation replaces this document. */
 export function queueFramePreview(run: (signal: AbortSignal) => Promise<void>): () => void {
   const controller = new AbortController()

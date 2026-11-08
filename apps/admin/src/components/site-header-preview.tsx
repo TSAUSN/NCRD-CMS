@@ -3,6 +3,7 @@
 import { PREVIEW_MESSAGE } from '@cms/renderer/preview-messages'
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react'
 import { framePreviewHeight } from '../lib/frame-preview-size.ts'
+import { framePreviewAddress } from '../lib/frame-preview-request.ts'
 import { Button, TextLink } from './ui/index.ts'
 import workspaceFormsStyles from './workspace-styles/workspace-forms.module.css'
 import ownedStyles from './site-header-preview-styles.module.css'
@@ -103,8 +104,6 @@ export function SiteHeaderPreview({
     }, RETRY_WITHOUT_READY_MS)
     return () => window.clearTimeout(timer)
   }, [href, updating, failed, openingKey, nextKey, freshTicket])
-  const previewUrl = (url: string) =>
-    url + '?visit=1' + (part === 'footer' ? '#cms-preview-footer' : '#cms-preview-header')
   const previews = [
     ...(shown ? [shown] : []),
     ...(href && nextKey && updating ? [{ href, channel, key: nextKey }] : []),
@@ -179,7 +178,7 @@ export function SiteHeaderPreview({
               // Chrome can suspend requestAnimationFrame in an invisible cross-origin
               // frame. Keep it in layout so it can send its verified ready message.
               style={active ? undefined : { opacity: 0, pointerEvents: 'none' }}
-              src={previewUrl(preview.href)}
+              src={framePreviewAddress(preview.href, part)}
             />
           )
         })}
@@ -193,7 +192,7 @@ export function SiteHeaderPreview({
                 Try preview again
               </Button>
             )}
-            <TextLink href={previewUrl(href)} target="_blank" rel="noopener noreferrer">
+            <TextLink href={framePreviewAddress(href, part)} target="_blank" rel="noopener noreferrer">
               Open preview in a new tab
             </TextLink>
           </div>

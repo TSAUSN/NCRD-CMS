@@ -4,7 +4,8 @@ import { createHash } from 'node:crypto'
 import { join } from 'node:path'
 
 type Runtime = { head: string; body: string; hashes: string[]; styles: boolean }
-type CanvasRuntimes = { editing: Runtime; visitor: Runtime }
+export type CanvasRuntimeMode = 'editing' | 'visitor' | 'frame'
+type CanvasRuntimes = Record<CanvasRuntimeMode, Runtime>
 
 let loaded: Promise<CanvasRuntimes> | undefined
 
@@ -28,12 +29,12 @@ async function readCanvasRuntimes(): Promise<CanvasRuntimes> {
     buildFile('preview.js'),
     buildFile('preview.css'),
   ])
-  // The visitor prelude must run before reviewed scripts rewrite private URLs.
-  // Shipping the fixed build output in the document removes a blocking fetch.
+  // Embedded frame previews need the prelude before reviewed scripts run.
+  // Shipping the fixed build output there removes a blocking fetch.
   // Hash the exact text the HTML parser sees and reject unsafe raw-text output.
   const source = prelude.bytes.toString('utf8').replace(/\r\n?/g, '\n')
   if (/<\/?script(?=[\s/>])|<!--|\0/i.test(source)) throw Error('Invalid canvas prelude output.')
-  const visitorHash = 'sha256-' + digest(source).toString('base64')
+  const frameHash = 'sha256-' + digest(source).toString('base64')
   return {
     editing: {
       head: stylesheet.tag + prelude.tag,
@@ -41,12 +42,13 @@ async function readCanvasRuntimes(): Promise<CanvasRuntimes> {
       hashes: [prelude.hash, editor.hash],
       styles: true,
     },
-    visitor: { head: '<script>' + source + '</script>', body: '', hashes: [visitorHash], styles: false },
+    visitor: { head: prelude.tag, body: '', hashes: [prelude.hash], styles: false },
+    frame: { head: '<script>' + source + '</script>', body: '', hashes: [frameHash], styles: false },
   }
 }
 
 /** Fixed code-owned paths only. A read-only canvas does not mount editor controls. */
-export async function canvasRuntimeFiles(visitor = false): Promise<Runtime> {
+export async function canvasRuntimeFiles(mode: CanvasRuntimeMode): Promise<Runtime> {
   if (!loaded) {
     const attempt = readCanvasRuntimes()
     loaded = attempt
@@ -55,5 +57,5 @@ export async function canvasRuntimeFiles(visitor = false): Promise<Runtime> {
     })
   }
   const files = await loaded
-  return visitor ? files.visitor : files.editing
+  return files[mode]
 }

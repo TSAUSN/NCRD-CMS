@@ -5,6 +5,7 @@ import { ThemeTokens as ThemeValue, type NavTree, type ThemeTokens } from '@cms/
 import { CORE_THEME_PRESETS } from '@cms/seeds/core-themes'
 import type { ThemeWorkspace, GlobalElementsWorkspace } from '../../../../lib/queries.ts'
 import type { MediaAsset } from '../../../../lib/media-library.ts'
+import { framePreviewAddress } from '../../../../lib/frame-preview-request.ts'
 import { ThemeEditor } from './theme-editor.tsx'
 import { SiteLookPanel } from '../../../../components/site-look-panel.tsx'
 import { SiteLookPreviewStage } from './site-look-preview-stage.tsx'
@@ -285,7 +286,7 @@ export function SiteLookWorkspace({
               isolated={Boolean(isolatedOrigin)}
               href={
                 isolated.ticket
-                  ? isolated.ticket.href + '?visit=1#cms-preview-' + (tab === 'footer' ? 'footer' : 'header')
+                  ? framePreviewAddress(isolated.ticket.href, tab === 'footer' ? 'footer' : 'header')
                   : null
               }
               html={html}

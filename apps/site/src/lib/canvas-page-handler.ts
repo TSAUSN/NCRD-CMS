@@ -11,10 +11,11 @@ import { CANVAS_TOKEN, canvasDocument } from './canvas-resources.ts'
 import { canvasNotFound } from './canvas-resource-handler.ts'
 import type { CanvasSnapshot } from './canvas-preview-repository.ts'
 import { publicSecurityHeaders } from './public-security.ts'
+import type { CanvasRuntimeMode } from './canvas-runtime-files.ts'
 export function createCanvasPageHandler(deps: {
   host: (headers: Headers) => string | null
   snapshot: (host: string, token: string) => Promise<{ snapshot: CanvasSnapshot; expiresAt: string } | null>
-  runtime: (visitor?: boolean) => Promise<{ head: string; body: string; hashes: string[]; styles?: boolean }>
+  runtime: (mode: CanvasRuntimeMode) => Promise<{ head: string; body: string; hashes: string[]; styles?: boolean }>
 }) {
   return async (request: Request, token: string): Promise<Response> => {
     const host = deps.host(request.headers)
@@ -35,10 +36,12 @@ export function createCanvasPageHandler(deps: {
       !/^[A-Za-z0-9_-]{16,128}$/.test(snapshot.channel)
     )
       return canvasNotFound()
-    const visitor = new URL(request.url).searchParams.get('visit') === '1'
+    const params = new URL(request.url).searchParams
+    const visitor = params.get('visit') === '1'
+    const mode = visitor ? (params.get('frame') === '1' ? 'frame' : 'visitor') : 'editing'
     let runtime: Awaited<ReturnType<typeof deps.runtime>>
     try {
-      runtime = await deps.runtime(visitor)
+      runtime = await deps.runtime(mode)
     } catch {
       return new Response('The editing preview is temporarily unavailable.', {
         status: 503,

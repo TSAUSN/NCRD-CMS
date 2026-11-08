@@ -6,6 +6,7 @@ import { canvasDocument, canvasResourceUrl, canvasStylesheet } from './canvas-re
 import { createCanvasResourceHandler, type CanvasResourceRepository } from './canvas-resource-handler.ts'
 import { createCanvasPageHandler } from './canvas-page-handler.ts'
 import type { CanvasSnapshot } from './canvas-preview-repository.ts'
+import type { CanvasRuntimeMode } from './canvas-runtime-files.ts'
 const token = 'a'.repeat(64),
   id = '11111111-1111-4111-8111-111111111111',
   site = '22222222-2222-4222-8222-222222222222'
@@ -329,7 +330,9 @@ describe('isolated canvas resource transport', () => {
         ],
       },
     }
-    const runtimeFor = vi.fn(async (visitor?: boolean) => (visitor ? { ...runtime, body: '' } : runtime))
+    const runtimeFor = vi.fn(async (mode: CanvasRuntimeMode) =>
+      mode === 'editing' ? runtime : { ...runtime, body: '' },
+    )
     const handle = createCanvasPageHandler({
       host: () => 'site.staging.localhost',
       snapshot: async () => ({ snapshot: data, expiresAt: '2026-10-26T12:00:00Z' }),
@@ -340,13 +343,18 @@ describe('isolated canvas resource transport', () => {
         token,
       ),
       html = await response.text()
-    expect(runtimeFor).toHaveBeenCalledWith(true)
+    expect(runtimeFor).toHaveBeenCalledWith('visitor')
     expect(html).toContain('<h1>Server rendered first</h1>')
     expect(html).not.toContain('data-cms-slot=')
     expect(html).not.toContain('data-cms-section=')
     expect(html).not.toContain('/__cms/editor/preview.js')
     expect(html).toContain('data-cms-ticket="' + token + '"')
     expect(response.headers.get('cache-control')).toBe('private, no-store')
+    const address = 'http://site.staging.localhost:3201/__cms/canvas/' + token
+    await handle(new Request(address + '?visit=1&frame=1'), token)
+    expect(runtimeFor).toHaveBeenLastCalledWith('frame')
+    await handle(new Request(address + '?frame=1'), token)
+    expect(runtimeFor).toHaveBeenLastCalledWith('editing')
   })
   it('fails closed for expired/foreign tickets and missing code-owned build output', async () => {
     const unavailable = createCanvasPageHandler({
