@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test'
 import { mkdir } from 'node:fs/promises'
 import { resolve } from 'node:path'
-import { sawsoFixture } from '../fixtures/sawso.ts'
+import { reserveSawsoSlug, sawsoFixture } from '../fixtures/sawso.ts'
 import { echelonFixture } from '../fixtures/echelon.ts'
 import { signIn } from '../helpers.ts'
 test('Super admin reviews template drafts and starts a private shared-section copy; Cancel creates nothing', async ({
@@ -11,10 +11,10 @@ test('Super admin reviews template drafts and starts a private shared-section co
   test.setTimeout(120000)
   const f = await sawsoFixture(true),
     alternate = await echelonFixture(true),
-    created: string[] = [],
-    originalSlug = (await f.client.query('SELECT slug FROM sites WHERE id=$1', [f.siteId])).rows[0]!.slug
+    created: string[] = []
+  let restoreSlug: (() => Promise<void>) | undefined
   try {
-    await f.pool.query("UPDATE sites SET slug='sawso' WHERE id=$1", [f.siteId])
+    restoreSlug = await reserveSawsoSlug(f.pool, f.siteId)
     await f.client.query('BEGIN')
     await f.client.query('SET LOCAL ROLE cms_authenticated_user')
     await f.client.query("SELECT set_config('app.user_id',$1,true)", [f.actor])
@@ -164,7 +164,7 @@ test('Super admin reviews template drafts and starts a private shared-section co
       await editor.close()
     }
   } finally {
-    await f.pool.query('UPDATE sites SET slug=$2 WHERE id=$1', [f.siteId, originalSlug])
+    await restoreSlug?.()
     for (const id of [f.siteId, alternate.site, ...created])
       await f.pool.query('UPDATE sites SET archived_at=now() WHERE id=$1', [id])
     f.client.release()

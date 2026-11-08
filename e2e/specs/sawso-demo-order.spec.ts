@@ -1,13 +1,13 @@
 import { test, expect } from '@playwright/test'
 import { mkdir } from 'node:fs/promises'
 import { resolve } from 'node:path'
-import { sawsoFixture } from './fixtures/sawso.ts'
+import { reserveSawsoSlug, sawsoFixture } from './fixtures/sawso.ts'
 import { signIn } from './helpers.ts'
 test('SAWSO leads Home and the site switcher without hiding other visible sites', async ({ page }) => {
-  const f = await sawsoFixture(),
-    originalSlug = (await f.client.query('SELECT slug FROM sites WHERE id=$1', [f.siteId])).rows[0]!.slug
+  const f = await sawsoFixture()
+  let restoreSlug: (() => Promise<void>) | undefined
   try {
-    await f.client.query("UPDATE sites SET slug='sawso' WHERE id=$1", [f.siteId])
+    restoreSlug = await reserveSawsoSlug(f.pool, f.siteId)
     await signIn(page, 'root@example.test')
     await page.goto('/')
     await expect(page.getByRole('heading', { name: 'Home', exact: true, level: 1 })).toBeVisible()
@@ -45,7 +45,8 @@ test('SAWSO leads Home and the site switcher without hiding other visible sites'
     await page.setViewportSize({ width: 1440, height: 900 })
     await page.screenshot({ path: resolve(folder, 'switcher-1440.png') })
   } finally {
-    await f.pool.query('UPDATE sites SET archived_at=now(),slug=$2 WHERE id=$1', [f.siteId, originalSlug])
+    await restoreSlug?.()
+    await f.pool.query('UPDATE sites SET archived_at=now() WHERE id=$1', [f.siteId])
     f.client.release()
     await f.pool.end()
   }
