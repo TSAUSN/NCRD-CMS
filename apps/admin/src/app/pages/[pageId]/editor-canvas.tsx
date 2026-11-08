@@ -200,6 +200,10 @@ export function EditorCanvas({ view, frame, fields, overlays }: Props) {
       ? `/preview/${canvasSource.versionId}?v=${canvasSource.epoch}&hidden=${showHiddenSections ? '1' : '0'}&site=${sitePreview}${libraryPreview ? '&insert=' + libraryPreview.section_def_id + '&definitionVersion=' + libraryPreview.version + '&at=' + insertAt : ''}`
       : null
   const retryDocument = useCanvasDocumentRetry(sameOriginSource, canvasReady > 0, toCanvas)
+  // Use the same URL generation as Reload preview for the fresh document.
+  const canvasAddress = retryDocument
+    ? sameOriginSource?.replace(`?v=${canvasSource.epoch}&`, `?v=${canvasSource.epoch + 1}&`)
+    : sameOriginSource
   return (
     <div id="editor-panel-canvas" className="canvas-pane" role="tabpanel" aria-labelledby="editor-tab-canvas">
       {/* One slim row. Every line above the page is height the page does
@@ -375,13 +379,7 @@ export function EditorCanvas({ view, frame, fields, overlays }: Props) {
                   height: canvasSize.height > 0 ? canvasSize.height / previewScale : '100%',
                   transform: `scale(${previewScale})`,
                 }}
-                src={
-                  isolated.enabled
-                    ? (isolated.href ?? undefined)
-                    : sameOriginSource
-                      ? sameOriginSource + (retryDocument ? '&retry=1' : '')
-                      : undefined
-                }
+                src={(isolated.enabled ? isolated.href : canvasAddress) ?? undefined}
               />
             )
           ) : (

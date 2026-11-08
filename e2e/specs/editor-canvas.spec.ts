@@ -148,8 +148,10 @@ test.describe('click to select', () => {
       )
       await expect(page.getByRole('button', { name: 'Reload preview', exact: true })).toHaveCount(0)
       expect(sources).toHaveLength(2)
-      expect(sources[1]!.searchParams.get('retry')).toBe('1')
-      sources[1]!.searchParams.delete('retry')
+      const firstGeneration = sources[0]!.searchParams.get('v')
+      expect(firstGeneration).toBe('0')
+      expect(sources[1]!.searchParams.get('v')).toBe('1')
+      sources[1]!.searchParams.set('v', firstGeneration!)
       expect(sources[1]!.href).toBe(sources[0]!.href)
       await expect(page.locator('#slot-0-intro')).toHaveValue('Still here after the stalled canvas')
     } finally {
