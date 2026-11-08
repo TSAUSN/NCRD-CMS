@@ -7,7 +7,7 @@ import { signIn } from '../helpers.ts'
 test('Super admin reviews template drafts and starts a private shared-section copy; Cancel creates nothing', async ({
   page,
   browser,
-}) => {
+}, info) => {
   test.setTimeout(120000)
   const f = await sawsoFixture(true),
     alternate = await echelonFixture(true),
@@ -15,6 +15,8 @@ test('Super admin reviews template drafts and starts a private shared-section co
   let restoreSlug: (() => Promise<void>) | undefined
   try {
     restoreSlug = await reserveSawsoSlug(f.pool, f.siteId)
+    await f.pool.query('UPDATE sites SET name=$2 WHERE id=$1', [f.siteId, '[Template review primary]'])
+    await f.pool.query('UPDATE sites SET name=$2 WHERE id=$1', [alternate.site, '[Template review alternate]'])
     await f.client.query('BEGIN')
     await f.client.query('SET LOCAL ROLE cms_authenticated_user')
     await f.client.query("SELECT set_config('app.user_id',$1,true)", [f.actor])
@@ -39,7 +41,7 @@ test('Super admin reviews template drafts and starts a private shared-section co
     await page.goto('/sites/' + f.siteId + '/template')
     await expect(page.getByRole('heading', { name: 'National template', exact: true })).toBeVisible()
     await expect(page.getByRole('link', { name: 'Back', exact: true })).toHaveCount(0)
-    const folder = resolve('../.r8-progress/round3/template-preview-target/chromium')
+    const folder = resolve('../.r8-progress/round3/template-preview-target', info.project.name)
     await mkdir(folder, { recursive: true })
     for (const width of [1440, 1024]) {
       await page.setViewportSize({ width, height: 900 })
@@ -58,7 +60,17 @@ test('Super admin reviews template drafts and starts a private shared-section co
     await page.getByRole('button', { name: 'Review an update', exact: true }).click()
     const review = page.getByRole('dialog')
     const scopes = review.getByRole('list', { name: 'Sites in this update', exact: true })
-    await expect(scopes.locator('summary')).toHaveCount(2)
+    const names = (
+      await f.pool.query<{ name: string }>('SELECT name FROM sites WHERE id=ANY($1::uuid[])', [
+        [f.siteId, alternate.site],
+      ])
+    ).rows.map(row => row.name)
+    expect(new Set(names).size).toBe(2)
+    // The full suite can leave other eligible demo sites. Both explicit fixtures
+    // must be offered; only the current site may be selected by default.
+    for (const name of names) await expect(scopes.getByRole('checkbox', { name, exact: true })).toBeVisible()
+    await expect(scopes.locator('input:checked')).toHaveCount(1)
+    expect(await scopes.locator('summary').count()).toBe(await scopes.locator(':scope>li').count())
     for (const disclosure of await scopes.locator('details').all())
       await expect(disclosure).not.toHaveAttribute('open', '')
     const labels = await scopes
@@ -72,22 +84,13 @@ test('Super admin reviews template drafts and starts a private shared-section co
       createDrafts = review.getByRole('button', { name: 'Create drafts on 1 site', exact: true })
     await expect(previewOn).toHaveValue(f.siteId)
     await expect(createDrafts).toBeEnabled()
-    const other = await previewOn
-      .locator('option')
-      .evaluateAll(
-        (options, selected) =>
-          options
-            .map(option => ({ id: (option as HTMLOptionElement).value, text: option.textContent }))
-            .find(option => option.id !== selected),
-        f.siteId,
-      )
-    expect(other).toBeTruthy()
+    await expect(previewOn.locator('option[value="' + alternate.site + '"]')).toHaveCount(1)
     const otherHeads = (
       await f.pool.query('SELECT id,draft_version_id,published_version_id FROM pages WHERE site_id=$1 ORDER BY id', [
-        other!.id,
+        alternate.site,
       ])
     ).rows
-    await previewOn.selectOption(other!.id)
+    await previewOn.selectOption(alternate.site)
     await expect(review).toContainText('collection binding is missing, private, or belongs to another site')
     await expect(createDrafts).toBeDisabled()
     for (const width of [1440, 1024]) {
@@ -99,7 +102,7 @@ test('Super admin reviews template drafts and starts a private shared-section co
     expect(
       (
         await f.pool.query('SELECT id,draft_version_id,published_version_id FROM pages WHERE site_id=$1 ORDER BY id', [
-          other!.id,
+          alternate.site,
         ])
       ).rows,
     ).toEqual(otherHeads)
