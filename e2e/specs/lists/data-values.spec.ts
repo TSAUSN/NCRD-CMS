@@ -137,13 +137,24 @@ test('a sourced number updates two published pages through review while Editors 
           expect(await records.evaluate(n => n.getBoundingClientRect().width <= n.parentElement!.clientWidth + 1)).toBe(
             true,
           )
-          if (name === 'numbers-list')
+          if (name === 'numbers-list') {
+            const fullLabel = 'Countries in the global network'
+            const number = records.getByRole('button', { name: fullLabel, exact: true })
+            await expect(number).toHaveAttribute('title', fullLabel)
             expect(
-              await records
-                .getByRole('button', { name: 'Countries in the global network', exact: true })
-                .locator('span')
-                .evaluate(n => n.scrollWidth <= n.clientWidth + 1),
-            ).toBe(true)
+              await number.locator('span').evaluate(node => {
+                const style = getComputedStyle(node)
+                const range = document.createRange()
+                range.selectNodeContents(node)
+                return {
+                  lines: new Set([...range.getClientRects()].map(rect => rect.top)).size,
+                  whiteSpace: style.whiteSpace,
+                  overflow: style.overflow,
+                  textOverflow: style.textOverflow,
+                }
+              }),
+            ).toEqual({ lines: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' })
+          }
         }
         const details = target.getByRole('group', { name: 'Number details', exact: true })
         if (await details.isVisible()) {

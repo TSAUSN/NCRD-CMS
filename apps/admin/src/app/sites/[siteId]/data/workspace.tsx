@@ -381,7 +381,11 @@ export function DataValuesWorkspace({
                   <p className="hint">No pages use this number yet.</p>
                 )}
               </div>
-              <Note>Changing this saves a draft. It goes live on these {pageLinks.length} pages when you publish.</Note>
+              <Note>
+                {pageLinks.length
+                  ? 'Save to keep the change private. Publish to update the live pages that use this number.'
+                  : 'Save to keep this number private. Publishing it by itself won’t change a public page.'}
+              </Note>
             </div>
           ) : undefined
         }

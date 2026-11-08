@@ -340,10 +340,6 @@
   .table[data-layout='records'] [data-col='date'] {
     display: none;
   }
-  .table[data-layout='records'] .tableTitle .truncateValue {
-    white-space: normal;
-    overflow: visible;
-  }
 }
 @container cms-records (max-width:700px) {
   .table[data-layout='records'] [data-secondary] {
@@ -351,10 +347,6 @@
   }
   .table[data-layout='records'] [data-col='value'] {
     width: var(--record-updated-width);
-  }
-  .table[data-layout='records'] .numberValue {
-    white-space: normal;
-    overflow: visible;
   }
   .table[data-layout='records'][data-density='content'] .tableTitle + p {
     white-space: normal;
