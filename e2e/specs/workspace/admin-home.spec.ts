@@ -13,7 +13,9 @@ test('Admin Home shows saved attention, immediate authenticated pictures and rec
 }, info) => {
   test.setTimeout(120000)
   const f = await siteLookFixture(),
-    email = 'home-admin-' + randomUUID().slice(0, 8) + '@example.test',
+    suffix = randomUUID().slice(0, 8),
+    email = 'home-admin-' + suffix + '@example.test',
+    siteName = '! 000 Home preview ' + suffix,
     folder = resolve('../.r8-progress/round3/admin-home/' + info.project.name)
   let sourceReads = 0,
     user: string | undefined
@@ -22,8 +24,9 @@ test('Admin Home shows saved attention, immediate authenticated pictures and rec
     const c = await f.pool.connect()
     try {
       await c.query('BEGIN')
-      // Keep this fixture within the four alphabetical Home shortcuts for both roles.
-      await c.query('UPDATE sites SET name=$2 WHERE id=$1', [f.site, 'A shared site look'])
+      // Pinned sites come first, then the alphabetical remainder. Other
+      // browser fixtures can remain active and sort ahead of an A prefix.
+      await c.query('UPDATE sites SET name=$2 WHERE id=$1', [f.site, siteName])
       const root = (await c.query("SELECT id FROM app_users WHERE email='root@example.test'")).rows[0]!.id
       await c.query("SELECT set_config('app.user_id',$1,true)", [root])
       const bytes = await readFile(resolve('../apps/site/public/cms-samples/r8-landscape.png'))
@@ -129,7 +132,7 @@ test('Admin Home shows saved attention, immediate authenticated pictures and rec
         await expect(main.getByRole('link', { name: 'Create a site', exact: true })).toHaveCount(
           account.role === 'superadmin' ? 1 : 0,
         )
-        const image = main.getByRole('img', { name: 'A shared site look saved home-page picture', exact: true })
+        const image = main.getByRole('img', { name: siteName + ' saved home-page picture', exact: true })
         const imageAddress = '/media/' + f.picture + '/original'
         await expect(image).toHaveAttribute('src', imageAddress)
         await expect
@@ -173,10 +176,9 @@ test('Admin Home shows saved attention, immediate authenticated pictures and rec
         }
         await main.getByText('More tasks', { exact: true }).click()
         await expect(main.getByRole('heading', { name: 'What would you like to do?', exact: true })).toBeVisible()
-        await expect(main.getByRole('link', { name: /^Edit A shared site look home page / })).toHaveAttribute(
-          'href',
-          '/pages/' + f.pages[0],
-        )
+        const tasks = main.getByRole('region', { name: 'What would you like to do?', exact: true })
+        const homeShortcut = tasks.getByRole('link').filter({ hasText: 'Edit ' + siteName + ' home page' })
+        await expect(homeShortcut).toHaveAttribute('href', '/pages/' + f.pages[0])
         if (account.role === 'siteadmin') {
           await page.route('**' + imageAddress, route =>
             route.fulfill({ status: 503, contentType: 'image/png', body: '' }),
@@ -191,11 +193,11 @@ test('Admin Home shows saved attention, immediate authenticated pictures and rec
           await page.unroute('**' + imageAddress)
           await page.reload()
           await expect(
-            main.getByRole('img', { name: 'A shared site look saved home-page picture', exact: true }),
+            main.getByRole('img', { name: siteName + ' saved home-page picture', exact: true }),
           ).toHaveAttribute('src', imageAddress)
           await expect(main.getByText('Preview unavailable · Open site', { exact: true })).toHaveCount(0)
         }
-        await main.getByRole('link', { name: 'Open A shared site look', exact: true }).click()
+        await main.getByRole('link', { name: 'Open ' + siteName, exact: true }).click()
         await expect(page).toHaveURL('/sites/' + f.site)
         expect(errors).toEqual([])
       } finally {
