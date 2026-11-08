@@ -3,7 +3,7 @@ import { PermanentJobError, type EventHandler } from './handlers.ts'
 
 export const MEDIA_CLEANUP_EVENT = 'media.cleanup_requested'
 
-export type MediaCleanupObject = { kind: string; objectKey: string }
+type MediaCleanupObject = { kind: string; objectKey: string }
 
 export type MediaCleanupRepository = {
   /** Empty means restored, re-deleted at another revision, or already purged. */

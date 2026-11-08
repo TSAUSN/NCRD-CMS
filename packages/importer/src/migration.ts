@@ -21,8 +21,8 @@ import { referencePages, type ReferencePage } from './reference-pages.ts'
 import { staticCompatibility } from './static-compatibility.ts'
 import { editableReference } from './editable-reference.ts'
 
-export const V1_MIGRATION_VERSION = 11
-export const V1_ROLE_MAPPING = {
+const V1_MIGRATION_VERSION = 11
+const V1_ROLE_MAPPING = {
   content_creator: 'contributor',
   editor: 'editor',
   admin: 'site_admin',
@@ -54,7 +54,7 @@ export type MigrationBundle = {
     siteVariants?: ImportRun['counts']['siteVariants']
   }
 }
-export type PageParity = {
+type PageParity = {
   site: string
   page: string
   state: string
@@ -78,7 +78,7 @@ function sourceSite(key: string, payload: JsonObject | null): string | null {
   return null
 }
 
-export function backupRecordKind(key: string, payload: JsonObject | null): string {
+function backupRecordKind(key: string, payload: JsonObject | null): string {
   if (payload === null) return 'placeholder'
   if (/^sites\/[^/]+\/pages\/[^/]+$/.test(key)) return 'draft-page'
   if (key.startsWith('publishedPages/'))
@@ -93,7 +93,7 @@ export function backupRecordKind(key: string, payload: JsonObject | null): strin
 }
 
 /** Page states are kept separate even when their content happens to be equal. */
-export function inspectBackupPages(backup: V1Backup, run: ImportRun): PageParity[] {
+function inspectBackupPages(backup: V1Backup, run: ImportRun): PageParity[] {
   const definitions = new Map(run.records.map(record => [record.provenance.id, record]))
   return backup.records.flatMap(record => {
     const kind = backupRecordKind(record.path, record.payload)

@@ -4,7 +4,7 @@ import { markSampleValues, clearSampleField, type ChapterSetup, type SectionInst
 import type { CorePageDefinition } from './core-templates.ts'
 import { ECHELON_PUBLIC_COPY } from './echelon-content.ts'
 const people = Array.from({ length: 16 }, (_, index) => '[Board member ' + (index + 1) + ']')
-export type ChapterPart =
+type ChapterPart =
   | 'title'
   | 'paragraph'
   | 'social'

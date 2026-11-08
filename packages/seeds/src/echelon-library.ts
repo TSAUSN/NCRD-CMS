@@ -165,4 +165,3 @@ export const ECHELON_LIBRARY: readonly CoreSection[] = [
   ...echelonLeadershipLibrary(variant),
   ...echelonEngagementLibrary(variant),
 ]
-export const ECHELON_TEMPLATE_INTRO = mission

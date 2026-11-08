@@ -11,7 +11,7 @@ import { IconPlus } from '../../../components/icons.tsx'
 import styles from './canvas-chrome.module.css'
 
 export type CanvasHover = { section: number; repeatId: string; key: string }
-export type CanvasSurface = { document: Document; element: HTMLElement }
+type CanvasSurface = { document: Document; element: HTMLElement }
 export type CanvasAction =
   | 'up'
   | 'down'

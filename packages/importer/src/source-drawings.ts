@@ -46,7 +46,7 @@ const ATTRIBUTES = new Set([
 ])
 
 /** A drawing is passive line art: shapes and presentation attributes only, with no URL, script or event anywhere. */
-export function isPassiveDrawing(svg: string): boolean {
+function isPassiveDrawing(svg: string): boolean {
   const parsed = parseHtml(svg)
   if (!parsed.ok) return false
   const roots = parsed.nodes.filter((node): node is HtmlElement => node.kind === 'element')
@@ -65,7 +65,7 @@ export function isPassiveDrawing(svg: string): boolean {
   return passive(roots[0]!) && !/<\s*\/?\s*(script|style|foreignobject|use|image|a)\b|\bon[a-z]+\s*=/i.test(svg)
 }
 
-export function drawingKey(svg: string): string {
+function drawingKey(svg: string): string {
   return `d${createHash('sha256').update(svg).digest('hex').slice(0, 10)}`
 }
 

@@ -41,7 +41,7 @@ export type MediaForInspection = {
   declaredBytes: number
 }
 
-export type ProcessedMediaObject = {
+type ProcessedMediaObject = {
   objectKey: string
   mimeType: 'image/jpeg' | 'image/png' | 'image/webp'
   bytes: number
@@ -50,13 +50,13 @@ export type ProcessedMediaObject = {
   sha256: string
 }
 
-export type ProcessedMediaVariant = ProcessedMediaObject & {
+type ProcessedMediaVariant = ProcessedMediaObject & {
   kind: keyof typeof MEDIA_VARIANTS
   mimeType: 'image/webp'
 }
 
-export type ProcessedMediaAsset = ProcessedMediaObject & { data: Uint8Array }
-export type ProcessedMediaVariantAsset = ProcessedMediaVariant & { data: Uint8Array }
+type ProcessedMediaAsset = ProcessedMediaObject & { data: Uint8Array }
+type ProcessedMediaVariantAsset = ProcessedMediaVariant & { data: Uint8Array }
 
 export type ProcessedMedia = {
   original: ProcessedMediaAsset

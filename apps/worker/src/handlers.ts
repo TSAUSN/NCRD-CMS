@@ -73,7 +73,7 @@ export type EventHandler = {
   handle(event: OutboxEvent): Promise<void>
 }
 
-export type Settlement = { ok: boolean; permanent: boolean; error: string | null }
+type Settlement = { ok: boolean; permanent: boolean; error: string | null }
 
 export type DrainResult = {
   claimed: number
@@ -114,7 +114,7 @@ export function isPermanentFailure(error: unknown): boolean {
 
 // ------------------------------------------------------------------ outbox
 
-export function cacheInvalidationHandler(cache: CacheInvalidator): EventHandler {
+function cacheInvalidationHandler(cache: CacheInvalidator): EventHandler {
   return {
     // Purging a key that is already absent is a no-op, so a duplicate delivery
     // costs one wasted call and changes nothing.

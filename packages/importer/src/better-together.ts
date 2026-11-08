@@ -276,6 +276,3 @@ export function importBetterTogetherPage(options: {
   })
   return { archive, report, omitted: [...omitted] }
 }
-
-/** Backwards-compatible entry for the completed homepage checkpoint. */
-export const importBetterTogetherHomepage = importBetterTogetherPage

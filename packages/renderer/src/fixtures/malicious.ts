@@ -497,9 +497,6 @@ export const FORBIDDEN_IN_ATTRIBUTES: readonly { name: string; pattern: RegExp }
   { name: 'off-site fetch', pattern: /(src|href|data|action|srcset|poster)\s*=/i },
 ]
 
-/** Both lists, for callers that want the whole fragment judged at once. */
-export const FORBIDDEN_IN_OUTPUT = FORBIDDEN_TAGS
-
 export const FORBIDDEN_ANYWHERE = FORBIDDEN_TAGS.filter(f => !['style element', 'meta element'].includes(f.name))
 
 /**

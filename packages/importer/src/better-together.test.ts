@@ -3,7 +3,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync, symlinkSync } from 'node
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { createHash } from 'node:crypto'
-import { BT_NO_SCRIPT_CSS, importBetterTogetherHomepage } from './better-together.ts'
+import { BT_NO_SCRIPT_CSS, importBetterTogetherPage } from './better-together.ts'
 const folders: string[] = []
 afterEach(() => {
   for (const folder of folders.splice(0)) rmSync(folder, { recursive: true, force: true })
@@ -44,7 +44,7 @@ function fixture() {
 describe('BT2027 homepage-only offline import', () => {
   it('preserves actual roots, classes, data attributes and readable source content with editable fields', () => {
     const f = fixture(),
-      { archive, report } = importBetterTogetherHomepage(f),
+      { archive, report } = importBetterTogetherPage(f),
       c = archive.content,
       bundle = c.site_file_versions![0]!.bundle
     expect(c.pages).toHaveLength(1)
@@ -65,7 +65,7 @@ describe('BT2027 homepage-only offline import', () => {
   })
   it('keeps cascade order, keyframes, transitions and media queries in reviewed styles; externalizes behavior in order', () => {
     const f = fixture(),
-      { archive } = importBetterTogetherHomepage(f),
+      { archive } = importBetterTogetherPage(f),
       bundle = archive.content.site_file_versions![0]!.bundle
     const bytes = (id: string) => Buffer.from(archive.objects.find(o => o.media_id === id)!.base64, 'base64').toString()
     expect(bundle.styles.map(s => bytes(s.fileId))).toEqual([
@@ -85,7 +85,7 @@ describe('BT2027 homepage-only offline import', () => {
   })
   it('imports only the eight allowed marketing pages with their own frame and owned navigation', () => {
     const f = fixture(),
-      r = importBetterTogetherHomepage({
+      r = importBetterTogetherPage({
         ...f,
         page: 'hotel-information.php',
         title: 'Hotel information',
@@ -97,11 +97,11 @@ describe('BT2027 homepage-only offline import', () => {
     expect(c.section_def_versions[0]!.source_html).toContain('href="/#header"')
     expect(c.site_file_versions![0]!.bundle.original!.pages[0]).toMatchObject({ header: false, footer: false })
     expect(c.site_files!.some(file => file.name.startsWith('hotel-information-inline-'))).toBe(true)
-    expect(() => importBetterTogetherHomepage({ ...f, page: 'dashboard.php' as never })).toThrow(/marketing page/)
+    expect(() => importBetterTogetherPage({ ...f, page: 'dashboard.php' as never })).toThrow(/marketing page/)
   })
   it('preserves authored page metadata and keeps a useful CMS page name', () => {
     const f = fixture(),
-      c = importBetterTogetherHomepage({
+      c = importBetterTogetherPage({
         ...f,
         page: 'workshops.html',
         title: 'Workshops',
@@ -118,7 +118,7 @@ describe('BT2027 homepage-only offline import', () => {
   })
   it('keeps the workshop submission application at its source address without importing or fetching it', () => {
     const f = fixture(),
-      c = importBetterTogetherHomepage({
+      c = importBetterTogetherPage({
         ...f,
         html: f.html.replace('<h1>', '<a href="/workshop-submissions.html">Submit a workshop</a><h1>'),
       }).archive.content
@@ -133,21 +133,21 @@ describe('BT2027 homepage-only offline import', () => {
   it('records an old document mode instead of silently changing table layout', () => {
     const f = fixture()
     expect(
-      importBetterTogetherHomepage({ ...f, page: 'workshops.html', html: f.html }).archive.content
-        .site_file_versions![0]!.bundle.original!.pages[0]!.quirks,
+      importBetterTogetherPage({ ...f, page: 'workshops.html', html: f.html }).archive.content.site_file_versions![0]!
+        .bundle.original!.pages[0]!.quirks,
     ).toBe(true)
     expect(
-      importBetterTogetherHomepage({ ...f, html: '<!doctype html>' + f.html }).archive.content.site_file_versions![0]!
+      importBetterTogetherPage({ ...f, html: '<!doctype html>' + f.html }).archive.content.site_file_versions![0]!
         .bundle.original!.pages[0]!.quirks,
     ).toBeUndefined()
   })
   it('rejects changed cache bytes and missing script dependencies instead of silently losing behavior', () => {
     const f = fixture()
     writeFileSync(join(f.cache, f.hash + '.bin'), 'changed')
-    expect(() => importBetterTogetherHomepage(f)).toThrow(/do not match/)
+    expect(() => importBetterTogetherPage(f)).toThrow(/do not match/)
     const next = fixture()
     expect(() =>
-      importBetterTogetherHomepage({
+      importBetterTogetherPage({
         ...next,
         html: next.html.replace('cdn.example.test/home.js', 'other.example.test/home.js'),
       }),
@@ -155,21 +155,21 @@ describe('BT2027 homepage-only offline import', () => {
   })
   it('refuses inline handlers and referenced files or cache symlinks escaping the chosen folders', () => {
     const f = fixture()
-    expect(() =>
-      importBetterTogetherHomepage({ ...f, html: f.html.replace('<h1>', '<h1 onclick="alert(1)">') }),
-    ).toThrow(/Inline event/)
+    expect(() => importBetterTogetherPage({ ...f, html: f.html.replace('<h1>', '<h1 onclick="alert(1)">') })).toThrow(
+      /Inline event/,
+    )
     const external = fixture()
     rmSync(join(f.root, 'images', 'logo.svg'))
     symlinkSync(join(external.root, 'images', 'logo.svg'), join(f.root, 'images', 'logo.svg'))
-    expect(() => importBetterTogetherHomepage(f)).toThrow(/escapes/)
+    expect(() => importBetterTogetherPage(f)).toThrow(/escapes/)
     const g = fixture()
     rmSync(join(g.cache, g.hash + '.bin'))
     symlinkSync(join(external.cache, external.hash + '.bin'), join(g.cache, g.hash + '.bin'))
-    expect(() => importBetterTogetherHomepage(g)).toThrow(/cache file escapes/)
+    expect(() => importBetterTogetherPage(g)).toThrow(/cache file escapes/)
   })
   it('records unavailable offline pictures without making runtime third-party image requests', () => {
     const f = fixture(),
-      r = importBetterTogetherHomepage({
+      r = importBetterTogetherPage({
         ...f,
         html: f.html.replace(
           'http://bettertogether2027.org/images/logo.svg',

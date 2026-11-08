@@ -698,7 +698,7 @@ const CSS_VIOLATION_TOKENS: readonly [string, string][] = [
   ['could not be made safe to embed', 'unembeddable'],
 ]
 
-export function cssViolationToken(violation: string): string {
+function cssViolationToken(violation: string): string {
   for (const [needle, token] of CSS_VIOLATION_TOKENS) if (violation.includes(needle)) return token
   return 'other'
 }

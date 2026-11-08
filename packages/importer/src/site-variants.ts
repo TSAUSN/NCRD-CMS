@@ -2,7 +2,7 @@ import { digest, isObject } from './backup.ts'
 import { readLiteralTemplateModule } from './literal-module.ts'
 import type { V1Definition, V1Slot } from './source.ts'
 
-export const VARIANT_SITES: Record<string, string> = {
+const VARIANT_SITES: Record<string, string> = {
   humanneedsindex: 'tsa-humanneedsindex',
   echelonsymposium: 'tsa-echelonsymposium',
   'site-host': 'tsa-site-host',

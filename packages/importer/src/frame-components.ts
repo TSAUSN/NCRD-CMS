@@ -21,7 +21,7 @@ import { remapReferenceUrls, type ImportedAsset } from './media-transfer.ts'
 
 /** Stands in for the menu until field extraction has run; never stored. */
 const MENU_MARKER = 'cms-frame-menu-marker'
-export const FRAME_MENU_SLOT: SlotDef = { id: 'site-menu', kind: 'navigation', label: 'Site menu', constraints: {} }
+const FRAME_MENU_SLOT: SlotDef = { id: 'site-menu', kind: 'navigation', label: 'Site menu', constraints: {} }
 
 export type FrameSource = { html: string; css: string; issues: string[] }
 
@@ -293,7 +293,7 @@ function frameAnchors(root: HtmlElement, document: string) {
 
 /** The source site's compiled stylesheet, narrowed to one frame, without font
  * files: pages already carry the site's fonts as governed site assets. */
-export function frameStylesheet(html: string, builtCss: string, extraCss: string): string {
+function frameStylesheet(html: string, builtCss: string, extraCss: string): string {
   const withoutFonts = postcss.parse(builtCss)
   withoutFonts.walkAtRules('font-face', rule => {
     rule.remove()

@@ -319,7 +319,7 @@ export function v1DefaultValues(html: string, slots: readonly V1Slot[]): RegionE
 
 // ------------------------------------------------------------ the comparison
 
-export type ParityDifferenceKind =
+type ParityDifferenceKind =
   | 'unreadable'
   | 'child-count'
   | 'node-kind'

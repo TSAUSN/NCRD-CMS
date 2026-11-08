@@ -15,7 +15,7 @@
 // Links/images and structural changes still need the canonical server render.
 import { deepEqual, type EditorDocument, type EditorSection } from '@cms/domain'
 
-export type CanvasPatch = { section: number; slot: string; value: string; kind?: 'richtext' }
+type CanvasPatch = { section: number; slot: string; value: string; kind?: 'richtext' }
 
 export type CanvasPlan = {
   /** Values the canvas can be given directly, without a round trip. */

@@ -71,7 +71,7 @@ type ThumbnailSourceRow = {
  * `thumbnail-definition-unrenderable` reaching an operator should say the same
  * thing whichever layer noticed it.
  */
-export const THUMBNAIL_CODES = {
+const THUMBNAIL_CODES = {
   payload: 'thumbnail-payload-unusable',
   missing: 'thumbnail-definition-missing',
   unidentifiable: 'thumbnail-version-has-no-render-hash',
@@ -114,7 +114,7 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
  * next request retakes it. 2: the site's fonts and the section's own pictures
  * and sample words are embedded (migration 0106).
  */
-export const THUMBNAIL_RECIPE = 2
+const THUMBNAIL_RECIPE = 2
 
 export function thumbnailKeyPrefix(sectionDefId: string, version: number, renderHash: string): string | null {
   if (renderHash.trim() === '') return null

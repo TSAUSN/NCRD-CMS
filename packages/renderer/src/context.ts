@@ -90,12 +90,7 @@ export type SlotContext =
   | 'unknown'
 
 /** Contexts a value may be rendered into, each with its own escaping. */
-export const SAFE_CONTEXTS: readonly SlotContext[] = [
-  'element-text',
-  'quoted-attribute',
-  'url-attribute',
-  'style-attribute',
-]
+const SAFE_CONTEXTS: readonly SlotContext[] = ['element-text', 'quoted-attribute', 'url-attribute', 'style-attribute']
 
 export function isSafeContext(context: SlotContext): boolean {
   return (SAFE_CONTEXTS as readonly string[]).includes(context)

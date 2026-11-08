@@ -25,7 +25,7 @@ export function canonical(value: unknown): string {
 export const digest = (value: string | Buffer): string => createHash('sha256').update(value).digest('hex')
 
 export type InputFile = { path: string; sha256: string; bytes: number }
-export type BackupRecord = { path: string; sha256: string; payload: JsonObject | null }
+type BackupRecord = { path: string; sha256: string; payload: JsonObject | null }
 export type V1Backup = {
   format: 'v1-backup-firestore-json'
   takenAt: string

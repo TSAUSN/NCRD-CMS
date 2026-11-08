@@ -18,7 +18,7 @@ import type { Filter, ReviewModel } from './use-review-model.ts'
 import { reviewAge } from './review-display.tsx'
 import { FullReviewDiscussion } from './review-discussion.tsx'
 
-export function FullReviewQueue({ model }: { model: ReviewModel }) {
+function FullReviewQueue({ model }: { model: ReviewModel }) {
   const { queueHeader, selected, basePath, filter, setFilter, query, setQuery, visible } = model
   return (
     <>
@@ -84,7 +84,7 @@ export function FullReviewQueue({ model }: { model: ReviewModel }) {
   )
 }
 
-export function ReviewChecks({ model }: { model: ReviewModel }) {
+function ReviewChecks({ model }: { model: ReviewModel }) {
   const { selected, readiness } = model
   return (
     <section className={reviewWorkbenchStyles.workbenchChecks} aria-label="Checks">

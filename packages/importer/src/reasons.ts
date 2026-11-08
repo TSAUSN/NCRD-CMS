@@ -27,9 +27,9 @@
  * a decision is work somebody can do this week; a quarantined one is work that
  * needs a faithful icon mapping, collection binding, or governed interaction.
  */
-export type ReasonDisposition = 'quarantine' | 'manual-decision'
+type ReasonDisposition = 'quarantine' | 'manual-decision'
 
-export type ReasonDef = {
+type ReasonDef = {
   code: string
   disposition: ReasonDisposition
   /** A whole sentence, in the present tense, about this definition. */

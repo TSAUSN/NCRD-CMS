@@ -5,7 +5,7 @@ import { join } from 'node:path'
 import { TestDatabase } from './harness.ts'
 import { seedScenario, type Scenario } from './fixtures.ts'
 import { createFilesystemMediaStore } from '../../platform/src/local/index.ts'
-import { importBetterTogetherHomepage } from '../../importer/src/better-together.ts'
+import { importBetterTogetherPage } from '../../importer/src/better-together.ts'
 import { installBetterTogetherPages } from '../../importer/src/better-together-install.ts'
 let db: TestDatabase, s: Scenario, root: string
 beforeAll(async () => {
@@ -38,7 +38,7 @@ afterAll(async () => {
   if (root) rmSync(root, { force: true, recursive: true })
 })
 const archive = () =>
-  importBetterTogetherHomepage({
+  importBetterTogetherPage({
     root,
     cache: join(root, 'cache'),
     page: 'hotel-information.php',

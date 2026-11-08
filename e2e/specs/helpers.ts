@@ -208,14 +208,6 @@ export async function deleteSelectedSection(page: Page): Promise<void> {
   await expect(confirm).toBeHidden()
 }
 
-/** Put the seeded home page back the way the seed left it. */
-export async function restoreSeededContent(page: Page): Promise<void> {
-  await clickOnCanvas(page, 'heading')
-  await typeInInspector(page, 0, 'heading', 'A page served by cms-v2')
-  await saveDraft(page)
-  await publish(page)
-}
-
 /** The preview choice moved into Preview in revision 8. */
 export async function setPreviewSiteLook(page: Page, context: 'draft' | 'published') {
   const choice = page.getByLabel('Preview with saved site-look changes', { exact: true })

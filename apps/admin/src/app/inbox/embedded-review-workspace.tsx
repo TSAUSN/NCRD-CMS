@@ -12,7 +12,7 @@ import type { ReviewModel } from './use-review-model.ts'
 import { ReviewFact, summaryOf } from './review-display.tsx'
 import { EmbeddedReviewDiscussion } from './review-discussion.tsx'
 
-export function EmbeddedReviewRail({ model }: { model: ReviewModel }) {
+function EmbeddedReviewRail({ model }: { model: ReviewModel }) {
   const { selected, basePath, filter, setFilter, query, setQuery, visible } = model
   return (
     <aside className={'review-queue ' + reviewWorkbenchStyles.workbenchRail} aria-label="Review requests">

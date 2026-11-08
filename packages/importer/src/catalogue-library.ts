@@ -211,7 +211,7 @@ export function mapFaithfully(
 }
 
 /** V1's embed sections, by the kind of governed embed each one frames. */
-export const LIBRARY_EMBEDS: Record<string, GovernedEmbedKind> = {
+const LIBRARY_EMBEDS: Record<string, GovernedEmbedKind> = {
   'video-embed-v1': 'video',
   'map-embed-v1': 'map',
   'form-embed-v1': 'form',

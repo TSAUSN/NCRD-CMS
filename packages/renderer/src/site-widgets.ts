@@ -1,7 +1,7 @@
 import { renderEchelonDirectory } from './echelon-directory.ts'
 import type { SiteWidget } from '@cms/schema'
 import { escapeAttribute as attr, escapeText as text, safeUrl } from './escape.ts'
-export type ChapterDirectoryEntry = {
+type ChapterDirectoryEntry = {
   name: string
   path?: string | null
   externalUrl?: string | null

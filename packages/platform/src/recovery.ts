@@ -12,7 +12,7 @@ import { isSafeObjectKey } from './local/index.ts'
 const MAGIC = Buffer.from('CMSBK1')
 const HEADER_BYTES = MAGIC.length + 12
 export type RecoveryFile = { file: string; sha256: string; bytes: number }
-export type RecoveryObject = RecoveryFile & { objectKey: string; contentType: string }
+type RecoveryObject = RecoveryFile & { objectKey: string; contentType: string }
 export type RecoveryManifest = {
   format: 'cms-recovery'
   version: 1

@@ -2,7 +2,7 @@
 import type { SlotDef } from '@cms/schema'
 import type { CoreSection } from './core-library.ts'
 type Variant = (slug: string, name: string, purpose: string, html: string, fields: SlotDef[]) => CoreSection
-export const ECHELON_NATIONAL_STORIES = [
+const ECHELON_NATIONAL_STORIES = [
   {
     title: 'Leading through others',
     summary: 'Col. Michele Matthews on helping Echelon grow across the country.',

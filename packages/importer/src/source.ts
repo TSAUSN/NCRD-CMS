@@ -35,9 +35,9 @@ export const V1_INPUTS = {
  * data and checked against its census hash, preserving every site variant.
  * Both the census and the exact source modules enter the run manifest.
  */
-export const CENSUS_INPUT = 'docs/v1-inventory/summary.json'
+const CENSUS_INPUT = 'docs/v1-inventory/summary.json'
 
-export type SourceFile = {
+type SourceFile = {
   /** Relative to its root. Absolute paths never enter a report or a run ID. */
   path: string
   sha256: string
