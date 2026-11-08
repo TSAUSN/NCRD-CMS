@@ -164,7 +164,7 @@ export function FontLibrary({
       setSaved(JSON.stringify(snapshot))
       setKit(ADOBE_KIT_URL)
       setRevision(result.revision)
-      router.refresh()
+      // The server action already invalidates the design. A refresh here can cancel the requested exit.
       return { ok: true }
     } catch {
       const message = 'The font draft could not be saved. Your choices are still here. Try again when connected.'
