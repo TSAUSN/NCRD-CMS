@@ -328,7 +328,8 @@ export function SiteLookWorkspace({
                 menuMove={null}
                 onEdit={noop}
                 onDone={noop}
-                onSaved={refresh}
+                // The preview already renders this draft. Saving only updates its revision.
+                onSaved={noop}
                 registerDone={noop}
                 onDraftChange={changedFrame}
               />
