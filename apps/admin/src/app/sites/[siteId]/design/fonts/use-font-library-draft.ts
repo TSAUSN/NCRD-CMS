@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useTransition } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { THEME_FONT_OPTIONS, type ThemeTokens, type NavTree } from '@cms/schema'
 import { ADOBE_KIT_URL, PREVIEW_MESSAGE } from '@cms/renderer'
 import type { ThemeWorkspace, GlobalElementsWorkspace } from '../../../../../lib/queries.ts'
@@ -29,7 +29,7 @@ export function useFontLibraryDraft({ siteId, theme, frame, menu, chapter, origi
   const [error, setError] = useState('')
   const [notice, setNotice] = useState<ActionResult | null>(null)
   const [retry, setRetry] = useState(0)
-  const [pending, start] = useTransition()
+  const [pending, setPending] = useState(false)
   const [status, setStatus] = useState<'unchecked' | 'checking' | 'loaded' | 'unavailable'>('unchecked')
   const busy = useRef(false)
   const iframe = useRef<HTMLIFrameElement>(null)
@@ -137,6 +137,7 @@ export function useFontLibraryDraft({ siteId, theme, frame, menu, chapter, origi
       return { ok: false, message }
     }
     busy.current = true
+    setPending(true)
     setNotice(null)
     const snapshot = structuredClone(tokens)
     const data = new FormData()
@@ -158,12 +159,8 @@ export function useFontLibraryDraft({ siteId, theme, frame, menu, chapter, origi
       return { ok: false, message }
     } finally {
       busy.current = false
+      setPending(false)
     }
-  }
-  function save() {
-    start(async () => {
-      await persist()
-    })
   }
 
   const options = THEME_FONT_OPTIONS.filter(
@@ -198,6 +195,6 @@ export function useFontLibraryDraft({ siteId, theme, frame, menu, chapter, origi
     bodyOptions,
     defaultBody,
     buttonFont,
-    save,
+    save: persist,
   }
 }
