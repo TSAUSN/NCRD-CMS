@@ -3770,18 +3770,3 @@ real constraint intact; deployed ticket lifetimes and grants do not change.
 Keep private artifacts outside Git and delete capabilities after verification.
 Any changed output byte or new failing gate leaves the refactor on its own branch.
 Existing failures require the same-code baseline evidence described above.
-
-## 2026-11-06 — ship the safe reference/isolation prefix, hold editor and CSS work
-
-Final integration checks found a new tablet Close-navigation blocker and broader
-CSS-module cascade changes after the mechanical editor moves. The unchanged test
-reproduced alone. Targeted CSS-order attempts fixed it but did not preserve all
-views; they were reverted. Friday takes priority. Keep the complete editor, dead
-CSS and named stylesheet work on refactor/handover994c30cc for next week.
-
-Select only its first four commits: browser-port isolation and oracles, checked
-SQL reference, maintainer map and capture cleanup. This prefix changes no app
-runtime, production package, migration or lock file from6dcfc5c1. Full exact-tag
-browser gates and the hosted route still govern acceptance. Reverse by returning
-to6dcfc5c1, retaining all deployment fixes and private backups. Never deploy the
-held branch or count its interrupted runs as passing release gates.

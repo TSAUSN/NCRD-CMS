@@ -7,7 +7,7 @@ acceptance belong in the top handoff and SPEC. Do not deploy a moving branch tip
 
 | Area | Observed behavior | What to do |
 | --- | --- | --- |
-| Previews | The earlier personal build sometimes loaded the page but did not open the inline frame. | Wait for real content. If the inline preview offers **Try preview again**, use it once, or open the same preview in a new tab. Your draft is separate. |
+| Previews | The personal review copy has sometimes left the inline frame blank even when the preview document endpoint responded. | Wait for real content. If the inline preview offers **Try preview again**, use it once, or open the same preview in a new tab. Your draft is separate. |
 | Story scheduling | After the phase-scoped readiness fix, server requests took 11.588 seconds to prepare, 12.814 seconds to schedule and 3.072 seconds to cancel. | Allow about 15 seconds per server step; wait for its final receipt. Do not run bulk content checks while timing it. Cancel a QA schedule before it can run. |
 | Chrome debugging | Attaching browser debugging stalled some previews; cancelling Chrome's debugging banner let them load. | Review in ordinary Chrome. An ordinary-browser stall remains a defect and takes priority; do not dismiss it based only on the debugging observation. |
 
@@ -59,9 +59,8 @@ unchanged. Passing only a focused repeat does not erase the original failure.
 - `section-product-completion.spec.ts:66` in WebKit failed only during overlap and
   passed unchanged alone. Repeat any overlap-only failure alone before diagnosis.
 
-These are unresolved baseline observations, not approval to ignore a failing demo
-step. New failures on the final candidate must be resolved or the refactor left
-on its branch.
+These observations describe the frozen release baseline. Record the exact commit
+and complete checks for any new release candidate.
 
 ## Delivery and imported content
 
