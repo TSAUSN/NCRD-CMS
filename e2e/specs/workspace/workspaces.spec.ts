@@ -1,5 +1,8 @@
 import { test, expect, type Page, type Locator } from '@playwright/test'
 import { mkdir } from 'node:fs/promises'
+import { randomUUID } from 'node:crypto'
+import { Pool } from 'pg'
+import { e2eTarget } from '../../test-target.ts'
 import { resolve } from 'node:path'
 import { signIn } from '../helpers.ts'
 import { CORE_THEME_PRESETS } from '@cms/seeds/core-themes'
@@ -258,7 +261,7 @@ test('revision 8 workspaces: media grid, conditional attention filter, details d
   const base = await openSite(page),
     siteId = base.split('/').at(-1)!
   const assets = [0, 1, 2].map(index => ({
-    id: '90000000-0000-4000-8000-00000000000' + (index + 1),
+    id: randomUUID(),
     revision: 1,
     siteId,
     scope: 'site',
@@ -284,89 +287,152 @@ test('revision 8 workspaces: media grid, conditional attention filter, details d
     createdAt: '2026-10-25T12:00:00Z',
     deletedAt: null,
   }))
-  let fail = false
-  await page.route('**/api/sites/*/media?**', async route => {
-    if (fail) {
-      await route.fulfill({ status: 503, json: { error: 'The local fixture is temporarily unavailable.' } })
-      return
+  const { host, port, database } = e2eTarget()
+  const pool = new Pool({ connectionString: `postgres://cms:cms@${host}:${port}/${database}` })
+  try {
+    // The initial library comes from the server; the route below still controls later filter/error responses.
+    for (const [index, asset] of assets.entries()) {
+      await pool.query(
+        `INSERT INTO media
+           (id,site_id,object_key,content_hash,original_name,alt_text,width,height,bytes,mime_type,status,
+            folder,attribution,source,tags,created_at)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,now()+($16*interval '1 second'))`,
+        [
+          asset.id,
+          siteId,
+          'e2e-workspace/' + asset.id,
+          asset.id.replaceAll('-', '').repeat(2),
+          asset.name,
+          asset.altText,
+          asset.width,
+          asset.height,
+          asset.bytes,
+          asset.mimeType,
+          asset.status,
+          asset.folder,
+          asset.attribution,
+          asset.source,
+          asset.tags,
+          3 - index,
+        ],
+      )
+      if (asset.status === 'ready') {
+        await pool.query(
+          `INSERT INTO media_variants(media_id,kind,object_key,content_hash,width,height,bytes,mime_type)
+           VALUES ($1,'thumbnail',$2,$3,$4,$5,$6,$7)`,
+          [
+            asset.id,
+            'e2e-workspace/thumb-' + asset.id,
+            asset.id.replaceAll('-', '').repeat(2),
+            asset.width,
+            asset.height,
+            asset.bytes,
+            asset.mimeType,
+          ],
+        )
+        await page.route('**/media/' + asset.id + '/thumbnail', route =>
+          route.fulfill({
+            path: resolve('../apps/site/public/cms-samples/r8-landscape.png'),
+            contentType: 'image/png',
+          }),
+        )
+      }
     }
-    const parameters = new URL(route.request().url()).searchParams,
-      status = parameters.get('status'),
-      shown =
-        parameters.get('search') === 'missing-picture'
-          ? []
-          : status === 'failed'
-            ? assets.filter(asset => asset.status === 'failed')
-            : assets
-    await route.fulfill({
-      json: {
-        assets: shown,
-        total: shown.length,
-        page: 1,
-        pageSize: 24,
-        pageCount: 1,
-        facets: {
-          folders: [{ path: 'Events/2027', count: 3 }],
-          tags: [{ tag: 'event', count: 3 }],
-          scopes: { site: 3, shared: 0 },
-          statuses: { ready: 2, processing: 0, failed: 1, deleted: 0 },
+    let fail = false
+    let filterRequests = 0
+    await page.route('**/api/sites/*/media?**', async route => {
+      filterRequests += 1
+      if (fail) {
+        await route.fulfill({ status: 503, json: { error: 'The local fixture is temporarily unavailable.' } })
+        return
+      }
+      const parameters = new URL(route.request().url()).searchParams,
+        status = parameters.get('status'),
+        shown =
+          parameters.get('search') === 'missing-picture'
+            ? []
+            : status === 'failed'
+              ? assets.filter(asset => asset.status === 'failed')
+              : assets
+      await route.fulfill({
+        json: {
+          assets: shown,
+          total: shown.length,
+          page: 1,
+          pageSize: 24,
+          pageCount: 1,
+          facets: {
+            folders: [{ path: 'Events/2027', count: 3 }],
+            tags: [{ tag: 'event', count: 3 }],
+            scopes: { site: 3, shared: 0 },
+            statuses: { ready: 2, processing: 0, failed: 1, deleted: 0 },
+          },
         },
-      },
+      })
     })
-  })
-  await page.route('**/api/media/assets/*/usage', route =>
-    route.fulfill({ json: { usage: { currentLive: [], currentDraft: [], history: [] } } }),
-  )
-  await page.goto(base + '/media')
-  await expect(page.getByRole('button', { name: 'Needs attention (1)', exact: true })).toBeVisible()
-  if (await page.getByRole('button', { name: 'Close upload panel', exact: true }).count())
+    await page.route('**/api/media/assets/*/usage', route =>
+      route.fulfill({ json: { usage: { currentLive: [], currentDraft: [], history: [] } } }),
+    )
+    await page.goto(base + '/media')
+    await expect(page.getByRole('button', { name: 'Needs attention (1)', exact: true })).toBeVisible()
+    if (await page.getByRole('button', { name: 'Close upload panel', exact: true }).count())
+      await page.getByRole('button', { name: 'Close upload panel', exact: true }).click()
+    await expect(page.locator('.media-summary')).toHaveCount(0)
+    await capture(page, 'media-grid-folders')
+    expect(filterRequests, 'The first Media screen uses the result already read by the server').toBe(0)
+    await page.locator('.media-asset-open').first().click()
+    const drawer = page.getByRole('dialog', { name: 'Image details', exact: true })
+    await expect(drawer.getByLabel('Description for people who can’t see it', { exact: true })).toBeVisible()
+    await capture(page, 'media-details-drawer')
+    await expect(drawer.getByRole('button', { name: 'Save image details', exact: true })).toBeInViewport()
+    await drawer
+      .getByLabel('Description for people who can’t see it', { exact: true })
+      .fill('An unsaved description that should not disappear')
+    await expect(drawer.getByRole('button', { name: 'Save image details', exact: true })).toBeEnabled()
+    await drawer.getByRole('button', { name: 'Close Image details', exact: true }).click()
+    await page
+      .getByRole('alertdialog', { name: 'Before you leave', exact: true })
+      .getByRole('button', { name: 'Keep editing', exact: true })
+      .click()
+    await expect(drawer).toBeVisible()
+    await drawer
+      .getByLabel('Description for people who can’t see it', { exact: true })
+      .fill('A welcoming community gathering')
+    await expect(drawer.getByRole('button', { name: 'Save image details', exact: true })).toBeDisabled()
+    await drawer.getByText('More details', { exact: true }).click()
+    await capture(page, 'media-more-details', drawer.getByText('More details', { exact: true }))
+    await drawer.getByRole('tab', { name: 'Used on', exact: true }).click()
+    await expect(drawer.getByRole('tab', { name: 'Used on', exact: true })).toHaveAttribute('aria-selected', 'true')
+    await expect(drawer.getByText('No saved content references this image.', { exact: true })).toBeVisible()
+    await capture(page, 'media-unused')
+    await page.keyboard.press('Escape')
+    await page.getByLabel('Search all images', { exact: true }).fill('missing-picture')
+    await expect(page.getByRole('heading', { name: 'No images match these filters', exact: true })).toBeVisible()
+    await capture(
+      page,
+      'media-empty-search',
+      page.getByRole('heading', { name: 'No images match these filters', exact: true }),
+    )
+    await page.getByLabel('Search all images', { exact: true }).clear()
+    await expect(page.locator('.media-asset')).toHaveCount(3)
+    await page.getByRole('button', { name: 'Needs attention (1)', exact: true }).click()
+    await expect(page.locator('.media-asset')).toHaveCount(1)
+    await capture(page, 'media-attention', page.locator('.media-asset'))
+    await page.getByRole('button', { name: 'Upload images', exact: true }).click()
+    await capture(page, 'media-upload-empty')
     await page.getByRole('button', { name: 'Close upload panel', exact: true }).click()
-  await expect(page.locator('.media-summary')).toHaveCount(0)
-  await capture(page, 'media-grid-folders')
-  await page.locator('.media-asset-open').first().click()
-  const drawer = page.getByRole('dialog', { name: 'Image details', exact: true })
-  await expect(drawer.getByLabel('Description for people who can’t see it', { exact: true })).toBeVisible()
-  await capture(page, 'media-details-drawer')
-  await expect(drawer.getByRole('button', { name: 'Save image details', exact: true })).toBeInViewport()
-  await drawer
-    .getByLabel('Description for people who can’t see it', { exact: true })
-    .fill('An unsaved description that should not disappear')
-  await expect(drawer.getByRole('button', { name: 'Save image details', exact: true })).toBeEnabled()
-  await drawer.getByRole('button', { name: 'Close Image details', exact: true }).click()
-  await page
-    .getByRole('alertdialog', { name: 'Before you leave', exact: true })
-    .getByRole('button', { name: 'Keep editing', exact: true })
-    .click()
-  await expect(drawer).toBeVisible()
-  await drawer
-    .getByLabel('Description for people who can’t see it', { exact: true })
-    .fill('A welcoming community gathering')
-  await expect(drawer.getByRole('button', { name: 'Save image details', exact: true })).toBeDisabled()
-  await drawer.getByText('More details', { exact: true }).click()
-  await capture(page, 'media-more-details', drawer.getByText('More details', { exact: true }))
-  await drawer.getByRole('tab', { name: 'Used on', exact: true }).click()
-  await expect(drawer.getByRole('tab', { name: 'Used on', exact: true })).toHaveAttribute('aria-selected', 'true')
-  await expect(drawer.getByText('No saved content references this image.', { exact: true })).toBeVisible()
-  await capture(page, 'media-unused')
-  await page.keyboard.press('Escape')
-  await page.getByLabel('Search all images', { exact: true }).fill('missing-picture')
-  await expect(page.getByRole('heading', { name: 'No images match these filters', exact: true })).toBeVisible()
-  await capture(
-    page,
-    'media-empty-search',
-    page.getByRole('heading', { name: 'No images match these filters', exact: true }),
-  )
-  await page.getByLabel('Search all images', { exact: true }).clear()
-  await expect(page.locator('.media-asset')).toHaveCount(3)
-  await page.getByRole('button', { name: 'Needs attention (1)', exact: true }).click()
-  await expect(page.locator('.media-asset')).toHaveCount(1)
-  await capture(page, 'media-attention', page.locator('.media-asset'))
-  await page.getByRole('button', { name: 'Upload images', exact: true }).click()
-  await capture(page, 'media-upload-empty')
-  await page.getByRole('button', { name: 'Close upload panel', exact: true }).click()
-  fail = true
-  await page.getByRole('button', { name: 'All', exact: true }).click()
-  await expect(page.getByRole('alert').filter({ hasText: 'temporarily unavailable' })).toBeVisible()
-  await capture(page, 'media-error')
-  expect(errors).toEqual([])
+    fail = true
+    await page.getByRole('button', { name: 'All', exact: true }).click()
+    await expect(page.getByRole('alert').filter({ hasText: 'temporarily unavailable' })).toBeVisible()
+    await capture(page, 'media-error')
+    expect(errors).toEqual([])
+  } finally {
+    try {
+      const ids = assets.map(asset => asset.id)
+      await pool.query('DELETE FROM media_variants WHERE media_id=ANY($1::uuid[])', [ids])
+      await pool.query('DELETE FROM media WHERE id=ANY($1::uuid[])', [ids])
+    } finally {
+      await pool.end()
+    }
+  }
 })
