@@ -151,11 +151,25 @@ function render() {
 function flushEffects() {
   harness.effects.splice(0).forEach(effect => effect())
 }
+function renderListPresentation(node: ReactElement<Record<string, unknown>>): ReactNode | undefined {
+  // Expand the workspace's own markup; keep shared UI controls shallow.
+  if (
+    typeof node.type === 'function' &&
+    [
+      'SelectedCollection',
+      'CollectionHeading',
+      'CollectionRecords',
+      'CollectionWorkspaceDialogs',
+      'CollectionRail',
+    ].includes(node.type.name)
+  )
+    return (node.type as (props: Record<string, unknown>) => ReactNode)(node.props)
+}
 function elements(node: ReactNode): ReactElement<Record<string, any>>[] {
   if (Array.isArray(node)) return node.flatMap(elements)
   if (!isValidElement<Record<string, any>>(node)) return []
-  // Traverse owned presentation while keeping the shared controls shallow.
-  // The harness still exercises the workspace's real pending handlers.
+  const owned = renderListPresentation(node)
+  if (owned !== undefined) return [node, ...elements(owned)]
   if (node.type === CollectionRecordList)
     return [node, ...elements(CollectionRecordList(node.props as Parameters<typeof CollectionRecordList>[0]))]
   if (node.type === CollectionEntryDrawer)
@@ -169,6 +183,8 @@ function elements(node: ReactNode): ReactElement<Record<string, any>>[] {
 function label(node: ReactNode): string {
   if (Array.isArray(node)) return node.map(label).join('')
   if (isValidElement<{ children?: ReactNode }>(node)) {
+    const owned = renderListPresentation(node)
+    if (owned !== undefined) return label(owned)
     if (node.type === CollectionPublishingStatus)
       return label(CollectionPublishingStatus(node.props as Parameters<typeof CollectionPublishingStatus>[0]))
     return label(node.props.children)
