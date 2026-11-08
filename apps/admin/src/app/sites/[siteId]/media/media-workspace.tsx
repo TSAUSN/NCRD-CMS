@@ -55,6 +55,7 @@ import type { NavigationGuardState } from '../../../../lib/navigation-guard.ts'
 import { MediaUploadPanel } from './media-upload-panel.tsx'
 import { ImageReplacement } from './image-replacement.tsx'
 import { MediaDetail } from './media-detail.tsx'
+import { MediaSearch } from './media-search.tsx'
 import { normalizedTags } from './media-tags.ts'
 
 type View = 'grid' | 'list'
@@ -772,31 +773,21 @@ export function MediaWorkspace({
               Image library
             </h2>
           </div>
-          <div className="media-search">
-            <IconSearch size={16} />
-            <label className="sr-only" htmlFor="media-search">
-              Search all images
-            </label>
-            <input
-              id="media-search"
-              type="search"
-              placeholder="Search names, descriptions, credits or tags"
-              value={searchInput}
-              onChange={event => {
-                const value = event.target.value
-                const apply = () => {
-                  if (native) {
-                    setSelectedId(null)
-                    metadataDirty.current = false
-                    setMetadataChanged(false)
-                  }
-                  setSearchInput(value)
+          <MediaSearch
+            value={searchInput}
+            onChange={value => {
+              const apply = () => {
+                if (native) {
+                  setSelectedId(null)
+                  metadataDirty.current = false
+                  setMetadataChanged(false)
                 }
-                if (native || bulkDirty) leaveDetails(apply)
-                else apply()
-              }}
-            />
-          </div>
+                setSearchInput(value)
+              }
+              if (native || bulkDirty) leaveDetails(apply)
+              else apply()
+            }}
+          />
         </div>
         <div className={'media-controls ' + mediaUi.toolbar}>
           <SegmentedControl

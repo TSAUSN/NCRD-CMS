@@ -580,9 +580,29 @@ test.describe('media library workspace', () => {
     await expect.poll(async () => (await fetchPublic()).body.includes(realMediaId)).toBe(false)
     expect((await fetchPublic(publicImagePath, { 'If-None-Match': publicImage.headers.etag! })).status).toBe(404)
 
-    await page.goto(mediaPath)
+    // Test a slow document load: text entered before the client takes over
+    // must not disappear. The search stays disabled until it can process input.
+    const chunks = /\/_next\/static\/chunks\/[^?]+\.js(?:\?|$)/
+    let releaseScripts!: () => void
+    const scriptsReady = new Promise<void>(resolve => {
+      releaseScripts = resolve
+    })
+    const hold = async (route: Route) => {
+      await scriptsReady
+      await route.fallback()
+    }
+    const search = page.getByLabel('Search all images')
+    await page.route(chunks, hold)
+    try {
+      await page.goto(mediaPath, { waitUntil: 'commit' })
+      await expect(search).toBeAttached()
+      await expect(search).toBeDisabled()
+    } finally {
+      releaseScripts()
+      await page.unroute(chunks, hold)
+    }
     await expect(page.getByRole('heading', { name: 'Media', level: 1 })).toBeVisible()
-    await page.getByLabel('Search all images').fill(imageSearch)
+    await search.fill(imageSearch)
     await expect(page.getByRole('list', { name: 'Images' }).getByRole('button')).toHaveCount(1)
     await page.getByRole('button', { name: imageLabel }).click()
     await page.getByRole('button', { name: 'Delete image' }).click()
