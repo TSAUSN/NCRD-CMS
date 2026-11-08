@@ -8,7 +8,8 @@
 // Every interleaving here is driven deliberately. Each save request parks until
 // the test hands it a permit, so "A's response arrives while B is untyped" is
 // something the test *causes* rather than something it hopes a timer produces.
-import { expect, test, type Page } from '@playwright/test'
+import { expect, type Page } from '@playwright/test'
+import { test } from './fixtures/shared-demo-home.ts'
 import { canvas, clickOnCanvas, openSeededPage, saveDraft, savedState, signIn, typeInInspector } from './helpers.ts'
 
 /**

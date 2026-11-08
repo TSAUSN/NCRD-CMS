@@ -1,4 +1,5 @@
-import { test, expect } from '@playwright/test'
+import { expect } from '@playwright/test'
+import { test } from './fixtures/shared-demo-home.ts'
 import { openSeededPage, signIn, publish } from './helpers.ts'
 test('editor Publish asks for review and Cancel leaves the live page unchanged', async ({ page }) => {
   await signIn(page, 'editor@example.test')

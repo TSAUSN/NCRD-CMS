@@ -1,6 +1,7 @@
 // Drive the editor through real controls in both documents. Canvas keyboard
 // events do not bubble to the parent, even when the iframe is same-origin.
-import { expect, test, type Page } from '@playwright/test'
+import { expect, type Page } from '@playwright/test'
+import { test } from './fixtures/shared-demo-home.ts'
 import {
   addSectionButton,
   canvas,

@@ -27,6 +27,40 @@ release sequence](friday-go-live.md) and [recovery](../upgrades/backup-recovery.
 Do not transfer service-role keys, account passwords, or session links in this packet.
 The receiving administrator manages the environment’s secrets through its own approved store.
 
+## Transfer the candidate source
+
+1. Freeze the reviewed candidate commit and compare its full SHA with the
+   personal review health receipts, image digest, and complete browser results.
+   Keep the immutable Friday release tag and the candidate identifier separate.
+2. The sender creates a source bundle from the personal repository. Use the
+   verified ref, write the bundle outside the checkout, and pass it through the
+   approved private transfer channel. Put the content and identity packet
+   described above in separate files.
+
+   ```bash
+   git branch handoff/cms-reviewed CANDIDATE_SHA
+   git bundle create /PRIVATE/PATH/cms-reviewed.bundle refs/heads/handoff/cms-reviewed
+   shasum -a 256 /PRIVATE/PATH/cms-reviewed.bundle
+   ```
+
+3. The receiving repository owner verifies the bundle checksum, fetches the
+   handoff ref from the local bundle into an organization checkout, and checks
+   the full SHA. Review the diff and the repository's existing history before
+   publishing an integration branch. Use the normal review and branch policy.
+
+   ```bash
+   git bundle verify /PRIVATE/PATH/cms-reviewed.bundle
+   git fetch /PRIVATE/PATH/cms-reviewed.bundle refs/heads/handoff/cms-reviewed:refs/heads/handoff/cms-reviewed
+   git rev-parse refs/heads/handoff/cms-reviewed
+   ```
+
+4. Set up the receiving repository's staging and production environments and
+   their Google workload identities. Follow [automatic releases](../upgrades/automatic-releases.md)
+   and the [Google go-live runbook](friday-go-live.md) for the exact target
+   verification, backup, restore, media, health, role and rollback checks.
+   Use the final commit and immutable image digest. Confirm sign-in delivery and
+   a fresh Super admin session on the new Admin callback before moving editors.
+
 ## Record hosted role acceptance
 
 Use the personal review copy and keep the completed account inventory and
@@ -47,8 +81,8 @@ project-team addresses. Record any role you could only walk locally as local.
 Use the CMS's [access controls](../people/adding-a-person.md) to assign the
 smallest scope and confirm the visible role after sign-in. Check both the
 permitted actions and direct access to an unassigned site, division or chapter.
-Archive or remove disposable drafts after the walk and record where the test
-accounts remain. Keep passwords, authentication links and session data out of
+Archive or remove disposable drafts, revoke their CMS grants and delete their
+provider accounts after the walk. Retain the private evidence of cleanup. Keep passwords, authentication links and session data out of
 the handoff notes. [Supabase email delivery documentation](https://supabase.com/docs/guides/auth/auth-smtp).
 
 ## Move sign-in ownership

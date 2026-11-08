@@ -1,4 +1,5 @@
-import { expect, test } from '@playwright/test'
+import { expect } from '@playwright/test'
+import { test } from '../fixtures/shared-demo-home.ts'
 import { mkdir } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { signIn, openSeededPage, addSectionButton, saveDraft, treeLabels, deleteSelectedSection } from '../helpers.ts'

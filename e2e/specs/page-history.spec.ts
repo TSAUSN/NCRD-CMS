@@ -1,4 +1,5 @@
-import { expect, test, type Page } from '@playwright/test'
+import { expect, type Page } from '@playwright/test'
+import { test } from './fixtures/shared-demo-home.ts'
 import { Client } from 'pg'
 import { READINESS_POLICY_VERSION } from '../../packages/domain/src/readiness.ts'
 import { e2eTarget } from '../test-target.ts'

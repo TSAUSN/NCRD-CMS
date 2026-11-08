@@ -1,4 +1,5 @@
-import { expect, test } from '@playwright/test'
+import { expect } from '@playwright/test'
+import { test } from './fixtures/shared-demo-home.ts'
 import { Client } from 'pg'
 import { canvas, clickOnCanvas, fetchPublic, openSeededPage, saveDraft, signIn, typeInInspector } from './helpers.ts'
 

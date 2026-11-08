@@ -5,7 +5,8 @@
 // input path producing a convincing false result. Consequential findings are
 // confirmed through a second path: the browser says the page published, and a
 // raw socket with no browser confirms what the internet actually receives.
-import { expect, test } from '@playwright/test'
+import { expect } from '@playwright/test'
+import { test } from './fixtures/shared-demo-home.ts'
 import {
   canvas,
   clickOnCanvas,
