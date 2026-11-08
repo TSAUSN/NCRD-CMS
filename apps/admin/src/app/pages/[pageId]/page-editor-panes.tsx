@@ -26,7 +26,7 @@ export function PageEditorPanes({ session, commands, viewTools }: PageEditorScre
     clipboard,
   } = session
   const { sitePreview, setShowHiddenSections, showHiddenSections } = session.view
-  const { rightWidth, structureWidth, structureCollapsed, rightOverlay } = session.panels
+  const { rightWidth, structureWidth, structureCollapsed, rightOverlay, panesRef, layoutReady } = session.panels
   const { pageSettingsOpen, setPageSettingsOpen, pane, setPane, closeSharedPanel } = session.selection
   const { sectionTool } = session.sectionTools
   const { layoutTarget } = session.sectionUpdates
@@ -78,6 +78,8 @@ export function PageEditorPanes({ session, commands, viewTools }: PageEditorScre
 
       <div
         id="editor-panes"
+        ref={panesRef}
+        data-layout-ready={layoutReady}
         className={`panes ${panelStyles.panes}`}
         data-shown={pane}
         data-library={libraryOpen}

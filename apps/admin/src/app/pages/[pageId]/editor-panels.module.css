@@ -25,6 +25,9 @@
   position: relative;
   background: var(--surface);
 }
+.panes[data-layout-ready='false'] > .structure {
+  visibility: hidden;
+}
 .structurePanel {
   width: 100% !important;
   height: 100%;

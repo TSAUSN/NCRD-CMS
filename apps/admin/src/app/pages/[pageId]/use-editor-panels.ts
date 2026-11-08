@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { EditorState } from '@cms/domain'
 
 /** Size the panes and restore focus when section placement or a field closes. */
@@ -9,15 +9,19 @@ export function useEditorPanels(
 ) {
   const [rightWidth, setRightWidth] = useState(360)
   const [structureWidth, setStructureWidth] = useState(240)
-  const [workspaceWidth, setWorkspaceWidth] = useState(1440)
+  const [measuredWidth, setMeasuredWidth] = useState<number | null>(null)
+  const workspaceWidth = measuredWidth ?? 1440
   const [structureOpen, setStructureOpen] = useState(false)
   const pendingFieldFocus = useRef<string | null>(null)
   const structureCollapsed = workspaceWidth - rightWidth - structureWidth < 480
   const rightOverlay = originalDesign && workspaceWidth - rightWidth - 48 < 480
-  useEffect(() => {
-    const panes = document.getElementById('editor-panes')
+  const panesRef = useRef<HTMLDivElement>(null)
+  useLayoutEffect(() => {
+    const panes = panesRef.current
     if (!panes) return
-    const observer = new ResizeObserver(() => setWorkspaceWidth(panes.clientWidth))
+    const measure = () => setMeasuredWidth(panes.clientWidth)
+    measure()
+    const observer = new ResizeObserver(measure)
     observer.observe(panes)
     return () => observer.disconnect()
   }, [])
@@ -48,6 +52,8 @@ export function useEditorPanels(
     structureWidth,
     setStructureWidth,
     workspaceWidth,
+    panesRef,
+    layoutReady: measuredWidth !== null,
     structureOpen,
     setStructureOpen,
     pendingFieldFocus,
