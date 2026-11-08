@@ -104,6 +104,8 @@ pnpm test:db --maxWorkers=2
 
 Run relevant tests for each change. At a release checkpoint, run the full
 Chromium and WebKit suites on the exact candidate with the approved local
-source inputs. Keep assertions and timeouts intact. Record missing inputs,
+source inputs. Keep assertions and timeouts intact. If you split an independent
+journey, map its original test title to the replacement cases in the private
+inventory so every assertion remains accountable. Record missing inputs,
 baseline failures and new failures separately. A pre-existing failure is still
 a failed check; do not use it to justify a production deployment.

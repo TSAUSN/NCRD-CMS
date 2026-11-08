@@ -38,6 +38,11 @@ selection and move controls. `collection-record-display.ts` formats record field
 for the list and editor. An inline List save uses the same private entry command
 as Lists, then refreshes the canvas. The Lists route loads fresh records on entry.
 
+Header defaults come from the pinned component’s logo field in
+`lib/frame-field-values.ts`. Site Look uses the contrast policy validated by the
+theme schema. Story refresh and sector limits come from the configured story
+source. Keep installation compatibility defaults in `lib/site-installation-settings.ts`.
+
 The report's stylesheet is composed in `packages/renderer/src/report-page-presentation.ts`.
 The `report-presentation/` modules own the foundations, content bands, page
 layout, narrative layout and native sections. The stylesheet hash test checks
@@ -50,7 +55,7 @@ and confirmation dialogs each have a named component in the same directory.
 
 Browser tests live under `e2e/specs/` in feature folders. Use the
 [test move map](../../maintainers/test-moves.md) to find old round names.
-Test titles and assertions are preserved. Unit tests sit beside
+Keep existing assertions when reorganizing tests. Unit tests sit beside
 code; real database tests are `packages/schema/test/*.db.test.ts` and package/app
 `test/` folders. Permission claims need the real-role tests, not only unit mocks.
 
@@ -106,6 +111,10 @@ Call it from the server route using the verified session's user ID and route's
 site ID. Use `asUser` with a parameterized site-scoped read, and fetch only what
 the screen displays. If the route already loads the right record, extend that
 read rather than running a duplicate query. Keep the route's capability checks.
+Usage counts in `lib/section-usage.ts` and `server/queries/theme.ts` resolve
+current versions by their indexed ownership keys. Check the query plan with
+freshly restored and analyzed data under the real reader role before changing
+that join.
 
 **Add a renderer behavior.** `packages/renderer/src/behaviors/types.ts` defines
 `SectionBodyBehavior`. Use a named module beside `feature-tiles.ts`, return the
