@@ -116,6 +116,11 @@ unrelated one; use the golden comparison before shipping a public change.
   dialogs have their own files. The page outline and page settings live in
   `page-inspector.tsx`; selected-section fields live in `inspector.tsx`. The
   domain package owns undoable changes.
+- In `app/sites/[siteId]/content/`, `collections-workspace.tsx` coordinates
+  revisions, navigation and server actions. `collection-record-list.tsx` shows
+  the rows and cards, `collection-entry-drawer.tsx` owns one item's fields, and
+  `collection-publishing-status.tsx` and `collection-publication-review.tsx` own
+  the footer and the saved changes shown before publishing.
 - For Chapters, `app/sites/[siteId]/chapters/workspace.tsx` owns the list and
   saved detail. `chapter-form.tsx` owns the setup draft, its navigation guard,
   and Save. The destination, section, and contact fields each have a named

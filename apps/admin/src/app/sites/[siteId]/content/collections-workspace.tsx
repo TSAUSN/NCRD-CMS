@@ -8,7 +8,6 @@ import shared from '../../../../components/workspace.module.css'
 import workspaceFormsStyles from '../../../../components/workspace-styles/workspace-forms.module.css'
 import recordTableStyles from '../../../../components/workspace-styles/record-table.module.css'
 import selectionControlsStyles from '../../../../components/workspace-styles/selection-controls.module.css'
-import listInspectorStyles from '../../../../components/workspace-styles/list-inspector.module.css'
 import ownedStyles from './collections-workspace-styles.module.css'
 import { MediaPicker } from '../../../pages/[pageId]/media-picker.tsx'
 import {
@@ -18,7 +17,6 @@ import {
   CardHeading,
   CardContent,
   Disclosure,
-  Drawer,
   Menu,
   Field,
   SegmentedControl,
@@ -33,7 +31,6 @@ import { useNavigationGuard, requestClientNavigation } from '../../../../compone
 import type { CollectionReview } from '../../../../lib/collection-review.ts'
 import { useEffect, useMemo, useRef, useState, useTransition } from 'react'
 import { GuardedLink as Link } from '../../../../components/guarded-link.tsx'
-import { CollectionFieldControl } from '../../../../components/collection-field-control.tsx'
 import { useRouter } from 'next/navigation'
 import { parseCollectionEntryValues, type CollectionModel as CollectionModelValue } from '@cms/schema'
 import {
@@ -58,6 +55,9 @@ import { CreateCollectionDialog } from './create-collection-dialog.tsx'
 import { SchemaDesigner } from './schema-designer.tsx'
 import { CsvDialog } from './csv-dialog.tsx'
 import { CollectionRecordList } from './collection-record-list.tsx'
+import { CollectionEntryDrawer } from './collection-entry-drawer.tsx'
+import { CollectionPublicationReview } from './collection-publication-review.tsx'
+import { CollectionPublishingStatus } from './collection-publishing-status.tsx'
 import { entryChanged, entryIdentity, recordTitle } from './collection-record-display.ts'
 import { DocumentPickerDialog } from './document-picker-dialog.tsx'
 
@@ -589,18 +589,6 @@ export function CollectionsWorkspace({
     })
   }
 
-  const readableValue = (value: unknown): string =>
-    typeof value === 'string'
-      ? value.replace(/<[^>]*>/g, '').trim() || 'Empty'
-      : typeof value === 'boolean'
-        ? value
-          ? 'Yes'
-          : 'No'
-        : typeof value === 'number'
-          ? String(value)
-          : value && typeof value === 'object'
-            ? 'Picture selected'
-            : 'Empty'
   const noun = listItemUnit(selected?.readerKey ?? '')
   const opened = entries.find(entry => entryIdentity(entry) === expanded)
   const imageValue = imageFor
@@ -643,54 +631,17 @@ export function CollectionsWorkspace({
           headerTarget,
         )}
       {publishOpen && selected && (
-        <ConfirmDialog
-          tone="publish"
-          title={`Publish ${selected.name}?`}
-          what={
-            <div className={styles.publication}>
-              <p>The saved items, order and removals will become live on every page that uses this list.</p>
-              {publicationChanges.length ? (
-                <ul>
-                  {publicationChanges.map(item => (
-                    <li key={item.key}>
-                      <strong>{item.title}</strong>
-                      <ul>
-                        {item.changes.map((change, index) => (
-                          <li key={index}>{change}</li>
-                        ))}
-                      </ul>
-                      <Disclosure title="View item details">
-                        <dl>
-                          {model?.fields.map(field => (
-                            <div key={field.key}>
-                              <dt>{field.label}</dt>
-                              <dd>
-                                {readableValue(
-                                  savedEntries.find(entry => (entry.id ?? entry.stableKey) === item.key)?.values[
-                                    field.key
-                                  ],
-                                )}
-                              </dd>
-                            </div>
-                          ))}
-                        </dl>
-                      </Disclosure>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p>No visible content differences.</p>
-              )}
-            </div>
-          }
-          reassurance="Other saved work stays private until published."
-          confirmLabel="Publish this list"
+        <CollectionPublicationReview
+          listName={selected.name}
+          publicationChanges={publicationChanges}
+          fields={model?.fields ?? []}
+          savedEntries={savedEntries}
           pending={pending}
           error={notice && !notice.ok ? notice.message : undefined}
           onCancel={() => {
             if (!busy()) setPublishOpen(false)
           }}
-          onConfirm={publishEntriesNow}
+          onPublish={publishEntriesNow}
         />
       )}
       {submitOpen && (
@@ -1008,88 +959,31 @@ export function CollectionsWorkspace({
                 label={selected.name + ' records'}
                 footerLabel="List publishing status"
                 footer={
-                  <>
-                    <span>
-                      <strong>
-                        {entryEdits
-                          ? 'Unsaved changes'
-                          : entriesNeedResave
-                            ? 'Apply saved field changes'
-                            : changes + ' ' + (changes === 1 ? 'change' : 'changes') + ' not live'}
-                      </strong>
-                      <small>
-                        {entryEdits
-                          ? 'Save your draft before publishing.'
-                          : entriesNeedResave
-                            ? 'The saved list fields need applying to item drafts.'
-                            : 'Visitors see the published list.'}
-                      </small>
-                    </span>
-                    <div className={styles.actions}>
-                      {rights.editEntries && (
-                        <Button
-                          variant="secondary"
-                          disabled={!entryDirty || invalidEntryKeys.size > 0}
-                          loading={pending}
-                          onClick={saveEntries}
-                        >
-                          Save draft
-                        </Button>
-                      )}
-                      {rights.editEntries && (
-                        <Button
-                          variant={rights.publish ? 'secondary' : 'primary'}
-                          disabled={
-                            anythingDirty ||
-                            Boolean(currentReview) ||
-                            pending ||
-                            (entryRevision === publishedEntryRevision && draftSchemaId === publishedSchemaId)
-                          }
-                          onClick={() => setSubmitOpen(true)}
-                        >
-                          {currentReview ? 'Waiting for review' : 'Submit for review'}
-                        </Button>
-                      )}
-                      {rights.publish && (
-                        <>
-                          <Button
-                            variant="secondary"
-                            disabled={
-                              entryDirty ||
-                              entryRevision === publishedEntryRevision ||
-                              Boolean(currentReview) ||
-                              pending
-                            }
-                            onClick={event =>
-                              openDialog(() => {
-                                setNotice(null)
-                                setPublishOpen(true)
-                              }, event.currentTarget)
-                            }
-                          >
-                            Review
-                          </Button>
-                          <Button
-                            variant="publish"
-                            disabled={
-                              entryDirty ||
-                              entryRevision === publishedEntryRevision ||
-                              Boolean(currentReview) ||
-                              pending
-                            }
-                            onClick={event =>
-                              openDialog(() => {
-                                setNotice(null)
-                                setPublishOpen(true)
-                              }, event.currentTarget)
-                            }
-                          >
-                            Publish list
-                          </Button>
-                        </>
-                      )}
-                    </div>
-                  </>
+                  <CollectionPublishingStatus
+                    entryEdits={entryEdits}
+                    entriesNeedResave={entriesNeedResave}
+                    changes={changes}
+                    pending={pending}
+                    canEdit={rights.editEntries}
+                    canPublish={rights.publish}
+                    hasOpenReview={Boolean(currentReview)}
+                    saveReady={entryDirty && invalidEntryKeys.size === 0}
+                    submitReady={
+                      !anythingDirty &&
+                      !currentReview &&
+                      !pending &&
+                      (entryRevision !== publishedEntryRevision || draftSchemaId !== publishedSchemaId)
+                    }
+                    publishReady={!entryDirty && entryRevision !== publishedEntryRevision && !currentReview && !pending}
+                    onSave={saveEntries}
+                    onSubmit={() => setSubmitOpen(true)}
+                    onReview={event =>
+                      openDialog(() => {
+                        setNotice(null)
+                        setPublishOpen(true)
+                      }, event.currentTarget)
+                    }
+                  />
                 }
               >
                 <CollectionRecordList
@@ -1117,82 +1011,26 @@ export function CollectionsWorkspace({
         </div>
       )}
       {opened && model && (
-        <Drawer
-          density="compact"
-          title={(opened.id ? 'Edit ' : 'Add ') + noun}
-          onClose={cancelEntry}
+        <CollectionEntryDrawer
+          opened={opened}
+          noun={noun}
+          fields={model.fields}
+          availableMedia={availableMedia}
           pending={pending}
-          footer={
-            <>
-              <Button variant="secondary" disabled={pending} onClick={cancelEntry}>
-                Cancel
-              </Button>
-              <Button
-                disabled={!rights.editEntries || !entryDirty || invalidEntryKeys.size > 0}
-                loading={pending}
-                onClick={saveEntries}
-              >
-                Save {noun}
-              </Button>
-            </>
+          canEdit={rights.editEntries}
+          canSave={rights.editEntries && entryDirty && invalidEntryKeys.size === 0}
+          error={notice && !notice.ok ? notice.message : undefined}
+          onCancel={cancelEntry}
+          onSave={saveEntries}
+          onChange={(fieldKey, value) => setValue(entryIdentity(opened), fieldKey, value)}
+          onImage={fieldKey => openDialog(() => setImageFor({ entryKey: entryIdentity(opened), fieldKey }))}
+          onDocument={fieldKey => openDialog(() => setDocumentFor({ entryKey: entryIdentity(opened), fieldKey }))}
+          onDuplicate={() => duplicateEntry(opened)}
+          onToggleVisibility={() =>
+            updateEntry(entryIdentity(opened), entry => ({ ...entry, archived: !entry.archived }))
           }
-        >
-          <p className={recordTableStyles.meta}>Save keeps this item private until you publish the list.</p>
-          {opened.editedAt && (
-            <p className={recordTableStyles.meta}>
-              Updated {new Date(opened.editedAt).toLocaleString('en-US')} ·{' '}
-              <span title={opened.editedBy ?? undefined}>{opened.editedBy ?? 'Not saved yet'}</span>
-            </p>
-          )}
-          {notice && !notice.ok && <p role="alert">{notice.message}</p>}
-          <div className={listInspectorStyles.formStack}>
-            {model.fields.map(field => (
-              <CollectionFieldControl
-                key={field.key}
-                field={field}
-                entry={opened}
-                media={availableMedia}
-                disabled={!rights.editEntries || opened.archived || pending}
-                onChange={value => setValue(entryIdentity(opened), field.key, value)}
-                onChooseImage={() =>
-                  openDialog(() => setImageFor({ entryKey: entryIdentity(opened), fieldKey: field.key }))
-                }
-                onChooseDocument={() =>
-                  openDialog(() => setDocumentFor({ entryKey: entryIdentity(opened), fieldKey: field.key }))
-                }
-              />
-            ))}
-          </div>
-          {rights.editEntries && (
-            <div className={styles.actions}>
-              <Button variant="secondary" disabled={pending} onClick={() => duplicateEntry(opened)}>
-                Duplicate
-              </Button>
-              <Button
-                variant="secondary"
-                disabled={pending}
-                onClick={() => updateEntry(entryIdentity(opened), entry => ({ ...entry, archived: !entry.archived }))}
-              >
-                {opened.archived ? 'Show in list' : 'Hide from list'}
-              </Button>
-            </div>
-          )}
-          <Disclosure title="Advanced">
-            <Field
-              id={'stable-' + entryIdentity(opened)}
-              label="Record key"
-              help="Pages use this permanent key to identify the item."
-            >
-              <input
-                value={opened.stableKey}
-                disabled={!rights.editEntries || pending || opened.id !== null}
-                onChange={event =>
-                  updateEntry(entryIdentity(opened), entry => ({ ...entry, stableKey: event.target.value }))
-                }
-              />
-            </Field>
-          </Disclosure>
-        </Drawer>
+          onKeyChange={stableKey => updateEntry(entryIdentity(opened), entry => ({ ...entry, stableKey }))}
+        />
       )}
       {createOpen && (
         <CreateCollectionDialog

@@ -86,6 +86,9 @@ vi.mock('../../../../lib/document-library.ts', () => ({
 
 import { CollectionsWorkspace } from './collections-workspace.tsx'
 import { CollectionRecordList } from './collection-record-list.tsx'
+import { CollectionEntryDrawer } from './collection-entry-drawer.tsx'
+import { CollectionPublicationReview } from './collection-publication-review.tsx'
+import { CollectionPublishingStatus } from './collection-publishing-status.tsx'
 
 const model = {
   fields: [{ key: 'title', label: 'Title', type: 'text' as const, required: true }],
@@ -151,15 +154,25 @@ function flushEffects() {
 function elements(node: ReactNode): ReactElement<Record<string, any>>[] {
   if (Array.isArray(node)) return node.flatMap(elements)
   if (!isValidElement<Record<string, any>>(node)) return []
-  // Traverse the real rows after their extraction. Keep other components
-  // shallow so the harness still controls the workspace's pending handlers.
+  // Traverse owned presentation while keeping the shared controls shallow.
+  // The harness still exercises the workspace's real pending handlers.
   if (node.type === CollectionRecordList)
     return [node, ...elements(CollectionRecordList(node.props as Parameters<typeof CollectionRecordList>[0]))]
+  if (node.type === CollectionEntryDrawer)
+    return elements(CollectionEntryDrawer(node.props as Parameters<typeof CollectionEntryDrawer>[0]))
+  if (node.type === CollectionPublicationReview)
+    return elements(CollectionPublicationReview(node.props as Parameters<typeof CollectionPublicationReview>[0]))
+  if (node.type === CollectionPublishingStatus)
+    return elements(CollectionPublishingStatus(node.props as Parameters<typeof CollectionPublishingStatus>[0]))
   return [node, ...elements(node.props.children), ...elements(node.props.footer)]
 }
 function label(node: ReactNode): string {
   if (Array.isArray(node)) return node.map(label).join('')
-  if (isValidElement<{ children?: ReactNode }>(node)) return label(node.props.children)
+  if (isValidElement<{ children?: ReactNode }>(node)) {
+    if (node.type === CollectionPublishingStatus)
+      return label(CollectionPublishingStatus(node.props as Parameters<typeof CollectionPublishingStatus>[0]))
+    return label(node.props.children)
+  }
   return typeof node === 'string' || typeof node === 'number' ? String(node) : ''
 }
 function button(tree: ReactNode, name: string) {
