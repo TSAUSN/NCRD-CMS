@@ -161,7 +161,17 @@ async function fixture() {
       ]),
     ])
     await client.query('COMMIT')
-    return { pool, site, page, from, to, list }
+    async function close() {
+      // The intercepted images only exist inside this spec. Later Home visits must not request them.
+      try {
+        await pool.query("UPDATE sites SET status='archived',archived_at=COALESCE(archived_at,now()) WHERE id=$1", [
+          site,
+        ])
+      } finally {
+        await pool.end()
+      }
+    }
+    return { pool, site, page, from, to, list, close }
   } catch (error) {
     await client.query('ROLLBACK')
     client.release()
@@ -248,7 +258,7 @@ test('image replacement reviews destinations and saves selected drafts while kee
     await page.getByRole('button', { name: 'Done', exact: true }).click()
     expect(errors).toEqual([])
   } finally {
-    await f.pool.end()
+    await f.close()
   }
 })
 test('image replacement refuses an outdated review and offers a fresh review without losing the new edit', async ({
@@ -297,7 +307,7 @@ test('image replacement refuses an outdated review and offers a fresh review wit
       ).rows[0]!.content[0].values.heading,
     ).toBe('A newer saved welcome')
   } finally {
-    await f.pool.end()
+    await f.close()
   }
 })
 test('contributors can replace content images and see that shared Site look needs an administrator', async ({
@@ -314,7 +324,7 @@ test('contributors can replace content images and see that shared Site look need
     await review.getByRole('button', { name: 'Close Replace image in saved drafts', exact: true }).click()
     await expect(review).toBeHidden()
   } finally {
-    await f.pool.end()
+    await f.close()
   }
 })
 
@@ -342,7 +352,7 @@ test('an unused image explains that previous saved versions keep their original 
     await review.getByRole('button', { name: 'Choose another image', exact: true }).click()
     await expect(picker).toBeVisible()
   } finally {
-    await f.pool.end()
+    await f.close()
   }
 })
 
@@ -394,6 +404,6 @@ test('opening an upload does not call the available current picture missing, and
     await picker.getByRole('button', { name: 'Cancel', exact: true }).click()
     await expect(page.locator('#slot-1-picture-src')).toHaveValue(`/media/${f.from}/wide`)
   } finally {
-    await f.pool.end()
+    await f.close()
   }
 })
