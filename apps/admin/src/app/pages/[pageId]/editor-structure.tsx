@@ -37,7 +37,6 @@ type Props = {
     setState: Set<EditorState>
     openLibrary: Tree['onAdd']
     placeLibraryEntry: Tree['onDropLibrary']
-    openPageSettings: Tree['onPageSettings']
   }
 }
 
@@ -67,7 +66,6 @@ export function EditorStructure({ layout, sections }: Props) {
     setState,
     openLibrary,
     placeLibraryEntry,
-    openPageSettings,
   } = sections
   return (
     <div
@@ -118,7 +116,6 @@ export function EditorStructure({ layout, sections }: Props) {
           onAdd={openLibrary}
           onDropLibrary={placeLibraryEntry}
           onToggleHidden={section => setState(toggleHidden(state, section))}
-          onPageSettings={openPageSettings}
         />
       </ResizablePanel>
     </div>

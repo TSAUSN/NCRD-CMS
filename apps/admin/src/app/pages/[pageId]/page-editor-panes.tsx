@@ -45,7 +45,6 @@ export function PageEditorPanes({ session, commands, viewTools }: PageEditorScre
     selectedSection,
     replacingSection,
     libraryActions,
-    openPageSettings,
     sectionActions,
     layoutActions,
     collectionActions,
@@ -97,7 +96,6 @@ export function PageEditorPanes({ session, commands, viewTools }: PageEditorScre
             slotsByDef,
             siteWide,
             setSiteWide,
-            openPageSettings,
           }}
         />
 
