@@ -157,7 +157,7 @@ export function adaptImportedMenu(
 }
 
 /** Shared by imports and versioned corrections to an earlier imported frame. */
-export function importedMenuCss(): string {
+function importedMenuCss(): string {
   return [
     '.navbar{position:relative;top:auto;left:auto;right:auto}',
     '.navbar>.container{display:flex;align-items:center;justify-content:space-between}',

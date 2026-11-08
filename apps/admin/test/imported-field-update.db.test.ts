@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import { compileSection } from '@cms/renderer'
-import { editableReference } from '@cms/importer/src/editable-reference.ts'
+import { editableReference } from '@cms/importer/editable-reference'
 import { CHECKED_CLEAN, TestDatabase } from '@cms/schema/testing'
 import { seedScenario, type Scenario } from '@cms/schema/fixtures'
 

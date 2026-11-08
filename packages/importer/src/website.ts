@@ -16,8 +16,6 @@ import { walk, attr, textOf, find, visibleText } from './website-tree.ts'
 import { createPageStylesheetReader } from './website-styles.ts'
 import { randomUUID } from 'node:crypto'
 import { createWebsiteSectionRegistry } from './website-section-registry.ts'
-export { siteStylesheet } from './website-styles.ts'
-export { importedMenuCss } from './website-page-cleanup.ts'
 
 export type WebsiteImportOptions = {
   /** Folder holding the site's pages and assets. */

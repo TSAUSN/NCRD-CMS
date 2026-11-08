@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { compileSection, renderSection } from '@cms/renderer'
 import type { SlotDef } from '@cms/schema'
-import { editableReference } from '@cms/importer/src/editable-reference.ts'
+import { editableReference } from '@cms/importer/editable-reference'
 import { isImportedDefinition, planImportedFieldUpdate, type ImportedDefinition } from './imported-field-update.ts'
 
 const PRESENTED = 'class="lead" style="font-family: var(--font-secondary);"'

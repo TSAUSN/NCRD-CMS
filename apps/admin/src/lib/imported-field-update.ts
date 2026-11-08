@@ -16,9 +16,9 @@
 // remove from (LIB-02). Each item keeps what its numbered copy held, and the
 // update is offered only when the page looks the same: the HTML may differ
 // only in whitespace between copies and V1's `data-block-id` editing hooks.
-import { editableReference } from '@cms/importer/src/editable-reference.ts'
-import { adaptRepeats, rendersAlike } from '@cms/importer/src/library-repeats.ts'
-import { withSourceSamples } from '@cms/importer/src/source-samples.ts'
+import { editableReference } from '@cms/importer/editable-reference'
+import { adaptRepeats, rendersAlike } from '@cms/importer/library-repeats'
+import { withSourceSamples } from '@cms/importer/source-samples'
 import { renderSection, type CompiledSection } from '@cms/renderer'
 import { repeatItemSlotId, repeatItemSpec, type SlotDef } from '@cms/schema'
 import { isImportedDefinition } from './imported-definition.ts'
