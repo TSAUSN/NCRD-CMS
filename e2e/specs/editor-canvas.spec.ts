@@ -699,7 +699,7 @@ test.describe('breakpoint visibility is bounded, not free layout (D5)', () => {
   })
 
   test('hiding a section on phones is recorded and undoable', async ({ page }) => {
-    await canvas(page).locator('[data-cms-section]').first().click()
+    await treeLabels(page).first().click()
     const inspector = page.getByRole('complementary', { name: 'Inspector' })
 
     await inspector.getByRole('tab', { name: 'Visibility', exact: true }).click()
@@ -720,14 +720,14 @@ test.describe('breakpoint visibility is bounded, not free layout (D5)', () => {
     await expect(canvas(page).locator('.cms-section--hero')).toBeVisible()
 
     await page.keyboard.press('ControlOrMeta+z')
-    await canvas(page).locator('[data-cms-section]').first().click()
+    await treeLabels(page).first().click()
     await inspector.getByRole('tab', { name: 'Visibility', exact: true }).click()
     await expect(inspector.getByRole('checkbox', { name: 'Phone', exact: true })).toBeChecked()
     await saveDraft(page)
   })
 
   test('offers no per-breakpoint layout controls, only visibility', async ({ page }) => {
-    await canvas(page).locator('[data-cms-section]').first().click()
+    await treeLabels(page).first().click()
     const inspector = page.getByRole('complementary', { name: 'Inspector' })
     await inspector.getByRole('tab', { name: 'Visibility', exact: true }).click()
     // The guardrail: there is deliberately nothing here that lets someone build
