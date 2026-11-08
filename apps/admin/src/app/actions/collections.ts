@@ -2,8 +2,9 @@
 import { revalidatePath } from 'next/cache'
 import { randomUUID } from 'node:crypto'
 import { asUser } from '@cms/platform'
-import { CollectionDraftBatch, CollectionModel, CollectionStableKey } from '@cms/schema'
-import { ActionResult, requireSession, toActionResult } from '../../lib/action-result.ts'
+import { CollectionModel, CollectionStableKey } from '@cms/schema'
+import { type ActionResult, requireSession } from '../../lib/action-result.ts'
+import { collectionActionError, saveListEntries } from '../../server/commands/save-list-entries.ts'
 
 export type CollectionCreateResult =
   | {
@@ -15,17 +16,6 @@ export type CollectionCreateResult =
       message: string
     }
   | Exclude<ActionResult, { ok: true }>
-
-function collectionActionError(error: unknown): Exclude<ActionResult, { ok: true }> {
-  const result = toActionResult(error)
-  return result.kind === 'conflict'
-    ? {
-        ...result,
-        message:
-          'Someone else saved this list while you were editing. Your work is still here. Reload to compare their changes before saving again.',
-      }
-    : result
-}
 
 function parseCollectionModelForm(
   formData: FormData,
@@ -189,36 +179,14 @@ export async function saveCollectionEntries(formData: FormData): Promise<ActionR
   } catch {
     return { ok: false, kind: 'error', message: 'The items could not be read. Reopen this list and try again.' }
   }
-  const parsed = CollectionDraftBatch.safeParse(raw)
-  if (!parsed.success) {
-    return {
-      ok: false,
-      kind: 'error',
-      message: parsed.error.issues[0]?.message ?? 'Check the item details before saving.',
-    }
-  }
-  try {
-    const row = await asUser(
-      { userId: session.principal.userId, requestId: randomUUID() },
-      async client =>
-        (
-          await client.query<{ entry_revision: string }>('SELECT * FROM app.save_collection_entries($1,$2,$3)', [
-            collectionId,
-            expectedRevision,
-            JSON.stringify(parsed.data),
-          ])
-        ).rows[0]!,
-    )
-    revalidatePath(`/sites/${siteId}/content`)
-    return {
-      ok: true,
-      revision: Number(row.entry_revision),
-      versionId: null,
-      message: 'List draft saved. The live site is unchanged.',
-    }
-  } catch (error) {
-    return collectionActionError(error)
-  }
+  const result = await saveListEntries({
+    actorId: session.principal.userId,
+    collectionId,
+    expectedRevision,
+    entries: raw,
+  })
+  if (result.ok) revalidatePath(`/sites/${siteId}/content`)
+  return result
 }
 
 export async function publishCollectionEntries(formData: FormData): Promise<ActionResult> {
