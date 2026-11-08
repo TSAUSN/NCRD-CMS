@@ -1,9 +1,8 @@
 import 'server-only'
 import { asUser } from '@cms/platform'
-import type { HeaderConfig } from '@cms/schema'
-import { UUID } from '../../../../lib/action-result.ts'
+import { UUID } from '../../../lib/action-result.ts'
 
-export type HeaderLogoChoice = {
+export type FrameLogoChoice = {
   id: string
   name: string
   altText: string
@@ -11,18 +10,13 @@ export type HeaderLogoChoice = {
   deliveryUrl: string | null
 }
 
-/** The Header screen shows the saved logos. Its picker loads the library on demand. */
-export async function readHeaderLogoChoices(
+/** Site frames need only their saved logos. Their pickers read the library when opened. */
+export async function readFrameLogoChoices(
   userId: string,
   siteId: string,
-  header: HeaderConfig,
-): Promise<HeaderLogoChoice[]> {
-  const logo = header.schemaVersion === 2 ? header.component.values.logo : undefined
-  const ids = (
-    header.schemaVersion === 1
-      ? [header.brand.logoMediaId, header.brand.compactLogoMediaId]
-      : [logo && typeof logo === 'object' && 'media_id' in logo ? logo.media_id : undefined]
-  ).filter((value): value is string => typeof value === 'string' && UUID.test(value))
+  mediaIds: readonly unknown[],
+): Promise<FrameLogoChoice[]> {
+  const ids = [...new Set(mediaIds.filter((value): value is string => typeof value === 'string' && UUID.test(value)))]
   if (!ids.length) return []
   return asUser({ userId }, async client => {
     const { rows } = await client.query<{

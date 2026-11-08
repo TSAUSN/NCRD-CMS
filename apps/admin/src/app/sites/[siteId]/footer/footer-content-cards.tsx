@@ -43,11 +43,12 @@ export function FooterTextField({ model, id, label }: { model: FooterDraft; id: 
 
 export function FooterContentCards({
   model,
-  media,
+  logoPreviewUrl,
   superAdmin,
 }: {
   model: FooterDraft
-} & Pick<FooterWorkspaceProps, 'media' | 'superAdmin'>) {
+  logoPreviewUrl: string
+} & Pick<FooterWorkspaceProps, 'superAdmin'>) {
   const {
     pending,
     setPicker,
@@ -70,11 +71,7 @@ export function FooterContentCards({
         {logoSlot ? (
           <>
             {!inherits && logo.src && (
-              <img
-                className={workspacePreviewStyles.assetThumb}
-                src={media.find(asset => asset.id === logo.media_id)?.previewUrl ?? String(logo.src)}
-                alt={String(logo.alt ?? '')}
-              />
+              <img className={workspacePreviewStyles.assetThumb} src={logoPreviewUrl} alt={String(logo.alt ?? '')} />
             )}
             <div className={workspaceFormsStyles.actions}>
               <Button variant="secondary" disabled={pending} onClick={() => setPicker(true)}>

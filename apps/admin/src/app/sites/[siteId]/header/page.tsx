@@ -11,7 +11,8 @@ import {
   roleLabel,
 } from '../../../../lib/queries.ts'
 import { publicSiteOrigin } from '../../../../lib/public-site-url.ts'
-import { readHeaderLogoChoices } from './logo-choices.ts'
+import { readFrameLogoChoices } from '../frame-logo-choices.ts'
+import { frameValueRecord } from '../../../../lib/frame-field-values.ts'
 import { HeaderMenuWorkspace } from './workspace.tsx'
 import styles from '../../../../components/workspace.module.css'
 import workspaceFormsStyles from '../../../../components/workspace-styles/workspace-forms.module.css'
@@ -31,7 +32,12 @@ export default async function HeaderPage({ params }: { params: Promise<{ siteId:
     roleLabel(user),
   ])
   if (!frame || !menu || !theme || !allowed) notFound()
-  const media = await readHeaderLogoChoices(user, siteId, frame.header.draft)
+  const header = frame.header.draft
+  const logoIds =
+    header.schemaVersion === 1
+      ? [header.brand.logoMediaId, header.brand.compactLogoMediaId]
+      : [frameValueRecord(header.component.values.logo).media_id]
+  const media = await readFrameLogoChoices(user, siteId, logoIds)
   return (
     <AppShell email={session.email} role={role} groups={navigationFor(site, session.principal)}>
       <main id="main" className={'wrap wrap-wide ' + styles.page + ' ' + workspaceFormsStyles.compactForm}>

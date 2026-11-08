@@ -1,9 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
 import { FooterConfig, type FooterConfig as Footer, type ThemeTokens } from '@cms/schema'
 import type { GlobalElementsWorkspace, NavigationWorkspace } from '../../../../lib/queries.ts'
-import type { MediaAsset } from '../../../../lib/media-library.ts'
+import type { FrameLogoChoice } from '../frame-logo-choices.ts'
 import { readFooterLinks } from '../../../../lib/footer-links.ts'
-import { carryFrameValues, frameValueRecord as record } from '../../../../lib/frame-field-values.ts'
+import {
+  carryFrameValues,
+  frameComponentDefinition,
+  frameLogoField,
+  frameValueRecord as record,
+} from '../../../../lib/frame-field-values.ts'
 import { useNavigationGuard } from '../../../../components/navigation-guard.ts'
 import { prepareNationalHeader } from '../header/actions.ts'
 import { saveFooter } from './actions.ts'
@@ -15,7 +20,7 @@ export type FooterWorkspaceProps = {
   initial: GlobalElementsWorkspace
   navigation: NavigationWorkspace
   theme: ThemeTokens
-  media: MediaAsset[]
+  savedLogos: FrameLogoChoice[]
   superAdmin: boolean
   origin: string | null
 }
@@ -36,12 +41,11 @@ export function useFooterDraft({ siteId, initial, navigation, theme, origin }: F
   const serial = JSON.stringify(footer)
   const dirty = serial !== saved
   const config = footer.schemaVersion === 2 ? footer.component : null
-  const component = config ? components.find(item => item.id === config.section_def_id) : null
-  const pin = component?.versions.find(version => version.version === config?.section_def_version)
+  const { component, pin } = frameComponentDefinition(components, config)
   const latest = component?.versions.at(-1)
   const fields = pin?.slots ?? []
   const values = config?.values ?? {}
-  const logoSlot = fields.find(slot => slot.kind === 'image' && slot.constraints?.siteLogo === true)
+  const logoSlot = frameLogoField(fields)
   const inherits = logoSlot?.constraints?.inheritHeaderLogo === true && !Object.hasOwn(values, logoSlot.id)
   const logo = record(logoSlot ? values[logoSlot.id] : null)
   const links = readFooterLinks(values.links)

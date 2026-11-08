@@ -1,4 +1,6 @@
 'use client'
+import { useState } from 'react'
+import type { MediaAsset } from '../../../../lib/media-library.ts'
 import { contentCountsForPages } from '../../../../lib/content-counts.ts'
 import { unpublishedChangeLabel } from '../../../../components/status.tsx'
 import { Badge, Button, ButtonLink, Note, PageHeader, TextLink } from '../../../../components/ui/index.ts'
@@ -10,8 +12,9 @@ import { FooterContentCards } from './footer-content-cards.tsx'
 import { FooterLinkList, FooterLinkDialogs } from './footer-link-controls.tsx'
 import { FrameWorkspacePreview, FrameWorkspacePreviewDialog } from '../frame-workspace-preview.tsx'
 export function FooterWorkspace(props: FooterWorkspaceProps) {
-  const { siteId, siteName, initial, navigation, media, superAdmin } = props
+  const { siteId, siteName, initial, navigation, savedLogos, superAdmin } = props
   const model = useFooterDraft(props)
+  const [chosenLogo, setChosenLogo] = useState<Pick<MediaAsset, 'id' | 'previewUrl'> | null>(null)
   const {
     footer,
     setFooter,
@@ -33,6 +36,10 @@ export function FooterWorkspace(props: FooterWorkspaceProps) {
     setPicker,
   } = model
   const { editing } = model.linkControls
+  const logoPreviewUrl =
+    (chosenLogo?.id === logo.media_id
+      ? chosenLogo?.previewUrl
+      : savedLogos.find(asset => asset.id === logo.media_id)?.previewUrl) ?? String(logo.src ?? '')
   return (
     <div className={styles.denseStack + ' ' + styles.singleColumn}>
       <PageHeader
@@ -89,7 +96,7 @@ export function FooterWorkspace(props: FooterWorkspaceProps) {
       <FrameWorkspacePreview part="footer" preview={preview} valid={valid} />
       {footer.schemaVersion === 2 ? (
         <div className={styles.threeColumns}>
-          <FooterContentCards model={model} media={media} superAdmin={superAdmin} />
+          <FooterContentCards model={model} logoPreviewUrl={logoPreviewUrl} superAdmin={superAdmin} />
           <FooterLinkList model={model} />
         </div>
       ) : (
@@ -115,7 +122,8 @@ export function FooterWorkspace(props: FooterWorkspaceProps) {
           siteId={siteId}
           mode="placement"
           confirmLabel="Use this logo"
-          initialAssets={media}
+          initialAssets={[]}
+          onSelectedAsset={({ id, previewUrl }) => setChosenLogo({ id, previewUrl })}
           currentValue={logo}
           onChoose={image => {
             value(logoSlot.id, { ...image, decorative: false })

@@ -8,7 +8,7 @@ import {
   type ThemeTokens,
 } from '@cms/schema'
 import type { GlobalElementsWorkspace, NavigationWorkspace } from '../../../../lib/queries.ts'
-import type { HeaderLogoChoice } from './logo-choices.ts'
+import type { FrameLogoChoice } from '../frame-logo-choices.ts'
 import { carryFrameValues, frameValueRecord as record } from '../../../../lib/frame-field-values.ts'
 import { useNavigationGuard } from '../../../../components/navigation-guard.ts'
 import { validHeaderButtonUrl } from '../../../../lib/header-button-link.ts'
@@ -20,7 +20,7 @@ export type HeaderMenuProps = {
   initial: GlobalElementsWorkspace
   navigation: NavigationWorkspace
   theme: ThemeTokens
-  media: HeaderLogoChoice[]
+  media: FrameLogoChoice[]
   superAdmin: boolean
   origin: string | null
 }
