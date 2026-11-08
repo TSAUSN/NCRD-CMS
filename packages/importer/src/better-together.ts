@@ -1,25 +1,12 @@
-/** BT2027 offline marketing pages. No network, crawling or backend reads:
- * rendered marketing HTML and explicitly referenced public files only. */
-import { createHash, randomUUID } from 'node:crypto'
-import { readFileSync, realpathSync, statSync } from 'node:fs'
-import { basename, extname, resolve, sep } from 'node:path'
+/** Convert one approved offline conference page into a private draft archive. */
+import { randomUUID } from 'node:crypto'
 import { parse, serializeOuter, type DefaultTreeAdapterMap } from 'parse5'
 import { compileSection, sectionScopeSelector } from '@cms/renderer'
-import {
-  DEFAULT_THEME_TOKENS,
-  DEFAULT_HEADER_CONFIG_V1,
-  DEFAULT_FOOTER_CONFIG_V1,
-  parseSiteArchive,
-  type SiteArchive,
-  type SiteFileBundle,
-  type SiteFileKind,
-  type SlotDef,
-} from '@cms/schema'
-
+import type { SiteArchive, SiteFileBundle, SlotDef } from '@cms/schema'
+import { assembleBetterTogetherArchive } from './better-together-archive.ts'
+import { BETTER_TOGETHER_SOURCE_ORIGIN, readBetterTogetherAssets } from './better-together-assets.ts'
 type Node = DefaultTreeAdapterMap['node']
 type Element = DefaultTreeAdapterMap['element']
-type Receipt = { source: string; final: string; file: string; hash: string; bytes: number; type: string }
-const hash = (bytes: string | Uint8Array) => createHash('sha256').update(bytes).digest('hex')
 const attr = (node: Element, name: string) => node.attrs.find(a => a.name === name)?.value
 function* walk(node: Node): Generator<Element> {
   if ('tagName' in node) yield node
@@ -27,15 +14,6 @@ function* walk(node: Node): Generator<Element> {
 }
 const text = (node: Node): string =>
   'value' in node ? node.value : 'childNodes' in node ? node.childNodes.map(text).join('') : ''
-const extensions = /\.(?:css|js|png|jpe?g|gif|webp|svg|woff2?|ttf|otf)$/i
-const kindOf = (name: string): SiteFileKind =>
-  /\.css$/i.test(name)
-    ? 'stylesheet'
-    : /\.js$/i.test(name)
-      ? 'script'
-      : /\.(?:woff2?|ttf|otf)$/i.test(name)
-        ? 'font'
-        : 'image'
 export const BT_NO_SCRIPT_CSS =
   '@media(scripting:none){.animate-on-scroll{opacity:1;transform:none}.sched-panel{display:block}}'
 
@@ -75,101 +53,17 @@ export function importBetterTogetherPage(options: {
     ].includes(page)
   )
     throw new Error('Choose a BT2027 marketing page.')
-  const root = realpathSync(options.root),
-    cache = realpathSync(options.cache),
-    created = new Date().toISOString(),
-    slug = options.slug ?? 'bt2027-r8'
-  const receipts = JSON.parse(readFileSync(resolve(cache, 'receipts.json'), 'utf8')) as Receipt[]
-  const bySource = new Map(
-    receipts.flatMap(
-      row =>
-        [
-          [row.source, row],
-          [row.final, row],
-        ] as const,
-    ),
+
+  const created = new Date().toISOString()
+  const slug = options.slug ?? 'bt2027-r8'
+  const { files, objects, paths, omitted, add, resource, fileIdAtPath } = readBetterTogetherAssets(
+    options.root,
+    options.cache,
+    created,
   )
-  const files: NonNullable<SiteArchive['content']['site_files']> = [],
-    objects: SiteArchive['objects'] = [],
-    paths: NonNullable<SiteFileBundle['paths']> = [],
-    styles: SiteFileBundle['styles'] = [],
-    scripts: SiteFileBundle['scripts'] = []
-  const loaded = new Map<string, { id: string; path: string }>(),
-    omitted = new Set<string>(),
-    sourceBase = 'https://bettertogether2027.org/'
-  function add(kind: SiteFileKind, name: string, source: string, bytes: Buffer, path: string) {
-    const id = randomUUID()
-    files.push({ id, kind, name, source, bytes: bytes.length, sha256: hash(bytes), created_at: created })
-    objects.push({ media_id: id, kind: 'site-file', sha256: hash(bytes), base64: bytes.toString('base64') })
-    paths.push({ path, fileId: id })
-    return { id, path }
-  }
-  function resource(value: string, base = sourceBase): string {
-    if (!value || /^(?:data:|#)/i.test(value)) return value
-    const url = new URL(value, base),
-      key = url.origin + url.pathname + url.search,
-      existing = loaded.get(key)
-    if (existing) return existing.path + url.hash
-    let bytes: Buffer, name: string, path: string, source: string
-    if (url.hostname === new URL(sourceBase).hostname) {
-      const relative = decodeURIComponent(url.pathname).replace(/^\//, '')
-      if (!extensions.test(relative) || !/^(?:css|images|js|fonts)\//.test(relative)) return value
-      const lexical = resolve(root, relative),
-        real = realpathSync(lexical)
-      if (
-        !lexical.startsWith(root + sep) ||
-        !real.startsWith(root + sep) ||
-        extname(real) !== extname(lexical) ||
-        !statSync(real).isFile()
-      )
-        throw new Error('A homepage asset escapes the chosen local folder.')
-      bytes = readFileSync(real)
-      name = basename(relative).replace(/[^A-Za-z0-9._-]/g, '-')
-      path = url.pathname
-      source = 'local:bettertogether2027.org/' + relative
-    } else {
-      const receipt = bySource.get(key)
-      if (!receipt) {
-        omitted.add(key)
-        return '/images/unavailable-' + hash(key).slice(0, 16) + '.png'
-      }
-      if (!/^[a-f0-9]{64}\.bin$/.test(receipt.file)) throw new Error('Invalid offline cache receipt.')
-      const cached = realpathSync(resolve(cache, receipt.file))
-      if (!cached.startsWith(cache + sep)) throw new Error('An offline cache file escapes the chosen folder.')
-      bytes = readFileSync(cached)
-      if (hash(bytes) !== receipt.hash || bytes.length !== receipt.bytes)
-        throw new Error('Offline cache bytes do not match their receipt.')
-      const ext = /css/i.test(receipt.type)
-        ? '.css'
-        : /javascript/i.test(receipt.type)
-          ? '.js'
-          : extname(url.pathname) || '.woff2'
-      name = 'cached-' + hash(key).slice(0, 16) + ext
-      path = '/fonts/' + name
-      source = receipt.source
-    }
-    const kind = kindOf(name),
-      reserved = { id: randomUUID(), path }
-    loaded.set(key, reserved)
-    if (kind === 'stylesheet') {
-      let css = bytes.toString('utf8')
-      css = css.replace(/@import\s+(?:url\(\s*)?["']?([^"'\s);]+)["']?\s*\)?[^;]*;/gi, (_match, href: string) => {
-        const imported = resource(href, url.href),
-          entry = paths.find(row => row.path === imported),
-          object = entry && objects.find(object => object.media_id === entry.fileId)
-        return object ? Buffer.from(object.base64, 'base64').toString('utf8') : ''
-      })
-      css = css.replace(/url\(\s*(["']?)(.*?)\1\s*\)/gi, (_match, _quote: string, href: string) => {
-        // EOT/SVG font fallbacks are unused by the three supported modern engines.
-        if (/\.(?:eot)(?:[?#]|$)/i.test(href)) return 'url(data:application/octet-stream;base64,)'
-        return 'url("' + resource(href, url.href).replace(/"/g, '%22') + '")'
-      })
-      bytes = Buffer.from(css)
-    }
-    const result = add(kind, name, source, bytes, path)
-    loaded.set(key, result)
-    return result.path + url.hash
-  }
+  const styles: SiteFileBundle['styles'] = []
+  const scripts: SiteFileBundle['scripts'] = []
+  const sourceBase = BETTER_TOGETHER_SOURCE_ORIGIN
   const doc = parse(options.html),
     elements = [...walk(doc)],
     html = elements.find(n => n.tagName === 'html')!,
@@ -178,10 +72,9 @@ export function importBetterTogetherPage(options: {
   // Keep stylesheet cascade order, including styles originally inside the body.
   for (const [index, node] of elements.entries()) {
     if (node.tagName === 'link' && /\bstylesheet\b/.test(attr(node, 'rel') ?? '')) {
-      const path = resource(attr(node, 'href') ?? ''),
-        file = paths.find(row => row.path === path)
-      if (!file) throw new Error('A homepage stylesheet is missing from the offline cache.')
-      styles.push({ fileId: file.fileId, pages: [pageId] })
+      const fileId = fileIdAtPath(resource(attr(node, 'href') ?? ''))
+      if (!fileId) throw new Error('A homepage stylesheet is missing from the offline cache.')
+      styles.push({ fileId, pages: [pageId] })
     } else if (node.tagName === 'style') {
       const css = text(node).replace(
         /url\(\s*(["']?)(.*?)\1\s*\)/gi,
@@ -204,18 +97,17 @@ export function importBetterTogetherPage(options: {
       }
       const position =
         body.childNodes.indexOf(node) >= 0 && body.childNodes.indexOf(node) < 3 ? 'body-start' : 'body-end'
-      const scriptPath = src ? resource(src) : null
-      const file = src
-        ? paths.find(row => row.path === scriptPath)
+      const fileId = src
+        ? fileIdAtPath(resource(src))
         : add(
             'script',
             prefix + '-inline-' + index + '.js',
             'local:' + page + '#script-' + index,
             Buffer.from(code),
             '/js/' + prefix + '-inline-' + index + '.js',
-          )
-      if (!file) throw new Error('A homepage script is missing from the offline cache.')
-      scripts.push({ fileId: 'fileId' in file ? file.fileId : file.id, position, loading: 'normal', pages: [pageId] })
+          ).id
+      if (!fileId) throw new Error('A homepage script is missing from the offline cache.')
+      scripts.push({ fileId, position, loading: 'normal', pages: [pageId] })
     }
   }
   const fallback = add(
@@ -359,131 +251,28 @@ export function importBetterTogetherPage(options: {
     description =
       attr(elements.find(node => node.tagName === 'meta' && attr(node, 'name') === 'description') ?? html, 'content') ??
       ''
-  const one = () => ({ id: randomUUID(), revision: 1, draft_version_id: randomUUID(), published_version_id: null }),
-    pageVersion = randomUUID(),
-    theme = one(),
-    settings = one(),
-    navigation = one(),
-    head = one(),
-    foot = one(),
-    fileVersion = randomUUID()
-  const bundle: SiteFileBundle = {
-    version: 1,
-    files: files.map(file => file.id),
-    scripts,
-    styles,
-    paths,
-    original: {
-      version: 1,
-      definitions: definitions.map(def => ({ section_def_id: def.id, section_def_version: 1 })),
-      pages: [
-        {
-          pageId,
-          ...(doc.mode === 'quirks' ? { quirks: true } : {}),
-          html: Object.fromEntries(html.attrs.map(a => [a.name, a.value])),
-          body: Object.fromEntries(body.attrs.map(a => [a.name, a.value])),
-          header: !!header,
-          footer: !!footer,
-        },
-      ],
-    },
-  }
-  const archive = parseSiteArchive({
-    format: 'cms-site-content',
-    version: 1,
-    exported_at: created,
+
+  const archive = assembleBetterTogetherArchive({
+    created,
+    slug,
+    pageSlug: home ? '' : prefix,
+    pageId,
+    title,
+    originalTitle,
+    description,
+    quirks: doc.mode === 'quirks',
+    html: Object.fromEntries(html.attrs.map(attribute => [attribute.name, attribute.value])),
+    body: Object.fromEntries(body.attrs.map(attribute => [attribute.name, attribute.value])),
+    header,
+    footer,
+    files,
     objects,
-    content: {
-      site: { name: 'Better Together 2027', slug, kind: 'conference' },
-      pages: [
-        {
-          id: pageId,
-          revision: 1,
-          draft_version_id: pageVersion,
-          published_version_id: null,
-          slug: home ? '' : prefix,
-          title,
-          layout_mode: 'sections',
-          status: 'draft',
-          editor_label: '',
-          sort_index: 0,
-          archived_at: null,
-        },
-      ],
-      page_versions: [
-        {
-          id: pageVersion,
-          revision: 1,
-          created_at: created,
-          page_id: pageId,
-          content,
-          meta: { title: originalTitle, description, noindex: false },
-          kind: 'checkpoint',
-          note: 'Original local homepage',
-          page_title: title,
-          page_slug: home ? '' : prefix,
-        },
-      ],
-      themes: [theme],
-      theme_versions: [
-        {
-          id: theme.draft_version_id,
-          revision: 1,
-          created_at: created,
-          theme_id: theme.id,
-          tokens: DEFAULT_THEME_TOKENS,
-        },
-      ],
-      site_settings: [settings],
-      site_setting_versions: [
-        {
-          id: settings.draft_version_id,
-          revision: 1,
-          created_at: created,
-          site_settings_id: settings.id,
-          settings: { name: 'Better Together 2027' },
-        },
-      ],
-      navigations: [{ ...navigation, mode: 'manual' }],
-      navigation_versions: [
-        { id: navigation.draft_version_id, revision: 1, created_at: created, navigation_id: navigation.id, tree: [] },
-      ],
-      global_elements: [
-        { ...head, kind: 'header', use_on_live: true },
-        { ...foot, kind: 'footer', use_on_live: true },
-      ],
-      global_element_versions: [
-        {
-          id: head.draft_version_id,
-          revision: 1,
-          created_at: created,
-          global_element_id: head.id,
-          content: header
-            ? { schemaVersion: 2, enabled: true, sticky: false, component: header }
-            : { ...DEFAULT_HEADER_CONFIG_V1, enabled: false },
-        },
-        {
-          id: foot.draft_version_id,
-          revision: 1,
-          created_at: created,
-          global_element_id: foot.id,
-          content: footer
-            ? { schemaVersion: 2, enabled: true, component: footer }
-            : { ...DEFAULT_FOOTER_CONFIG_V1, enabled: false },
-        },
-      ],
-      section_defs: definitions,
-      section_def_versions: versions,
-      collections: [],
-      collection_schema_versions: [],
-      collection_entries: [],
-      collection_entry_versions: [],
-      media: [],
-      media_variants: [],
-      site_files: files,
-      site_file_versions: [{ id: fileVersion, version: 1, bundle, reviewed_at: created }],
-      site_file_heads: [{ revision: 1, draft_version_id: fileVersion, published_version_id: null }],
-    },
+    styles,
+    scripts,
+    paths,
+    definitions,
+    versions,
+    content,
   })
   return { archive, report, omitted: [...omitted] }
 }
