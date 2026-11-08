@@ -1,8 +1,8 @@
 'use client'
-import { useState } from 'react'
-import { NavTree, NavUrl, type NavNode } from '@cms/schema'
+import { useMemo, useState } from 'react'
+import { NavTree, type NavNode } from '@cms/schema'
 import { canAppendMenuItem, dropMenuItem, editMenuItem, moveMenuItem } from '../lib/menu-editing.ts'
-import { Badge, Button, Card, Dialog, Field, Menu, SegmentedControl, SearchableSelect } from './ui/index.ts'
+import { Badge, Button, Card, Dialog, Menu } from './ui/index.ts'
 import { IconDrag, IconMore, IconPlus } from './icons.tsx'
 import recordTableStyles from './workspace-styles/record-table.module.css'
 import siteSummaryStyles from './workspace-styles/site-summary.module.css'
@@ -12,8 +12,7 @@ import reorderStyles from './ui/reorderable-list.module.css'
 import { useReorderableList } from './ui/use-reorderable-list.ts'
 import { DropIndicator, ReorderAnnouncement } from './ui/drop-indicator.tsx'
 import { menuReorderIntent, type MenuMove } from '../lib/menu-reorder-intent.ts'
-type PageChoice = { id: string; title: string; path: string; published: boolean }
-type Editing = { path: string; snapshot: NavTree; fresh: boolean; kind: 'page' | 'url' | 'group' }
+import { CompactMenuItemDialog, type MenuPageChoice, type MenuItemEditing } from './compact-menu-item-dialog.tsx'
 export function CompactMenuEditor({
   tree,
   pages,
@@ -22,14 +21,15 @@ export function CompactMenuEditor({
   onEditing,
 }: {
   tree: NavTree
-  pages: PageChoice[]
+  pages: MenuPageChoice[]
   disabled: boolean
   onChange: (tree: NavTree) => void
   onEditing: (editing: boolean) => void
 }) {
-  const [editing, setEditing] = useState<Editing | null>(null),
-    [removing, setRemoving] = useState<{ path: string; label: string } | null>(null),
-    [labelEdited, setLabelEdited] = useState(false)
+  const [editing, setEditing] = useState<MenuItemEditing | null>(null)
+  const [removing, setRemoving] = useState<{ path: string; label: string } | null>(null)
+  const [labelEdited, setLabelEdited] = useState(false)
+  const pageById = useMemo(() => new Map(pages.map(page => [page.id, page])), [pages])
   const reorder = useReorderableList({
     mimeType: 'application/x-cms-menu',
     decide: point => menuReorderIntent(tree, point),
@@ -37,8 +37,7 @@ export function CompactMenuEditor({
       const next = dropMenuItem(tree, from, to, position)
       if (next === tree) return
       onChange(next)
-      const target = to.split('.').map(Number)
-      const item = target.length === 1 ? tree[target[0]!] : tree[target[0]!]?.children?.[target[1]!]
+      const item = menuNodeAt(tree, to)
       return 'Moved ' + (position === 'inside' ? 'under ' : position + ' ') + (item?.label || 'the menu item') + '.'
     },
   })
@@ -50,29 +49,23 @@ export function CompactMenuEditor({
       action === 'indent' ? 'under the previous item' : action === 'outdent' ? 'out of the dropdown' : action
     reorder.announce(`Moved ${label || 'menu item'} ${placement}.`)
   }
-  const node = editing
-    ? editing.path
-        .split('.')
-        .map(Number)
-        .reduce<NavNode | undefined>((found, at, index) => (index === 0 ? tree[at] : found?.children?.[at]), undefined)
-    : undefined
+  const node = editing ? menuNodeAt(tree, editing.path) : undefined
   const patch = (fn: (node: NavNode) => NavNode) => {
     if (editing) onChange(editMenuItem(tree, editing.path, fn))
   }
-  function begin(path: string, fresh = false, kind?: Editing['kind']) {
-    const indices = path.split('.').map(Number),
-      item = indices.length === 1 ? tree[indices[0]!] : tree[indices[0]!]!.children![indices[1]!]!
+  function begin(path: string, fresh = false, kind?: MenuItemEditing['kind']) {
+    const item = menuNodeAt(tree, path)
     setEditing({
       path,
       snapshot: structuredClone(tree),
       fresh,
-      kind: kind ?? ((item as NavNode | undefined)?.dropdownGroup ? 'group' : (item?.target.type ?? 'page')),
+      kind: kind ?? (item?.dropdownGroup ? 'group' : (item?.target.type ?? 'page')),
     })
     setLabelEdited(
       Boolean(
         item?.label &&
         item.label !==
-          pages.find(page => item?.target.type === 'page' && page.id === item.target.page_id)?.title.slice(0, 80),
+          (item.target.type === 'page' ? pageById.get(item.target.page_id)?.title.slice(0, 80) : undefined),
       ),
     )
     onEditing(true)
@@ -84,14 +77,14 @@ export function CompactMenuEditor({
   }
   function add() {
     if (!canAppendMenuItem(tree)) return
-    const snapshot = structuredClone(tree),
-      path = String(tree.length)
+    const snapshot = structuredClone(tree)
+    const path = String(tree.length)
     onChange([...tree, { label: '', target: { type: 'url', url: '' }, visible: true }])
     setEditing({ path, snapshot, fresh: true, kind: 'page' })
     setLabelEdited(false)
     onEditing(true)
   }
-  function kind(value: Editing['kind']) {
+  function kind(value: MenuItemEditing['kind']) {
     if (!editing) return
     setEditing({ ...editing, kind: value })
     patch(current => {
@@ -103,12 +96,12 @@ export function CompactMenuEditor({
     })
   }
   function row(item: NavNode, path: string, index: number, total: number, nested = false) {
-    const target = item.target,
-      destination = item.dropdownGroup
-        ? 'Dropdown'
-        : target.type === 'page'
-          ? (pages.find(page => page.id === target.page_id)?.path ?? 'Page unavailable')
-          : target.url
+    const target = item.target
+    const destination = item.dropdownGroup
+      ? 'Dropdown'
+      : target.type === 'page'
+        ? (pageById.get(target.page_id)?.path ?? 'Page unavailable')
+        : target.url
     return (
       <li
         key={path}
@@ -226,129 +219,18 @@ export function CompactMenuEditor({
         <ReorderAnnouncement>{reorder.announcement}</ReorderAnnouncement>
       </Card>
       {editing && node && (
-        <Dialog
-          density="compact"
-          size="medium"
-          title={editing.fresh ? 'Add to menu' : 'Edit menu item'}
-          onClose={() => close(true)}
-          footer={
-            <>
-              <Button variant="secondary" onClick={() => close(true)}>
-                Cancel
-              </Button>
-              <Button disabled={!NavTree.safeParse(tree).success} onClick={() => close(false)}>
-                Done
-              </Button>
-            </>
-          }
-        >
-          <div className={listInspectorStyles.formStack}>
-            {editing.fresh && (
-              <SegmentedControl
-                appearance="pills"
-                size="s"
-                label="What would you like to add?"
-                value={editing.kind}
-                onChange={value => kind(value as Editing['kind'])}
-                options={[
-                  { value: 'page', label: 'A page on this site' },
-                  { value: 'url', label: 'A website' },
-                  { value: 'group', label: 'A dropdown group' },
-                ]}
-              />
-            )}
-            {(editing.kind === 'page' || (editing.kind === 'group' && editing.fresh)) && (
-              <SearchableSelect
-                key={editing.kind}
-                id="menu-item-page"
-                label={editing.kind === 'group' ? 'First page in this dropdown' : 'Page'}
-                required
-                autoFocus
-                help={
-                  editing.kind === 'group'
-                    ? 'A dropdown needs a real link. Add more links after this.'
-                    : 'Type a page title or address, then choose a suggestion.'
-                }
-                value={
-                  editing.kind === 'group'
-                    ? node.children?.[0]?.target.type === 'page'
-                      ? node.children[0].target.page_id
-                      : ''
-                    : node.target.type === 'page'
-                      ? node.target.page_id
-                      : ''
-                }
-                options={pages.map(page => ({
-                  value: page.id,
-                  label: page.title + ' — ' + page.path + (page.published ? '' : ' · draft'),
-                }))}
-                onChange={id => {
-                  const page = pages.find(page => page.id === id)
-                  patch(current =>
-                    editing.kind === 'group'
-                      ? {
-                          ...current,
-                          children: page
-                            ? [
-                                {
-                                  label: page.title.slice(0, 80),
-                                  target: { type: 'page', page_id: page.id },
-                                  visible: true,
-                                },
-                              ]
-                            : [],
-                        }
-                      : {
-                          ...current,
-                          label: page && !labelEdited ? page.title.slice(0, 80) : current.label,
-                          target: { type: 'page', page_id: page?.id ?? '' },
-                        },
-                  )
-                }}
-              />
-            )}
-            <Field id="menu-item-name" label="Menu label" required>
-              <input
-                autoFocus={editing.kind === 'url' || (editing.kind === 'group' && !editing.fresh)}
-                value={node.label}
-                maxLength={80}
-                onChange={event => {
-                  setLabelEdited(true)
-                  patch(current => ({ ...current, label: event.target.value }))
-                }}
-              />
-            </Field>
-            {editing.kind === 'url' && (
-              <Field
-                id="menu-item-url"
-                label="Web address"
-                required
-                error={
-                  node.target.type === 'url' && node.target.url && !NavUrl.safeParse(node.target.url).success
-                    ? 'Use /path or https://example.org.'
-                    : undefined
-                }
-              >
-                <input
-                  value={node.target.type === 'url' ? node.target.url : ''}
-                  maxLength={2048}
-                  onChange={event =>
-                    patch(current => ({ ...current, target: { type: 'url', url: event.target.value } }))
-                  }
-                />
-              </Field>
-            )}
-
-            {editing.kind === 'group' && (
-              <p className="muted">Opens the links below it. The group has no web address of its own.</p>
-            )}
-            {!NavTree.safeParse(tree).success && (
-              <p role="status" className="muted">
-                Complete the name and destination to show this item in the preview.
-              </p>
-            )}
-          </div>
-        </Dialog>
+        <CompactMenuItemDialog
+          editing={editing}
+          node={node}
+          pages={pages}
+          pageById={pageById}
+          close={close}
+          kind={kind}
+          valid={NavTree.safeParse(tree).success}
+          patch={patch}
+          labelEdited={labelEdited}
+          setLabelEdited={setLabelEdited}
+        />
       )}
       {removing && (
         <Dialog
@@ -376,4 +258,10 @@ export function CompactMenuEditor({
       )}
     </>
   )
+}
+
+function menuNodeAt(tree: NavTree, path: string): NavNode | undefined {
+  const [parent, child] = path.split('.').map(Number)
+  const root = tree[parent!]
+  return child === undefined ? root : root?.children?.[child]
 }
