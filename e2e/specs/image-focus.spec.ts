@@ -288,7 +288,10 @@ test('picture focus drags once into page history, previews crops and publishes o
     await focus.getByRole('button', { name: 'Try image again', exact: true }).click()
     await expect(focus.getByRole('img', { name: /crop preview$/ })).toHaveCount(3)
     await dot.press('ArrowRight')
-    await expect.poll(() => hero.evaluate(node => (node as HTMLImageElement).naturalWidth)).toBeGreaterThan(0)
+    // The keyboard edit can replace the canvas while the recovered image is loading.
+    await expect(async () => {
+      expect(await hero.evaluate(node => (node as HTMLImageElement).naturalWidth)).toBeGreaterThan(0)
+    }).toPass({ timeout: 10_000 })
     provokedImageFailure = false
     for (const url of readonlyWarnings) {
       const response = await page.request.get(url)
