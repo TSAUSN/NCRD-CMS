@@ -2,18 +2,11 @@ import { isDeepStrictEqual } from 'node:util'
 import { dataValueChangeWords } from './data-value-copy.ts'
 import { dataValueUsage, resolvedDataSections } from './data-values.ts'
 import 'server-only'
-import { STORY_SECTORS, STORY_REGIONS } from '@cms/seeds/sawso-stories'
 import { FooterConfig, NavTree, chapterDestinationLabel, type ChapterSetup } from '@cms/schema'
 import { menuChangeWords, footerLinkChangeWords } from './page-list-links.ts'
 import { asUser } from '@cms/platform'
-import { getCollectionSelections } from './collection-queries.ts'
-import {
-  changedCells,
-  pageChangePresentation,
-  readableReleaseValue,
-  storyEntryPresentation,
-  type ReleasePresentation,
-} from './release-copy.ts'
+import { addReleaseListPresentations } from './release-list-presentation.ts'
+import { changedCells, pageChangePresentation, readableReleaseValue, type ReleasePresentation } from './release-copy.ts'
 import type { ReleaseItem } from './releases.ts'
 
 type ReleasePageContent = Parameters<typeof pageChangePresentation>[1]
@@ -64,6 +57,50 @@ function chapterSetupCells(before: ChapterSetup | null, after: ChapterSetup) {
       memberLogin: 'Member login',
     }),
   ]
+}
+
+function pinnedPagePresentation(
+  row: PinnedPage,
+  chapter: PinnedChapter | undefined,
+  forms: Parameters<typeof pageChangePresentation>[2],
+  liveSettings: unknown,
+  candidateSettings: unknown,
+): ReleasePresentation {
+  const presentation = pageChangePresentation(
+    row.published_version_id ? resolvedDataSections(row.live_content ?? [], forms, liveSettings) : null,
+    resolvedDataSections(row.content, forms, candidateSettings),
+    forms,
+    row.published_version_id
+      ? { title: row.live_title, address: row.live_slug, description: row.live_meta?.description }
+      : null,
+    { title: row.page_title, address: row.page_slug, description: row.meta?.description },
+  )
+  const chapterCells = chapter ? chapterSetupCells(chapter.live, chapter.draft) : []
+  if (chapterCells.length) {
+    const changes = chapterCells.map(cell => ({ text: 'Chapter setup: ' + cell.label + ' changed' }))
+    presentation.changes = [...(presentation.changes ?? []), ...changes]
+    presentation.summary = [
+      ...(presentation.summary === 'No page changes' ? [] : [presentation.summary]),
+      ...changes.map(change => change.text),
+    ].join(' · ')
+    presentation.cells.push(...chapterCells.map(cell => ({ ...cell, label: 'Chapter setup · ' + cell.label })))
+  }
+  const noVisibleChanges =
+    Boolean(row.published_version_id) &&
+    presentation.changes?.length === 0 &&
+    isDeepStrictEqual(row.meta, row.live_meta) &&
+    row.carries_trusted_code === row.live_trusted_code &&
+    Boolean(row.trusted_code_approved_by) === Boolean(row.live_approved_by)
+  return {
+    ...presentation,
+    noVisibleChanges,
+    summary: noVisibleChanges
+      ? 'No visible page changes'
+      : presentation.summary === 'No page changes'
+        ? 'Saved page details changed'
+        : presentation.summary,
+    ...(row.published_version_id ? { beforeVersionId: row.published_version_id } : {}),
+  }
 }
 
 /** Read-only summaries. Publication still resolves every exact pin again. */
@@ -144,46 +181,16 @@ export async function releasePresentations(
       if (item.type === 'page') {
         const row = pageRows.get(`${item.id}:${item.versionId}`)
         if (!row) continue
-        const presentation = pageChangePresentation(
-          row.published_version_id ? resolvedDataSections(row.live_content ?? [], forms, numberSettings?.live) : null,
-          resolvedDataSections(row.content, forms, candidateSettings),
-          forms,
-          row.published_version_id
-            ? { title: row.live_title, address: row.live_slug, description: row.live_meta?.description }
-            : null,
-          { title: row.page_title, address: row.page_slug, description: row.meta?.description },
+        retain(
+          item,
+          pinnedPagePresentation(
+            row,
+            item.versionId ? chapterRows.get(item.versionId) : undefined,
+            forms,
+            numberSettings?.live,
+            candidateSettings,
+          ),
         )
-        // Publishing a chapter page also applies the immutable chapter setup
-        // pinned to that exact page version. Its current draft may be newer.
-        // Read through the caller's existing RLS; private contact fields remain
-        // unavailable to whole-site Editors and other sites.
-        const chapter = item.versionId ? chapterRows.get(item.versionId) : undefined
-        const chapterCells = chapter ? chapterSetupCells(chapter.live, chapter.draft) : []
-        if (chapterCells.length) {
-          const changes = chapterCells.map(cell => ({ text: 'Chapter setup: ' + cell.label + ' changed' }))
-          presentation.changes = [...(presentation.changes ?? []), ...changes]
-          presentation.summary = [
-            ...(presentation.summary === 'No page changes' ? [] : [presentation.summary]),
-            ...changes.map(change => change.text),
-          ].join(' · ')
-          presentation.cells.push(...chapterCells.map(cell => ({ ...cell, label: 'Chapter setup · ' + cell.label })))
-        }
-        const noVisibleChanges =
-          Boolean(row.published_version_id) &&
-          presentation.changes?.length === 0 &&
-          isDeepStrictEqual(row.meta, row.live_meta) &&
-          row.carries_trusted_code === row.live_trusted_code &&
-          Boolean(row.trusted_code_approved_by) === Boolean(row.live_approved_by)
-        retain(item, {
-          ...presentation,
-          noVisibleChanges,
-          summary: noVisibleChanges
-            ? 'No visible page changes'
-            : presentation.summary === 'No page changes'
-              ? 'Saved page details changed'
-              : presentation.summary,
-          ...(row.published_version_id ? { beforeVersionId: row.published_version_id } : {}),
-        })
       } else if (item.type === 'theme') {
         const row = (
           await client.query(
@@ -341,10 +348,10 @@ export async function releasePresentations(
             before: readableReleaseValue(row.live),
             after: readableReleaseValue(row.draft),
           }))
-        const footer = rows.find(row => row.kind === 'footer'),
-          before = FooterConfig.safeParse(footer?.live),
-          after = FooterConfig.safeParse(footer?.draft),
-          links = native && before.success && after.success ? footerLinkChangeWords(before.data, after.data) : []
+        const footer = rows.find(row => row.kind === 'footer')
+        const before = FooterConfig.safeParse(footer?.live)
+        const after = FooterConfig.safeParse(footer?.draft)
+        const links = native && before.success && after.success ? footerLinkChangeWords(before.data, after.data) : []
         retain(item, {
           summary: [cells.map(cell => cell.label).join(' and ') + ' changed on every page', ...links].join('; '),
           preview: lookPreview,
@@ -353,89 +360,6 @@ export async function releasePresentations(
       }
     }
   })
-  const collectionIds = [...new Set(items.filter(item => item.type.startsWith('collection_')).map(item => item.id))]
-  const collections = await getCollectionSelections(userId, siteId, collectionIds)
-  for (const id of collectionIds) {
-    const list = collections.get(id)
-    if (!list) continue
-    for (const item of items.filter(item => item.id === id && item.type.startsWith('collection_'))) {
-      if (item.type === 'collection_schema') {
-        const describe = (model: typeof list.draft | null) =>
-          model?.fields.map(field => `${field.label}${field.required ? ' (required)' : ''}`).join(' · ') ||
-          'No fields yet'
-        retain(item, {
-          summary: 'Editor form fields changed',
-          cells: [{ label: 'Fields', before: describe(list.published), after: describe(list.draft) }],
-        })
-      } else {
-        const entries = item.entryIds
-          ? list.entries.filter(entry => entry.id && item.entryIds!.includes(entry.id))
-          : list.entries
-        const cells = entries.flatMap(entry => {
-          const title = readableReleaseValue(entry.values[list.draft.presentation.titleField])
-          if (entry.archived)
-            return entry.publishedValues && !entry.publishedArchived
-              ? [{ label: title, before: 'Live item', after: 'Removed from the live list' }]
-              : []
-          const fields = changedCells(
-            entry.publishedValues ?? {},
-            entry.values,
-            Object.fromEntries(list.draft.fields.map(field => [field.key, field.label])),
-          )
-          if (entry.sortIndex !== entry.publishedSortIndex)
-            fields.push({
-              label: 'Position',
-              before: entry.publishedSortIndex == null ? 'Not live' : String(entry.publishedSortIndex + 1),
-              after: String(entry.sortIndex + 1),
-            })
-          return fields.map(field => ({ ...field, label: `${title} · ${field.label}` }))
-        })
-        if (item.entryIds && entries.length === 1) {
-          const entry = entries[0]!,
-            catalog = list.draft.presentation.stories,
-            names = {
-              main: Object.fromEntries((catalog?.mainTags ?? STORY_SECTORS).map(t => [t.id, t.label])),
-              secondary: Object.fromEntries((catalog?.secondaryTags ?? STORY_REGIONS).map(t => [t.id, t.label])),
-            }
-          retain(item, storyEntryPresentation(entry.publishedValues, entry.values, list.draft.fields, names))
-          continue
-        }
-        const count = item.entryIds
-          ? entries.filter(
-              entry =>
-                JSON.stringify(entry.values) !== JSON.stringify(entry.publishedValues) ||
-                entry.sortIndex !== entry.publishedSortIndex ||
-                entry.archived !== entry.publishedArchived,
-            ).length
-          : list.changedEntries
-        const upgrading =
-          list.readerKey === 'stories' && !item.entryIds
-            ? await asUser({ userId }, async client =>
-                Number(
-                  (
-                    await client.query(
-                      `SELECT COALESCE(sum(models.story_count),0) AS count FROM (
-          SELECT v.schema_version_id,count(*) AS story_count FROM collection_entries e JOIN collection_entry_versions v ON v.id=e.draft_version_id
-          WHERE e.collection_id=$1 AND e.archived_at IS NULL GROUP BY v.schema_version_id
-         ) models WHERE NOT app.story_controls_schema_compatible(models.schema_version_id,$2::uuid)`,
-                      [list.id, list.draftSchemaVersionId],
-                    )
-                  ).rows[0]!.count,
-                ),
-              )
-            : 0
-        const words = [
-          ...(count || !upgrading
-            ? [
-                `${count} ${item.entryIds ? (count === 1 ? 'story changed' : 'stories changed') : count === 1 ? 'item changed' : 'items changed'}`,
-              ]
-            : []),
-          ...(upgrading ? [`Update editing controls for ${upgrading} ${upgrading === 1 ? 'story' : 'stories'}`] : []),
-          `used on ${list.usedOn?.length ?? 0} ${(list.usedOn?.length ?? 0) === 1 ? 'page' : 'pages'}`,
-        ]
-        retain(item, { summary: words.join(' · '), cells })
-      }
-    }
-  }
+  await addReleaseListPresentations(userId, siteId, items, retain)
   return result
 }
