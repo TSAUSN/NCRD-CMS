@@ -154,6 +154,8 @@ test('Reviews uses a readable queue and decisions, protects unsent comments and 
       ).rows[0]!.n,
     ).toBe(0)
     await page.getByRole('link', { name: /^Welcome/ }).click()
+    await expect(page).toHaveURL(new RegExp('review=' + requests[0]))
+    await expect(page.getByRole('heading', { name: 'Welcome', exact: true, level: 2 })).toBeVisible()
     await discussion()
     await expect(page.getByLabel('Add a comment', { exact: true })).toHaveValue('[Unsent review comment]')
     await capture(page, 'comment-restored')
@@ -162,6 +164,8 @@ test('Reviews uses a readable queue and decisions, protects unsent comments and 
     await leave.getByRole('button', { name: 'Discard changes', exact: true }).click()
     await expect(page).toHaveURL(new RegExp('review=' + requests[1]))
     await page.getByRole('link', { name: /^Welcome/ }).click()
+    await expect(page).toHaveURL(new RegExp('review=' + requests[0]))
+    await expect(page.getByRole('heading', { name: 'Welcome', exact: true, level: 2 })).toBeVisible()
     await discussion()
     await expect(page.getByLabel('Add a comment', { exact: true })).toHaveValue('[Unsent review comment]')
     const duplicateRefreshes: string[] = []
