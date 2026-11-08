@@ -69,6 +69,8 @@ async function createPage(page: Page, name: string): Promise<{ slug: string }> {
   // The redirect lands in the editor for the new page, which is the only thing
   // anybody wants after creating one.
   await page.waitForURL(/\/pages\/[0-9a-f-]{36}$/)
+  // A committed URL can precede the mounted editor and its keyboard controls.
+  await expect(canvas(page).locator('h1')).toHaveText(name)
   await expect(
     page
       .getByRole('button', { name: 'Open Structure', exact: true })
@@ -79,7 +81,6 @@ async function createPage(page: Page, name: string): Promise<{ slug: string }> {
     await page.keyboard.press('Enter')
   }
   await expect(page.getByRole('complementary', { name: 'Page structure' })).toBeVisible()
-  await expect(canvas(page).locator('h1')).toHaveText(name)
   await expect(treeLabels(page)).toHaveCount(2)
   await expect(canvas(page).locator('[data-cms-section="0"] h1')).toHaveText(name)
   await expect(canvas(page).locator('[data-cms-section="1"]')).toContainText('A shared purpose.')
