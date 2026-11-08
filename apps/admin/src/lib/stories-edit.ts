@@ -5,6 +5,7 @@ import {
   COLLECTION_LIMITS,
   type StoriesSettings,
   storyTagIds,
+  storySourceCapabilities,
 } from '@cms/schema'
 import { DomainError } from '@cms/domain'
 import { sanitizeRichText, escapeText } from '@cms/renderer'
@@ -61,6 +62,7 @@ export function storyDetailValues(
       'Check the title, summary (up to 155 characters), tags and region before saving.',
     )
   const tags = [...new Set(input.tags)]
+  const { sectorPages } = storySourceCapabilities(catalog?.source ?? 'sawso')
   const values = {
     ...original,
     ...(input.author !== undefined ? { author: input.author.trim() } : {}),
@@ -76,8 +78,8 @@ export function storyDetailValues(
     sector_links: tags
       .map(id => {
         const label = escapeText(sectors.find(s => s.id === id)?.label ?? id)
-        return !catalog || (catalog.source === 'sawso' && STORY_SECTORS.some(t => t.id === id))
-          ? '<a href="/ways-we-help/' + id + '">' + label + '</a>'
+        return sectorPages && STORY_SECTORS.some(t => t.id === id)
+          ? '<a href="' + sectorPages.pathPrefix + id + '">' + label + '</a>'
           : label
       })
       .join(' '),

@@ -1,4 +1,5 @@
 import { DataValue, parseCsvRows, type DataValue as NumberValue } from '@cms/schema'
+import { isStorySourceEndpoint } from './story-source-endpoint.ts'
 export function numberFileUrl(source: string): URL {
   const url = new URL(source)
   if (
@@ -10,12 +11,8 @@ export function numberFileUrl(source: string): URL {
     url.hostname.endsWith('.localhost')
   )
     throw new Error('Use a public https file address without sign-in details.')
-  if (
-    (url.hostname.replace(/\.+$/, '').toLowerCase() === 'sawso.org' ||
-      url.hostname.replace(/\.+$/, '').toLowerCase().endsWith('.sawso.org')) &&
-    /^\/sawso\/story\/symphony\/json(?:\/|$)/i.test(decodeURIComponent(url.pathname))
-  )
-    throw new Error('Use Refresh in Stories for the approved SAWSO story feed. Choose a number file here.')
+  if (isStorySourceEndpoint(url))
+    throw new Error('Use Check for new stories in Stories for the approved feed. Choose a number file here.')
   return url
 }
 export function previewNumberFile(text: string, current: readonly NumberValue[]): NumberValue[] {

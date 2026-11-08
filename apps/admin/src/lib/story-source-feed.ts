@@ -1,7 +1,6 @@
 import { suggestStoryTags, withStoryTagIds, type StoriesSettings } from '@cms/schema'
 import { escapeText } from '@cms/renderer'
 import { sawsoStoryRows } from '@cms/seeds/sawso-stories'
-export const SAWSO_STORIES_FEED = 'https://sawso.org/sawso/story/symphony/json?start=0&limit=999'
 const STORY_SOURCE_FIELDS = ['title', 'summary', 'published_date', 'old_address', 'image_url'] as const
 type StorySourceField = (typeof STORY_SOURCE_FIELDS)[number]
 type StorySourceFields = Record<StorySourceField, string>

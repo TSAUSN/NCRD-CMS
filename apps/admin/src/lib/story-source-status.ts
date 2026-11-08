@@ -1,3 +1,4 @@
+import { storySourceCapabilities, type StoriesSettings } from '@cms/schema'
 import { reviewTime } from './review-time.ts'
 import type { StorySourceCheck } from './story-source-check.ts'
 export type StorySourceStatus = { latest: StorySourceCheck | null; lastSuccessAt: string | null }
@@ -5,8 +6,8 @@ const stamp = (value: string) => {
   const time = reviewTime(value)
   return time === 'Time unavailable' ? 'at an unknown time' : time
 }
-export function storySourceStatusLine(source: string, status: StorySourceStatus) {
-  if (source !== 'sawso') return 'Public feed not connected'
+export function storySourceStatusLine(source: StoriesSettings['source'], status: StorySourceStatus) {
+  if (!storySourceCapabilities(source).canCheck) return 'Public feed not connected'
   if (!status.latest) return 'Feed not checked yet'
   if (status.latest.status === 'checking') return 'Checking feed…'
   if (status.latest.status === 'error')

@@ -4,6 +4,7 @@ import {
   numberChoiceValues,
   usesSiteSocialAccounts,
   siteSocialGroup,
+  siteSocialHidesSampleNote,
   isDrawingSlot,
   isIconSlot,
   sampleFieldNames,
@@ -156,7 +157,7 @@ export function InspectorSectionContent({
       if (
         group.kind === 'single' &&
         group.slot.id === 'sample_note' &&
-        entry?.slug === 'core-echelon-follow' &&
+        siteSocialHidesSampleNote(entry?.slug) &&
         siteSocial
       )
         return null

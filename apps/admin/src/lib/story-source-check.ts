@@ -7,11 +7,11 @@ import {
   initialSawsoSourceBaselines,
   mergeStorySource,
   parseSawsoStoriesFeed,
-  SAWSO_STORIES_FEED,
   StoryFeedFormatError,
   type SourceStory,
   type StorySourceBaseline,
 } from './story-source-feed.ts'
+import { SAWSO_STORIES_FEED } from './story-source-endpoint.ts'
 export type StorySourceCheck = {
   id: string
   status: 'checking' | 'ok' | 'error'

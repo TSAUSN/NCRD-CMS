@@ -1,7 +1,15 @@
 import { SitePublicSettings, SITE_SOCIAL_LABELS, type SiteSocialAccount } from './site-settings.ts'
 import { clearSampleField } from './sample-content.ts'
 import { repeatItemSlotId, type FieldLike } from './repeat-items.ts'
-const ACCOUNT_LAYOUTS = new Set(['core-on-page-navigation', 'core-echelon-follow', 'core-echelon-jump-links'])
+const accountLayouts: Readonly<Record<string, { hideSampleNote?: true; newTab?: true }>> = {
+  'core-on-page-navigation': {},
+  'core-echelon-follow': { hideSampleNote: true },
+  'core-echelon-jump-links': { newTab: true },
+}
+
+export function siteSocialHidesSampleNote(slug: string | undefined): boolean {
+  return accountLayouts[slug ?? '']?.hideSampleNote === true
+}
 export function siteSocialGroup(slots: readonly FieldLike[]): 'links' | 'social' {
   return slots.some(slot => slot.id === 'accounts_from' && slot.constraints?.siteSocialGroup === 'social')
     ? 'social'
@@ -14,7 +22,7 @@ export function usesSiteSocialAccounts(
   slug?: string,
 ): boolean {
   return (
-    ACCOUNT_LAYOUTS.has(slug ?? '') &&
+    Object.hasOwn(accountLayouts, slug ?? '') &&
     values.accounts_from === 'site' &&
     slots.some(slot => slot.id === 'accounts_from' && slot.constraints?.siteSocialAccounts === true)
   )
@@ -31,13 +39,13 @@ export function siteSocialSectionValues(
   settings: unknown,
 ): Record<string, unknown> {
   if (
-    !ACCOUNT_LAYOUTS.has(slug ?? '') ||
+    !Object.hasOwn(accountLayouts, slug ?? '') ||
     !slots.some(slot => slot.id === 'accounts_from' && slot.constraints?.siteSocialAccounts === true)
   )
     return values
   let next = clearSampleField({ ...values }, 'accounts_from')
   if (!usesSiteSocialAccounts(values, slots, slug)) return next
-  if (slug === 'core-echelon-follow') {
+  if (siteSocialHidesSampleNote(slug)) {
     next = clearSampleField(next, 'sample_note')
     next.sample_note = ''
   }
@@ -54,7 +62,7 @@ export function siteSocialSectionValues(
     next[repeatItemSlotId(group, items[index]!, 'action')] = {
       url: row.url,
       label: SITE_SOCIAL_LABELS[row.service],
-      ...(slug === 'core-echelon-jump-links' ? { newTab: true } : {}),
+      ...(accountLayouts[slug ?? '']?.newTab ? { newTab: true } : {}),
     }
   })
   return next

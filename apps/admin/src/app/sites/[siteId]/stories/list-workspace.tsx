@@ -3,6 +3,7 @@ import { Button, ButtonLink, Dialog, EmptyState, Note, TextLink } from '../../..
 import { StoryListRowView } from '../../../../components/story-list-row.tsx'
 import { storyPreviewHref } from '../../../../lib/story-list.ts'
 import { AddStory } from './add-story.tsx'
+import { storySourceCapabilities } from '@cms/schema'
 import { storySourceStatusLine } from '../../../../lib/story-source-status.ts'
 import { StoriesHeader } from './header.tsx'
 import workspaceFormsStyles from '../../../../components/workspace-styles/workspace-forms.module.css'
@@ -55,7 +56,7 @@ export function StoriesList(props: StoryListProps) {
         sourceStatus={checking ? 'Checking feed…' : storySourceStatusLine(settings.source, sourceStatus)}
         actions={
           <>
-            {rights.manageSchema && initial.ready && settings.source === 'sawso' && (
+            {rights.manageSchema && initial.ready && storySourceCapabilities(settings.source).canCheck && (
               <Button
                 variant="secondary"
                 disabled={checking || queued > 0 || Boolean(failure)}

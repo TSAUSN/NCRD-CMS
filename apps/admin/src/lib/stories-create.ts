@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto'
 import type { Queryable } from '@cms/platform'
-import { CollectionModel, parseCollectionEntryValues, imageFocus } from '@cms/schema'
+import { CollectionModel, parseCollectionEntryValues, storySourceCapabilities, imageFocus } from '@cms/schema'
 import { DomainError } from '@cms/domain'
 import { storyDetailValues, type StoryEditInput } from './stories-edit.ts'
 import { storyDraftFingerprint } from './story-draft-request.ts'
@@ -143,10 +143,10 @@ export async function createStoryDraft(
     .rows[0]!.id
   const defs = await corePageDefinitions(client)
   const more = sawsoFeed(defs, input.tags[0] ?? null, 3, key)
+  const { sectorPages } = storySourceCapabilities(model.presentation.stories?.source)
   more.values.heading = 'More stories'
-  if (!input.tags.length || model.presentation.stories?.source !== 'sawso')
-    more.values.empty_line = 'Check back soon for more stories.'
-  if (model.presentation.stories?.source !== 'sawso') {
+  if (!input.tags.length || !sectorPages) more.values.empty_line = 'Check back soon for more stories.'
+  if (!sectorPages) {
     more.values.more = { label: '', url: '' }
     more.values.newsroom = { label: '', url: '' }
   }

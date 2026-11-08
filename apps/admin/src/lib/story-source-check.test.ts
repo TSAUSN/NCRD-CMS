@@ -1,6 +1,6 @@
 import { it, expect, vi } from 'vitest'
 import { readSawsoStoriesSource } from './story-source-check.ts'
-import { SAWSO_STORIES_FEED } from './story-source-feed.ts'
+import { SAWSO_STORIES_FEED } from './story-source-endpoint.ts'
 import { createStorySourceCheckHandler } from './story-source-check-handler.ts'
 const site = '00000000-0000-4000-8000-000000000001',
   collection = '00000000-0000-4000-8000-000000000002',

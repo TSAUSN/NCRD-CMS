@@ -57,6 +57,16 @@ export const StoriesSettings = z
   })
   .strict()
 export type StoriesSettings = z.infer<typeof StoriesSettings>
+
+const storySources = {
+  none: { canCheck: false, sectorPages: null },
+  sawso: { canCheck: true, sectorPages: { pathPrefix: '/ways-we-help/', limit: 6 } },
+} as const
+
+/** Feature policy comes from the collection's configured source. */
+export function storySourceCapabilities(source: StoriesSettings['source'] = 'none') {
+  return storySources[source]
+}
 /** Only display metadata may travel with a public Story binding. */
 export const StoryCatalog = z
   .object({
@@ -76,10 +86,11 @@ export const StoryCatalog = z
   .strict()
 export type StoryCatalog = z.infer<typeof StoryCatalog>
 export function storyCatalog(settings: StoriesSettings): StoryCatalog {
+  const { sectorPages } = storySourceCapabilities(settings.source)
   return {
     mainLabel: settings.mainLabel,
     secondaryLabel: settings.secondaryLabel,
-    ...(settings.source === 'sawso' ? { sectorPageLimit: 6 as const } : {}),
+    ...(sectorPages ? { sectorPageLimit: sectorPages.limit } : {}),
     mainTags: settings.mainTags.map(({ id, label }) => ({ id, label })),
     secondaryTags: settings.secondaryTags.map(({ id, label, areas }) => ({ id, label, areas: [...areas] })),
   }

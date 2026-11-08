@@ -1,4 +1,4 @@
-import type { StoryTagFilter, StructuredRepeatBinding } from '@cms/schema'
+import { storySourceCapabilities, type StoryTagFilter, type StructuredRepeatBinding } from '@cms/schema'
 import { readCollectionBinding, type StoryFeedTags } from './collection-binding.ts'
 export function storyFeedChoice(value: unknown): {
   selection: Extract<StructuredRepeatBinding['selection'], { mode: 'automatic' }> | null
@@ -36,5 +36,7 @@ export function storyFeedBinding(value: unknown, tags: StoryTagFilter, limit: nu
   }
 }
 export function storyFeedMaximum(catalog: StoryFeedTags, path: string): number {
-  return catalog.source === 'sawso' && /^\/ways-we-help\/[^/]+\/?$/.test(path) ? 6 : 200
+  const { sectorPages } = storySourceCapabilities(catalog.source)
+  if (!sectorPages || !path.startsWith(sectorPages.pathPrefix)) return 200
+  return /^[^/]+\/?$/.test(path.slice(sectorPages.pathPrefix.length)) ? sectorPages.limit : 200
 }
