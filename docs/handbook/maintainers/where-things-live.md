@@ -73,6 +73,40 @@ local-source importer cases; a skipped source suite does not prove parity.
 local database; `pnpm schema:reference:check` and its database test catch drift.
 Browser tests use `E2E_DATABASE` and configurable `E2E_ADMIN_PORT`/`E2E_SITE_PORT`.
 
+## Make your first small change
+
+**Edit the Header & menu dialog.** Start in
+`app/sites/[siteId]/header/page.tsx` and follow `HeaderMenuWorkspace` in
+`header/workspace.tsx`. Its Menu tab uses
+`apps/admin/src/components/compact-menu-editor.tsx`, which owns the Add/Edit
+menu item dialog. Done closes the dialog and keeps the draft in the workspace;
+Cancel restores the state from when the dialog opened. Save draft goes through
+`header/actions.ts` → `lib/header-menu.ts` → `app.save_navigation_draft` (and
+`app.save_global_elements_draft` if the header changed). Publication is separate.
+A display-only field belongs in the dialog. A field that persists must also
+agree with the `NavTree` schema, revisioned save, and public renderer; follow
+those imports before changing stored data.
+
+**Change spacing on that screen.** `header/workspace-styles.module.css`
+owns Header-only layout, such as the row beside “When a new page goes live.”
+`components/compact-menu-editor-styles.module.css` owns Menu-only rules. If an
+import points into `workspace-styles/`, check the other consumers before
+changing a shared rule. Use existing tokens in `styles/tokens.css`.
+
+**Add a screen read.** Start with the route's `page.tsx` and the matching
+`apps/admin/src/server/queries/` owner; for menu data that is `navigation.ts`.
+Call it from the server route using the verified session's user ID and route's
+site ID. Use `asUser` with a parameterized site-scoped read, and fetch only what
+the screen displays. If the route already loads the right record, extend that
+read rather than running a duplicate query. Keep the route's capability checks.
+
+**Add a renderer behavior.** `packages/renderer/src/behaviors/types.ts` defines
+`SectionBodyBehavior`. Use a named module beside `feature-tiles.ts`, return the
+body unchanged for other sections, and register it in `registry.ts` in the order
+its inputs require. The colocated `national-panels.test.ts` shows how to exercise
+`renderPage` in both public and preview modes. Check the intended section and an
+unrelated one; use the golden comparison before shipping a public change.
+
 ## Find a specific editor, renderer or style change
 
 - Start in `app/pages/[pageId]/editor.tsx` for the editor’s wiring. Draft

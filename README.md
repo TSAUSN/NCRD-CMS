@@ -21,7 +21,8 @@ the frozen tag and an older runbook receipt do not identify what serves today.
 
 ## Maintaining this code
 
-Use the [feature map](docs/handbook/maintainers/where-things-live.md) to follow a
+Start with the [maintainer reading path](docs/README.md). Use the
+[feature map](docs/handbook/maintainers/where-things-live.md) to follow a
 screen through its action, SQL command, renderer and tests. The
 [current SQL reference](packages/schema/current/README.md) shows each function's
 current definition; immutable migrations remain the runtime authority.
