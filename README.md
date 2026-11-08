@@ -10,19 +10,14 @@ ready; every site keeps its own look. It replaces the V1 CMS's architecture
 editing-experience overhaul, a shared core section library, and moving real
 sites onto the platform, starting with SAWSO and Echelon.
 
-## Current state and cleanup plan
+## Release baseline and current branch
 
-The frozen release is `friday-2026-11-06`. The personal review Admin health endpoint reports `e51b4b5`, the frozen runtime;
-its environment details and last check are in
-[review-environment.md](docs/handbook/hosting/review-environment.md). Organization deployment remains an administrator-run acceptance gate.
-The render/schema oracle covers 356 artifacts. Complete baseline browser runs
-recorded Chromium 629/631 and WebKit 626/631, with known failures retained in
-[known-issues.md](docs/handbook/start-here/known-issues.md).
-
-Technical debt includes the large page editor, `globals.css`, and site-specific
-renderer branches. Structural cleanup continues on a separate branch and lands
-as reviewed commits after its behavior and visual gates pass. The handover
-cleanup changes documentation, comments and neutral test-support text only.
+`friday-2026-11-06` is the frozen comparison release. Its historical browser
+results and limitations are in [known issues](docs/handbook/start-here/known-issues.md).
+This branch separates the page editor, admin styles and public renderer by
+responsibility. Check the exact candidate and its recorded verification before
+shipping it. A running environment's `/health` reports its deployed version;
+the frozen tag and an older runbook receipt do not identify what serves today.
 
 ## Maintaining this code
 
@@ -30,15 +25,18 @@ Use the [feature map](docs/handbook/maintainers/where-things-live.md) to follow 
 screen through its action, SQL command, renderer and tests. The
 [current SQL reference](packages/schema/current/README.md) shows each function's
 current definition; immutable migrations remain the runtime authority.
-[Refactor gates](docs/handbook/maintainers/refactor-gates.md) explain the byte-level
-render/schema oracle and isolated browser ports. Current release readiness is in SPEC.
+[Verification](docs/handbook/maintainers/refactor-gates.md) explains isolated
+fixtures, browser walks and visual comparisons. The
+[release guide](docs/handbook/upgrades/automatic-releases.md) covers separate
+staging and production environments and rollback. [SPEC.md](SPEC.md) defines
+the product and its acceptance checks.
 
 ## Start here
 
 - **Run it:** `pnpm install`, then `pnpm demo` (details below).
 - **How do I…?** The [handbook index](docs/handbook/INDEX.md) maps everyday tasks to step-by-step guides.
 - **How it is built:** [docs/architecture.md](docs/architecture.md).
-- **Tests and operations:** [docs/operations.md](docs/operations.md). Run `pnpm format` before committing.
+- **Tests and operations:** [docs/operations.md](docs/operations.md). Format the files you changed and run `pnpm format:check`.
 
 ## Try it
 
@@ -70,8 +68,9 @@ ends with a walkthrough of the current interface.
 
 The local revision 8 implementation includes the shared design system, 24 core
 sections, designed samples and templates, the visual editor and task-based
-workspaces. Better Together 2027 keeps its imported design and reviewed scripts,
-with editable speakers, sponsors, workshops, menu and footer.
+workspaces. Better Together 2027 and Human Needs Index remain frozen reference
+imports. Imported pages retain their designs and expose the fields mapped for
+editing; the editor does not turn every part of an imported site into a field.
 
 Echelon chapters adds a national home and directory, chapter setup, page/division
 access, protected shared sections, recorded invitations, division approval,
