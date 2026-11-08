@@ -2,12 +2,8 @@
 
 import { listItemUnit } from '../../../lib/list-items.ts'
 import { useEffect, useState } from 'react'
-import {
-  readCollectionBinding,
-  toggleCollectionEntry,
-  moveCollectionEntry,
-  type CollectionBindingOption,
-} from '../../../lib/collection-binding.ts'
+import { readCollectionBinding, type CollectionBindingOption } from '../../../lib/collection-binding.ts'
+import { AutomaticCollectionSelection, ManualCollectionSelection } from './collection-selection-controls.tsx'
 
 export function CollectionField({
   id,
@@ -56,13 +52,8 @@ export function CollectionField({
     return () => controller.abort()
   }, [siteId, definitionId, version, fieldId, reload])
   const binding = readCollectionBinding(value)
-  const [filterText, setFilterText] = useState('')
-  const filterValue = binding?.selection.mode === 'automatic' ? binding.selection.filter?.value : undefined
-  useEffect(() => setFilterText(filterValue ?? ''), [filterValue])
   const selected = options.find(option => option.readerKey === binding?.readerKey)
-  const keys = binding?.selection.mode === 'manual' ? binding.selection.stableKeys : []
-  const missing = keys.filter(key => !selected?.entries.some(entry => entry.stableKey === key))
-  const canSelect = selected?.compatible && !loading && !error
+  const canSelect = Boolean(selected?.compatible && !loading && !error)
   return (
     <div className="subfields">
       {selected && (
@@ -146,7 +137,7 @@ export function CollectionField({
       {!loading && !error && selected && !selected.compatible && (
         <p className="warn-inline">{selected.problem} Your saved selection has not changed.</p>
       )}
-      {!loading && !error && options.filter(option => option.compatible).length === 0 && (
+      {!loading && !error && !options.some(option => option.compatible) && (
         <p className="hint">
           No list fits this layout yet. Create or publish its fields in Lists, then refresh these choices.
         </p>
@@ -198,181 +189,22 @@ export function CollectionField({
             {Boolean(selected?.filters?.length) && <option value="filtered">Filter by tag or category</option>}
           </select>
           {binding.selection.mode === 'automatic' ? (
-            <>
-              <label htmlFor={`${id}-limit`}>Maximum items</label>
-              <input
-                id={`${id}-limit`}
-                type="number"
-                min={1}
-                max={200}
-                value={binding.selection.limit}
-                disabled={!canSelect}
-                onChange={event => {
-                  const limit = Number(event.target.value)
-                  if (Number.isSafeInteger(limit) && limit >= 1 && limit <= 200)
-                    onChange({ ...binding, selection: { ...binding.selection, mode: 'automatic', limit } })
-                }}
-              />
-              {binding.selection.filter && (
-                <>
-                  <label htmlFor={`${id}-category`}>Tag or category</label>
-                  <select
-                    id={`${id}-category`}
-                    value={binding.selection.filter.field}
-                    disabled={!canSelect}
-                    onChange={event =>
-                      onChange({
-                        ...binding,
-                        selection: {
-                          ...binding.selection,
-                          filter: {
-                            field: event.target.value,
-                            value:
-                              selected?.filters?.find(field => field.key === event.target.value)?.values[0] ??
-                              'Choose a category',
-                          },
-                        },
-                      })
-                    }
-                  >
-                    {selected?.filters?.map(field => (
-                      <option key={field.key} value={field.key}>
-                        {field.label}
-                      </option>
-                    ))}
-                  </select>
-                  <label htmlFor={`${id}-category-value`}>Matching value</label>
-                  <input
-                    id={`${id}-category-value`}
-                    maxLength={120}
-                    list={`${id}-category-values`}
-                    value={filterText}
-                    disabled={!canSelect}
-                    onChange={event => setFilterText(event.target.value)}
-                    onBlur={() => {
-                      if (filterText.trim())
-                        onChange({
-                          ...binding,
-                          selection: {
-                            ...binding.selection,
-                            filter: {
-                              field: binding.selection.mode === 'automatic' ? binding.selection.filter!.field : '',
-                              value: filterText.trim(),
-                            },
-                          },
-                        })
-                      else setFilterText(filterValue ?? '')
-                    }}
-                  />
-                  <datalist id={`${id}-category-values`}>
-                    {selected?.filters
-                      ?.find(
-                        field =>
-                          binding.selection.mode === 'automatic' && field.key === binding.selection.filter?.field,
-                      )
-                      ?.values.map(value => (
-                        <option key={value} value={value} />
-                      ))}
-                  </datalist>
-                </>
-              )}
-              <p className="hint">
-                Shows up to {binding.selection.limit}{' '}
-                {binding.selection.order === 'newest'
-                  ? 'newest items (by the date they were added)'
-                  : binding.selection.filter
-                    ? 'matching items, in list order'
-                    : 'items, in the order set in Lists'}
-                . The canvas includes saved list drafts. Visitors see published items.
-              </p>
-            </>
+            <AutomaticCollectionSelection
+              id={id}
+              selection={binding.selection}
+              option={selected}
+              enabled={canSelect}
+              onChange={selection => onChange({ ...binding, selection })}
+            />
           ) : (
-            <>
-              <p className="hint">
-                Select up to 200 published items. Reorder the selected list below. {keys.length} selected.
-              </p>
-              <div className="collection-binding-choices">
-                {selected?.entries.map(entry => (
-                  <label className="checkbox" key={entry.stableKey}>
-                    <input
-                      type="checkbox"
-                      checked={keys.includes(entry.stableKey)}
-                      disabled={!canSelect || (!keys.includes(entry.stableKey) && keys.length >= 200)}
-                      onChange={event =>
-                        onChange({
-                          ...binding,
-                          selection: {
-                            mode: 'manual',
-                            stableKeys: toggleCollectionEntry(keys, entry.stableKey, event.target.checked),
-                          },
-                        })
-                      }
-                    />
-                    <span>{entry.title}</span>
-                  </label>
-                ))}
-              </div>
-              {keys.length === 0 && <p className="hint">No items selected. The section will show its empty state.</p>}
-              <ol className="collection-binding-order">
-                {keys.map((key, index) => (
-                  <li key={key}>
-                    <span>
-                      {selected?.entries.find(entry => entry.stableKey === key)?.title ?? `${key} (not published)`}
-                    </span>
-                    <span className="btn-row">
-                      <button
-                        type="button"
-                        className="secondary small"
-                        aria-label={`Move ${key} up`}
-                        disabled={!canSelect || index === 0}
-                        onClick={() =>
-                          onChange({
-                            ...binding,
-                            selection: { mode: 'manual', stableKeys: moveCollectionEntry(keys, index, -1) },
-                          })
-                        }
-                      >
-                        ↑
-                      </button>
-                      <button
-                        type="button"
-                        className="secondary small"
-                        aria-label={`Move ${key} down`}
-                        disabled={!canSelect || index === keys.length - 1}
-                        onClick={() =>
-                          onChange({
-                            ...binding,
-                            selection: { mode: 'manual', stableKeys: moveCollectionEntry(keys, index, 1) },
-                          })
-                        }
-                      >
-                        ↓
-                      </button>
-                      <button
-                        type="button"
-                        className="ghost small"
-                        aria-label={`Remove ${key} from selection`}
-                        disabled={loading}
-                        onClick={() =>
-                          onChange({
-                            ...binding,
-                            selection: { mode: 'manual', stableKeys: keys.filter(entry => entry !== key) },
-                          })
-                        }
-                      >
-                        Remove
-                      </button>
-                    </span>
-                  </li>
-                ))}
-              </ol>
-              {missing.length > 0 && !loading && !error && (
-                <p className="warn-inline">
-                  Some selected items are no longer published. Restore them in Lists or remove them from this selection
-                  before publishing the page.
-                </p>
-              )}
-            </>
+            <ManualCollectionSelection
+              selection={binding.selection}
+              option={selected}
+              enabled={canSelect}
+              loading={loading}
+              choicesFailed={Boolean(error)}
+              onChange={selection => onChange({ ...binding, selection })}
+            />
           )}
         </>
       )}
