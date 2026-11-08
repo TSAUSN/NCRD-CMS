@@ -42,3 +42,11 @@ export function newStoryInput(value: StoryEditInput): NewStoryInput {
     photoFocus: value.photo?.focus,
   }
 }
+
+export function missingNewStoryField(value: StoryEditInput): { field: string; message: string } | null {
+  if (!value.title.trim()) return { field: 'story-title', message: 'Add a title.' }
+  if (!value.summary.trim()) return { field: 'story-summary', message: 'Add a summary.' }
+  if (!value.photo?.id) return { field: 'story-photo-picker', message: 'Choose a lead photo and describe it.' }
+  if (!value.photo.description.trim()) return { field: 'story-photo-description', message: 'Describe the lead photo.' }
+  return null
+}

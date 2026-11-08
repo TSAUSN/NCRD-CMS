@@ -15,7 +15,7 @@ import {
   prepareStorySubmission,
   sendStorySubmission,
 } from '../actions.ts'
-import { newStoryInput, storyDraftInput } from './story-draft-input.ts'
+import { missingNewStoryField, newStoryInput, storyDraftInput } from './story-draft-input.ts'
 import { useStoryRecovery } from './use-story-recovery.ts'
 import { useStoryExit } from './use-story-exit.ts'
 
@@ -130,22 +130,12 @@ export function useStoryDraft({
       field?.scrollIntoView({ block: 'center' })
       return
     }
-    if (newDraft && !uncertain) {
-      const missing = !value.title.trim()
-        ? ['story-title', 'Add a title.']
-        : !value.summary.trim()
-          ? ['story-summary', 'Add a summary.']
-          : !value.photo?.id
-            ? ['story-photo-picker', 'Choose a lead photo and describe it.']
-            : !value.photo.description.trim()
-              ? ['story-photo-description', 'Describe the lead photo.']
-              : null
-      if (missing) {
-        setError(true)
-        setNotice(missing[1]!)
-        document.getElementById(missing[0]!)?.focus()
-        return
-      }
+    const missing = newDraft && !uncertain ? missingNewStoryField(value) : null
+    if (missing) {
+      setError(true)
+      setNotice(missing.message)
+      document.getElementById(missing.field)?.focus()
+      return
     }
     inFlight.current = true
     creationKind.current = kind
