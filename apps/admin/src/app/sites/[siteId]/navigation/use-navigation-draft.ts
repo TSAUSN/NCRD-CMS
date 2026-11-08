@@ -1,9 +1,8 @@
 import { useEffect, useMemo, useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import type { NavNode, NavTree } from '@cms/schema'
-import { dropMenuItem, moveMenuItem } from '../../../../lib/menu-editing.ts'
-import { menuReorderIntent, type MenuMove } from '../../../../lib/menu-reorder-intent.ts'
-import { useReorderableList } from '../../../../components/ui/use-reorderable-list.ts'
+import { menuPageIds } from '../../../../lib/menu-editing.ts'
+import { useMenuReordering } from '../../../../components/use-menu-reordering.ts'
 import { publishNavigation, saveNavigationDraft } from '../../../actions/site-look.ts'
 import type { ActionResult } from '../../../../lib/action-result.ts'
 
@@ -20,17 +19,6 @@ type InitialWorkspace = {
 
 const cloneTree = (tree: NavTree): NavTree => structuredClone(tree)
 const serial = (tree: NavTree): string => JSON.stringify(tree)
-
-function pageIds(tree: NavTree): Set<string> {
-  const ids = new Set<string>()
-  for (const node of tree) {
-    if (node.target.type === 'page') ids.add(node.target.page_id)
-    for (const child of node.children ?? []) {
-      if (child.target.type === 'page') ids.add(child.target.page_id)
-    }
-  }
-  return ids
-}
 
 export type NavigationEditorProps = {
   siteId: string
@@ -54,7 +42,7 @@ export function useNavigationDraft({ siteId, initial, canManage }: NavigationEdi
   const [pending, startTransition] = useTransition()
   const command = useRef(false)
 
-  const usedPages = useMemo(() => pageIds(tree), [tree])
+  const usedPages = useMemo(() => menuPageIds(tree), [tree])
   const availablePages = useMemo(
     () => initial.pages.filter(page => page.published && !usedPages.has(page.id)),
     [initial.pages, usedPages],
@@ -108,29 +96,7 @@ export function useNavigationDraft({ siteId, initial, canManage }: NavigationEdi
     )
   }
 
-  const reorder = useReorderableList({
-    mimeType: 'application/x-cms-navigation',
-    decide: point => menuReorderIntent(tree, point),
-    apply: ({ from, to, position }: MenuMove) => {
-      const next = dropMenuItem(tree, from, to, position)
-      if (next === tree) return
-      setTree(next)
-      const [parent, child] = to.split('.').map(Number)
-      const target = child === undefined ? tree[parent!] : tree[parent!]?.children?.[child]
-      return 'Moved ' + (position === 'inside' ? 'under ' : position + ' ') + (target?.label || 'the menu item') + '.'
-    },
-  })
-
-  function moveByKeyboard(path: string, action: 'up' | 'down' | 'indent' | 'outdent') {
-    const next = moveMenuItem(tree, path, action)
-    if (next === tree) return
-    setTree(next)
-    const [parent, child] = path.split('.').map(Number)
-    const moved = child === undefined ? tree[parent!] : tree[parent!]?.children?.[child]
-    const placement =
-      action === 'indent' ? 'under the previous item' : action === 'outdent' ? 'out of the dropdown' : action
-    reorder.announce(`Moved ${moved?.label || 'menu item'} ${placement}.`)
-  }
+  const { reorder, moveByKeyboard } = useMenuReordering(tree, setTree, 'application/x-cms-navigation')
 
   function addPage(page: PageChoice) {
     setTree(current => [

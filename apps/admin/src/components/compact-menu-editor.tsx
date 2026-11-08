@@ -1,7 +1,7 @@
 'use client'
 import { useMemo, useState } from 'react'
 import { NavTree, type NavNode } from '@cms/schema'
-import { canAppendMenuItem, dropMenuItem, editMenuItem, moveMenuItem } from '../lib/menu-editing.ts'
+import { canAppendMenuItem, editMenuItem, menuNodeAt, moveMenuItem } from '../lib/menu-editing.ts'
 import { Badge, Button, Card, Dialog, Menu } from './ui/index.ts'
 import { IconDrag, IconMore, IconPlus } from './icons.tsx'
 import recordTableStyles from './workspace-styles/record-table.module.css'
@@ -9,9 +9,8 @@ import siteSummaryStyles from './workspace-styles/site-summary.module.css'
 import listInspectorStyles from './workspace-styles/list-inspector.module.css'
 import ownedStyles from './compact-menu-editor-styles.module.css'
 import reorderStyles from './ui/reorderable-list.module.css'
-import { useReorderableList } from './ui/use-reorderable-list.ts'
+import { useMenuReordering } from './use-menu-reordering.ts'
 import { DropIndicator, ReorderAnnouncement } from './ui/drop-indicator.tsx'
-import { menuReorderIntent, type MenuMove } from '../lib/menu-reorder-intent.ts'
 import { CompactMenuItemDialog, type MenuPageChoice, type MenuItemEditing } from './compact-menu-item-dialog.tsx'
 export function CompactMenuEditor({
   tree,
@@ -30,25 +29,7 @@ export function CompactMenuEditor({
   const [removing, setRemoving] = useState<{ path: string; label: string } | null>(null)
   const [labelEdited, setLabelEdited] = useState(false)
   const pageById = useMemo(() => new Map(pages.map(page => [page.id, page])), [pages])
-  const reorder = useReorderableList({
-    mimeType: 'application/x-cms-menu',
-    decide: point => menuReorderIntent(tree, point),
-    apply: ({ from, to, position }: MenuMove) => {
-      const next = dropMenuItem(tree, from, to, position)
-      if (next === tree) return
-      onChange(next)
-      const item = menuNodeAt(tree, to)
-      return 'Moved ' + (position === 'inside' ? 'under ' : position + ' ') + (item?.label || 'the menu item') + '.'
-    },
-  })
-  function keyboardMove(path: string, label: string, action: 'up' | 'down' | 'indent' | 'outdent') {
-    const next = moveMenuItem(tree, path, action)
-    if (next === tree) return
-    onChange(next)
-    const placement =
-      action === 'indent' ? 'under the previous item' : action === 'outdent' ? 'out of the dropdown' : action
-    reorder.announce(`Moved ${label || 'menu item'} ${placement}.`)
-  }
+  const { reorder, moveByKeyboard } = useMenuReordering(tree, onChange)
   const node = editing ? menuNodeAt(tree, editing.path) : undefined
   const patch = (fn: (node: NavNode) => NavNode) => {
     if (editing) onChange(editMenuItem(tree, editing.path, fn))
@@ -136,20 +117,16 @@ export function CompactMenuEditor({
           {item.dropdownGroup ? 'Group' : item.target.type === 'page' ? 'Page' : 'Website'}
         </Badge>
         <Menu label={<IconMore size={16} />} accessibleLabel={'Actions for ' + item.label}>
-          <Button variant="tertiary" onClick={() => begin(path)}>
+          <Button variant="tertiary" disabled={disabled} onClick={() => begin(path)}>
             Edit menu item
           </Button>
-          <Button
-            variant="tertiary"
-            disabled={disabled || index === 0}
-            onClick={() => keyboardMove(path, item.label, 'up')}
-          >
+          <Button variant="tertiary" disabled={disabled || index === 0} onClick={() => moveByKeyboard(path, 'up')}>
             Move up
           </Button>
           <Button
             variant="tertiary"
             disabled={disabled || index === total - 1}
-            onClick={() => keyboardMove(path, item.label, 'down')}
+            onClick={() => moveByKeyboard(path, 'down')}
           >
             Move down
           </Button>
@@ -157,7 +134,7 @@ export function CompactMenuEditor({
             <Button
               variant="tertiary"
               disabled={disabled || tree.length >= 50}
-              onClick={() => keyboardMove(path, item.label, 'outdent')}
+              onClick={() => moveByKeyboard(path, 'outdent')}
             >
               Move out
             </Button>
@@ -170,7 +147,7 @@ export function CompactMenuEditor({
                 Boolean(item.children?.length) ||
                 (tree[index - 1]?.children?.length ?? 0) >= 20
               }
-              onClick={() => keyboardMove(path, item.label, 'indent')}
+              onClick={() => moveByKeyboard(path, 'indent')}
             >
               Move under previous item
             </Button>
@@ -258,10 +235,4 @@ export function CompactMenuEditor({
       )}
     </>
   )
-}
-
-function menuNodeAt(tree: NavTree, path: string): NavNode | undefined {
-  const [parent, child] = path.split('.').map(Number)
-  const root = tree[parent!]
-  return child === undefined ? root : root?.children?.[child]
 }

@@ -1,14 +1,13 @@
 'use client'
-import { useId, useState } from 'react'
+import { useId, useMemo, useState } from 'react'
 import { NavUrl, type NavTree, type NavNode } from '@cms/schema'
-import { canAppendMenuItem, editMenuItem, menuHasPage, moveMenuItem, dropMenuItem } from '../lib/menu-editing.ts'
+import { canAppendMenuItem, editMenuItem, menuPageIds, moveMenuItem } from '../lib/menu-editing.ts'
 import { Button, Dialog, IconButton } from './ui/index.ts'
 import { IconArrowUp, IconArrowDown, IconTrash } from './icons.tsx'
 import styles from './site-look-panel.module.css'
 import reorderStyles from './ui/reorderable-list.module.css'
-import { useReorderableList } from './ui/use-reorderable-list.ts'
+import { useMenuReordering } from './use-menu-reordering.ts'
 import { DropIndicator, ReorderAnnouncement } from './ui/drop-indicator.tsx'
-import { menuReorderIntent, type MenuMove } from '../lib/menu-reorder-intent.ts'
 type PageChoice = { id: string; title: string; published: boolean }
 export function MenuTreeEditor({
   tree,
@@ -36,36 +35,19 @@ export function MenuTreeEditor({
         : next,
     )
   const [removing, setRemoving] = useState<{ path: string; label: string; children: number } | null>(null)
-  const addId = useId(),
-    available = pages.filter(page => !menuHasPage(tree, page.id)),
-    canAdd = canAppendMenuItem(tree)
-  const reorder = useReorderableList({
-    mimeType: 'application/x-cms-menu',
-    decide: point => menuReorderIntent(tree, point),
-    apply: ({ from, to, position }: MenuMove) => {
-      const next = dropMenuItem(tree, from, to, position)
-      if (next === tree) return
-      onChange(next)
-      const [parent, child] = to.split('.').map(Number)
-      const target = child === undefined ? tree[parent!] : tree[parent!]?.children?.[child]
-      return 'Moved ' + (position === 'inside' ? 'under ' : position + ' ') + (target?.label || 'the menu item') + '.'
-    },
-  })
-  function keyboardMove(path: string, label: string, action: 'up' | 'down' | 'indent' | 'outdent') {
-    const next = moveMenuItem(tree, path, action)
-    if (next === tree) return
-    onChange(next)
-    const placement =
-      action === 'indent' ? 'under the previous item' : action === 'outdent' ? 'out of the dropdown' : action
-    reorder.announce(`Moved ${label || 'menu item'} ${placement}.`)
-  }
+  const addId = useId()
+  const included = useMemo(() => menuPageIds(tree), [tree])
+  const available = useMemo(() => pages.filter(page => !included.has(page.id)), [pages, included])
+  const pageById = useMemo(() => new Map(pages.map(page => [page.id, page])), [pages])
+  const canAdd = canAppendMenuItem(tree)
+  const { reorder, moveByKeyboard } = useMenuReordering(tree, onChange)
   const row = (node: NavNode, path: string, index: number, total: number, nested = false) => {
-    const target = node.target,
-      targetName =
-        target.type === 'url'
-          ? target.url || 'Choose a web address'
-          : (pages.find(page => page.id === target.page_id)?.title ?? 'Page unavailable'),
-      urlValid = target.type !== 'url' || NavUrl.safeParse(target.url).success
+    const target = node.target
+    const targetName =
+      target.type === 'url'
+        ? target.url || 'Choose a web address'
+        : (pageById.get(target.page_id)?.title ?? 'Page unavailable')
+    const urlValid = target.type !== 'url' || NavUrl.safeParse(target.url).success
     return (
       <li
         key={path}
@@ -141,7 +123,7 @@ export function MenuTreeEditor({
                       )
                     }
                   >
-                    {!pages.some(page => page.id === target.page_id) && (
+                    {!pageById.has(target.page_id) && (
                       <option value={target.page_id}>Page unavailable — choose another</option>
                     )}
                     {pages.map(page => (
@@ -185,7 +167,7 @@ export function MenuTreeEditor({
             tooltip="Move menu item up"
             variant="tertiary"
             disabled={disabled || index === 0}
-            onClick={() => keyboardMove(path, node.label, 'up')}
+            onClick={() => moveByKeyboard(path, 'up')}
           >
             <IconArrowUp size={16} />
           </IconButton>
@@ -193,7 +175,7 @@ export function MenuTreeEditor({
             tooltip="Move menu item down"
             variant="tertiary"
             disabled={disabled || index === total - 1}
-            onClick={() => keyboardMove(path, node.label, 'down')}
+            onClick={() => moveByKeyboard(path, 'down')}
           >
             <IconArrowDown size={16} />
           </IconButton>
@@ -202,7 +184,7 @@ export function MenuTreeEditor({
               size="s"
               variant="tertiary"
               disabled={disabled || tree.length >= 50}
-              onClick={() => keyboardMove(path, node.label, 'outdent')}
+              onClick={() => moveByKeyboard(path, 'outdent')}
             >
               Move out
             </Button>
@@ -216,7 +198,7 @@ export function MenuTreeEditor({
                 Boolean(node.children?.length) ||
                 (tree[index - 1]?.children?.length ?? 0) >= 20
               }
-              onClick={() => keyboardMove(path, node.label, 'indent')}
+              onClick={() => moveByKeyboard(path, 'indent')}
             >
               Indent
             </Button>

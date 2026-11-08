@@ -94,3 +94,9 @@ export function canAppendMenuItem(tree: NavTree): boolean {
 }
 
 export { dropMenuItem } from './menu-drop.ts'
+
+export function menuNodeAt(tree: NavTree, path: string): NavNode | undefined {
+  const [parent, child] = path.split('.').map(Number)
+  const root = tree[parent!]
+  return child === undefined ? root : root?.children?.[child]
+}
