@@ -8,8 +8,7 @@ import {
   type ReactNode,
   type SetStateAction,
 } from 'react'
-import { setSelection, setValue, type EditorDocument, type EditorSection, type EditorState } from '@cms/domain'
-import { slotForId } from '@cms/schema'
+import { setSelection, type EditorDocument, type EditorSection, type EditorState } from '@cms/domain'
 import { PREVIEW_MESSAGE } from '@cms/renderer'
 import { Button, IconButton } from '../../../components/ui/index.ts'
 import { IconPlus } from '../../../components/icons.tsx'
@@ -18,9 +17,8 @@ import type { LibraryEntry } from '../../../lib/queries.ts'
 import type { SitePreviewContext } from '../../../lib/preview-context.ts'
 import { installNativeFieldFeedback } from './canvas-field-feedback.ts'
 import { sectionVersionKey } from '../../../lib/section-version.ts'
-import { withCanvasValue } from './canvas-sync.ts'
-import { CanvasRichText, patchCanvasRichText, type CanvasRichTextRequest } from './canvas-rich-text.tsx'
-import { IsolatedRichTextToolbar } from './isolated-rich-text-toolbar.tsx'
+import type { CanvasRichTextRequest } from './canvas-rich-text.tsx'
+import { EditorCanvasRichText } from './editor-canvas-rich-text.tsx'
 import type { RichTextToolbarState } from './rich-text-commands.ts'
 import { CanvasChrome, type CanvasHover } from './canvas-chrome.tsx'
 import type { PageEditorProps, EditorPane } from './editor-types.ts'
@@ -35,7 +33,7 @@ type Current<T> = { current: T }
 type Chrome = ComponentProps<typeof CanvasChrome>
 type Isolation = ReturnType<typeof useIsolatedCanvas>
 type Zoom = 'fit' | 'actual'
-type Props = {
+export type EditorCanvasProps = {
   view: {
     props: Pick<PageEditorProps, 'originalDesign' | 'liveSections'>
     viewTools: ReactNode
@@ -120,7 +118,7 @@ type Props = {
 }
 
 /** The editor's canvas view uses the same draft and undo history as the other panes. */
-export function EditorCanvas({ view, frame, fields, overlays }: Props) {
+export function EditorCanvas({ view, frame, fields, overlays }: EditorCanvasProps) {
   const {
     props,
     viewTools,
@@ -140,9 +138,6 @@ export function EditorCanvas({ view, frame, fields, overlays }: Props) {
     canvasSize,
     previewScale,
     canvasZoomRef,
-    manualScale,
-    setManualScale,
-    setZoom,
   } = view
   const {
     isolated,
@@ -153,7 +148,6 @@ export function EditorCanvas({ view, frame, fields, overlays }: Props) {
     canvasSlow,
     canvasAttached,
     renderCanvas,
-    shown,
     toCanvas,
     canvasAwaitingRender,
     sitePreview,
@@ -164,13 +158,7 @@ export function EditorCanvas({ view, frame, fields, overlays }: Props) {
     currentEditor,
     setState,
     setPane,
-    activeRichText,
     slotsByDef,
-    richTextConstraints,
-    canvasHistoryBlocked,
-    remoteRichState,
-    remoteRichUnavailable,
-    setRichTextRequest,
     sectionLocked,
     selected,
     remoteHover,
@@ -182,11 +170,6 @@ export function EditorCanvas({ view, frame, fields, overlays }: Props) {
     setInlineList,
   } = fields
   const {
-    upgrade,
-    replacement,
-    overrideOpen,
-    submitOpen,
-    recovery,
     sectionTool,
     libraryPreview,
     libraryPreparing,
@@ -202,6 +185,8 @@ export function EditorCanvas({ view, frame, fields, overlays }: Props) {
     canInsertAt,
     canMoveSection,
   } = overlays
+  const slotsFor = (section: EditorSection | undefined) =>
+    section ? (slotsByDef.get(sectionVersionKey(section.section_def_id, section.section_def_version))?.slots ?? []) : []
   const needsPreview = state.document.sections.length > 0 || Boolean(libraryPreview)
   const sameOriginSource =
     !isolated.enabled && canvasAttached && needsPreview && canvasSource.versionId
@@ -220,8 +205,6 @@ export function EditorCanvas({ view, frame, fields, overlays }: Props) {
   )
   return (
     <div id="editor-panel-canvas" className="canvas-pane" role="tabpanel" aria-labelledby="editor-tab-canvas">
-      {/* One slim row. Every line above the page is height the page does
-        not get, and V1 gave the page nearly all of it. */}
       <div className={foundationStyles.canvasTools}>
         {!props.originalDesign && <div className={'bar-tools ' + foundationStyles.nativeViewTools}>{viewTools}</div>}
         <div ref={canvasItemToolbarRef} className={foundationStyles.contextTools} />
@@ -273,70 +256,8 @@ export function EditorCanvas({ view, frame, fields, overlays }: Props) {
           </div>
         </div>
       )}
-      {activeRichText &&
-        (isolated.enabled ? (
-          <IsolatedRichTextToolbar
-            request={activeRichText}
-            value={String(state.document.sections[activeRichText.section]?.values[activeRichText.slot] ?? '')}
-            label={
-              slotForId(
-                slotsByDef.get(
-                  sectionVersionKey(
-                    state.document.sections[activeRichText.section]!.section_def_id,
-                    state.document.sections[activeRichText.section]!.section_def_version,
-                  ),
-                )?.slots ?? [],
-                state.document.sections[activeRichText.section]!.values,
-                activeRichText.slot,
-              )?.label ?? 'Rich text'
-            }
-            constraints={richTextConstraints(state.document.sections[activeRichText.section], activeRichText.slot)}
-            disabled={canvasHistoryBlocked.current}
-            active={remoteRichState}
-            unavailable={remoteRichUnavailable}
-            post={toCanvas}
-            onClose={() => setRichTextRequest(null)}
-          />
-        ) : (
-          <CanvasRichText
-            frameRef={canvasRef}
-            request={activeRichText}
-            value={String(state.document.sections[activeRichText.section]?.values[activeRichText.slot] ?? '')}
-            label={(() => {
-              const section = state.document.sections[activeRichText.section]
-              return section
-                ? (slotForId(
-                    slotsByDef.get(sectionVersionKey(section.section_def_id, section.section_def_version))?.slots ?? [],
-                    section.values,
-                    activeRichText.slot,
-                  )?.label ?? 'Rich text')
-                : 'Rich text'
-            })()}
-            constraints={richTextConstraints(state.document.sections[activeRichText.section], activeRichText.slot)}
-            disabled={
-              upgrade !== null ||
-              replacement !== null ||
-              overrideOpen ||
-              submitOpen ||
-              recovery.review !== null ||
-              recovery.busy
-            }
-            onChange={value => {
-              const { section, slot, origin } = activeRichText
-              if (currentEditor.current.sectionOrigins[section] !== origin) return
-              patchCanvasRichText(
-                canvasRef.current,
-                section,
-                slot,
-                value,
-                richTextConstraints(currentEditor.current.document.sections[section], slot),
-              )
-              shown.current = withCanvasValue(shown.current, section, slot, value)
-              setState(current => setValue(current, section, slot, value))
-            }}
-            onClose={() => setRichTextRequest(null)}
-          />
-        ))}
+
+      <EditorCanvasRichText fields={fields} frame={frame} overlays={overlays} />
       <div
         className={'canvas-frame ' + foundationStyles.canvasFrame}
         style={{ maxWidth: `calc(${deviceWidth}px + var(--space-7))` }}
@@ -447,19 +368,8 @@ export function EditorCanvas({ view, frame, fields, overlays }: Props) {
                 sections={state.document.sections}
                 selected={libraryOpen ? null : selected}
                 selectedSlot={state.selection.slot}
-                slotsFor={section =>
-                  slotsByDef.get(sectionVersionKey(section.section_def_id, section.section_def_version))?.slots ?? []
-                }
-                slots={
-                  selected === null
-                    ? []
-                    : (slotsByDef.get(
-                        sectionVersionKey(
-                          state.document.sections[selected]!.section_def_id,
-                          state.document.sections[selected]!.section_def_version,
-                        ),
-                      )?.slots ?? [])
-                }
+                slotsFor={slotsFor}
+                slots={slotsFor(selected === null ? undefined : state.document.sections[selected])}
                 name={nameOf}
                 onAdd={openLibrary}
                 onAction={canvasAction}
@@ -472,46 +382,44 @@ export function EditorCanvas({ view, frame, fields, overlays }: Props) {
             )}
         </div>
       </div>
-      <div ref={canvasZoomRef} className={foundationStyles.zoom} role="group" aria-label="Canvas zoom">
-        <IconButton
-          tooltip="Zoom out"
-          variant="tertiary"
-          size="s"
-          disabled={zoom === 'actual' && manualScale <= 0.25}
-          onClick={() => {
-            setManualScale(Math.max(0.25, previewScale - 0.1))
-            setZoom('actual')
-          }}
-        >
-          −
-        </IconButton>
-        <Button
-          variant="tertiary"
-          size="s"
-          onClick={() => {
-            setManualScale(1)
-            setZoom('actual')
-          }}
-          aria-label="Zoom to actual size"
-        >
-          {Math.round(previewScale * 100)}%
-        </Button>
-        <IconButton
-          tooltip="Zoom in"
-          variant="tertiary"
-          size="s"
-          disabled={zoom === 'actual' && manualScale >= 2}
-          onClick={() => {
-            setManualScale(Math.min(2, previewScale + 0.1))
-            setZoom('actual')
-          }}
-        >
-          +
-        </IconButton>
-        <Button variant="tertiary" size="s" aria-pressed={zoom === 'fit'} onClick={() => setZoom('fit')}>
-          Fit
-        </Button>
-      </div>
+
+      <CanvasZoom view={view} />
+    </div>
+  )
+}
+
+function CanvasZoom({ view }: { view: EditorCanvasProps['view'] }) {
+  const { canvasZoomRef, zoom, manualScale, previewScale, setManualScale, setZoom } = view
+  function setActualScale(scale: number) {
+    setManualScale(scale)
+    setZoom('actual')
+  }
+  return (
+    <div ref={canvasZoomRef} className={foundationStyles.zoom} role="group" aria-label="Canvas zoom">
+      <IconButton
+        tooltip="Zoom out"
+        variant="tertiary"
+        size="s"
+        disabled={zoom === 'actual' && manualScale <= 0.25}
+        onClick={() => setActualScale(Math.max(0.25, previewScale - 0.1))}
+      >
+        −
+      </IconButton>
+      <Button variant="tertiary" size="s" onClick={() => setActualScale(1)} aria-label="Zoom to actual size">
+        {Math.round(previewScale * 100)}%
+      </Button>
+      <IconButton
+        tooltip="Zoom in"
+        variant="tertiary"
+        size="s"
+        disabled={zoom === 'actual' && manualScale >= 2}
+        onClick={() => setActualScale(Math.min(2, previewScale + 0.1))}
+      >
+        +
+      </IconButton>
+      <Button variant="tertiary" size="s" aria-pressed={zoom === 'fit'} onClick={() => setZoom('fit')}>
+        Fit
+      </Button>
     </div>
   )
 }
