@@ -116,6 +116,11 @@ unrelated one; use the golden comparison before shipping a public change.
   dialogs have their own files. The page outline and page settings live in
   `page-inspector.tsx`; selected-section fields live in `inspector.tsx`. The
   domain package owns undoable changes.
+- For Chapters, `app/sites/[siteId]/chapters/workspace.tsx` owns the list and
+  saved detail. `chapter-form.tsx` owns the setup draft, its navigation guard,
+  and Save. The destination, section, and contact fields each have a named
+  component. `chapter-invite.tsx` uses the local invitation action; neither a
+  displayed name nor a mail status grants hosted access.
 - The renderer entry point exports the supported API. Follow
   `document/render-page.ts` for a whole document, `frame/site-frame.ts` for
   header and footer, `section/` for sections and slots, `theme/` for theme
