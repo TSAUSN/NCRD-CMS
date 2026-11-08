@@ -62,9 +62,24 @@ export async function readStoryPlacement(
         ]
       : []
   })
+  // Look up each visible page's current version and route before RLS scans unrelated history.
   const saved = (
     await client.query(
-      'SELECT p.id,p.title,CASE WHEN $2 OR app.page_path(p.slug)=$3 THEN app.page_path(p.slug) ELSE (SELECT r.path FROM published_routes r WHERE r.page_id=p.id ORDER BY r.updated_at DESC LIMIT 1) END AS path,v.content FROM pages p JOIN page_versions v ON v.id=CASE WHEN $2 OR app.page_path(p.slug)=$3 THEN p.draft_version_id ELSE p.published_version_id END WHERE p.site_id=$1 AND p.archived_at IS NULL AND ($2 OR app.page_path(p.slug)=$3 OR EXISTS(SELECT 1 FROM published_routes r WHERE r.page_id=p.id)) ORDER BY p.slug,p.id',
+      `SELECT p.id,p.title,CASE WHEN $2 OR app.page_path(p.slug)=$3 THEN app.page_path(p.slug) ELSE r.path END AS path,v.content
+         FROM pages p
+         LEFT JOIN LATERAL (
+           SELECT r.path FROM published_routes r
+            WHERE NOT $2 AND app.page_path(p.slug)<>$3 AND r.site_id=p.site_id AND r.page_id=p.id
+            ORDER BY r.updated_at DESC LIMIT 1
+         ) r ON true
+         JOIN LATERAL (
+           SELECT v.content FROM page_versions v
+            WHERE v.id=CASE WHEN $2 OR app.page_path(p.slug)=$3 THEN p.draft_version_id ELSE p.published_version_id END
+              AND v.site_id=p.site_id AND v.page_id=p.id
+            LIMIT 1
+         ) v ON true
+        WHERE p.site_id=$1 AND p.archived_at IS NULL AND ($2 OR app.page_path(p.slug)=$3 OR r.path IS NOT NULL)
+        ORDER BY p.slug,p.id`,
       [siteId, privateSite, path],
     )
   ).rows
