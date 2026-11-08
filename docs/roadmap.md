@@ -1,8 +1,8 @@
 # Delivery roadmap
 
 [SPEC release state](../SPEC.md#current-release-state) controls the current milestone.
-The frozen build is `friday-2026-11-06`. Documentation/comment cleanup is isolated
-from runtime work. Deployment uses reviewed release refs, not work-in-progress branches.
+The release is `v2026.11.06`; `e51b4b5` was the runtime-identical review build.
+Deployment uses the reviewed release ref and private verification receipts.
 
 ## Implemented scope
 
@@ -32,10 +32,8 @@ from runtime work. Deployment uses reviewed release refs, not work-in-progress b
 | RO-4 | Utilities hub | Separate product scope |
 | Maintenance | Split the large editor, reduce `globals.css`, remove site-specific renderer branches | Separate branch, reviewed commits and complete behavior/visual gates |
 
-The editor/CSS refactor is held on `refactor/handover`; tablet navigation and CSS
-precedence failures prevent including it in this frozen release. See
-[refactor gates](handbook/maintainers/refactor-gates.md) and
-[known issues](handbook/start-here/known-issues.md) for evidence and limitations.
+For code and visual verification, see the [maintainer gates](maintainers/gates.md).
+For a new installation, use the [private release handoff](handbook/hosting/private-release-handoff.md).
 
 Organization installation, custom-domain/DNS cutover, real-editor rollout and
 SMTP/provider changes are distinct administrator decisions. Approved public copy,

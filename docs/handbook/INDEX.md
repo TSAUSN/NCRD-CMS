@@ -60,6 +60,7 @@ Permissions are enforced by the database, not only by the screens.
 | Back up and recover | [upgrades/backup-recovery.md](upgrades/backup-recovery.md) |
 | Prepare a clean hosted content copy | [hosting/local-staging.md](hosting/local-staging.md#prepare-the-maintainer-review-hosted-copy) |
 | Bootstrap an empty organization project (administrator operated) | [hosting/bootstrap.md](hosting/bootstrap.md) |
+| Receive the private release and sign-in packet | [hosting/private-release-handoff.md](hosting/private-release-handoff.md) |
 | Run Friday deployment checks and rollback | [hosting/friday-go-live.md](hosting/friday-go-live.md) |
 | Size the database and review measured speed | [hosting/speed-and-size.md](hosting/speed-and-size.md) |
 | Deploy the verified Google review and roll back | [hosting/go-live.md](hosting/go-live.md) |

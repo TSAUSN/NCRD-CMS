@@ -10,14 +10,11 @@ ready; every site keeps its own look. It replaces the V1 CMS's architecture
 editing-experience overhaul, a shared core section library, and moving real
 sites onto the platform, starting with SAWSO and Echelon.
 
-## Release baseline and current branch
-
-`friday-2026-11-06` is the frozen comparison release. Its historical browser
-results and limitations are in [known issues](docs/handbook/start-here/known-issues.md).
-This branch separates the page editor, admin styles and public renderer by
-responsibility. Check the exact candidate and its recorded verification before
-shipping it. A running environment's `/health` reports its deployed version;
-the frozen tag and an older runbook receipt do not identify what serves today.
+## Release
+`v2026.11.06` is the release. `e51b4b5` was the runtime-identical review build.
+Check the deployed revision through `/health`. Use the
+[private handoff checklist](docs/handbook/hosting/private-release-handoff.md)
+to verify the source, content and sign-in inputs for a new installation.
 
 ## Maintaining this code
 

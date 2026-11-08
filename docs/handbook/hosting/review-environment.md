@@ -1,8 +1,8 @@
 # Personal review environment
 
 This is the personal review deployment, separate from the organization project.
-Last checked: November 6, 2026; read-only Admin `/health` returned `ok` and
-version `e51b4b5`. This identifies the Admin runtime, not a full hosted acceptance.
+The release is `v2026.11.06`. The November 6 review served the runtime-identical
+build `e51b4b5`. Check the current Admin and Site `/health` before a new review.
 
 The identifiers below are placeholders. Supply actual values through a private
 operator configuration; this document grants no permission to deploy. Verify the account, project and deployed revision at action time.
@@ -28,7 +28,6 @@ addresses route to the public Site service. The frozen Git tag and the deployed
 image are separate records: check `/health` and image digests before reporting a
 version as live. Deployment and content checks do not establish organization readiness.
 
-Private archives, media inventories, source fingerprints, backup keys and deployment
-receipts are transferred separately by the maintainer. Verify their checksums;
-never commit those inputs. See [bootstrap](bootstrap.md), [Friday go-live](friday-go-live.md)
-and [shipping an update](../upgrades/ship-an-update.md) for the procedures.
+Use the [private release handoff checklist](private-release-handoff.md) for the
+content and sign-in packet. See [bootstrap](bootstrap.md) and
+[shipping an update](../upgrades/ship-an-update.md) for the procedures.

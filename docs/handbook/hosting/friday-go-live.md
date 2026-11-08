@@ -1,8 +1,8 @@
 # Friday go-live: administrator-run production test
 
 For the platform lead and Google project administrator.
-**Release tag:** `friday-2026-11-06-handover` (freeze/gate results are recorded in SPEC and
-the handoff). Deploy only the verified tag/commit, never a moving branch tip.
+**Release tag:** `v2026.11.06`. Its runtime-identical review build was `e51b4b5`.
+Deploy the verified release commit; the private handoff records the full SHA.
 Select the verified release ref in GitHub and verify its full commit hash before building.
 
 Friday is Super-admin-only sign-in through the **existing personal Supabase** project.
@@ -21,14 +21,14 @@ handoff. From a new workstation, clone and fetch the release refs first:
 ```bash
 git clone ORGANIZATION_REPOSITORY_URL cms-v2
 cd cms-v2
-git fetch origin tag friday-2026-11-06 tag friday-2026-11-06-handover
-git rev-parse friday-2026-11-06-handover^{commit}
+git fetch origin tag v2026.11.06
+git rev-parse v2026.11.06^{commit}
 ```
 
 Compare the full hash with the handoff before checking out the release. Then select and check the release:
 
 ```bash
-TASK_TAG=friday-2026-11-06-handover
+TASK_TAG=v2026.11.06
 git checkout --detach "$TASK_TAG"
 pnpm install --frozen-lockfile
 pnpm check:node
@@ -38,8 +38,8 @@ TASK_REVISION=$(git rev-parse "$TASK_TAG^{commit}")
  CI is not an automatic deployment;
 bootstrap builds the selected committed source through Cloud Build.
 
-Obtain the cleaned database archive, fingerprint receipt, media inventory,
-media bytes and asset oracle from the maintainer through a private transfer.
+Collect the [private release handoff packet](private-release-handoff.md) before
+restoring content or configuring sign-in.
 Match the archive SHA-256 and inventory before proceeding. Keep inputs outside
 Git and public storage. Do not use an unchecked live-review dump as a seed.
 Preserve the retained demo and its data if it exists on the workstation.

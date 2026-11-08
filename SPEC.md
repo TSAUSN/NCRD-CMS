@@ -34,15 +34,15 @@ because code and tests cite its section numbers ("SPEC §8.6" means revision 7).
 
 ## Current release state
 
-The frozen runtime is `friday-2026-11-06` (`e51b4b520918706d88650de3a8f58cf7a1d0bfc7`).
+The release is `v2026.11.06`. Its runtime-identical review build was `e51b4b5`.
 The hosted personal review copy is a separate deployment; the frozen tag does not
 prove that copy runs the same revision. Organization deployment, public-invocation
 policy, notification delivery and the ordinary-browser acceptance route remain
 administrator gates. See [known issues](docs/handbook/start-here/known-issues.md).
 
 The release includes isolated browser ports, the render/schema oracle, current
-SQL reference and maintainer map. The editor/CSS refactor is held on its separate
-branch because tablet navigation and CSS precedence failed integration checks.
+SQL reference and maintainer map. Verify tablet navigation and CSS precedence
+when changing the editor or shared styles.
 Baseline complete engines recorded Chromium 629/631 and WebKit 626/631, with no
 skipped or flaky cases; the failures remain listed rather than waived.
 The golden oracle covers 356 artifacts: 75 public pages, 121 assets, 150 direct

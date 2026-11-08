@@ -1,6 +1,6 @@
 # Friday test-phase known issues
 
-Release tag: `friday-2026-11-06`. Exact commit, complete gate results and hosted
+Release tag: `v2026.11.06`. Runtime-identical review build: `e51b4b5`. Exact commit, complete gate results and hosted
 acceptance belong in the top handoff and SPEC. Do not deploy a moving branch tip.
 
 ## Demo pace and workarounds
@@ -63,14 +63,7 @@ These are unresolved baseline observations, not approval to ignore a failing dem
 step. New failures on the final candidate must be resolved or the refactor left
 on its branch.
 
-## Refactor branch and handover
-
-The Friday tag is the frozen baseline. The separate refactor branch contains
-the editor and renderer splits, named stylesheets, preview recovery and the
-personal release workflow. Compare the exact candidate against the Friday
-baseline. Check direct loads, links between screens, and the 900 px navigation
-drawer before accepting stylesheet changes. See [where things live](../maintainers/where-things-live.md)
-and the [automatic release procedure](../upgrades/automatic-releases.md).
+## Delivery and imported content
 
 - **Contact forms:** On sites with a public CMS contact form, site administrators
   can read saved submissions in **Settings → Contact messages**. The CMS does
