@@ -3,16 +3,13 @@ import { GuardedLink as Link } from '../../../components/guarded-link.tsx'
 import { getCollectionWorkspace } from '../../../lib/collection-queries.ts'
 import { listWorkspacePages } from '../../../lib/workspace-queries.ts'
 import { listReviewSubmissions } from '../../../lib/review-queries.ts'
-import { Card, Disclosure } from '../../../components/ui/index.ts'
+import { Disclosure } from '../../../components/ui/index.ts'
 import { getPageListControls } from '../../../lib/page-list-workspace.ts'
 import { NativePagesTable } from './native-pages-table.tsx'
 import { NativeNewPage } from './native-new-page.tsx'
 import { PagesTable } from './pages-table.tsx'
 import styles from '../../../components/workspace.module.css'
 import workspaceFormsStyles from '../../../components/workspace-styles/workspace-forms.module.css'
-import recordTableStyles from '../../../components/workspace-styles/record-table.module.css'
-import siteSummaryStyles from '../../../components/workspace-styles/site-summary.module.css'
-import selectionControlsStyles from '../../../components/workspace-styles/selection-controls.module.css'
 import { publicSiteOrigin } from '../../../lib/public-site-url.ts'
 import { notFound } from 'next/navigation'
 import { currentSession } from '../../../lib/session.ts'
@@ -20,20 +17,14 @@ import { getSite, listArchivedPages, listSectionLibrary, roleLabel } from '../..
 import { PageHeader } from '../../../components/shell.tsx'
 import { AppShell } from '../../../components/app-shell.tsx'
 import { navigationFor } from '../../../components/nav.ts'
-import { pageStatus, StatusChip, siteStatus } from '../../../components/status.tsx'
+import { StatusChip, siteStatus } from '../../../components/status.tsx'
 import { NewPageForm } from './new-page.tsx'
 import { editorialPosture } from '../../../lib/editorial-posture.ts'
-import {
-  IconAlert,
-  IconCheck,
-  IconExternal,
-  IconPage,
-  IconCollection,
-  IconSettings,
-} from '../../../components/icons.tsx'
+import { IconAlert, IconCheck, IconExternal } from '../../../components/icons.tsx'
 import { PageManagement } from './page-management.tsx'
 import { SiteHostingNotice } from '../../../components/site-hosting-notice.tsx'
 
+import { OriginalSiteOverviewSections } from './original-site-overview-sections.tsx'
 export async function SiteWorkspace({
   params,
   searchParams,
@@ -41,12 +32,12 @@ export async function SiteWorkspace({
 }: {
   area?: 'overview' | 'pages'
   params: Promise<{ siteId: string }>
-  searchParams: Promise<{ error?: string; created?: string; siteCreated?: string }>
+  searchParams: Promise<{ error?: string; created?: string }>
 }) {
   const session = await currentSession()
   if (!session) notFound()
   const { siteId } = await params
-  const { error, created, siteCreated } = await searchParams
+  const { error, created } = await searchParams
 
   // A site the session cannot see returns null here because RLS filtered it —
   // the same answer a site that does not exist gives. No existence oracle.
@@ -61,7 +52,8 @@ export async function SiteWorkspace({
   const nativePages = area === 'pages' && !site.original_design
   // The native overview and native pages use neither the library nor its cards.
   const needsLibrary = canManagePages && (area === 'overview' ? site.original_design : !nativePages)
-  const [pages, archivedPages, role, library, reviews, lists] = await Promise.all([
+
+  const [pages, archivedPages, role, library, reviews, lists, controls] = await Promise.all([
     listWorkspacePages(session.principal.userId, siteId),
     canManagePages ? listArchivedPages(session.principal.userId, siteId) : Promise.resolve([]),
     roleLabel(session.principal.userId),
@@ -74,27 +66,26 @@ export async function SiteWorkspace({
     area === 'overview' && !scopedOnly
       ? getCollectionWorkspace(session.principal.userId, siteId)
       : Promise.resolve(null),
-  ])
-  const canAdmin = session.principal.isSuperAdmin || siteRole === 'site_admin'
-  let pageControlError = false
-  const pageControls =
+
     !site.original_design && !scopedOnly
-      ? await getPageListControls(session.principal.userId, siteId).catch(() => {
-          pageControlError = true
-          return null
-        })
-      : null
-  const ordinaryPages = pages.filter(
-    page =>
-      !page.slug.startsWith('stories/') &&
-      !pageControls?.stories.some(story => story.path === (page.slug ? '/' + page.slug : '/')),
-  )
+      ? getPageListControls(session.principal.userId, siteId)
+          .then(data => ({ data, failed: false }))
+          .catch(() => ({ data: null, failed: true }))
+      : { data: null, failed: false },
+  ])
+  const { data: pageControls, failed: pageControlError } = controls
+  const canAdmin = session.principal.isSuperAdmin || siteRole === 'site_admin'
+
+  const storyPaths = new Set(pageControls?.stories.map(story => story.path))
+  const ordinaryPages = pages.filter(page => !page.slug.startsWith('stories/') && !storyPaths.has('/' + page.slug))
   const liveOrigin =
     site.status === 'archived' || (!site.primary_hostname && site.hosting_status && site.hosting_status !== 'ready')
       ? null
       : publicSiteOrigin(site.primary_hostname || site.staging_hostname)
   const published = pages.filter(page => page.published_version_id !== null).length
-  const changed = pages.filter(page => editorialPosture(page).hasUnpublishedChanges).length
+
+  const unpublishedPages = pages.filter(page => editorialPosture(page).hasUnpublishedChanges)
+  const changed = unpublishedPages.length
 
   if (area === 'overview' && !site.original_design)
     return (
@@ -252,190 +243,16 @@ export async function SiteWorkspace({
 
         <div className={styles.stack}>
           {area === 'overview' && (
-            <>
-              <section aria-label="Quick actions" className={styles.stack}>
-                <h2 className={selectionControlsStyles.visuallyHidden}>Quick actions</h2>
-                <div className={styles.grid}>
-                  {scopedOnly && pages[0] && (
-                    <Link
-                      className={siteSummaryStyles.task}
-                      editorCanvasOrigin={editorCanvasOrigin}
-                      href={'/pages/' + pages[0].id}
-                    >
-                      <span className={siteSummaryStyles.taskIcon}>
-                        <IconPage size={18} />
-                      </span>
-                      <strong>Edit {pages[0].title}</strong>
-                    </Link>
-                  )}
-                  {pages.find(page => page.slug === '') && (
-                    <Link
-                      className={siteSummaryStyles.task}
-                      editorCanvasOrigin={editorCanvasOrigin}
-                      href={'/pages/' + pages.find(page => page.slug === '')!.id}
-                    >
-                      <span className={siteSummaryStyles.taskIcon}>
-                        <IconPage size={18} />
-                      </span>
-                      <strong>Edit home page</strong>
-                    </Link>
-                  )}
-                  {canManagePages && (
-                    <Link className={siteSummaryStyles.task} href={`/sites/${siteId}/pages`}>
-                      <span className={siteSummaryStyles.taskIcon}>
-                        <IconPage size={18} />
-                      </span>
-                      <strong>Manage pages</strong>
-                    </Link>
-                  )}
-                  {!scopedOnly && (
-                    <Link className={siteSummaryStyles.task} href={`/sites/${siteId}/content`}>
-                      <span className={siteSummaryStyles.taskIcon}>
-                        <IconCollection size={18} />
-                      </span>
-                      <strong>Update lists</strong>
-                    </Link>
-                  )}
-                  {!scopedOnly && (
-                    <Link className={siteSummaryStyles.task} href={`/sites/${siteId}/design`}>
-                      <span className={siteSummaryStyles.taskIcon}>
-                        <IconSettings size={18} />
-                      </span>
-                      <strong>{site.original_design ? 'Edit menu & footer' : 'Change site look'}</strong>
-                    </Link>
-                  )}
-                </div>
-              </section>
-              <div className={styles.twoColumns}>
-                <div className={styles.stack}>
-                  <Card title="Needs attention" density="compact">
-                    <ul className={siteSummaryStyles.rowList}>
-                      {changed === 0 && reviews.length === 0 && !pages.some(page => page.live_samples) && (
-                        <li>
-                          <span className={siteSummaryStyles.taskIcon}>
-                            <IconCheck size={18} />
-                          </span>
-                          <div className={recordTableStyles.rowCopy}>
-                            Everything saved is live. There is nothing waiting for attention.
-                          </div>
-                        </li>
-                      )}
-                      {pages
-                        .filter(page => editorialPosture(page).hasUnpublishedChanges)
-                        .map(page => (
-                          <li key={page.id}>
-                            <div className={recordTableStyles.rowCopy}>
-                              <strong>{page.title}</strong>
-                              <span className={recordTableStyles.meta}>
-                                {page.published_version_id ? 'Changes not live' : 'Draft'}
-                              </span>
-                            </div>
-                            <Link
-                              className="btn secondary"
-                              editorCanvasOrigin={editorCanvasOrigin}
-                              href={'/pages/' + page.id}
-                            >
-                              Open page
-                            </Link>
-                          </li>
-                        ))}
-                      {reviews.length > 0 && (
-                        <li>
-                          <div className={recordTableStyles.rowCopy}>
-                            <strong>
-                              {reviews.length} {reviews.length === 1 ? 'page is' : 'pages are'} in review
-                            </strong>
-                          </div>
-                          <Link className="btn secondary" href={`/sites/${siteId}/publishing`}>
-                            Review submissions
-                          </Link>
-                        </li>
-                      )}
-                      {pages
-                        .filter(page => page.live_samples)
-                        .map(page => (
-                          <li key={'sample' + page.id}>
-                            <div className={recordTableStyles.rowCopy}>
-                              <strong>{page.title}</strong>
-                              <span className={recordTableStyles.meta}>Sample content is live</span>
-                            </div>
-                            <Link
-                              className="btn secondary"
-                              editorCanvasOrigin={editorCanvasOrigin}
-                              href={'/pages/' + page.id}
-                            >
-                              Replace samples
-                            </Link>
-                          </li>
-                        ))}
-                    </ul>
-                  </Card>
-                  <Card title="Recent changes" density="compact">
-                    <ul className={siteSummaryStyles.rowList}>
-                      {[...pages]
-                        .sort((a, b) => Date.parse(b.edited_at) - Date.parse(a.edited_at))
-                        .slice(0, 4)
-                        .map(page => (
-                          <li key={page.id}>
-                            <span className={siteSummaryStyles.taskIcon}>
-                              <IconPage size={18} />
-                            </span>
-                            <div className={recordTableStyles.rowCopy}>
-                              <Link
-                                editorCanvasOrigin={editorCanvasOrigin}
-                                href={'/pages/' + page.id}
-                                aria-label={'Open recent change: ' + page.title}
-                              >
-                                {page.title}
-                              </Link>
-                              <span className={recordTableStyles.meta}>
-                                {page.edited_by} ·{' '}
-                                {new Date(page.edited_at).toLocaleDateString('en-US', {
-                                  month: 'short',
-                                  day: 'numeric',
-                                })}
-                              </span>
-                            </div>
-                            <StatusChip status={pageStatus(page)} />
-                          </li>
-                        ))}
-                    </ul>
-                  </Card>
-                </div>
-                {!scopedOnly && (
-                  <Card title="Lists" density="compact">
-                    <ul className={siteSummaryStyles.rowList}>
-                      {lists?.collections.map(list => (
-                        <li key={list.id}>
-                          <div className={recordTableStyles.rowCopy}>
-                            <Link
-                              href={
-                                list.readerKey === 'stories'
-                                  ? `/sites/${siteId}/stories`
-                                  : `/sites/${siteId}/content?collection=${list.id}`
-                              }
-                            >
-                              <strong>{list.name}</strong>
-                            </Link>
-                            <span className={recordTableStyles.meta}>
-                              {list.totalEntries} {list.totalEntries === 1 ? 'item' : 'items'} · {list.changedEntries}{' '}
-                              with changes not live
-                            </span>
-                          </div>
-                        </li>
-                      ))}
-                      {!lists?.collections.length && (
-                        <li>
-                          <div className={recordTableStyles.rowCopy}>
-                            No lists yet.<Link href={`/sites/${siteId}/content`}>Open Lists to get started</Link>
-                          </div>
-                        </li>
-                      )}
-                    </ul>
-                  </Card>
-                )}
-              </div>
-            </>
+            <OriginalSiteOverviewSections
+              siteId={siteId}
+              editorCanvasOrigin={editorCanvasOrigin}
+              scopedOnly={scopedOnly}
+              canManagePages={canManagePages}
+              pages={pages}
+              unpublishedPages={unpublishedPages}
+              reviews={reviews}
+              lists={lists}
+            />
           )}
           {pageControlError && (
             <p role="alert">
