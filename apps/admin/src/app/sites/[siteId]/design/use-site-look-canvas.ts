@@ -17,15 +17,8 @@ export function useSiteLookCanvas(input: {
     } | null>(null),
     [failure, setFailure] = useState<{ key: string; message: string } | null>(null)
   const serial = JSON.stringify(input.look)
-  const key = JSON.stringify([
-    input.origin,
-    input.siteId,
-    input.pageId,
-    input.versionId,
-    input.purpose,
-    input.retry,
-    serial,
-  ])
+  const documentKey = JSON.stringify([input.origin, input.siteId, input.pageId, input.versionId, input.purpose, serial])
+  const key = documentKey + ':' + input.retry
   const ticket = issued?.key === key ? issued.ticket : null
   const error = failure?.key === key ? failure.message : ''
   const loading = Boolean(input.origin && input.pageId && input.versionId && input.look && !ticket && !error)
@@ -109,5 +102,5 @@ export function useSiteLookCanvas(input: {
       document.removeEventListener('visibilitychange', visible)
     }
   }, [ticket, input.pageId])
-  return { ticket, loading, error }
+  return { ticket, loading, error, documentKey }
 }

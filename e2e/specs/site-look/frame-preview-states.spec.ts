@@ -199,7 +199,7 @@ test('an unfinished preview document can recover before its load event', async (
     const frames = await observeHeaderPreviewFrames(page)
     const canvasAddresses = new Set<string>()
     let heldScript = false
-    let firstDocument = true
+    let stalledAddress: string | null = null
     let releaseScript: () => void = () => {}
     const scriptGate = new Promise<void>(resolve => {
       releaseScript = resolve
@@ -212,9 +212,10 @@ test('an unfinished preview document can recover before its load event', async (
     await page.route(
       url => url.pathname.startsWith('/__cms/canvas/') && url.searchParams.get('visit') === '1',
       async route => {
-        canvasAddresses.add(route.request().url())
-        if (!firstDocument) return route.continue()
-        firstDocument = false
+        const address = route.request().url()
+        canvasAddresses.add(address)
+        stalledAddress ??= address
+        if (address !== stalledAddress) return route.continue()
         await route.fulfill({
           status: 200,
           contentType: 'text/html',
@@ -231,7 +232,7 @@ test('an unfinished preview document can recover before its load event', async (
       })
       await expect(frames).toHaveAttribute('data-test-header-preview-frames', '2')
       await expect(page.getByRole('button', { name: 'Try preview again', exact: true })).toHaveCount(0)
-      expect(canvasAddresses.size).toBe(1)
+      expect(canvasAddresses.size).toBe(2)
     } finally {
       releaseScript()
     }

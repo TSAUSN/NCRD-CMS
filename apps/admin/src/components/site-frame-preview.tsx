@@ -1,5 +1,5 @@
 import { Button, EmptyState } from './ui/index.ts'
-import { SiteHeaderPreview, type FramePreviewTicket } from './site-header-preview.tsx'
+import { SiteHeaderPreview, type FramePreviewRecovery, type FramePreviewTicket } from './site-header-preview.tsx'
 
 /** Header and Footer use the same status and retry choices for their own canvas. */
 export function SiteFramePreview({
@@ -12,6 +12,7 @@ export function SiteFramePreview({
   previewAvailable,
   previouslyOpened,
   retry,
+  recovery,
 }: {
   part: 'header' | 'footer'
   ticket: FramePreviewTicket | null
@@ -22,6 +23,7 @@ export function SiteFramePreview({
   previewAvailable: boolean
   previouslyOpened: boolean
   retry: () => void
+  recovery?: FramePreviewRecovery
 }) {
   if (pageAvailable && !previewAvailable)
     return (
@@ -38,6 +40,7 @@ export function SiteFramePreview({
           part={part}
           pending={valid && loading}
           retry={retry}
+          recovery={recovery}
         />
         {error && (
           <div role="status">
