@@ -22,22 +22,14 @@ name in the staging environment's branch rule and federation condition.
    deployments to their respective branches. Use a production reviewer if
    the repository's plan supports it. Protect both branches and review
    changes to `.github/workflows/` and `scripts/deploy-google-release.sh`.
-3. Configure [Google workload identity federation for GitHub](https://github.com/google-github-actions/auth#workload-identity-federation-through-a-service-account).
-   Create the provider and deploy service account in each target project.
-   Restrict the provider by
-   the exact GitHub repository ID, `push` event, branch, and environment
-   claims. For staging require the exact configured branch ref and the
-   `staging` environment; for
-   production require `refs/heads/main` and `production`. Grant
-   `roles/iam.workloadIdentityUser` on only the matching deploy account.
-   Do not use a service account key.
+3. Give each environment its own keyless deploy account using
+   [Scope the GitHub identity](#scope-the-github-identity). Keep both automatic
+   deployment flags off during setup.
 4. Set the variables below on each GitHub **environment**. At the
    **repository** level, set `CMS_RELEASE_STAGING_PROJECT_NUMBER` and, before
    enabling production, `CMS_RELEASE_PRODUCTION_PROJECT_NUMBER`. These
    numbers must be distinct; the release rejects an environment with the
-   wrong number before it asks for credentials. Run the local read-only
-   `plan` first using the intended project and release commit.
-   Verify all three services and that the project number matches.
+   wrong number before it asks for credentials. Use the read-only plan below before enabling the flag.
 5. Set the **repository** variable `CMS_AUTODEPLOY_STAGING=true`, make a
    normal staging push without a CI skip marker, and verify the revision,
    admin sign-in and public review site. When production is independently ready, set
@@ -55,11 +47,64 @@ name in the staging environment's branch rule and federation condition.
 | `CMS_DEPLOY_ADMIN_ORIGIN`, `CMS_DEPLOY_SITE_ORIGIN` | Optional HTTPS health origins when the default run.app address is disabled |
 | `CMS_DEPLOY_SCHEMA_REF` | Optional exact Git commit matching the database's applied migrations |
 
-The deploy identity needs to read the project and bucket metadata, submit
-and read the project’s Cloud Build jobs, read revisions and update traffic
-on the three named services, and act as the existing builder and runtime
-identities. Scope access to those resources. The builder writes the images
-and its logs. Neither role should be able to read database credentials.
+## Scope the GitHub identity
+
+Use [Google's deployment federation guide](https://docs.cloud.google.com/iam/docs/workload-identity-federation-with-deployment-pipelines)
+to create a dedicated pool and OIDC provider in the target project. Set the issuer
+to `https://token.actions.githubusercontent.com` and keep the provider's default
+audience. Find the canonical repository name and numeric IDs with:
+
+```sh
+gh api "repos/$GH_OWNER/$GH_REPO" --jq '{repo: .full_name, repository_id: .id, owner_id: .owner.id}'
+```
+
+Map `google.subject` to `assertion.sub`. Map `attribute.repository_id`,
+`attribute.repository_owner_id`, `attribute.event_name`, `attribute.ref`,
+`attribute.environment` and `attribute.job_workflow_ref` to the matching
+`assertion.*` claims. See the [GitHub OIDC claims](https://docs.github.com/en/actions/reference/security/oidc).
+For staging, replace the placeholders in this provider condition with the exact
+repository IDs, name and configured staging ref:
+
+```text
+attribute.repository_id == 'REPOSITORY_ID' &&
+attribute.repository_owner_id == 'OWNER_ID' &&
+attribute.event_name == 'push' &&
+attribute.ref == 'refs/heads/staging/cms-release' &&
+attribute.environment == 'staging' &&
+attribute.job_workflow_ref == 'OWNER/REPO/.github/workflows/google-release.yml@refs/heads/staging/cms-release'
+```
+
+For production, use `refs/heads/main` in both places and `production` as the
+environment. Give the pool's `attribute.repository_id/REPOSITORY_ID` principal
+set `roles/iam.workloadIdentityUser` on that environment's deploy account only:
+
+```text
+principalSet://iam.googleapis.com/projects/PROJECT_NUMBER/locations/global/workloadIdentityPools/POOL_ID/attribute.repository_id/REPOSITORY_ID
+```
+
+Use the provider's full resource name in `CMS_DEPLOY_IDENTITY_PROVIDER`.
+
+Grant only what the deploy script needs:
+
+| Scope | Access needed |
+| --- | --- |
+| Target project | Read the project number; submit and read Cloud Build jobs and their operations. |
+| Existing build source bucket | Read bucket metadata and upload the committed archive. |
+| Existing image repository | Read the built image. |
+| Existing Admin, Site and Worker | Read service and revision state, stage revisions and update traffic. |
+| Existing builder and runtime identities | Act as the accounts on the matching build and deployments. |
+
+The separate builder reads the source archive and writes the image and build
+logs. Do not grant direct Secret Manager access to the deploy or builder accounts.
+The deploy account can still run an image under the runtime identities, so
+treat changes to the workflow, deployment script and build inputs as privileged.
+Do not create a service account key.
+
+Run `plan` from a full checkout with the target's operator account before
+enabling the flag. This proves the configured project, services and migration
+check without routing traffic. The first staging push with the flag enabled
+still needs to prove GitHub's token exchange and the actual deploy job. Save the
+release artifact and check the full commit on Admin and Site `/health`.
 
 ## What a release does
 
