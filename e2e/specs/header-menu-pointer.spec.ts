@@ -8,7 +8,14 @@ const item = (label: string) => ({
   target: { type: 'url', url: label === 'Home' ? '/' : '/visit' },
 })
 
-async function grab(page: Page, source: Locator, target: Locator, after: boolean, horizontal = 0) {
+async function grab(
+  page: Page,
+  source: Locator,
+  target: Locator,
+  after: boolean,
+  horizontal = 0,
+  afterPress?: () => Promise<void>,
+) {
   await source.scrollIntoViewIfNeeded()
   await target.scrollIntoViewIfNeeded()
   const handle = source.locator(':scope > svg').first()
@@ -26,6 +33,7 @@ async function grab(page: Page, source: Locator, target: Locator, after: boolean
   const y = from.y + from.height / 2
   await page.mouse.move(x, y)
   await page.mouse.down()
+  if (afterPress) await afterPress()
   // Start the browser's native drag before moving across the row.
   await page.mouse.move(x, y + 8)
   // The parent row excludes its nested list from its hit area.
@@ -45,6 +53,10 @@ for (const width of [1440, 1024]) {
     const fixture = await siteLookFixture()
     const client = await fixture.pool.connect()
     const { site: siteId, host: hostname } = fixture
+    let releasePreview = () => {}
+    const waitForPress = new Promise<void>(resolve => {
+      releasePreview = resolve
+    })
     try {
       const {
         rows: [{ id: actor }],
@@ -69,7 +81,16 @@ for (const width of [1440, 1024]) {
       await client.query('COMMIT')
       await page.setViewportSize({ width, height: 900 })
       await signIn(page, 'root@example.test')
-      await page.goto('/sites/' + siteId + '/header')
+      if (width === 1024) {
+        await page.route(
+          url => url.pathname.startsWith('/__cms/canvas/') && url.searchParams.get('visit') === '1',
+          async route => {
+            await waitForPress
+            await route.continue()
+          },
+        )
+      }
+      await page.goto('/sites/' + siteId + '/header', { waitUntil: 'domcontentloaded' })
       const menu = page.getByRole('region', { name: 'Main menu', exact: true })
       const row = (label: string) =>
         menu.locator('li[data-reorder-row]:has(> button[title=' + JSON.stringify(label) + '])')
@@ -81,14 +102,33 @@ for (const width of [1440, 1024]) {
         expect.poll(async () => (await topOrder()).map(label => label.trim())).toEqual(labels)
       await verify(['Home', 'About', 'Programs', 'Contact'])
       await expect(save).toBeDisabled()
-      const drop = async (from: string, to: string, after: boolean, dx = 0, capture?: string) => {
-        await grab(page, row(from), row(to), after, dx)
+      const drop = async (
+        from: string,
+        to: string,
+        after: boolean,
+        dx = 0,
+        capture?: string,
+        afterPress?: () => Promise<void>,
+      ) => {
+        await grab(page, row(from), row(to), after, dx, afterPress)
         await expect(marker).toBeVisible()
         if (capture) await page.screenshot({ path: info.outputPath(capture + '.png') })
         await page.mouse.up()
         await expect(marker).toHaveCount(0)
       }
-      await drop('Home', 'Contact', true, 0, 'first-to-last-mid-drag')
+      const preview = page.frameLocator('iframe[title="Header preview"]')
+      const previewNav = preview.getByRole('navigation', { name: 'Main', exact: true })
+      const openPreviewMidDrag =
+        width === 1024
+          ? async () => {
+              const before = await row('Home').boundingBox()
+              expect(before).not.toBeNull()
+              releasePreview()
+              await expect(previewNav.getByRole('link', { name: 'Home', exact: true })).toBeVisible()
+              expect((await row('Home').boundingBox())?.y).toBe(before!.y)
+            }
+          : undefined
+      await drop('Home', 'Contact', true, 0, 'first-to-last-mid-drag', openPreviewMidDrag)
       await verify(['About', 'Programs', 'Contact', 'Home'])
       await drop('Home', 'About', false)
       await verify(['Home', 'About', 'Programs', 'Contact'])
@@ -130,8 +170,6 @@ for (const width of [1440, 1024]) {
       await expect(marker).toHaveCount(0)
       await page.mouse.up()
       await expect(save).toBeDisabled()
-      const preview = page.frameLocator('iframe[title="Header preview"]')
-      const previewNav = preview.getByRole('navigation', { name: 'Main', exact: true })
       await expect(previewNav.getByRole('link', { name: 'Programs', exact: true })).toBeVisible()
       const order = (links: Locator) => links.allTextContents().then(names => names.map(name => name.trim()))
       const previewOrder = await order(previewNav.getByRole('link'))
@@ -162,6 +200,7 @@ for (const width of [1440, 1024]) {
       const publishedNav = page.getByRole('navigation', { name: 'Main', exact: true })
       await expect.poll(() => order(publishedNav.getByRole('link'))).toEqual(previewOrder)
     } finally {
+      releasePreview()
       await client.query('ROLLBACK').catch(() => {})
       await client.query('UPDATE sites SET archived_at=now() WHERE id=$1', [siteId])
       client.release()

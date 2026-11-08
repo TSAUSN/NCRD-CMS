@@ -1,5 +1,5 @@
 'use client'
-import { useMemo, useState } from 'react'
+import { useMemo, useState, type PointerEventHandler } from 'react'
 import { NavTree, type NavNode } from '@cms/schema'
 import { canAppendMenuItem, editMenuItem, menuNodeAt, moveMenuItem } from '../lib/menu-editing.ts'
 import { Badge, Button, Card, Dialog, Menu } from './ui/index.ts'
@@ -18,12 +18,14 @@ export function CompactMenuEditor({
   disabled,
   onChange,
   onEditing,
+  onReorderPointerDown,
 }: {
   tree: NavTree
   pages: MenuPageChoice[]
   disabled: boolean
   onChange: (tree: NavTree) => void
   onEditing: (editing: boolean) => void
+  onReorderPointerDown?: PointerEventHandler<HTMLUListElement>
 }) {
   const [editing, setEditing] = useState<MenuItemEditing | null>(null)
   const [removing, setRemoving] = useState<{ path: string; label: string } | null>(null)
@@ -184,7 +186,11 @@ export function CompactMenuEditor({
             No menu items yet. Add a page, website or dropdown to help visitors find their way.
           </p>
         ) : (
-          <ul className={siteSummaryStyles.rowList + ' ' + reorderStyles.list} data-reorder-list>
+          <ul
+            className={siteSummaryStyles.rowList + ' ' + reorderStyles.list}
+            data-reorder-list
+            onPointerDownCapture={disabled ? undefined : onReorderPointerDown}
+          >
             {tree.flatMap((item, index) => [
               row(item, String(index), index, tree.length),
               ...(item.children ?? []).map((child, at) =>

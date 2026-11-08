@@ -5,6 +5,7 @@ import { Badge, Button, ButtonLink, Note, PageHeader, Tabs } from '../../../../c
 import styles from '../../../../components/workspace.module.css'
 import listInspectorStyles from '../../../../components/workspace-styles/list-inspector.module.css'
 import { useHeaderMenu, type HeaderMenuProps } from './use-header-menu.ts'
+import { useMenuPreviewHeight } from './use-menu-preview-height.ts'
 import { HeaderMenuTab } from './header-menu-tab.tsx'
 import { HeaderLogoTab, HeaderExtraText, HeaderLogoPicker } from './header-logo-tab.tsx'
 import { HeaderButtonsTab } from './header-buttons-tab.tsx'
@@ -12,6 +13,7 @@ import { FrameWorkspacePreview, FrameWorkspacePreviewDialog } from '../frame-wor
 export function HeaderMenuWorkspace(props: HeaderMenuProps) {
   const { siteId, siteName, initial } = props
   const model = useHeaderMenu(props)
+  const { previewRef, holdHeight, onMenuPointerDown } = useMenuPreviewHeight()
   const {
     dirty,
     changes,
@@ -90,11 +92,15 @@ export function HeaderMenuWorkspace(props: HeaderMenuProps) {
         ]}
       >
         <div className={listInspectorStyles.formStack + ' ' + styles.singleColumn}>
-          <FrameWorkspacePreview part="header" preview={preview} valid={valid} />
+          <div ref={previewRef} style={holdHeight === undefined ? undefined : { height: holdHeight, overflow: 'clip' }}>
+            <FrameWorkspacePreview part="header" preview={preview} valid={valid} />
+          </div>
           {!valid && preview.previouslyOpened && (
             <p role="status">Complete the fields to show your changes in the preview.</p>
           )}
-          {tab === 'menu' && <HeaderMenuTab model={model} navigation={props.navigation} />}
+          {tab === 'menu' && (
+            <HeaderMenuTab model={model} navigation={props.navigation} onMenuPointerDown={onMenuPointerDown} />
+          )}
           {tab === 'logo' && <HeaderLogoTab model={model} {...props} />}
           {tab === 'buttons' && <HeaderButtonsTab model={model} {...props} />}
           {tab !== 'menu' && latest && pin && latest.version > pin.version && (
