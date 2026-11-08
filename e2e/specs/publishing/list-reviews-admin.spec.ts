@@ -190,6 +190,8 @@ test('Lists review keeps exact changed values and decisions together while prote
         .rows[0]!.n,
     ).toBe(0)
     await page.getByRole('link', { name: /^\[First list\]/ }).click()
+    await expect(page).toHaveURL(new RegExp('collectionReview=' + lists[0]!.request))
+    await expect(page.getByRole('heading', { name: '[First list]', exact: true })).toBeVisible()
     await discussion()
     await expect(page.getByLabel('Add a comment', { exact: true })).toHaveValue('[Unsent list comment]')
     await capture(page, 'comment-restored')
