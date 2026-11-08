@@ -1,4 +1,6 @@
 import { expect, test } from '@playwright/test'
+import { Client } from 'pg'
+import { e2eTarget } from '../test-target.ts'
 import {
   addSectionButton,
   canvas,
@@ -177,6 +179,32 @@ test('saves chosen recipe samples, previews, makes independent drafts, and gover
   await page.goto(siteUrl)
 })
 
+/** Shared starters are visible across the entire test database. Retire only this test's own starter. */
+async function retireSharedStarter(siteId: string, name: string) {
+  const { database, host, port } = e2eTarget()
+  const client = new Client({ connectionString: `postgres://cms:cms@${host}:${port}/${database}` })
+  await client.connect()
+  try {
+    await client.query('BEGIN')
+    const actor = (await client.query<{ id: string }>("SELECT id FROM app_users WHERE email='root@example.test'"))
+      .rows[0]!.id
+    await client.query('SET LOCAL ROLE cms_authenticated_user')
+    await client.query("SELECT set_config('app.user_id',$1,true)", [actor])
+    const { rows } = await client.query<{ id: string; revision: string }>(
+      `SELECT r.id,r.revision FROM page_recipes r
+       JOIN page_recipe_versions v ON v.id=r.current_version_id
+       WHERE r.site_id=$1 AND r.name=$2 AND r.scope='global' AND r.retired_at IS NULL AND v.created_by=$3`,
+      [siteId, name, actor],
+    )
+    if (rows.length > 1) throw new Error('Refusing to retire an ambiguous shared starter fixture.')
+    if (rows[0])
+      await client.query('SELECT app.manage_page_recipe($1,$2,$3,true)', [rows[0].id, rows[0].revision, name])
+    await client.query('COMMIT')
+  } finally {
+    await client.end()
+  }
+}
+
 test('super admins curate a shared starter and ordinary editors use it without receiving management access', async ({
   page,
   browser,
@@ -200,15 +228,15 @@ test('super admins curate a shared starter and ordinary editors use it without r
   const count = await page.getByLabel('Include this section’s sample content', { exact: true }).count()
   await page.getByRole('button', { name: 'Save template', exact: true }).click()
   const original = page.locator('article').filter({ has: page.getByRole('heading', { name, exact: true }) })
-  await original.getByText('Create a shared starter', { exact: true }).click()
-  await original.getByLabel('Shared starter name', { exact: true }).fill(sharedName)
-  await original.getByRole('button', { name: 'Create shared starter', exact: true }).click()
-  const shared = page.locator('article').filter({ has: page.getByRole('heading', { name: sharedName, exact: true }) })
-  await expect(shared).toBeVisible()
-  await expect(shared.getByText(/Shared starter/)).toBeVisible()
-  await shared.screenshot({ path: test.info().outputPath('recipe-shared-starter.png') })
   const context = await browser.newContext()
   try {
+    await original.getByText('Create a shared starter', { exact: true }).click()
+    await original.getByLabel('Shared starter name', { exact: true }).fill(sharedName)
+    await original.getByRole('button', { name: 'Create shared starter', exact: true }).click()
+    const shared = page.locator('article').filter({ has: page.getByRole('heading', { name: sharedName, exact: true }) })
+    await expect(shared).toBeVisible()
+    await expect(shared.getByText(/Shared starter/)).toBeVisible()
+    await shared.screenshot({ path: test.info().outputPath('recipe-shared-starter.png') })
     const editor = await context.newPage()
     await signIn(editor, 'editor@example.test')
     await editor.goto(workspace)
@@ -226,6 +254,10 @@ test('super admins curate a shared starter and ordinary editors use it without r
     await expect(treeLabels(editor)).toHaveCount(count)
     expect((await fetchPublic(`/${slug}`)).status).toBe(404)
   } finally {
-    await context.close()
+    try {
+      await context.close()
+    } finally {
+      await retireSharedStarter(new URL(workspace).pathname.split('/')[2]!, sharedName)
+    }
   }
 })
