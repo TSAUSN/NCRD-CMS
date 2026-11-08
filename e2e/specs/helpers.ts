@@ -26,8 +26,16 @@ export async function signIn(page: Page, email: string): Promise<void> {
 }
 
 export async function openSeededPage(page: Page): Promise<void> {
-  const site = page.getByRole('main').getByRole('link', { name: 'Demo site', exact: true }),
-    siteHref = await site.getAttribute('href')
+  const site = page.getByRole('main').getByRole('link', { name: 'Demo site', exact: true })
+  if (!(await site.count())) {
+    // Home may be scoped to a different active site. Use the real directory
+    // rather than depending on the fixture being the first site on Home.
+    const switcher = page.getByRole('button', { name: /^Switch site · / })
+    if (await switcher.count()) await switcher.click()
+    await page.getByRole('link', { name: 'All sites', exact: true }).click()
+    await expect(page.getByRole('heading', { name: 'All sites', exact: true, level: 1 })).toBeVisible()
+  }
+  const siteHref = await site.getAttribute('href')
   expect(siteHref).toMatch(/^\/sites\/[0-9a-f-]{36}$/)
   await site.click()
   await expect(page).toHaveURL(new URL(siteHref!, page.url()).href)

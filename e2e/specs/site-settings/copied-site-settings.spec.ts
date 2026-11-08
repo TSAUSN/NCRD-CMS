@@ -155,7 +155,7 @@ for (const model of ['canonical', 'legacy'] as const)
         await c.query('ROLLBACK').catch(() => {})
         await visitor.close()
         for (const id of [f.site, ...created])
-          await f.pool.query('UPDATE sites SET archived_at=now() WHERE id=$1', [id])
+          await f.pool.query("UPDATE sites SET status='archived',archived_at=now() WHERE id=$1", [id])
         c.release()
         await f.pool.end()
       }
