@@ -4,7 +4,7 @@ import { resolve } from 'node:path'
 import { Client } from 'pg'
 import { sectionStartingValues } from '@cms/schema'
 import { e2eTarget } from '../../test-target.ts'
-import { canvas, savedState, saveDraft, signIn, treeLabels, fetchPublic } from '../helpers.ts'
+import { canvas, savedState, saveDraft, signIn, treeLabels, fetchPublic, publish } from '../helpers.ts'
 const folder = resolve('../.r8-progress/step-3/editor')
 async function capture(page: Page, name: string) {
   await mkdir(folder, { recursive: true })
@@ -279,6 +279,29 @@ test('revision 8: canvas actions, one history, inspector tabs, actual-content la
   await page.getByRole('button', { name: 'Undo', exact: true }).click()
   await expect(treeLabels(page)).toHaveCount(3)
   expect(errors).toEqual([])
+})
+
+test('a republished page offers its new live sections for recovery without reloading', async ({ page }) => {
+  const id = await fixture()
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await signIn(page, 'root@example.test')
+  await page.goto(`/pages/${id}`)
+  await expect(canvas(page).locator('h1')).toHaveText('A welcoming place to begin')
+  await expect(treeLabels(page)).toHaveCount(3)
+  await treeLabels(page).nth(1).click()
+  const actions = page.getByRole('toolbar', { name: 'Selected section actions', exact: true })
+  await actions.getByRole('button', { name: 'Duplicate section', exact: true }).click()
+  await expect(treeLabels(page)).toHaveCount(4)
+  await saveDraft(page)
+  await publish(page)
+
+  await treeLabels(page).nth(1).click()
+  await actions.getByLabel('More section actions', { exact: true }).click()
+  await actions.getByRole('button', { name: 'Reset to live version', exact: true }).click()
+  const reset = page.getByRole('dialog', { name: 'Reset to live version?', exact: true })
+  await expect(reset.getByLabel('Section on the live page').locator('option')).toHaveCount(4)
+  await reset.getByRole('button', { name: 'Cancel', exact: true }).click()
+  await expect(reset).toBeHidden()
 })
 
 test('revision 8: native header and footer clicks offer site-level handoffs without changing the page or menu', async ({

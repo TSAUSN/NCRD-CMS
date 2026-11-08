@@ -29,7 +29,7 @@ type Inputs = {
     setPageDanger: Set<PageDanger>
     transitionPending: boolean
     startTransition: (action: () => Promise<void>) => void
-    setPublishedVersionId: Set<string | null>
+    clearPublication: () => void
     setReview: Set<PageEditorProps['openReview']>
     openAfterPageAction: (href: string) => void
   }
@@ -53,7 +53,7 @@ export function pageCommands({ draft, lifecycle }: Inputs) {
     setPageDanger,
     transitionPending,
     startTransition,
-    setPublishedVersionId,
+    clearPublication,
     setReview,
     openAfterPageAction,
   } = lifecycle
@@ -140,7 +140,7 @@ export function pageCommands({ draft, lifecycle }: Inputs) {
       })
       if (queued.status === 'acknowledged') {
         setRevision(queued.revision)
-        setPublishedVersionId(null)
+        clearPublication()
         setReview(null)
         setPageDanger(null)
         if (action === 'archive') openAfterPageAction(props.siteHref)

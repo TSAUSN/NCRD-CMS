@@ -8,13 +8,23 @@ import type { PagePublishReview, SampleConfirmation } from './editor-publish-dia
 export function useEditorReviewState(
   props: Pick<
     PageEditorProps,
-    'publishedVersionId' | 'trustedCodeApproved' | 'previewVersionId' | 'openReview' | 'latestReviewFeedback'
+    | 'publishedVersionId'
+    | 'liveSections'
+    | 'trustedCodeApproved'
+    | 'previewVersionId'
+    | 'openReview'
+    | 'latestReviewFeedback'
   >,
   sections: EditorSection[],
   scheduleFlight: { current: boolean },
   setScheduling: (value: boolean) => void,
 ) {
-  const [publishedVersionId, setPublishedVersionId] = useState(props.publishedVersionId)
+  const [publishedSnapshot, setPublishedSnapshot] =
+    useState<Pick<PageEditorProps, 'publishedVersionId' | 'liveSections'>>()
+  const { publishedVersionId, liveSections } = publishedSnapshot ?? props
+  function recordPublication(versionId: string | null, sections: EditorSection[] = []) {
+    setPublishedSnapshot({ publishedVersionId: versionId, liveSections: sections })
+  }
   const [approvedVersionId, setApprovedVersionId] = useState(props.trustedCodeApproved ? props.previewVersionId : null)
   const [publishReviewOpen, setPublishReviewOpen] = useState(false)
   const reviewFlight = useRef(false)
@@ -44,7 +54,8 @@ export function useEditorReviewState(
   return {
     publication: {
       publishedVersionId,
-      setPublishedVersionId,
+      liveSections,
+      recordPublication,
       approvedVersionId,
       setApprovedVersionId,
       remainingSamples,

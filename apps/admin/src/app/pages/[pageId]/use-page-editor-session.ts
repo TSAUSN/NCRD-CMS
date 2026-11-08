@@ -125,7 +125,7 @@ export function usePageEditorSession(props: PageEditorProps) {
   const sectionUpdates = useSectionUpdateDialogs()
   const { upgrade, layoutChooser, replacement, fieldUpdate, replacementDefinitions } = sectionUpdates
   const reviewState = useEditorReviewState(props, state.document.sections, scheduleFlight, setScheduling)
-  const { setApprovedVersionId } = reviewState.publication
+  const { liveSections, setApprovedVersionId } = reviewState.publication
   const { reviewFlight, setReview } = reviewState.review
   const { overrideOpen } = reviewState.override
   const { submitOpen } = reviewState.submission
@@ -159,7 +159,7 @@ export function usePageEditorSession(props: PageEditorProps) {
   const currentEditor = useRef(state)
   currentEditor.current = state
   const draft = {
-    props,
+    props: { ...props, liveSections },
     state,
     setState,
     currentEditor,

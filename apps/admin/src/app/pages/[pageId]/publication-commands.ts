@@ -28,7 +28,7 @@ type Inputs = {
     state: EditorState
     setState: Set<EditorState>
     setRevision: Set<PageEditorProps['revision']>
-    setPublishedVersionId: Set<string | null>
+    recordPublication: (versionId: string | null, sections: EditorDocument['sections']) => void
     openingSnapshot: Current<SaveSnapshot | null>
     setReview: Set<PageEditorProps['openReview']>
     setReviewFeedback: Set<PageEditorProps['latestReviewFeedback']>
@@ -51,7 +51,7 @@ export function publicationCommands({ draft, publishState, canvas }: Inputs) {
     state,
     setState,
     setRevision,
-    setPublishedVersionId,
+    recordPublication,
     openingSnapshot,
     setReview,
     setReviewFeedback,
@@ -110,7 +110,7 @@ export function publicationCommands({ draft, publishState, canvas }: Inputs) {
 
         if (queued.status !== 'acknowledged') return
         setRevision(queued.revision)
-        setPublishedVersionId(savedVersionId.current)
+        recordPublication(savedVersionId.current, queued.snapshot.document.sections)
         openingSnapshot.current = structuredClone(queued.snapshot)
         // The saved site design just went live, so the live one is what to show.
         if (siteWide) changeSitePreview('published')

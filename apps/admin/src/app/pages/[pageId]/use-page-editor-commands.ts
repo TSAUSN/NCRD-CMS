@@ -43,7 +43,7 @@ export function usePageEditorCommands(session: PageEditorSession) {
   const { slotsByDef, nameOf } = session.catalog
   const { flushForReview } = session.saveSession
   const { withCanvasValues, openAfterPageAction } = session.persistence
-  const { publishedVersionId, setPublishedVersionId, setApprovedVersionId } = session.reviewState.publication
+  const { publishedVersionId, recordPublication, setApprovedVersionId } = session.reviewState.publication
   const { setReview } = session.reviewState.review
   const { transitionPending, startTransition } = session.reviewState.transition
   const { pageDanger, setPageDanger } = session.pageActions
@@ -140,7 +140,7 @@ export function usePageEditorCommands(session: PageEditorSession) {
       setPageDanger,
       transitionPending,
       startTransition,
-      setPublishedVersionId,
+      clearPublication: () => recordPublication(null),
       setReview,
       openAfterPageAction,
     },
