@@ -147,7 +147,6 @@ async function fixture() {
 }
 test('revision 8 Publish: grouped choices, visual comparisons, real scheduled release and history', async ({
   page,
-  browser,
 }) => {
   test.setTimeout(120000)
   page.setDefaultTimeout(10000)
@@ -253,6 +252,7 @@ test('revision 8 Publish: grouped choices, visual comparisons, real scheduled re
 
 test('revision 8 Publish: a leased worker publishes the reviewed release through the local endpoint exactly once', async ({
   page,
+  browser,
 }) => {
   test.setTimeout(120000)
   page.setDefaultTimeout(10000)
