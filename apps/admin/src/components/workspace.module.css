@@ -8,10 +8,6 @@
   grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--size-240)), 1fr));
   gap: var(--space-4);
 }
-.empty {
-  padding: var(--space-6);
-  text-align: center;
-}
 
 .stack > :not(dialog) {
   margin-block: 0;

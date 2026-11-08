@@ -193,11 +193,6 @@
 .table[data-density='content'] .tableActions {
   gap: var(--space-1);
 }
-@media (max-width: 1199px) {
-  .table[data-density='content'] .duplicateTitleAction {
-    display: none;
-  }
-}
 
 .table[data-density='content'] :global([data-status]) {
   height: var(--badge-compact-height);

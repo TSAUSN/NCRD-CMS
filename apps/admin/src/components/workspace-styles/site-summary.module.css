@@ -112,18 +112,6 @@
   padding: 0;
   gap: 0;
 }
-
-.homePreviewMessage {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  padding: var(--space-3);
-  background: var(--surface-sunken);
-  color: var(--text-muted);
-  font-size: var(--text-meta);
-  text-align: center;
-}
 .cardTitle {
   min-width: 0;
   flex: 1;

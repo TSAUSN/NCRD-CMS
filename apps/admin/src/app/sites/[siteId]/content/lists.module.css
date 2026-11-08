@@ -21,36 +21,10 @@
 .heading p {
   margin-block-start: var(--space-2);
 }
-.help {
-  margin: 0;
-  color: var(--text-muted);
-}
 .tiles {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--size-240)), 1fr));
   gap: var(--space-4);
-}
-.tile {
-  display: grid;
-  align-content: start;
-  gap: var(--space-3);
-  padding: var(--space-5);
-  background: var(--surface);
-  border: var(--line-thin) solid var(--border);
-  border-radius: var(--radius-card);
-  color: var(--text);
-  text-decoration: none;
-}
-.tile:hover {
-  border-color: var(--primary);
-}
-.tile strong {
-  font-size: var(--text-section);
-  line-height: var(--line-section);
-}
-.tile small {
-  color: var(--text-muted);
-  overflow-wrap: anywhere;
 }
 .tools {
   justify-content: space-between;
@@ -139,9 +113,6 @@
   height: 100%;
   object-fit: cover;
 }
-.order {
-  display: flex;
-}
 .results[data-view='cards'] {
   grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--size-240)), 1fr));
   gap: var(--space-4);
@@ -160,10 +131,6 @@
 .results[data-view='cards'] .select {
   justify-self: start;
 }
-.results[data-view='cards'] .order {
-  grid-column: 2;
-  grid-row: 1;
-}
 .results[data-view='cards'] .open {
   grid-column: 1 / -1;
   grid-row: 2;
@@ -178,44 +145,10 @@
   width: 100%;
   height: var(--size-160);
 }
-.publishBar {
-  position: sticky;
-  inset-block-end: var(--space-4);
-  z-index: 2;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
-  gap: var(--space-4);
-  padding: var(--space-4);
-  background: var(--surface);
-  border: var(--line-thin) solid var(--border);
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-2);
-}
-.publishBar > span {
-  display: grid;
-  gap: var(--space-1);
-}
-.publishBar small {
-  color: var(--text-muted);
-}
 .bulk {
   padding: var(--space-3) var(--space-4);
   background: var(--surface-sunken);
   border-radius: var(--radius-control);
-}
-.fields {
-  display: grid;
-  gap: var(--space-4);
-  margin-block: var(--space-5);
-}
-.advanced {
-  margin-block-start: var(--space-5);
-}
-.advanced summary {
-  cursor: pointer;
-  min-height: var(--target-small);
 }
 
 .tools > :first-child {
@@ -287,28 +220,8 @@
   gap: var(--space-3);
   min-width: 0;
 }
-.subtitle {
-  overflow-wrap: anywhere;
-  color: var(--text-muted);
-}
 .results[data-view='table'] .open small {
   overflow-wrap: anywhere;
-}
-.columnHead {
-  display: grid;
-  grid-template-columns: var(--target-small) minmax(0, 1.5fr) minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr) calc(
-      var(--target-small) * 2
-    );
-  gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
-  font-size: var(--text-meta);
-  color: var(--text-muted);
-  background: var(--surface-sunken);
-  border: var(--line-thin) solid var(--border);
-  border-radius: var(--radius-card) var(--radius-card) 0 0;
-}
-.columnHead[data-editable='false'] {
-  grid-template-columns: 0 minmax(0, 1.5fr) minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr) 0;
 }
 .results[data-view='cards'] .entryName {
   flex-direction: column;
@@ -321,9 +234,6 @@
   }
 }
 @media (max-width: 1023px) {
-  .columnHead {
-    display: none;
-  }
   .results[data-view='table'] .open {
     display: flex;
     flex-wrap: wrap;

@@ -115,12 +115,6 @@
   border: 0;
 }
 
-.utilities {
-  margin-block-start: auto;
-  padding-block-start: var(--space-4);
-  border-block-start: var(--line-thin) solid var(--nav-line);
-}
-
 .searchArea {
   padding: var(--space-2) var(--space-3);
 }

@@ -16,45 +16,6 @@
   flex-wrap: wrap;
   gap: var(--space-3);
 }
-.group {
-  display: grid;
-  gap: var(--space-3);
-  padding: var(--space-5);
-  border: var(--line-thin) solid var(--border);
-  border-radius: var(--radius-card);
-  background: var(--surface);
-}
-.group h3 {
-  font-size: var(--text-section);
-}
-.row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-4);
-  padding-block: var(--space-3);
-  border-block-end: var(--line-thin) solid var(--border);
-}
-.row:last-child {
-  border: 0;
-}
-.choice {
-  display: flex;
-  align-items: start;
-  gap: var(--space-3);
-  min-width: 0;
-  flex: 1;
-}
-.choice input {
-  flex: none;
-  min-height: var(--target-small);
-  margin: 0;
-}
-.choice span {
-  display: grid;
-  gap: var(--space-1);
-  overflow-wrap: anywhere;
-}
 .choice small,
 .muted {
   color: var(--text-muted);
@@ -72,26 +33,6 @@
   border-radius: var(--radius-card);
   z-index: 2;
   box-shadow: var(--shadow-2);
-}
-.review h2 {
-  scroll-margin-block-start: var(--space-5);
-}
-.review {
-  display: grid;
-  gap: var(--space-4);
-  padding: var(--space-5);
-  background: var(--surface);
-  border: var(--line-thin) solid var(--border);
-  border-radius: var(--radius-card);
-}
-.check {
-  display: grid;
-  gap: var(--space-3);
-  border-block-start: var(--line-thin) solid var(--border);
-  padding-block-start: var(--space-4);
-}
-.check li {
-  margin-block: var(--space-2);
 }
 .compare {
   display: grid;
@@ -116,42 +57,10 @@
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
-.schedule {
-  display: grid;
-  gap: var(--space-4);
-}
-.history {
-  display: grid;
-  gap: var(--space-3);
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-.history li {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: var(--space-4);
-  padding: var(--space-4);
-  border: var(--line-thin) solid var(--border);
-  border-radius: var(--radius-card);
-  background: var(--surface);
-}
 @media (max-width: 48rem) {
   .compare {
     grid-template-columns: minmax(0, 1fr);
   }
-  .row {
-    align-items: start;
-  }
-}
-
-.readiness {
-  color: var(--status-pending);
-  font-weight: var(--weight-semibold);
-}
-.readiness[data-ready='true'] {
-  color: var(--status-live-text);
 }
 
 .presets {

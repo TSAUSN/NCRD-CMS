@@ -61,35 +61,9 @@
   font-size: var(--text-meta);
   font-weight: var(--weight-semibold);
 }
-.menuKind {
-  display: inline-block;
-  background: var(--surface-sunken);
-  color: var(--text-muted);
-  font-size: var(--text-tag);
-  font-weight: var(--weight-medium);
-  border-radius: var(--radius-pill);
-  padding: var(--space-1) var(--space-2);
-  white-space: nowrap;
-}
-.menuKind[data-kind='page'] {
-  background: var(--status-live-bg);
-  color: var(--status-live-text);
-}
-.menuKind[data-kind='url'] {
-  background: var(--status-scheduled-bg);
-  color: var(--status-scheduled);
-}
 
 .menuRow .itemButton {
   padding-inline: 0;
-}
-.menuKind[data-tone='pending'] {
-  background: var(--status-pending-bg);
-  color: var(--status-pending);
-}
-.menuKind[data-tone='live'] {
-  background: var(--status-live-bg);
-  color: var(--status-live-text);
 }
 
 .listRows {

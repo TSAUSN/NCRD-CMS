@@ -63,22 +63,6 @@
   color: var(--text-muted);
   font-size: var(--text-help);
 }
-.historyHeading {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: var(--space-3);
-  align-items: start;
-}
-.historyHeading h2 {
-  margin: 0;
-  font-size: var(--text-dialog);
-  line-height: var(--line-emphasis);
-  font-weight: var(--weight-semibold);
-}
-.historyHeading p {
-  margin: 0 0 var(--space-1);
-}
 
 /* A semantic disabled group keeps the existing form layout. */
 

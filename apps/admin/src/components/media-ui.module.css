@@ -54,18 +54,6 @@
   font-size: var(--text-body);
   font-weight: var(--weight-semibold);
 }
-.filters.filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-1);
-}
-.filters button {
-  min-height: var(--target-small);
-  padding: var(--space-1) var(--space-3);
-  font-size: var(--text-meta);
-  border-radius: var(--radius-pill);
-  box-shadow: none;
-}
 .folders.folders {
   padding: var(--space-3);
   background: var(--bg);
