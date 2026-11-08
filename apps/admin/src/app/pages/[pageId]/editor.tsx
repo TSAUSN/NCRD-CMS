@@ -243,56 +243,64 @@ export function PageEditor(props: PageEditorProps) {
     result,
     setResult,
   }
-  const { recovery, limitedHistory, catalog, canvasBridge, saveSession, withCanvasValues, changeHistory } =
-    useEditorDraftSession({
-      draft,
-      lifecycle: { saving, transitionPending, upgrade, replacement, overrideOpen, submitOpen },
-      navigation: {
-        reviewFlight,
-        scheduleFlight,
+  const {
+    recovery,
+    limitedHistory,
+    catalog,
+    canvasBridge,
+    saveSession,
+    withCanvasValues,
+    changeHistory,
+    openAfterPageAction,
+  } = useEditorDraftSession({
+    draft,
+    lifecycle: { saving, transitionPending, upgrade, replacement, overrideOpen, submitOpen },
+    navigation: {
+      reviewFlight,
+      scheduleFlight,
+      canvasHistoryBlocked,
+      pageDanger,
+      siteWide,
+      inlineList,
+      layoutChooser,
+      sectionConfirmation,
+      discardConfirmation,
+      fieldUpdate,
+    },
+    definitions: { recipeDefinitions, replacementDefinitions },
+    bridge: {
+      frame: { ...canvasSession.frame, ...canvasSession.document, isolated, isolatedCurrent, remoteActions },
+      document: {
+        ...canvasSession.document,
+        currentEditor,
+        setState,
         canvasHistoryBlocked,
-        pageDanger,
-        siteWide,
-        inlineList,
-        layoutChooser,
-        sectionConfirmation,
-        discardConfirmation,
-        fieldUpdate,
+        sectionLocked,
+        state,
+        libraryStage,
+        libraryPreview,
+        insertAt,
+        richTextRequest,
+        setRichTextRequest,
       },
-      definitions: { recipeDefinitions, replacementDefinitions },
-      bridge: {
-        frame: { ...canvasSession.frame, ...canvasSession.document, isolated, isolatedCurrent, remoteActions },
-        document: {
-          ...canvasSession.document,
-          currentEditor,
-          setState,
-          canvasHistoryBlocked,
-          sectionLocked,
-          state,
-          libraryStage,
-          libraryPreview,
-          insertAt,
-          richTextRequest,
-          setRichTextRequest,
-        },
-        selection: { props, siteWideCurrent, setSiteWide, setMenuEdit, setMenuMove, setListSelection, setPane },
-        editing: {
-          libraryStage,
-          setLibraryOpen,
-          dropOnCanvas,
-          setRichTextRequest,
-          setRemoteHover,
-          setRemoteRichState,
-          setRemoteRichUnavailable,
-        },
-        view: { viewport, previewScale, siteWide, focusCanvas, setFocusCanvas },
+      selection: { props, siteWideCurrent, setSiteWide, setMenuEdit, setMenuMove, setListSelection, setPane },
+      editing: {
+        libraryStage,
+        setLibraryOpen,
+        dropOnCanvas,
+        setRichTextRequest,
+        setRemoteHover,
+        setRemoteRichState,
+        setRemoteRichUnavailable,
       },
-      protection: { props, isolated, canvasReady, canvasRef, sectionLocked, setState, setPane },
-      shortcut: { libraryStage, sectionTool, siteWideCurrent },
-      persistence: { setSaving, setApprovedVersionId, setReview, requiresReload, setRequiresReload, sectionTool },
-      canvas: { needsRender, isolatedCurrent, canvasRefreshBlocked },
-      clearRichText: () => setRichTextRequest(null),
-    })
+      view: { viewport, previewScale, siteWide, focusCanvas, setFocusCanvas },
+    },
+    protection: { props, isolated, canvasReady, canvasRef, sectionLocked, setState, setPane },
+    shortcut: { libraryStage, sectionTool, siteWideCurrent },
+    persistence: { setSaving, setApprovedVersionId, setReview, requiresReload, setRequiresReload, sectionTool },
+    canvas: { needsRender, isolatedCurrent, canvasRefreshBlocked },
+    clearRichText: () => setRichTextRequest(null),
+  })
   const { slotsByDef, slotKind, richTextConstraints, nameOf } = catalog
   const { canvasAwaitingRender, activeRichText, toCanvas, sendCanvasMenu, renderCanvas } = canvasBridge
   const { save, latestSave, flushForReview } = saveSession
@@ -413,7 +421,15 @@ export function PageEditor(props: PageEditorProps) {
   const { canvasAction, applyCanvasAction, pasteSection } = sectionActions
   const { duplicateCurrentPage, saveDetails, applyPageDanger } = pageCommands({
     draft: storedDraft,
-    lifecycle: { pageDanger, setPageDanger, transitionPending, startTransition, setPublishedVersionId, setReview },
+    lifecycle: {
+      pageDanger,
+      setPageDanger,
+      transitionPending,
+      startTransition,
+      setPublishedVersionId,
+      setReview,
+      openAfterPageAction,
+    },
   })
   const applyLiveReset = liveRestore({
     page: { ...storedDraft, publishedVersionId },

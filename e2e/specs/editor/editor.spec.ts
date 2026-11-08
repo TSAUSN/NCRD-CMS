@@ -548,8 +548,14 @@ for (const width of [1440, 1024]) {
         actionReturnedNotFound = (await response.text()).includes('NEXT_HTTP_ERROR_FALLBACK;404')
         await route.fulfill({ response })
       })
+      const browserPrompts: string[] = []
+      page.on('dialog', async dialog => {
+        browserPrompts.push(dialog.type())
+        await dialog.accept()
+      })
       await confirmation.getByRole('button', { name: 'Archive page', exact: true }).click()
       await expect(page).toHaveURL('/sites/' + before.site_id)
+      expect(browserPrompts).toEqual([])
       expect(actionReturnedNotFound).toBe(false)
       await expect(page.getByText('This page could not be found.', { exact: true })).toHaveCount(0)
       const after = (

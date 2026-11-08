@@ -31,6 +31,7 @@ type Inputs = {
     startTransition: (action: () => Promise<void>) => void
     setPublishedVersionId: Set<string | null>
     setReview: Set<PageEditorProps['openReview']>
+    openAfterPageAction: (href: string) => void
   }
 }
 
@@ -47,7 +48,15 @@ export function pageCommands({ draft, lifecycle }: Inputs) {
     setRevision,
     renderCanvas,
   } = draft
-  const { pageDanger, setPageDanger, transitionPending, startTransition, setPublishedVersionId, setReview } = lifecycle
+  const {
+    pageDanger,
+    setPageDanger,
+    transitionPending,
+    startTransition,
+    setPublishedVersionId,
+    setReview,
+    openAfterPageAction,
+  } = lifecycle
   async function duplicateCurrentPage() {
     if (transitionPending) return
     startTransition(async () => {
@@ -65,7 +74,7 @@ export function pageCommands({ draft, lifecycle }: Inputs) {
           return { ok: true, revision }
         },
       })
-      if (result.status === 'acknowledged' && destination) window.location.assign('/pages/' + destination)
+      if (result.status === 'acknowledged' && destination) openAfterPageAction('/pages/' + destination)
       else if (result.status === 'failed')
         setResult({
           ok: false,
@@ -134,7 +143,7 @@ export function pageCommands({ draft, lifecycle }: Inputs) {
         setPublishedVersionId(null)
         setReview(null)
         setPageDanger(null)
-        if (action === 'archive') window.location.assign(props.siteHref)
+        if (action === 'archive') openAfterPageAction(props.siteHref)
       }
     })
   }

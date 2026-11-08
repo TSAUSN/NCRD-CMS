@@ -1,7 +1,8 @@
 import { redo, undo } from '@cms/domain'
 import type { PageEditorProps } from './editor-types.ts'
 import { useCanvasSectionProtection } from './editor-section-rules.ts'
-import { useDraftSave, useEditorBeforeUnload } from './use-draft-save.ts'
+import { useDraftSave } from './use-draft-save.ts'
+import { useEditorDocumentNavigation } from './use-editor-document-navigation.ts'
 import { useEditorCanvasBridge } from './use-editor-canvas-bridge.ts'
 import { useEditorNavigationSafety } from './use-editor-navigation-safety.ts'
 import { useEditorRecoverySession } from './use-editor-recovery-session.ts'
@@ -82,11 +83,25 @@ export function useEditorDraftSession({
 
   useCanvasSectionProtection(protection)
   useEditorUndoShortcut({ ...shortcut, ...lifecycle, changeHistory })
-  useEditorBeforeUnload({ ...lifecycle, dirty: draft.dirty, queue: draft.queue, recovery })
+  const openAfterPageAction = useEditorDocumentNavigation({
+    ...lifecycle,
+    dirty: draft.dirty,
+    queue: draft.queue,
+    recovery,
+  })
   const saveSession = useDraftSave({
     draft: { ...draft, slotsByDef },
     persistence: { ...draft, ...lifecycle, ...persistence },
     canvas: { ...canvas, renderCanvas, withCanvasValues },
   })
-  return { recovery, limitedHistory, catalog, canvasBridge, saveSession, withCanvasValues, changeHistory }
+  return {
+    recovery,
+    limitedHistory,
+    catalog,
+    canvasBridge,
+    saveSession,
+    withCanvasValues,
+    changeHistory,
+    openAfterPageAction,
+  }
 }
