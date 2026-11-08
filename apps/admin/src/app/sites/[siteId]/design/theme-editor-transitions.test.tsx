@@ -54,6 +54,7 @@ vi.mock('react', async original => ({
 }))
 import { ConfirmDialog } from '../../../../components/confirm.tsx'
 import { Button } from '../../../../components/ui/index.ts'
+import { ThemeColourFields } from './theme-colour-fields.tsx'
 import { ThemeEditor } from './theme-editor.tsx'
 
 function render(canManage = true) {
@@ -77,9 +78,14 @@ function render(canManage = true) {
   })
 }
 function nodes(node: ReactNode): ReactElement<Record<string, unknown>>[] {
-  return Children.toArray(node).flatMap(child =>
-    isValidElement<Record<string, unknown>>(child) ? [child, ...nodes(child.props.children as ReactNode)] : [],
-  )
+  return Children.toArray(node).flatMap(child => {
+    if (!isValidElement<Record<string, unknown>>(child)) return []
+    const content =
+      child.type === ThemeColourFields
+        ? ThemeColourFields(child.props as Parameters<typeof ThemeColourFields>[0])
+        : (child.props.children as ReactNode)
+    return [child, ...nodes(content)]
+  })
 }
 function text(node: ReactNode): string {
   return Children.toArray(node)
