@@ -209,17 +209,24 @@ test('Reviews uses a readable queue and decisions, protects unsent comments and 
     } finally {
       await authorContext.close()
     }
+    await page.goto('/')
+    const reviewsLink = page.getByRole('link', { name: 'Reviews', exact: true })
+    await expect(reviewsLink).toBeVisible()
     const blocker = await f.pool.connect()
     try {
       await blocker.query('BEGIN')
       await blocker.query('LOCK TABLE submissions IN ACCESS EXCLUSIVE MODE')
-      await page.goto('/inbox?review=' + requests[0], { waitUntil: 'commit' })
+      // Keep the app document mounted while the real Reviews data is blocked.
+      // WebKit cannot snapshot a top-level document with an unfinished response.
+      await reviewsLink.click()
       await expect(page.getByRole('status').filter({ hasText: 'Loading reviews…' })).toBeVisible()
       await capture(page, 'loading')
     } finally {
       await blocker.query('ROLLBACK')
       blocker.release()
     }
+    await page.getByRole('link', { name: /^Welcome/ }).click()
+    await expect(page).toHaveURL(new RegExp('review=' + requests[0]))
     await expect(page.getByRole('heading', { name: 'Welcome', exact: true, level: 2 })).toBeVisible()
     // Restrict only this isolated test database, then restore its exact permission.
     expect((await f.pool.query('SELECT current_database() name')).rows[0]!.name).toMatch(/^cms_e2e(?:_|$)/)
