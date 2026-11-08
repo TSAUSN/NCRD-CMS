@@ -49,6 +49,8 @@ vi.mock('../../../actions/site-look.ts', () => ({
 }))
 import { GlobalElementsEditor } from './global-elements-editor.tsx'
 import { PresetFrameFields } from '../../../../components/preset-frame-fields.tsx'
+import { PresetHeaderIdentity } from '../../../../components/preset-header-fields.tsx'
+import { PresetFooterLayout } from '../../../../components/preset-footer-fields.tsx'
 import { FrameComponentPanel } from './frame-component-panel.tsx'
 import type { FrameComponentChoice } from '../../../../lib/queries.ts'
 const head = <T,>(draft: T) => ({
@@ -243,9 +245,20 @@ describe('frame source radio handlers', () => {
         }
         const presetInput = () => {
           const panel = nodes(render()).find(node => node.type === PresetFrameFields)!
-          return nodes(PresetFrameFields(panel.props as Parameters<typeof PresetFrameFields>[0])).find(
+          const shell = PresetFrameFields(panel.props as Parameters<typeof PresetFrameFields>[0])
+          const section = nodes(shell).find(node =>
+            kind === 'header' ? node.type === PresetHeaderIdentity : node.type === PresetFooterLayout,
+          )
+          expect(section).toBeDefined()
+          const controls =
+            kind === 'header'
+              ? PresetHeaderIdentity(section!.props as Parameters<typeof PresetHeaderIdentity>[0])
+              : PresetFooterLayout(section!.props as Parameters<typeof PresetFooterLayout>[0])
+          const input = nodes(controls).find(
             node => node.props.id === (kind === 'header' ? 'global-site-name' : 'global-footer-name'),
-          )!
+          )
+          expect(input).toBeDefined()
+          return input!
         }
         const authoredPanel = () => nodes(render()).find(node => node.type === FrameComponentPanel)!
         const edit = (source: 'preset' | 'authored') => {
