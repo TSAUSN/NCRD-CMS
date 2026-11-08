@@ -27,8 +27,8 @@ export function initials(value: string): string {
   return (words[0]![0]! + (words[1]?.[0] ?? words[0]![1] ?? '')).toUpperCase()
 }
 
-export function reviewAge(value: string) {
-  const minutes = Math.max(0, Math.floor((Date.now() - Date.parse(value)) / 60000))
+export function reviewAge(value: string, referenceTime: number) {
+  const minutes = Math.max(0, Math.floor((referenceTime - Date.parse(value)) / 60000))
   return minutes < 1
     ? 'sent just now'
     : minutes < 60

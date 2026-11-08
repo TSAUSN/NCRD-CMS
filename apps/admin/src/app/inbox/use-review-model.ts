@@ -15,7 +15,6 @@ import type { ReviewComment, ReviewPerson, ReviewSubmission } from '../../lib/re
 export type Filter = 'waiting' | 'returned' | 'decided' | 'all'
 
 export type ReviewWorkspaceProps = {
-  fullScreen?: boolean
   actorId?: string
   queueHeader?: ReactNode
   unavailable?: boolean
@@ -28,7 +27,7 @@ export type ReviewWorkspaceProps = {
   people: ReviewPerson[]
   readiness: ReadinessReport | null
   basePath: string
-}
+} & ({ fullScreen: true; ageReferenceTime: number } | { fullScreen?: false })
 
 export function useReviewModel(
   {

@@ -26,7 +26,7 @@ function SelectedReview({
   const model = useReviewModel(props, props.fullScreen ? setReceipt : undefined)
   const dialogs = <ReviewDecisionDialogs model={model} />
   return props.fullScreen ? (
-    <ReviewWorkbench model={model} dialogs={dialogs} receipt={receipt} />
+    <ReviewWorkbench model={model} dialogs={dialogs} receipt={receipt} ageReferenceTime={props.ageReferenceTime} />
   ) : (
     <EmbeddedReviewWorkspace model={model} dialogs={dialogs} />
   )

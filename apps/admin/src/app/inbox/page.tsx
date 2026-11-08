@@ -109,6 +109,7 @@ export default async function ReviewInbox({
           <section aria-label="Page reviews">
             <ReviewWorkspace
               fullScreen
+              ageReferenceTime={Date.now()}
               actorId={session.principal.userId}
               queueHeader={queueHeader}
               unavailable={Boolean(selectedId && !selected)}

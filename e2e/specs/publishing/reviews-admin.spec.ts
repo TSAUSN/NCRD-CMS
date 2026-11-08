@@ -1,9 +1,34 @@
-import { test, expect, type Page } from '@playwright/test'
+import { test, expect, type Browser, type Page } from '@playwright/test'
 import { randomUUID } from 'node:crypto'
 import { mkdir } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { siteLookFixture } from '../fixtures/r8-site-look.ts'
 import { signIn } from '../helpers.ts'
+
+async function expectStableReviewAge(browser: Browser, email: string, reviewId: string) {
+  const context = await browser.newContext()
+  try {
+    const page = await context.newPage()
+    await signIn(page, email)
+    await page.clock.setFixedTime(new Date(Date.now() + 86_400_000))
+    const errors: string[] = []
+    page.on('pageerror', error => errors.push(error.message))
+    await page.goto('/inbox?review=' + reviewId)
+    const discussion = page.getByRole('tab', { name: /^Discussion/ })
+    await discussion.click()
+    await expect(discussion).toHaveAttribute('aria-selected', 'true')
+    expect(errors).toEqual([])
+    const queueTime = page.getByRole('link', { name: /^Welcome/ }).locator('time')
+    const selectedTime = page
+      .getByRole('heading', { name: 'Welcome', exact: true, level: 2 })
+      .locator('..')
+      .locator('time')
+    await expect(queueTime).toHaveText(/^sent (?:just now|\d+ minutes? ago)$/)
+    await expect(selectedTime).toHaveText((await queueTime.textContent())!)
+  } finally {
+    await context.close()
+  }
+}
 
 test('Reviews uses a readable queue and decisions, protects unsent comments and recovers its real loading and error states', async ({
   page,
@@ -94,6 +119,7 @@ test('Reviews uses a readable queue and decisions, protects unsent comments and 
         )
       }
     })
+    await expectStableReviewAge(browser, accounts[1]!.email, requests[0]!)
     await open(requests[0]!)
     await expect(page.getByRole('region', { name: 'Saved changes', exact: true })).toContainText(
       'Welcome: changed heading',

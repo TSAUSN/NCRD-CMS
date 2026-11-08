@@ -18,7 +18,7 @@ import type { Filter, ReviewModel } from './use-review-model.ts'
 import { reviewAge } from './review-display.tsx'
 import { FullReviewDiscussion } from './review-discussion.tsx'
 
-function FullReviewQueue({ model }: { model: ReviewModel }) {
+function FullReviewQueue({ model, ageReferenceTime }: { model: ReviewModel; ageReferenceTime: number }) {
   const { queueHeader, selected, basePath, filter, setFilter, query, setQuery, visible } = model
   return (
     <>
@@ -59,7 +59,7 @@ function FullReviewQueue({ model }: { model: ReviewModel }) {
                 <small>
                   {review.submittedByName} ·{' '}
                   <time dateTime={review.submittedAt} title={formatWhen(review.submittedAt)}>
-                    {reviewAge(review.submittedAt)}
+                    {reviewAge(review.submittedAt, ageReferenceTime)}
                   </time>
                 </small>
                 <span className={reviewWorkbenchStyles.queueTag}>{review.siteName}</span>
@@ -117,10 +117,12 @@ export function ReviewWorkbench({
   model,
   dialogs,
   receipt,
+  ageReferenceTime,
 }: {
   model: ReviewModel
   dialogs: ReactNode
   receipt: string | null
+  ageReferenceTime: number
 }) {
   const router = useRouter()
   const {
@@ -146,7 +148,7 @@ export function ReviewWorkbench({
         className="review-board"
         queueLabel="Review requests"
         storageKey="cms.reviews.queue-width"
-        queue={<FullReviewQueue model={model} />}
+        queue={<FullReviewQueue model={model} ageReferenceTime={ageReferenceTime} />}
       >
         {receipt && (
           <div role="status" className="notice notice-ok">
@@ -183,7 +185,7 @@ export function ReviewWorkbench({
                 <p>
                   Submitted by <strong>{selected.submittedByName}</strong> ·{' '}
                   <time dateTime={selected.submittedAt} title={formatWhen(selected.submittedAt)}>
-                    {reviewAge(selected.submittedAt)}
+                    {reviewAge(selected.submittedAt, ageReferenceTime)}
                   </time>
                 </p>
                 <span className="review-state">{reviewStatusLabel(selected.status)}</span>
