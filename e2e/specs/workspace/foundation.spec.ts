@@ -53,7 +53,18 @@ test('foundation: navigation, full site names, settings spacing and safe archive
     await page.getByRole('button', { name: 'Save draft', exact: true }).click()
     await expect(page.getByRole('status').filter({ hasText: 'Site settings draft saved' })).toBeVisible()
     await page.getByRole('button', { name: 'Publish', exact: true }).click()
-    await page.getByRole('button', { name: 'Publish selected (1)', exact: true }).click()
+    const review = page.getByLabel('Selected changes review', { exact: true })
+    await expect(review.getByText('Site settings', { exact: true })).toBeVisible()
+    const publishSelected = review.getByRole('button', { name: 'Publish selected (1)', exact: true })
+    const samples = review.getByRole('checkbox', { name: /Publish with sample content/ })
+    // A site-wide settings change also checks the site's already published pages.
+    if (await samples.isVisible()) {
+      await expect(review.getByText(/still contains sample content/i).first()).toBeVisible()
+      await expect(publishSelected).toBeDisabled()
+      await samples.check()
+      await expect(publishSelected).toBeEnabled()
+    }
+    await publishSelected.click()
     await page.getByRole('alertdialog').getByRole('button', { name: 'Publish selected', exact: true }).click()
     await expect(page.getByRole('status').filter({ hasText: 'Release applied.' })).toBeVisible()
     await page.goto(sitePath + '/settings')
