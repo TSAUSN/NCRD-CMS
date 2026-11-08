@@ -18,14 +18,7 @@ export const SITE_CHOICE_SQL = `
    WHERE s.status <> 'archived'
    ORDER BY ${SITE_ORDER_SQL}, s.slug, s.id`
 
-export const SITE_SUMMARY_SQL = `
-  SELECT s.id, s.slug, s.name, s.status, s.staging_hostname, s.kind, EXISTS(SELECT 1 FROM collections c WHERE c.site_id=s.id AND c.reader_key='stories') AS has_stories, CASE WHEN app.has_site_access(s.id) THEN app.site_hosting_status(s.id) ELSE 'ready' END AS hosting_status,
-         (SELECT d.hostname_normalized FROM domains d WHERE d.site_id=s.id AND d.kind='primary'
-           AND d.status='live' AND d.removed_at IS NULL LIMIT 1) AS primary_hostname,
-         count(p.id) FILTER (WHERE ${ORDINARY_PAGE_SQL}) AS page_count,
-         (SELECT count(*) FROM collections sc JOIN collection_entries se ON se.collection_id=sc.id
-          WHERE sc.site_id=s.id AND sc.reader_key='stories' AND se.archived_at IS NULL) AS story_count,
-         (SELECT COALESCE(
+const HOME_PREVIEW_COLUMN = `(SELECT COALESCE(
             CASE WHEN m.id IS NOT NULL THEN '/media/'||m.id::text||'/'||
               CASE WHEN EXISTS(SELECT 1 FROM media_variants mv WHERE mv.media_id=m.id AND mv.kind='card') THEN 'card' ELSE 'original' END END,
             CASE WHEN sf.id IS NOT NULL THEN '/site-files/'||sf.id::text||'/'||sf.sha256||'/'||sf.name END)
@@ -45,7 +38,17 @@ export const SITE_SUMMARY_SQL = `
           LEFT JOIN site_files sf ON sf.site_id=s.id AND sf.id::text=mount.value->>'fileId' AND sf.kind='image'
             AND fv.bundle->'files' ? sf.id::text
           WHERE hp.site_id=s.id AND hp.slug='' AND hp.archived_at IS NULL AND (m.id IS NOT NULL OR sf.id IS NOT NULL)
-          ORDER BY pic.position LIMIT 1) AS preview_image,
+          ORDER BY pic.position LIMIT 1) AS preview_image`
+
+function siteSummarySql(includeHomePreview: boolean) {
+  return `
+  SELECT s.id, s.slug, s.name, s.status, s.staging_hostname, s.kind, EXISTS(SELECT 1 FROM collections c WHERE c.site_id=s.id AND c.reader_key='stories') AS has_stories, CASE WHEN app.has_site_access(s.id) THEN app.site_hosting_status(s.id) ELSE 'ready' END AS hosting_status,
+         (SELECT d.hostname_normalized FROM domains d WHERE d.site_id=s.id AND d.kind='primary'
+           AND d.status='live' AND d.removed_at IS NULL LIMIT 1) AS primary_hostname,
+         count(p.id) FILTER (WHERE ${ORDINARY_PAGE_SQL}) AS page_count,
+         (SELECT count(*) FROM collections sc JOIN collection_entries se ON se.collection_id=sc.id
+          WHERE sc.site_id=s.id AND sc.reader_key='stories' AND se.archived_at IS NULL) AS story_count,
+${includeHomePreview ? HOME_PREVIEW_COLUMN + ',' : ''}
          count(p.published_version_id) AS published_count,
          count(p.id) FILTER (WHERE p.published_version_id IS NULL) AS draft_only_count,
          count(p.id) FILTER (
@@ -57,3 +60,8 @@ export const SITE_SUMMARY_SQL = `
     LEFT JOIN pages p ON p.site_id = s.id AND p.archived_at IS NULL
    GROUP BY s.id, s.slug, s.name, s.status, s.staging_hostname, s.kind
    ORDER BY ${SITE_ORDER_SQL}`
+}
+
+/** Home uses the thumbnail on its compact cards; All sites only uses the facts. */
+export const SITE_SUMMARY_SQL = siteSummarySql(true)
+export const SITE_DIRECTORY_SQL = siteSummarySql(false)

@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { currentSession } from '../../lib/session.ts'
-import { listSites, roleLabel } from '../../lib/queries.ts'
+import { roleLabel } from '../../lib/queries.ts'
+import { listSiteDirectory } from '../../server/queries/sites.ts'
 import { AppShell } from '../../components/app-shell.tsx'
 import { navigationFor } from '../../components/nav.ts'
 import { PageHeader } from '../../components/shell.tsx'
@@ -11,7 +12,10 @@ export const dynamic = 'force-dynamic'
 export default async function SitesPage() {
   const session = await currentSession()
   if (!session) notFound()
-  const [sites, role] = await Promise.all([listSites(session.principal.userId), roleLabel(session.principal.userId)])
+  const [sites, role] = await Promise.all([
+    listSiteDirectory(session.principal.userId),
+    roleLabel(session.principal.userId),
+  ])
   const active = sites.filter(site => site.status !== 'archived'),
     archived = sites.filter(site => site.status === 'archived')
   return (

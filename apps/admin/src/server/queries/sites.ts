@@ -1,6 +1,6 @@
 import 'server-only'
 import { asUser } from '@cms/platform'
-import { SITE_SUMMARY_SQL } from '../../lib/site-summary.ts'
+import { SITE_DIRECTORY_SQL, SITE_SUMMARY_SQL } from '../../lib/site-summary.ts'
 import { REVIEWED_PAGE_CANVAS_SQL } from '../../lib/reviewed-page-canvas.ts'
 import { UUID_SHAPE } from './record-id.ts'
 
@@ -46,6 +46,10 @@ export type SiteSummaryRow = SiteRow & {
 /** Every read runs as the user's own database role; RLS decides what comes back. */
 export function listSites(userId: string): Promise<SiteSummaryRow[]> {
   return asUser({ userId }, async client => (await client.query<SiteSummaryRow>(SITE_SUMMARY_SQL)).rows)
+}
+
+export function listSiteDirectory(userId: string): Promise<SiteSummaryRow[]> {
+  return asUser({ userId }, async client => (await client.query<SiteSummaryRow>(SITE_DIRECTORY_SQL)).rows)
 }
 
 export function getSite(userId: string, siteId: string): Promise<SiteRow | null> {
