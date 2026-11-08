@@ -72,6 +72,18 @@ export function reorderMenuItem(tree: NavTree, from: string, to: string): NavTre
 }
 
 /** Hidden links still own their destination and place in the tree. */
+export function menuPageIds(tree: NavTree): ReadonlySet<string> {
+  const ids = new Set<string>()
+  function visit(nodes: NavTree) {
+    for (const node of nodes) {
+      if (node.target.type === 'page') ids.add(node.target.page_id)
+      if (node.children) visit(node.children)
+    }
+  }
+  visit(tree)
+  return ids
+}
+
 export function menuHasPage(tree: NavTree, pageId: string): boolean {
   return tree.some(
     node => (node.target.type === 'page' && node.target.page_id === pageId) || menuHasPage(node.children ?? [], pageId),

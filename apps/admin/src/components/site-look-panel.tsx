@@ -1,29 +1,22 @@
 'use client'
 import { CanvasMenuAdd, type CanvasMenuAddState } from './canvas-menu-add.tsx'
 import { createPortal } from 'react-dom'
-import { useEffect, useRef, useState, type RefObject } from 'react'
+import { useEffect, useMemo, useRef, useState, type RefObject } from 'react'
 import {
   DEFAULT_HEADER_CONFIG,
   DEFAULT_FOOTER_CONFIG,
-  FooterConfig,
-  HeaderConfig,
-  NavTree,
   type HeaderConfig as Header,
   type FooterConfig as Footer,
-  type NavTree as Tree,
 } from '@cms/schema'
 import type { MediaAsset } from '../lib/media-library.ts'
-import { canAppendMenuItem, editMenuItem, menuHasPage, reorderMenuItem } from '../lib/menu-editing.ts'
-import { loadPageSiteLook, savePageSiteLook } from '../app/pages/[pageId]/site-look-actions.ts'
+import { canAppendMenuItem, menuHasPage, menuPageIds } from '../lib/menu-editing.ts'
 import { PresetFrameFields } from './preset-frame-fields.tsx'
 import { FrameField } from '../app/sites/[siteId]/global-elements/frame-component-panel.tsx'
 import { MenuTreeEditor } from './menu-tree-editor.tsx'
-import { useNavigationGuard } from './navigation-guard.ts'
+import { usePageSiteLookDraft, type SiteLookDraftChange } from './use-page-site-look-draft.ts'
 import { Button } from './ui/index.ts'
 import styles from './site-look-panel.module.css'
 import settings from './settings-controls.module.css'
-type Loaded = Extract<Awaited<ReturnType<typeof loadPageSiteLook>>, { ok: true }>
-type ChangedParts = { header: boolean; footer: boolean; menu: boolean }
 export function SiteLookPanel({
   pageId,
   part,
@@ -44,13 +37,7 @@ export function SiteLookPanel({
 }: {
   onCanvasMenu?: (state: CanvasMenuAddState | null) => void
   canvasMenuPage?: { id: string; sequence: number } | null
-  onDraftChange?: (
-    draft: { header: Header; footer: Footer; menu: Tree },
-    dirty: boolean,
-    pending: boolean,
-    valid: boolean,
-    changed?: ChangedParts,
-  ) => void
+  onDraftChange?: SiteLookDraftChange
   frame: RefObject<HTMLIFrameElement | null>
   canvasReady: number
   scale: number
@@ -65,14 +52,22 @@ export function SiteLookPanel({
   onSaved: () => void
   registerDone: (finish: () => void) => void
 }) {
-  const [loaded, setLoaded] = useState<Loaded | null>(null),
-    [header, setHeader] = useState<Header | null>(null),
-    [footer, setFooter] = useState<Footer | null>(null),
-    [menu, setMenu] = useState<Tree>([])
-  const [saved, setSaved] = useState(''),
-    [error, setError] = useState<string | null>(null),
-    [pending, setPending] = useState(false)
-  const busy = useRef(false)
+  const {
+    loaded,
+    header,
+    setHeader,
+    footer,
+    setFooter,
+    menu,
+    setMenu,
+    error,
+    pending,
+    serial,
+    dirty,
+    valid,
+    validationMessage,
+    save,
+  } = usePageSiteLookDraft({ pageId, editing, menuEdit, menuMove, onDone, onSaved, registerDone, onDraftChange })
   const fieldArea = useRef<HTMLDivElement | null>(null)
   useEffect(() => {
     const area = fieldArea.current
@@ -80,8 +75,8 @@ export function SiteLookPanel({
     const keepFocus = () => {
       const active = document.activeElement
       if (!(active instanceof HTMLElement) || !area.contains(active) || !active.matches('input,textarea,select')) return
-      const field = active.getBoundingClientRect(),
-        box = area.getBoundingClientRect()
+      const field = active.getBoundingClientRect()
+      const box = area.getBoundingClientRect()
       if (field.top < box.top || field.bottom > box.bottom)
         area.scrollTop += field.top + field.height / 2 - box.top - area.clientHeight / 2
     }
@@ -104,121 +99,6 @@ export function SiteLookPanel({
         : null,
     )
   }, [frame, editing, part, canvasReady, onCanvasMenu])
-  useEffect(() => {
-    let alive = true
-    void loadPageSiteLook(pageId)
-      .then(result => {
-        if (!alive) return
-        if (!result.ok) {
-          setError(result.message)
-          return
-        }
-        setLoaded(result)
-        setHeader(result.frame.header.draft)
-        setFooter(result.frame.footer.draft)
-        setMenu(result.menu.draft)
-        setSaved(JSON.stringify([result.frame.header.draft, result.frame.footer.draft, result.menu.draft]))
-      })
-      .catch(() => {
-        if (alive) setError('The site look could not be loaded. Close this panel and try again.')
-      })
-    return () => {
-      alive = false
-    }
-  }, [pageId])
-  useEffect(() => {
-    if (menuEdit && editing)
-      setMenu(current =>
-        editMenuItem(current, menuEdit.path, node => ({ ...node, label: menuEdit.label.slice(0, 80) })),
-      )
-  }, [menuEdit, editing])
-  useEffect(() => {
-    if (menuMove && editing) setMenu(current => reorderMenuItem(current, menuMove.from, menuMove.to))
-  }, [menuMove, editing])
-  const serial = JSON.stringify([header, footer, menu]),
-    dirty = serial !== saved
-  useNavigationGuard(() => ({ dirty: editing && dirty, pending }))
-  useEffect(() => {
-    const leave = (event: BeforeUnloadEvent) => {
-      if (editing && (dirty || pending)) event.preventDefault()
-    }
-    window.addEventListener('beforeunload', leave)
-    return () => window.removeEventListener('beforeunload', leave)
-  }, [editing, dirty, pending])
-  const valid =
-    HeaderConfig.safeParse(header).success && FooterConfig.safeParse(footer).success && NavTree.safeParse(menu).success
-  useEffect(() => {
-    if (header && footer && loaded)
-      onDraftChange?.({ header, footer, menu }, dirty, pending, valid, {
-        header: JSON.stringify(header) !== JSON.stringify(loaded.frame.header.published),
-        footer: JSON.stringify(footer) !== JSON.stringify(loaded.frame.footer.published),
-        menu: JSON.stringify(menu) !== JSON.stringify(loaded.menu.published),
-      })
-  }, [serial, dirty, pending, valid, onDraftChange, Boolean(loaded)])
-  const validationMessage =
-    header?.schemaVersion === 1 && header.partner && !header.partner.name.trim()
-      ? 'Add the partner’s name before saving.'
-      : footer?.schemaVersion === 1 &&
-          footer.contact &&
-          ![footer.contact.address, footer.contact.email, footer.contact.phone].some(value => value?.trim())
-        ? 'Add an address, phone number or email for the contact details.'
-        : 'Check the names and web addresses before saving. Each link needs a name and a destination.'
-  async function save(): Promise<boolean> {
-    if (!loaded || !loaded.canManage || !header || !footer || !valid || busy.current) return false
-    if (!dirty) return true
-    busy.current = true
-    setPending(true)
-    setError(null)
-    try {
-      const result = await savePageSiteLook({
-        pageId,
-        headerRevision: loaded.frame.header.revision,
-        footerRevision: loaded.frame.footer.revision,
-        menuRevision: loaded.menu.revision,
-        header,
-        footer,
-        menu,
-        frameChanged:
-          JSON.stringify([header, footer]) !== JSON.stringify([loaded.frame.header.draft, loaded.frame.footer.draft]),
-        menuChanged: JSON.stringify(menu) !== JSON.stringify(loaded.menu.draft),
-      })
-      if (!result.ok) {
-        setError(result.message)
-        return false
-      }
-      setLoaded(current =>
-        current
-          ? {
-              ...current,
-              frame: {
-                ...current.frame,
-                header: { ...current.frame.header, revision: result.headerRevision, draft: header },
-                footer: { ...current.frame.footer, revision: result.footerRevision, draft: footer },
-              },
-              menu: { ...current.menu, revision: result.menuRevision, draft: menu },
-            }
-          : current,
-      )
-      setSaved(serial)
-      onSaved()
-      return true
-    } catch {
-      setError('The save could not be confirmed. Reload before trying again.')
-      return false
-    } finally {
-      busy.current = false
-      setPending(false)
-    }
-  }
-  useEffect(() =>
-    registerDone(() => {
-      if (!dirty) onDone()
-      else
-        void save().then(ok => {
-          if (ok) onDone()
-        })
-    }),
-  )
   const original = loaded?.frame.originalDesign === true
   const scopePages =
     loaded?.frame.pages.filter(page => (part === 'header' ? page.usesHeader !== false : page.usesFooter !== false)) ??
@@ -226,8 +106,8 @@ export function SiteLookPanel({
   const otherPages =
     loaded?.frame.pages.filter(page => (part === 'header' ? page.usesHeader === false : page.usesFooter === false)) ??
     []
-  const title = part === 'header' ? (original ? 'Menu' : 'Header') : 'Footer',
-    config = part === 'header' ? header : footer
+  const title = part === 'header' ? (original ? 'Menu' : 'Header') : 'Footer'
+  const config = part === 'header' ? header : footer
   const fields =
     config?.schemaVersion === 2
       ? loaded?.frame.components
@@ -242,7 +122,32 @@ export function SiteLookPanel({
         { label: page.title.slice(0, 80), target: { type: 'page', page_id: page.id }, visible: true },
       ])
   }
-  const available = loaded?.menu.pages.filter(page => !menuHasPage(menu, page.id)) ?? []
+  const available = useMemo(() => {
+    const included = menuPageIds(menu)
+    return loaded?.menu.pages.filter(page => !included.has(page.id)) ?? []
+  }, [loaded, menu])
+  const fieldMedia = useMemo(
+    () =>
+      media.map(asset => ({
+        id: asset.id,
+        name: asset.name,
+        url: asset.previewUrl ?? '',
+        alt: asset.altText,
+      })),
+    [media],
+  )
+  const presetMedia = useMemo(
+    () =>
+      media
+        .filter(asset => asset.status === 'ready')
+        .map(asset => ({
+          id: asset.id,
+          name: asset.name,
+          url: asset.previewUrl ?? asset.deliveryUrl ?? '',
+          alt: asset.altText,
+        })),
+    [media],
+  )
   useEffect(() => {
     onCanvasMenu?.(
       editing && part === 'header' && loaded?.canManage
@@ -296,12 +201,7 @@ export function SiteLookPanel({
                           key={slot.id}
                           slot={slot}
                           value={config.component.values[slot.id]}
-                          media={media.map(asset => ({
-                            id: asset.id,
-                            name: asset.name,
-                            url: asset.previewUrl ?? '',
-                            alt: asset.altText,
-                          }))}
+                          media={fieldMedia}
                           disabled={pending}
                           siteId={loaded.siteId}
                           onChange={value => {
@@ -326,14 +226,7 @@ export function SiteLookPanel({
                       footer={footer.schemaVersion === 1 ? footer : DEFAULT_FOOTER_CONFIG}
                       canManage={!pending && loaded.canManage}
                       superAdmin={loaded.superAdmin}
-                      media={media
-                        .filter(asset => asset.status === 'ready')
-                        .map(asset => ({
-                          id: asset.id,
-                          name: asset.name,
-                          url: asset.previewUrl ?? asset.deliveryUrl ?? '',
-                          alt: asset.altText,
-                        }))}
+                      media={presetMedia}
                       pages={loaded.menu.pages}
                       siteName={
                         header.schemaVersion === 1
