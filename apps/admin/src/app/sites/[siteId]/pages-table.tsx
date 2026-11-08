@@ -2,6 +2,7 @@
 import { useMemo, useState } from 'react'
 import { GuardedLink as Link } from '../../../components/guarded-link.tsx'
 import type { CSSProperties } from 'react'
+import { reviewDate } from '../../../lib/review-time.ts'
 import type { WorkspacePage } from '../../../lib/workspace-queries.ts'
 import { pageTree } from '../../../lib/workspace-model.ts'
 import { editorialPosture } from '../../../lib/editorial-posture.ts'
@@ -126,9 +127,7 @@ export function PagesTable({
                     <span className={recordTableStyles.meta} title={page.edited_by}>
                       {page.edited_by}
                       <br />
-                      <time dateTime={page.edited_at}>
-                        {new Date(page.edited_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                      </time>
+                      <time dateTime={page.edited_at}>{reviewDate(page.edited_at)}</time>
                     </span>
                   </td>
                   <td>

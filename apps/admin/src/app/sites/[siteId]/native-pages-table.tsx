@@ -9,6 +9,7 @@ import { Button, ButtonLink, SearchField, Note, EmptyState, SegmentedControl } f
 import { IconDrag, IconChevronRight } from '../../../components/icons.tsx'
 import { StatusChip, pageStatus } from '../../../components/status.tsx'
 import { pageInMenu, pageMenuLocations } from '../../../lib/page-details.ts'
+import { reviewDate } from '../../../lib/review-time.ts'
 import type { WorkspacePage } from '../../../lib/workspace-queries.ts'
 import type { PageListControls } from '../../../lib/page-list-workspace.ts'
 import { useNavigationGuard } from '../../../components/navigation-guard.ts'
@@ -268,7 +269,7 @@ export function NativePagesTable({
                     )}
                     <td>
                       <time className={recordTableStyles.meta} dateTime={page.edited_at}>
-                        {new Date(page.edited_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                        {reviewDate(page.edited_at)}
                       </time>
                     </td>
                     <td>
