@@ -28,19 +28,20 @@ async function draft(pageId: string): Promise<Draft> {
 async function fixture(page: Page) {
   const client = await database()
   const name = `Layout change ${Date.now()}-${Math.floor(Math.random() * 10000)}`
-  let pageId = '',
+  let siteId = '',
+    pageId = '',
     hero = '',
     cta = ''
   try {
     const user = (await client.query("SELECT id FROM app_users WHERE email='root@example.test'")).rows[0]!.id
-    const site = (await client.query("SELECT id FROM sites WHERE slug='demo'")).rows[0]!.id
+    siteId = (await client.query("SELECT id FROM sites WHERE slug='demo'")).rows[0]!.id
     hero = (await client.query("SELECT id FROM section_defs WHERE slug='hero' AND scope='global'")).rows[0]!.id
     cta = (await client.query("SELECT id FROM section_defs WHERE slug='cta' AND scope='global'")).rows[0]!.id
     await client.query('BEGIN')
     await client.query("SELECT set_config('app.user_id',$1,true)", [user])
     pageId = (
       await client.query('SELECT app.create_page($1,$2,$3) AS id', [
-        site,
+        siteId,
         `layout-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
         name,
       ])
@@ -76,7 +77,8 @@ async function fixture(page: Page) {
   }
   await signIn(page, 'root@example.test')
   await page.getByRole('main').getByRole('link', { name: 'Demo site', exact: true }).click()
-  await page.getByRole('link', { name, exact: true }).click()
+  await expect(page).toHaveURL(new RegExp(`/sites/${siteId}$`))
+  await page.getByRole('table', { name: 'Pages', exact: true }).getByRole('link', { name, exact: true }).click()
   await expect(page).toHaveURL(new RegExp(`/pages/${pageId}$`))
   return { pageId, hero, cta }
 }
