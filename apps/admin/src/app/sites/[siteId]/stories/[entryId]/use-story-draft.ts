@@ -1,6 +1,7 @@
 import type { StoriesSettings } from '@cms/schema'
 import { useEffect, useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
+import { openGuardedDocument } from '../../../../../components/document-link.tsx'
 import type { StatusLabel } from '../../../../../components/ui/status-pill.tsx'
 import type { StoryRecord } from '../../../../../lib/stories-model.ts'
 import type { StoryPlacementContext } from '../../../../../lib/story-placement.ts'
@@ -62,6 +63,7 @@ export function useStoryDraft({
   const [pending, start] = useTransition()
   const creationRequest = useRef(newDraft?.requestId)
   const [uncertain, setUncertain] = useState(false)
+  const [savedEditor, setSavedEditor] = useState<string>()
   const creationKind = useRef<StorySaveIntent>('save')
   const intentStarted = useRef(false)
   const [notice, setNotice] = useState('')
@@ -104,13 +106,18 @@ export function useStoryDraft({
     setValue,
     value,
   })
-  const disabled = !rights.editEntries || pending || uncertain || Boolean(recovery)
+  // Wait for the save and leave guard to settle before opening the editor document.
+  useEffect(() => {
+    if (savedEditor && !pending && !dirty) openGuardedDocument(savedEditor, { replace: true })
+  }, [savedEditor, pending, dirty])
+
+  const disabled = !rights.editEntries || pending || uncertain || Boolean(recovery || savedEditor)
   const change = <K extends keyof StoryEditInput>(key: K, next: StoryEditInput[K]) => {
     setValue(current => ({ ...current, [key]: next }))
     setNotice('')
   }
   const save = (kind: StorySaveIntent = 'save') => {
-    if (inFlight.current) return
+    if (inFlight.current || savedEditor) return
     if (recovery) {
       setRecoveryOpen(true)
       return
@@ -165,7 +172,10 @@ export function useStoryDraft({
             finishLeave()
             return
           }
-          router.push('/sites/' + site.id + '/stories/' + result.entryId + (kind === 'save' ? '' : '?intent=' + kind))
+          setNotice('Story draft saved. Opening it…')
+          setSavedEditor(
+            '/sites/' + site.id + '/stories/' + result.entryId + (kind === 'save' ? '' : '?intent=' + kind),
+          )
           return
         }
         let saved = value
@@ -293,6 +303,7 @@ export function useStoryDraft({
     setValue,
     pending,
     uncertain,
+    savedEditor,
     creationKind,
     notice,
     firstSiteReview,

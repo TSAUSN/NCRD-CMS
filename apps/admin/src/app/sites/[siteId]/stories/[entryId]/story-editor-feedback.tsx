@@ -1,15 +1,21 @@
+import { DocumentLink } from '../../../../../components/document-link.tsx'
 import { StatusPill } from '../../../../../components/ui/index.ts'
 import { Button } from '../../../../../components/ui/button.tsx'
 import styles from '../stories.module.css'
 import type { StoryDraftModel } from './use-story-draft.ts'
 
 export function StoryEditorActions({ model }: { model: StoryDraftModel }) {
-  const { rights, publicationStatus, pending, uncertain, disabled, save } = model
+  const { rights, publicationStatus, pending, uncertain, savedEditor, disabled, save } = model
   return (
     <>
       <>
         <StatusPill compact status={publicationStatus} />
-        <Button variant="secondary" size="standard" disabled={pending || uncertain} onClick={() => save('preview')}>
+        <Button
+          variant="secondary"
+          size="standard"
+          disabled={pending || uncertain || Boolean(savedEditor)}
+          onClick={() => save('preview')}
+        >
           Preview
         </Button>
         {rights.editEntries && (
@@ -44,6 +50,7 @@ export function StoryEditorNotice({ model }: { model: StoryDraftModel }) {
     router,
     pending,
     uncertain,
+    savedEditor,
     creationKind,
     notice,
     firstSiteReview,
@@ -60,6 +67,11 @@ export function StoryEditorNotice({ model }: { model: StoryDraftModel }) {
             <p role={error ? 'alert' : 'status'} className={styles.status + (error ? ' ' + styles.error : '')}>
               {notice}
             </p>
+          )}
+          {savedEditor && (
+            <DocumentLink href={savedEditor} replace>
+              Open saved draft
+            </DocumentLink>
           )}
           {!newDraft && error && !recovery && (
             <Button variant="secondary" disabled={pending} onClick={() => router.refresh()}>
