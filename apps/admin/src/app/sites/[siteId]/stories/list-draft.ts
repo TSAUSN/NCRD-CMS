@@ -3,6 +3,7 @@ import { storyFeatureRank, type StoryListPatch } from '@cms/schema'
 import { useNavigationGuard } from '../../../../components/navigation-guard.ts'
 import {
   filterStoryList,
+  mergeSavedStoryRows,
   optimisticStoryList,
   storyListLive,
   storyInSource,
@@ -24,16 +25,6 @@ export type StoryListProps = {
   initialFilters: { q: string; status: string; main: string; secondary: string }
 }
 type Job = { entryId: string; patch: StoryListPatch }
-
-type StoryRow = StoryListSnapshot['rows'][number]
-
-function applySavedStoryRows(rows: StoryRow[], savedRows: Pick<StoryRow, 'id' | 'values' | 'changed'>[]): StoryRow[] {
-  const savedById = new Map(savedRows.map(row => [row.id, row]))
-  return rows.map(row => {
-    const saved = savedById.get(row.id)
-    return saved ? { ...row, values: saved.values, changed: saved.changed } : row
-  })
-}
 
 export function useStoryListDraft({ siteId, initial, initialFilters }: StoryListProps) {
   const [newsroomReady, setNewsroomReady] = useState(initial.newsroomReady)
@@ -164,7 +155,7 @@ export function useStoryListDraft({ siteId, initial, initialFilters }: StoryList
         entryRevision.current = result.entryRevision
         baseRows.current =
           'entries' in result && result.entries
-            ? applySavedStoryRows(baseRows.current, result.entries)
+            ? mergeSavedStoryRows(baseRows.current, result.entries)
             : baseRows.current.map(row =>
                 row.id === result.entryId ? { ...row, values: result.values, changed: result.changed } : row,
               )

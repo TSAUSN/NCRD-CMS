@@ -107,6 +107,17 @@ export function optimisticStoryList(
   return next
 }
 
+export function mergeSavedStoryRows(
+  rows: StoryListRow[],
+  savedRows: Pick<StoryListRow, 'id' | 'values' | 'changed'>[],
+): StoryListRow[] {
+  const savedById = new Map(savedRows.map(row => [row.id, row]))
+  return rows.map(row => {
+    const saved = savedById.get(row.id)
+    return saved ? { ...row, values: saved.values, changed: saved.changed } : row
+  })
+}
+
 export function storyListFilters(query: URLSearchParams): StoryListFilters {
   const status = query.get('status') ?? 'all'
   return {
