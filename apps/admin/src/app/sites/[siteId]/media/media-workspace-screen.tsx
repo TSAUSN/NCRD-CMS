@@ -211,6 +211,7 @@ export function MediaWorkspaceScreen({ model }: { model: MediaWorkspaceModel }) 
         browse={{
           native,
           loading,
+          selectionBusy: loading || working || metadataBusy,
           result,
           query,
           view,

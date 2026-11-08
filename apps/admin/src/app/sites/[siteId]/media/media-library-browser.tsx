@@ -22,6 +22,7 @@ export type MediaLibraryView = 'grid' | 'list'
 type Browse = {
   native: boolean
   loading: boolean
+  selectionBusy: boolean
   result: MediaLibraryResult
   query: MediaLibraryQuery
   view: MediaLibraryView
@@ -52,7 +53,8 @@ const FILTERS: Array<{ value: 'all' | MediaStatus; label: string }> = [
 
 /** Browse and select images. The workspace owns mutations and unsaved work. */
 export function MediaLibraryBrowser({ browse, actions }: { browse: Browse; actions: Actions }) {
-  const { native, loading, result, query, view, searchInput, foldersExpanded, selectedId, checkedIds } = browse
+  const { native, loading, selectionBusy, result, query, view, searchInput, foldersExpanded, selectedId, checkedIds } =
+    browse
   const {
     changeSearch,
     changeQuery,
@@ -165,7 +167,13 @@ export function MediaLibraryBrowser({ browse, actions }: { browse: Browse; actio
           <div className="media-results-head">
             <p role="status">{loading ? 'Loading…' : `${result.total} ${result.total === 1 ? 'result' : 'results'}`}</p>
             {result.assets.some(canEdit) && (
-              <Button variant="secondary" type="button" className="small secondary" onClick={selectPage}>
+              <Button
+                variant="secondary"
+                type="button"
+                className="small secondary"
+                disabled={selectionBusy}
+                onClick={selectPage}
+              >
                 Select this page
               </Button>
             )}
@@ -202,6 +210,7 @@ export function MediaLibraryBrowser({ browse, actions }: { browse: Browse; actio
                       <input
                         type="checkbox"
                         checked={checkedIds.has(asset.id)}
+                        disabled={selectionBusy}
                         onChange={() => toggleChecked(asset)}
                         aria-label={`Select ${asset.name}`}
                       />

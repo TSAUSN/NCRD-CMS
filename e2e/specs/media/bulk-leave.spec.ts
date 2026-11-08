@@ -141,8 +141,21 @@ test('bulk image organization preserves typed targets and waits for an exact nor
     await expect(page.locator('section.media-library')).toHaveAttribute('aria-busy', 'false')
     await select()
     await tags.fill('extra')
+    const libraryAddress = (url: URL) => url.pathname === '/api/sites/' + f.site + '/media'
+    const refreshing = new Promise<void>(resolve => {
+      release = resolve
+    })
+    await page.route(libraryAddress, async route => {
+      await refreshing
+      await route.continue()
+    })
     await bulk.getByRole('button', { name: 'Apply organization', exact: true }).click()
     await expect(bulk).toHaveCount(0)
+    const selectPage = page.getByRole('button', { name: 'Select this page', exact: true })
+    await expect(selectPage).toBeDisabled()
+    release()
+    await expect(selectPage).toBeEnabled()
+    await page.unroute(libraryAddress)
     await capture('saved-library')
     for (const row of await rows()) {
       expect(row.folder).toBe('Campaigns/Local')
