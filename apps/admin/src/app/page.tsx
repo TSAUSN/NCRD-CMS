@@ -17,7 +17,8 @@ import styles from '../components/workspace.module.css'
 import recordTableStyles from '../components/workspace-styles/record-table.module.css'
 import siteSummaryStyles from '../components/workspace-styles/site-summary.module.css'
 import { SiteCard } from '../components/site-card.tsx'
-import { IconSite, IconPage, IconCollection, IconCheck } from '../components/icons.tsx'
+import { ScopedHomeTasks } from '../components/scoped-home-tasks.tsx'
+import { IconSite, IconCheck } from '../components/icons.tsx'
 
 export const dynamic = 'force-dynamic'
 
@@ -51,15 +52,15 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
       : null
   const activeSites = sites.filter(site => site.status !== 'archived')
   const archivedSites = sites.filter(site => site.status === 'archived')
-  const query = await searchParams,
-    contentOnly =
-      !session.principal.isSuperAdmin &&
-      Boolean(
-        session.principal.memberships.size ||
-        session.principal.pageScopes?.size ||
-        session.principal.divisionScopes?.size,
-      ) &&
-      ![...session.principal.memberships.values()].some(value => value === 'site_admin')
+  const query = await searchParams
+  const contentOnly =
+    !session.principal.isSuperAdmin &&
+    Boolean(
+      session.principal.memberships.size ||
+      session.principal.pageScopes?.size ||
+      session.principal.divisionScopes?.size,
+    ) &&
+    ![...session.principal.memberships.values()].some(value => value === 'site_admin')
   if (contentOnly && activeSites.length) {
     const choices = [...activeSites].sort(
       (a, b) =>
@@ -71,8 +72,8 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
       const selected = await getSite(session.principal.userId, choice.id)
       if (selected?.original_design && query.site === selected.id) break
       if (!selected || selected.original_design) continue
-      const siteRole = session.principal.memberships.get(selected.id),
-        full = siteRole === 'editor' || siteRole === 'contributor'
+      const siteRole = session.principal.memberships.get(selected.id)
+      const full = siteRole === 'editor' || siteRole === 'contributor'
       let storyError = false
       const stories =
         full && selected.has_stories
@@ -126,11 +127,14 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
   const total = (counts: Map<string, number>) => [...counts.values()].reduce((sum, count) => sum + count, 0)
   const reviewCount = total(reviewCounts.pages) + total(reviewCounts.lists)
 
+  const sampleCounts = new Map<string, number>()
+  for (const page of pages)
+    if (page.live_samples) sampleCounts.set(page.site_id, (sampleCounts.get(page.site_id) ?? 0) + 1)
   const attention = activeSites
     .map(site => ({
       site,
       changed: Number(site.changed_count),
-      samples: pages.filter(page => page.site_id === site.id && page.live_samples).length,
+      samples: sampleCounts.get(site.id) ?? 0,
       reviews: (reviewCounts.pages.get(site.id) ?? 0) + (reviewCounts.lists.get(site.id) ?? 0),
     }))
     .filter(item => item.changed || item.samples || item.reviews)
@@ -145,13 +149,6 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
         <PageHeader
           title="Home"
           crumbs={[{ label: 'Home' }]}
-          actions={
-            session.principal.isSuperAdmin ? (
-              <Link className="btn navy" href="/sites/new">
-                Create a site
-              </Link>
-            ) : undefined
-          }
           lede={
             sites.length === 0
               ? 'Nobody has given you access to a site yet.'
@@ -161,101 +158,12 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
 
         {activeSites.length > 0 && (
           <div className={styles.stack}>
-            <section aria-labelledby="home-tasks">
-              <h2 id="home-tasks">What would you like to do?</h2>
-              <div className={styles.grid}>
-                {activeSites
-                  .slice(0, 4)
-                  .filter(
-                    site =>
-                      session.principal.isSuperAdmin ||
-                      session.principal.memberships.has(site.id) ||
-                      pages.some(page => page.site_id === site.id),
-                  )
-                  .map(site => {
-                    const scoped = !session.principal.isSuperAdmin && !session.principal.memberships.has(site.id)
-                    const home = pages.find(page => page.site_id === site.id && (scoped || page.slug === ''))
-                    const role = session.principal.memberships.get(site.id)
-                    return (
-                      <a
-                        key={site.id}
-                        className={siteSummaryStyles.task}
-                        href={home ? '/pages/' + home.id : '/sites/' + site.id}
-                      >
-                        <span className={siteSummaryStyles.taskIcon}>
-                          <IconPage size={18} />
-                        </span>
-                        <span className={recordTableStyles.meta}>
-                          {site.name} ·{' '}
-                          {scoped
-                            ? 'Your assigned pages'
-                            : role === 'contributor'
-                              ? 'Draft content'
-                              : role === 'editor'
-                                ? 'Edit and publish'
-                                : 'Manage site'}
-                        </span>
-                        <strong>
-                          {home ? 'Edit ' + (scoped ? home.title : site.name + ' home page') : 'Open ' + site.name}
-                        </strong>
-                        <span>Open the real page and click anything to edit.</span>
-                      </a>
-                    )
-                  })}
-                {activeSites
-                  .filter(site => session.principal.isSuperAdmin || session.principal.memberships.has(site.id))
-                  .slice(0, 2)
-                  .map(site => (
-                    <a
-                      key={'list' + site.id}
-                      className={siteSummaryStyles.task}
-                      href={'/sites/' + site.id + (site.has_stories ? '/stories' : '/content')}
-                    >
-                      <span className={siteSummaryStyles.taskIcon}>
-                        <IconCollection size={18} />
-                      </span>
-                      <span className={recordTableStyles.meta}>{site.name}</span>
-                      <strong>{site.has_stories ? 'Update stories' : 'Update lists'}</strong>
-                      <span>
-                        {site.has_stories
-                          ? 'Add and tag stories for sector pages and the newsroom.'
-                          : 'Keep speakers, sessions and resources up to date.'}
-                      </span>
-                    </a>
-                  ))}
-                {activeSites
-                  .filter(
-                    site =>
-                      !session.principal.isSuperAdmin &&
-                      !session.principal.memberships.has(site.id) &&
-                      ([...(session.principal.divisionScopes?.values() ?? [])].some(
-                        scope => scope.siteId === site.id,
-                      ) ||
-                        [...(session.principal.pageScopes?.values() ?? [])].some(
-                          scope => scope.siteId === site.id && scope.role === 'editor',
-                        )),
-                  )
-                  .map(site => (
-                    <a
-                      key={'chapters' + site.id}
-                      className={siteSummaryStyles.task}
-                      href={'/sites/' + site.id + '/chapters'}
-                    >
-                      <span className={recordTableStyles.meta}>{site.name}</span>
-                      <strong>Set up chapters</strong>
-                      <span>Choose page sections and invite chapter volunteers.</span>
-                    </a>
-                  ))}
-                {reviewCount > 0 && (
-                  <a className={siteSummaryStyles.task} href="/inbox">
-                    <strong>
-                      Review {reviewCount} {reviewCount === 1 ? 'submission' : 'submissions'}
-                    </strong>
-                    <span>Check the proposed changes before publishing.</span>
-                  </a>
-                )}
-              </div>
-            </section>
+            <ScopedHomeTasks
+              activeSites={activeSites}
+              pages={pages}
+              access={session.principal}
+              reviewCount={reviewCount}
+            />
             <Card title="Needs attention" density="compact">
               <ul className={siteSummaryStyles.rowList}>
                 {attention.map(({ site, changed, samples, reviews }) => (
@@ -301,20 +209,14 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
         )}
 
         {activeSites.length === 0 ? (
-          // Empty states teach: what the thing is, and what happens next
-          //. There is no primary action here on purpose — being given
-          // access is somebody else's action, and offering a button that cannot
-          // work is worse than saying so.
           <div className="empty-state">
             <div className="empty-icon">
               <IconSite size={22} />
             </div>
             <h2>{archivedSites.length ? 'No active sites' : 'No sites yet'}</h2>
             <p>
-              A site is one website you look after — its pages, its sections and its published address.{' '}
-              {session.principal.isSuperAdmin
-                ? 'Create your first site with a resource or event starter.'
-                : 'When somebody gives you access to one it appears here.'}
+              A site is one website you look after — its pages, its sections and its published address. When somebody
+              gives you access to one it appears here.
             </p>
           </div>
         ) : (
@@ -355,8 +257,6 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
             </div>
           </details>
         )}
-
-        {operations && <BackgroundJobs heartbeat={operations[0][0]} queue={operations[1]} />}
       </main>
     </AppShell>
   )
