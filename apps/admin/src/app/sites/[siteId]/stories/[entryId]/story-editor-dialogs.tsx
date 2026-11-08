@@ -147,7 +147,7 @@ export function LeaveStoryDialog({ model }: { model: StoryDraftModel }) {
               <Button variant="secondary" onClick={cancelLeave} disabled={pending}>
                 Keep editing
               </Button>
-              <Button variant="secondary" disabled={pending} onClick={finishLeave}>
+              <Button variant="secondary" disabled={pending} onClick={() => finishLeave()}>
                 Discard changes
               </Button>
               <Button loading={pending} disabled={uncertain} onClick={() => save('leave')}>

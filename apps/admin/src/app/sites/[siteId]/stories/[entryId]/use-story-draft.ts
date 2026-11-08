@@ -1,5 +1,5 @@
 import type { StoriesSettings } from '@cms/schema'
-import { useEffect, useRef, useState, useTransition } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { openGuardedDocument } from '../../../../../components/document-link.tsx'
 import type { StatusLabel } from '../../../../../components/ui/status-pill.tsx'
@@ -60,10 +60,11 @@ export function useStoryDraft({
     JSON.stringify(storyDraftInput(entry.values, catalog, configured, authorAvailable)),
   )
   const [revision, setRevision] = useState(initialRevision)
-  const [pending, start] = useTransition()
+  const [pending, setPending] = useState(false)
   const creationRequest = useRef(newDraft?.requestId)
   const [uncertain, setUncertain] = useState(false)
-  const [savedEditor, setSavedEditor] = useState<string>()
+  const [createdStory, setCreatedStory] = useState<{ href: string; leave: boolean }>()
+  const savedEditor = createdStory?.href
   const creationKind = useRef<StorySaveIntent>('save')
   const intentStarted = useRef(false)
   const [notice, setNotice] = useState('')
@@ -108,15 +109,17 @@ export function useStoryDraft({
   })
   // Wait for the save and leave guard to settle before opening the editor document.
   useEffect(() => {
-    if (savedEditor && !pending && !dirty) openGuardedDocument(savedEditor, { replace: true })
-  }, [savedEditor, pending, dirty])
+    if (!createdStory || pending || dirty) return
+    if (createdStory.leave) finishLeave(true)
+    else openGuardedDocument(createdStory.href, { replace: true })
+  }, [createdStory, pending, dirty, finishLeave])
 
   const disabled = !rights.editEntries || pending || uncertain || Boolean(recovery || savedEditor)
   const change = <K extends keyof StoryEditInput>(key: K, next: StoryEditInput[K]) => {
     setValue(current => ({ ...current, [key]: next }))
     setNotice('')
   }
-  const save = (kind: StorySaveIntent = 'save') => {
+  const save = async (kind: StorySaveIntent = 'save') => {
     if (inFlight.current || savedEditor) return
     if (recovery) {
       setRecoveryOpen(true)
@@ -146,104 +149,100 @@ export function useStoryDraft({
         ? 'Saving story draft…'
         : 'Saving draft and preparing its review. This can take up to a minute…',
     )
-    start(async () => {
-      try {
-        if (newDraft) {
-          const result = await addStory(site.id, collectionId, revision, newStoryInput(value), creationRequest.current!)
-          if (!result.ok) {
-            setUncertain(false)
-            setError(true)
-            setNotice(result.message)
-            return
-          }
-          setBaseline(JSON.stringify(value))
-          setUncertain(false)
-          if (kind === 'leave') {
-            finishLeave()
-            return
-          }
-          setNotice('Story draft saved. Opening it…')
-          setSavedEditor(
-            '/sites/' + site.id + '/stories/' + result.entryId + (kind === 'save' ? '' : '?intent=' + kind),
-          )
-          return
-        }
-        let saved = value
-        if (dirty) {
-          const result = await saveStory(site.id, collectionId, entry.id, revision, value)
-          if (!result.ok) {
-            setError(true)
-            setNotice(result.message)
-            if (result.conflict) router.refresh()
-            return
-          }
-          saved = storyDraftInput(result.values, catalog, configured, authorAvailable)
-          setValue(saved)
-          setBaseline(JSON.stringify(saved))
-          setRevision(result.revision)
-          setRefresh(n => n + 1)
-        }
-        if (kind === 'save' || kind === 'preview' || kind === 'leave') {
-          setNotice(
-            rights.publish
-              ? 'Story draft saved. Publish to update the site.'
-              : 'Story draft saved. Nothing is published.',
-          )
-          if (kind === 'preview') {
-            setPreviewLoaded(false)
-            setPreviewOpen(true)
-            setRefresh(n => n + 1)
-          }
-          if (kind === 'leave') {
-            finishLeave()
-          } else router.refresh()
-          return
-        }
-        if (kind === 'review') {
-          const result = await prepareStorySubmission(site.id, collectionId, entry.id)
-          if (!result.ok) {
-            setError(true)
-            setNotice(result.message)
-            return
-          }
-          setSubmission(result.prepared)
-          setSubmissionOpen(true)
-          setNotice('')
-          return
-        }
-        setNotice('Checking this story and its feed pages. Nothing is published yet…')
-        const signature = JSON.stringify(saved)
-        if (reviewRequest.current?.signature !== signature || reviewRequest.current.kind !== kind)
-          reviewRequest.current = { signature, kind, id: crypto.randomUUID() }
-        const result = await prepareStoryPublication(site.id, entry.id, reviewRequest.current.id)
+    setPending(true)
+    try {
+      if (newDraft) {
+        const result = await addStory(site.id, collectionId, revision, newStoryInput(value), creationRequest.current!)
         if (!result.ok) {
-          setFirstSiteReview('firstSiteReview' in result && result.firstSiteReview === true)
+          setUncertain(false)
           setError(true)
           setNotice(result.message)
           return
         }
-        router.push(
-          '/sites/' +
-            site.id +
-            '/publishing?release=' +
-            result.releaseId +
-            (kind === 'schedule' ? '&intent=schedule' : ''),
-        )
-      } catch {
-        setError(true)
-        if (newDraft) {
-          setUncertain(true)
-          setNotice(
-            'The draft result could not be confirmed. Your words are here. Retry draft save to check the saved result before making more changes.',
-          )
-        } else
-          setNotice(
-            'The result could not be confirmed. Your words are still here. Check the saved story or History before retrying.',
-          )
-      } finally {
-        inFlight.current = false
+        setBaseline(JSON.stringify(value))
+        setUncertain(false)
+        const href = '/sites/' + site.id + '/stories/' + result.entryId
+        const intent = kind === 'save' || kind === 'leave' ? '' : '?intent=' + kind
+        setNotice(kind === 'leave' ? 'Story draft saved. Leaving the editor…' : 'Story draft saved. Opening it…')
+        setCreatedStory({ href: href + intent, leave: kind === 'leave' })
+        return
       }
-    })
+      let saved = value
+      if (dirty) {
+        const result = await saveStory(site.id, collectionId, entry.id, revision, value)
+        if (!result.ok) {
+          setError(true)
+          setNotice(result.message)
+          if (result.conflict) router.refresh()
+          return
+        }
+        saved = storyDraftInput(result.values, catalog, configured, authorAvailable)
+        setValue(saved)
+        setBaseline(JSON.stringify(saved))
+        setRevision(result.revision)
+        setRefresh(n => n + 1)
+      }
+      if (kind === 'save' || kind === 'preview' || kind === 'leave') {
+        setNotice(
+          rights.publish
+            ? 'Story draft saved. Publish to update the site.'
+            : 'Story draft saved. Nothing is published.',
+        )
+        if (kind === 'preview') {
+          setPreviewLoaded(false)
+          setPreviewOpen(true)
+          setRefresh(n => n + 1)
+        }
+        if (kind === 'leave') {
+          finishLeave()
+        } else router.refresh()
+        return
+      }
+      if (kind === 'review') {
+        const result = await prepareStorySubmission(site.id, collectionId, entry.id)
+        if (!result.ok) {
+          setError(true)
+          setNotice(result.message)
+          return
+        }
+        setSubmission(result.prepared)
+        setSubmissionOpen(true)
+        setNotice('')
+        return
+      }
+      setNotice('Checking this story and its feed pages. Nothing is published yet…')
+      const signature = JSON.stringify(saved)
+      if (reviewRequest.current?.signature !== signature || reviewRequest.current.kind !== kind)
+        reviewRequest.current = { signature, kind, id: crypto.randomUUID() }
+      const result = await prepareStoryPublication(site.id, entry.id, reviewRequest.current.id)
+      if (!result.ok) {
+        setFirstSiteReview('firstSiteReview' in result && result.firstSiteReview === true)
+        setError(true)
+        setNotice(result.message)
+        return
+      }
+      router.push(
+        '/sites/' +
+          site.id +
+          '/publishing?release=' +
+          result.releaseId +
+          (kind === 'schedule' ? '&intent=schedule' : ''),
+      )
+    } catch {
+      setError(true)
+      if (newDraft) {
+        setUncertain(true)
+        setNotice(
+          'The draft result could not be confirmed. Your words are here. Retry draft save to check the saved result before making more changes.',
+        )
+      } else
+        setNotice(
+          'The result could not be confirmed. Your words are still here. Check the saved story or History before retrying.',
+        )
+    } finally {
+      inFlight.current = false
+      setPending(false)
+    }
   }
 
   useEffect(() => {
@@ -253,29 +252,29 @@ export function useStoryDraft({
       save(initialIntent)
     }
   }, [initialIntent])
-  const submitForReview = () => {
+  const submitForReview = async () => {
     if (!submission) return
     if (inFlight.current) return
     inFlight.current = true
     setError(false)
     setNotice('Sending this saved story for review…')
-    start(async () => {
-      try {
-        const result = await sendStorySubmission(site.id, collectionId, entry.id, submission, submissionNote)
-        if (!result.ok) {
-          setError(true)
-          setNotice(result.message)
-          return
-        }
-        setSubmissionOpen(false)
-        router.push('/inbox?review=' + result.submissionId)
-      } catch {
+    setPending(true)
+    try {
+      const result = await sendStorySubmission(site.id, collectionId, entry.id, submission, submissionNote)
+      if (!result.ok) {
         setError(true)
-        setNotice('The review result could not be confirmed. Retry to check the same request.')
-      } finally {
-        inFlight.current = false
+        setNotice(result.message)
+        return
       }
-    })
+      setSubmissionOpen(false)
+      router.push('/inbox?review=' + result.submissionId)
+    } catch {
+      setError(true)
+      setNotice('The review result could not be confirmed. Retry to check the same request.')
+    } finally {
+      inFlight.current = false
+      setPending(false)
+    }
   }
   return {
     catalog,

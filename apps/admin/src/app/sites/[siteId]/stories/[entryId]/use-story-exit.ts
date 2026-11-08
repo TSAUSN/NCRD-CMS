@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState, type RefObject } from 'react'
+import { useCallback, useEffect, useRef, useState, type RefObject } from 'react'
 import { useRouter } from 'next/navigation'
+import { openGuardedDocument } from '../../../../../components/document-link.tsx'
 import { useNavigationGuard } from '../../../../../components/navigation-guard.ts'
 
 export function useStoryExit({
@@ -16,13 +17,17 @@ export function useStoryExit({
   const router = useRouter()
   const [leaveOpen, setLeaveOpen] = useState(false)
   const leaveDestination = useRef<(() => void) | null>(null)
-  const finishLeave = () => {
-    const proceed = leaveDestination.current
-    leaveDestination.current = null
-    setLeaveOpen(false)
-    if (proceed) proceed()
-    else router.push(storiesPath)
-  }
+  const finishLeave = useCallback(
+    (asDocument = false) => {
+      const proceed = leaveDestination.current
+      leaveDestination.current = null
+      setLeaveOpen(false)
+      if (proceed) proceed()
+      else if (asDocument) openGuardedDocument(storiesPath, { replace: true })
+      else router.push(storiesPath)
+    },
+    [router, storiesPath],
+  )
   const cancelLeave = () => {
     leaveDestination.current = null
     setLeaveOpen(false)

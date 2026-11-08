@@ -60,9 +60,8 @@ export async function addStory(
     const created = await asUser({ userId: session.principal.userId, requestId: randomUUID() }, client =>
       createStoryDraft(client, siteId, collectionId, revision, input, requestId),
     )
-    revalidatePath('/sites/' + siteId + '/stories', 'layout')
-    revalidatePath('/sites/' + siteId + '/pages')
-    revalidatePath('/sites/' + siteId + '/content')
+    // First creation leaves the form for a fresh document. Refreshing the
+    // Stories layout here would also replace that form before it can leave.
     return { ok: true as const, ...created }
   } catch (error) {
     const domain = error instanceof DomainError ? error : fromSqlError(error)
