@@ -1,5 +1,4 @@
 'use client'
-import { contentCountsForPages } from '../../../../../lib/content-counts.ts'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import type { ThemeTokens } from '@cms/schema'
@@ -12,7 +11,7 @@ import recordTableStyles from '../../../../../components/workspace-styles/record
 import listInspectorStyles from '../../../../../components/workspace-styles/list-inspector.module.css'
 
 export function FontLibrary(props: FontLibraryProps) {
-  const { siteId, frame, chapter, liveHost } = props
+  const { siteId, initial, chapter, liveHost } = props
   const router = useRouter()
   const [review, setReview] = useState(false)
   const {
@@ -249,7 +248,7 @@ export function FontLibrary(props: FontLibraryProps) {
             The saved font choices affect every page on this site. Review the saved changes and checks before
             publishing.
           </p>
-          <p>{frame.contentSummary ?? contentCountsForPages(frame.pages)} use this site look.</p>
+          <p>{initial.contentSummary} use this site look.</p>
         </Dialog>
       )}
     </>

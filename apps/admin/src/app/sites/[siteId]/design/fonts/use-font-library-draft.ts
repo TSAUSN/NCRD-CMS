@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
-import { THEME_FONT_OPTIONS, type ThemeTokens, type NavTree } from '@cms/schema'
+import { THEME_FONT_OPTIONS, type ThemeTokens } from '@cms/schema'
 import { ADOBE_KIT_URL, PREVIEW_MESSAGE } from '@cms/renderer'
-import type { ThemeWorkspace, GlobalElementsWorkspace } from '../../../../../lib/queries.ts'
+import type { FontLibraryWorkspace } from '../../../../../server/queries/font-library.ts'
 import { useNavigationGuard } from '../../../../../components/navigation-guard.ts'
 import { saveThemeDraft } from '../../../../actions/site-look.ts'
 import type { ActionResult } from '../../../../../lib/action-result.ts'
@@ -13,18 +13,16 @@ const bodyOptions = THEME_FONT_OPTIONS.filter(font => font.label.includes('Proxi
 
 export type FontLibraryProps = {
   siteId: string
-  theme: ThemeWorkspace
-  frame: GlobalElementsWorkspace
-  menu: NavTree
+  initial: FontLibraryWorkspace
   chapter: boolean
   origin: string | null
   liveHost: string | null
 }
 
-export function useFontLibraryDraft({ siteId, theme, frame, menu, chapter, origin }: FontLibraryProps) {
-  const [tokens, setTokens] = useState<ThemeTokens>(() => structuredClone(theme.draft))
-  const [saved, setSaved] = useState(JSON.stringify(theme.draft))
-  const [revision, setRevision] = useState(theme.revision)
+export function useFontLibraryDraft({ siteId, initial, chapter, origin }: FontLibraryProps) {
+  const [tokens, setTokens] = useState<ThemeTokens>(() => structuredClone(initial.draft))
+  const [saved, setSaved] = useState(JSON.stringify(initial.draft))
+  const [revision, setRevision] = useState(initial.revision)
   const [kit, setKit] = useState(ADOBE_KIT_URL)
   const [error, setError] = useState('')
   const [notice, setNotice] = useState<ActionResult | null>(null)
@@ -36,7 +34,7 @@ export function useFontLibraryDraft({ siteId, theme, frame, menu, chapter, origi
   const newestFrame = useRef<HTMLIFrameElement>(null)
   const connected = tokens.fonts.adobeKit?.enabled === true
   const dirty = JSON.stringify(tokens) !== saved || kit !== ADOBE_KIT_URL
-  const page = frame.pages.find(page => page.published) ?? frame.pages[0]
+  const { page, header, footer, menu } = initial
   const host = origin ? new URL(origin).hostname : null
   const canvas = useSiteLookCanvas({
     purpose: 'fonts',
@@ -44,7 +42,7 @@ export function useFontLibraryDraft({ siteId, theme, frame, menu, chapter, origi
     siteId,
     pageId: page?.id ?? '',
     versionId: page?.versionId ?? '',
-    look: connected ? { tokens, header: frame.header.draft, footer: frame.footer.draft, menu } : null,
+    look: connected ? { tokens, header, footer, menu } : null,
     retry,
   })
   useNavigationGuard(() => ({

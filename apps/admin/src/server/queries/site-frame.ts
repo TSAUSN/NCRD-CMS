@@ -1,7 +1,7 @@
 import { contentCounts } from '../../lib/content-counts.ts'
 import 'server-only'
 import { asUser } from '@cms/platform'
-import { ORDINARY_PAGE_SQL } from '../../lib/site-summary.ts'
+import { ORDINARY_PAGE_SQL, SITE_CONTENT_COUNTS_SQL } from '../../lib/site-summary.ts'
 import {
   SiteFileBundle,
   DEFAULT_HEADER_CONFIG,
@@ -64,10 +64,7 @@ export function getGlobalElementsWorkspace(userId: string, siteId: string): Prom
   return asUser({ userId }, async client => {
     const site = (
       await client.query<{ name: string; page_count: number; story_count: number }>(
-        `SELECT s.name,
-        (SELECT count(*)::int FROM pages p WHERE p.site_id=s.id AND p.archived_at IS NULL AND ${ORDINARY_PAGE_SQL}) AS page_count,
-        (SELECT count(*)::int FROM collections sc JOIN collection_entries se ON se.collection_id=sc.id WHERE sc.site_id=s.id AND sc.reader_key='stories' AND se.archived_at IS NULL) AS story_count
-       FROM sites s WHERE s.id=$1`,
+        `SELECT s.name, ${SITE_CONTENT_COUNTS_SQL} FROM sites s WHERE s.id=$1`,
         [siteId],
       )
     ).rows[0]

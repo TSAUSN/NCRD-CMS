@@ -13,6 +13,12 @@ export const ORDINARY_PAGE_SQL = `p.slug NOT LIKE 'stories/%' AND NOT EXISTS (
     AND sv.values->>'story_url'=CASE WHEN p.slug='' THEN '/' ELSE '/'||p.slug END
 )`
 
+/** Counts used when previewing a site's shared design. The outer site is s. */
+export const SITE_CONTENT_COUNTS_SQL = `(SELECT count(*)::int FROM pages p
+  WHERE p.site_id=s.id AND p.archived_at IS NULL AND ${ORDINARY_PAGE_SQL}) AS page_count,
+  (SELECT count(*)::int FROM collections sc JOIN collection_entries se ON se.collection_id=sc.id
+    WHERE sc.site_id=s.id AND sc.reader_key='stories' AND se.archived_at IS NULL) AS story_count`
+
 /** Older restored records can have the archive time without the matching status. */
 export const ACTIVE_SITE_SQL = "s.status <> 'archived' AND s.archived_at IS NULL"
 export const SITE_STATUS_SQL = "CASE WHEN s.archived_at IS NOT NULL THEN 'archived' ELSE s.status END"
