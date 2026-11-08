@@ -9,22 +9,14 @@ import { isEchelonTemplatePage, ECHELON_PAGE_CSS } from '../echelon-page.ts'
 import { ECHELON_DIRECTORY_CSS } from '../echelon-directory-presentation.ts'
 import { ECHELON_BODY_CSS, ECHELON_STORY_CARDS_CSS, ECHELON_SECTION_LINK_CSS } from '../echelon-body-presentation.ts'
 import { ECHELON_PRESENTATION_CSS } from '../echelon-presentation.ts'
-import { siteSocialAccounts, SITE_SOCIAL_LABELS, SitePublicSettings } from '@cms/schema'
-import { inheritFooterLogo } from '../frame-logo.ts'
+import { SitePublicSettings } from '@cms/schema'
 import { HERO_SLIDES_CSS } from '../hero-slides.ts'
 import { adobeKitLink } from '../adobe-fonts.ts'
 import { CORE_SECTION_LAYOUT_CSS } from '../national-panels.ts'
 import { SITE_WIDGET_CSS } from '../site-widgets.ts'
 import { renderSiteFiles } from '../site-files.ts'
-import { renderOriginalNavigation } from '../original-navigation.ts'
-import {
-  originalLayout,
-  originalDefinition,
-  originalTemplateHeader,
-  documentAttributes,
-  themeCssWithinSections,
-} from '../original-layout.ts'
-import { siteWidget, type FooterConfigV2 } from '@cms/schema'
+import { originalLayout, originalDefinition, documentAttributes, themeCssWithinSections } from '../original-layout.ts'
+import { siteWidget } from '@cms/schema'
 import { resolveCanonical, type CanonicalDecision } from '../canonical.ts'
 import { escapeAttribute, escapeText, safeUrl } from '../escape.ts'
 import { renderSiteFontCss } from '../site-fonts.ts'
@@ -32,22 +24,12 @@ import { fixedRuntimeTag } from '../fixed-runtime-files.ts'
 import { PREVIEW_RUNTIME, PREVIEW_STYLES } from '../preview-runtime.ts'
 import { buttonAppearanceCss } from '../button-appearance.ts'
 import { applyRegistrationAvailability } from '../registration.ts'
-import { REVIEWED_ORIGINAL_NAVIGATION, type RenderManifest, type SiteShell, type RenderOptions } from '../types.ts'
+import { type RenderManifest, type SiteShell, type RenderOptions } from '../types.ts'
 import { renderSection } from '../section/render-section.ts'
 import { collectCss } from '../section/stylesheet.ts'
 import { themeCss } from '../theme/theme-css.ts'
-import {
-  renderNavigation,
-  parsedHeaderConfig,
-  parsedFooterConfig,
-  renderFrameComponent,
-  frameComponentCss,
-  renderConfiguredHeader,
-  renderBaselineHeader,
-  renderConfiguredFooter,
-  renderBaselineFooter,
-  globalElementsCss,
-} from '../frame/site-frame.ts'
+import { globalElementsCss } from '../frame/site-frame.ts'
+import { renderPageFrame } from './render-page-frame.ts'
 
 export type PageDocument = {
   html: string
@@ -67,10 +49,6 @@ export type PageDocument = {
   canonical: CanonicalDecision
 }
 
-/**
- * A complete HTML document with no client JavaScript required for its content,
- * navigation, metadata, or primary interaction.
- */
 /** Social crawlers require an absolute image URL; staging uses the live canonical origin. */
 function socialImageUrl(value: string | undefined, canonical: string): string {
   const address = value?.trim()
@@ -85,6 +63,7 @@ function socialImageUrl(value: string | undefined, canonical: string): string {
   }
 }
 
+/** Render the complete public or preview document from the same page and site data. */
 export function renderPage(input: {
   manifest: RenderManifest
   shell: SiteShell
@@ -95,19 +74,12 @@ export function renderPage(input: {
   const { manifest, shell, isStaging } = input
   const options = input.options ?? {}
 
-  const original = originalLayout(shell.site_files, manifest.page.id),
-    parsedSettings = !original ? SitePublicSettings.safeParse(shell.settings) : null,
-    siteSettings = parsedSettings?.success ? parsedSettings.data : undefined
+  const original = originalLayout(shell.site_files, manifest.page.id)
+  const parsedSettings = !original ? SitePublicSettings.safeParse(shell.settings) : null
+  const siteSettings = parsedSettings?.success ? parsedSettings.data : undefined
   const title = manifest.meta.title?.trim() || manifest.page.title
   const description = manifest.meta.description?.trim() || siteSettings?.general?.description || ''
-  // Canonical and og:url name *which document this is*, so they get their own
-  // policy rather than the general URL one (canonical.ts). `safeUrl` answers a
-  // question about schemes and passes any absolute https URL, which is not the
-  // question a canonical link asks: `https://evil.test/x` is well-formed, and
-  // publishing it asks every search engine to credit another host with this
-  // page. The verified `canonical_host` wins over the origin actually serving
-  // the response, which is what makes a staging page name its live address
-  // instead of the staging one it is about to stop having.
+  // A verified live host remains canonical even on staging.
   const canonicalDecision = resolveCanonical({
     authored: manifest.meta.canonical,
     verifiedHost: shell.canonical_host,
@@ -149,8 +121,9 @@ export function renderPage(input: {
       pagePath: manifest.page.path,
     },
   }
-  const chapterPage = isReviewedChapterComposition(manifest.sections.map(section => section.instance))
-  const chapterLinks = chapterPage ? chapterJumpValues(manifest.sections.map(section => section.instance)) : null
+  const sectionInstances = pageOptions.reportLinkSections
+  const chapterPage = isReviewedChapterComposition(sectionInstances)
+  const chapterLinks = chapterPage ? chapterJumpValues(sectionInstances) : null
   const renderedSections = manifest.sections.map((section, index) =>
     renderSection(
       chapterLinks && section.def.slug === 'core-echelon-jump-links'
@@ -165,107 +138,8 @@ export function renderPage(input: {
     : reportIndex
       ? '<div class="cms-report-index-card">' + renderedSections.join('') + '</div>'
       : renderedSections.join('')
-  const navigationPaths = input.navigationPaths ?? {}
-  // The public renderer does not trust a JSON column's asserted shape. A valid
-  // v1 config opts into the governed global element; absent, legacy, or corrupt
-  // content keeps the exact baseline shell that existed before global elements
-  // rather than hiding a site's navigation or footer because a draft was bad.
-  const headerConfig = parsedHeaderConfig(shell.header)
-  const footerConfig = parsedFooterConfig(shell.footer)
-  const siteNavigation = renderNavigation(
-    shell.navigation ?? [],
-    pageId => navigationPaths[pageId] ?? null,
-    0,
-    manifest.page.path,
-    options.preview === true,
-  )
-  const frameOptions = {
-    ...pageOptions,
-    preview: false,
-    showHiddenSections: false,
-    siteNavigation,
-    [REVIEWED_ORIGINAL_NAVIGATION]: original
-      ? renderOriginalNavigation(
-          shell.navigation ?? [],
-          id => navigationPaths[id] ?? null,
-          manifest.page.path,
-          options.preview === true,
-        )
-      : undefined,
-  }
-  const markFrame = options.preview === true
-  const authoredHeader =
-    headerConfig?.schemaVersion === 2
-      ? renderFrameComponent('header', headerConfig, shell.header_component, frameOptions, markFrame)
-      : null
-  const footerWithLogo =
-    footerConfig?.schemaVersion === 2 && shell.footer_component
-      ? inheritFooterLogo(footerConfig, shell.footer_component.slots ?? [], headerConfig, shell.header_component?.slots)
-      : footerConfig
-  const authoredFooter =
-    footerConfig?.schemaVersion === 2
-      ? renderFrameComponent(
-          'footer',
-          footerWithLogo as FooterConfigV2,
-          shell.footer_component,
-          frameOptions,
-          markFrame,
-        )
-      : null
-  const presetHeader = headerConfig?.schemaVersion === 1 ? headerConfig : null
-  const accounts = !original ? siteSocialAccounts(shell.settings) : undefined
-  const presetFooter =
-    footerConfig?.schemaVersion === 1
-      ? accounts
-        ? {
-            ...footerConfig,
-            social: accounts.filter(row => row.inFooter && row.url).map(({ service, url }) => ({ service, url })),
-          }
-        : footerConfig
-      : null
-  let renderedHeader =
-    authoredHeader ??
-    (presetHeader === null
-      ? renderBaselineHeader(shell.site?.name ?? '', shell.navigation ?? [], navigationPaths, markFrame)
-      : renderConfiguredHeader(
-          presetHeader,
-          shell.site?.name ?? '',
-          shell.navigation ?? [],
-          navigationPaths,
-          markFrame,
-        ))
-  let renderedFooter =
-    authoredFooter ??
-    (presetFooter === null
-      ? renderBaselineFooter(shell.site?.name ?? '')
-      : renderConfiguredFooter(presetFooter, shell.site?.name ?? '', navigationPaths))
-  if (accounts && (authoredFooter !== null || presetFooter === null) && footerConfig?.enabled !== false) {
-    const links = accounts
-      .filter(row => row.inFooter && row.url)
-      .map(row => '<li><a href="' + escapeAttribute(row.url) + '">' + SITE_SOCIAL_LABELS[row.service] + '</a></li>')
-      .join('')
-    if (links)
-      renderedFooter = renderedFooter.replace(
-        /<\/footer>$/,
-        () => '<nav class="cms-global-footer-social" aria-label="Social media"><ul>' + links + '</ul></nav></footer>',
-      )
-  }
-  if (markFrame) {
-    if (authoredHeader === null) renderedHeader = renderedHeader.replace('<header ', '<header data-cms-frame="header" ')
-    if (authoredFooter === null) renderedFooter = renderedFooter.replace('<footer ', '<footer data-cms-frame="footer" ')
-  }
-  const newOriginalPage = Boolean(
-    original && !original.layout.pages.some(page => page.pageId.toLowerCase() === manifest.page.id.toLowerCase()),
-  )
-  const templateHeader =
-    newOriginalPage && authoredHeader !== null && original?.page.header !== false && !options.sectionOnly
-      ? originalTemplateHeader(renderedHeader)
-      : null
-  if (templateHeader) renderedHeader = templateHeader.html
-  const frameCss = frameComponentCss([
-    authoredHeader === null ? null : (shell.header_component ?? null),
-    authoredFooter === null ? null : (shell.footer_component ?? null),
-  ])
+  const { renderedHeader, renderedFooter, frameCss, templateHeader, presetHeader, presetFooter, footerSocialCss } =
+    renderPageFrame({ page: manifest.page, shell, pageOptions, original, navigationPaths: input.navigationPaths ?? {} })
 
   const siteFiles = options.sectionOnly
     ? { head: '', bodyStart: '', bodyEnd: '' }
@@ -320,7 +194,7 @@ export function renderPage(input: {
       '<meta property="og:type" content="website">',
       sharingImage ? `<meta property="og:image" content="${escapeAttribute(sharingImage)}">` : '',
       `<style>${renderSiteFontCss(manifest.fonts)}${ownedTheme}${globalElementsCss(presetHeader, presetFooter)}${frameCss}${templateHeader?.css ?? ''}${collectCss(manifest.sections)}${!original ? CORE_SECTION_LAYOUT_CSS : ''}` +
-        `${accounts?.some(row => row.inFooter && row.url) && (authoredFooter !== null || presetFooter === null) ? '.cms-frame--footer .cms-global-footer-social ul{display:flex;flex-wrap:wrap;justify-content:center;gap:1rem;list-style:none;padding:0}.cms-frame--footer .cms-global-footer-social a{display:inline-flex;min-height:2.75rem;align-items:center;color:inherit;text-underline-offset:.2em}.cms-frame--footer .cms-global-footer-social a:focus-visible{outline:2px solid currentColor;outline-offset:2px}' : ''}${ownedAppearance}${!original && features.dataSource ? '.cms-data-source{display:block;font-size:.75rem;font-family:var(--font-body);font-weight:400;line-height:1.5;margin-top:.5rem}' : ''}${!original && features.echelonStyles ? ECHELON_PRESENTATION_CSS : ''}${!original && features.echelonTemplate ? ECHELON_BODY_CSS + ECHELON_STORY_CARDS_CSS + ECHELON_SECTION_LINK_CSS : ''}${features.chapterDirectory ? ECHELON_DIRECTORY_CSS : ''}${echelonPage ? ECHELON_PAGE_CSS : ''}${reportPage ? REPORT_PAGE_CSS : ''}${!original && features.reportText ? REPORT_TEXT_CSS : ''}${reportRows ? REPORT_INDEX_CSS : ''}${features.heroSlides ? HERO_SLIDES_CSS : ''}${features.siteWidget ? SITE_WIDGET_CSS : ''}${options.preview ? PREVIEW_STYLES : ''}</style>`,
+        `${footerSocialCss}${ownedAppearance}${!original && features.dataSource ? '.cms-data-source{display:block;font-size:.75rem;font-family:var(--font-body);font-weight:400;line-height:1.5;margin-top:.5rem}' : ''}${!original && features.echelonStyles ? ECHELON_PRESENTATION_CSS : ''}${!original && features.echelonTemplate ? ECHELON_BODY_CSS + ECHELON_STORY_CARDS_CSS + ECHELON_SECTION_LINK_CSS : ''}${features.chapterDirectory ? ECHELON_DIRECTORY_CSS : ''}${echelonPage ? ECHELON_PAGE_CSS : ''}${reportPage ? REPORT_PAGE_CSS : ''}${!original && features.reportText ? REPORT_TEXT_CSS : ''}${reportRows ? REPORT_INDEX_CSS : ''}${features.heroSlides ? HERO_SLIDES_CSS : ''}${features.siteWidget ? SITE_WIDGET_CSS : ''}${options.preview ? PREVIEW_STYLES : ''}</style>`,
     ]
       .filter(Boolean)
       .join('') + siteFiles.head
