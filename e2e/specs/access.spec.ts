@@ -106,7 +106,7 @@ test.describe('capability tiers', () => {
 
 test('contributors are not offered page creation', async ({ page }) => {
   await signIn(page, 'contributor@example.test')
-  await page.getByRole('link', { name: 'Demo site', exact: true }).click()
+  await page.getByRole('main').getByRole('link', { name: 'Demo site', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Pages' })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Add a page' })).toHaveCount(0)
 })
@@ -114,7 +114,7 @@ test('contributors are not offered page creation', async ({ page }) => {
 test.describe('route protection', () => {
   test('a page URL is not reachable without a session', async ({ page }) => {
     await signIn(page, 'editor@example.test')
-    await page.getByRole('link', { name: 'Demo site', exact: true }).click()
+    await page.getByRole('main').getByRole('link', { name: 'Demo site', exact: true }).click()
     await page.getByRole('link', { name: 'A page served by cms-v2', exact: true }).click()
     await expect(page).toHaveURL(/\/pages\/[0-9a-f-]+$/)
     const url = page.url()

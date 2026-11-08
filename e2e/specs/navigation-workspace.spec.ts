@@ -3,7 +3,7 @@ import { fetchPublic, signIn, STAGING_ORIGIN } from './helpers.ts'
 
 async function openNavigation(page: import('@playwright/test').Page, email = 'editor@example.test') {
   await signIn(page, email)
-  await page.getByRole('link', { name: 'Demo site', exact: true }).click()
+  await page.getByRole('main').getByRole('link', { name: 'Demo site', exact: true }).click()
   await expect(page).toHaveURL(/\/sites\/[0-9a-f-]+$/)
   // Historical links remain usable. New menu editing is covered on the real
   // site canvas in r8-site-look; this keeps the old route's security and draft

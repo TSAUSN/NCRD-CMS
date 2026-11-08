@@ -4,7 +4,7 @@ import { canvas, saveDraft, signIn, treeLabels } from './helpers.ts'
 test.describe('same-site link chooser', () => {
   test('chooses published pages, preserves manual addresses, and excludes drafts', async ({ page }) => {
     await signIn(page, 'editor@example.test')
-    await page.getByRole('link', { name: 'Demo site', exact: true }).click()
+    await page.getByRole('main').getByRole('link', { name: 'Demo site', exact: true }).click()
 
     const draftTitle = `Unpublished destination ${Date.now()}`
     await page.getByRole('button', { name: 'Add a page' }).click()
@@ -13,7 +13,7 @@ test.describe('same-site link chooser', () => {
     await draft.getByRole('button', { name: 'Create draft', exact: true }).click()
     await expect(page.getByRole('complementary', { name: 'Page structure' })).toBeVisible()
 
-    await page.getByRole('link', { name: 'Demo site', exact: true }).click()
+    await page.getByRole('banner').getByRole('link', { name: 'Demo site', exact: true }).click()
     await page.getByRole('link', { name: 'A page served by cms-v2', exact: true }).click()
     await treeLabels(page).filter({ hasText: 'Call to action' }).click()
 

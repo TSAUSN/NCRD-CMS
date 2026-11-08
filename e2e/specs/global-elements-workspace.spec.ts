@@ -3,7 +3,7 @@ import { fetchPublic, signIn, STAGING_ORIGIN } from './helpers.ts'
 
 async function openGlobalElements(page: Page, email = 'editor@example.test') {
   await signIn(page, email)
-  await page.getByRole('link', { name: 'Demo site', exact: true }).click()
+  await page.getByRole('main').getByRole('link', { name: 'Demo site', exact: true }).click()
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Demo site')
   if ((page.viewportSize()?.width ?? 1280) <= 960) {
     const opener = page.getByRole('button', { name: 'Open navigation' })

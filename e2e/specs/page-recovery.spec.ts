@@ -40,7 +40,7 @@ async function fixture(page: Page) {
     await client.end()
   }
   await signIn(page, 'editor@example.test')
-  await page.getByRole('link', { name: 'Demo site', exact: true }).click()
+  await page.getByRole('main').getByRole('link', { name: 'Demo site', exact: true }).click()
   await page.getByRole('link', { name, exact: true }).click()
   await expect(page).toHaveURL(new RegExp(`/pages/${pageId}$`))
   await expect(recoveryStatus(page)).toHaveText('Ready')
@@ -391,7 +391,7 @@ test('unavailable browser storage and history support do not claim a durable rec
   })
   // This case deliberately cannot use fixture's Ready assertion.
   await signIn(page, 'editor@example.test')
-  await page.getByRole('link', { name: 'Demo site', exact: true }).click()
+  await page.getByRole('main').getByRole('link', { name: 'Demo site', exact: true }).click()
   await page.getByRole('link', { name: 'A page served by cms-v2', exact: true }).click()
   await expect(recoveryStatus(page)).toHaveText('Unavailable')
   await expect(page.getByRole('alert').filter({ hasText: 'Browser recovery is unavailable' })).toBeVisible()

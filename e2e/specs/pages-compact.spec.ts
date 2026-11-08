@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test'
 import { signIn } from './helpers.ts'
 test('Pages keeps actions together and filters its Main pages and Drafts groups', async ({ page }) => {
   await signIn(page, 'editor@example.test')
-  const base = await page.getByRole('link', { name: 'Demo site', exact: true }).getAttribute('href')
+  const base = await page.getByRole('main').getByRole('link', { name: 'Demo site', exact: true }).getAttribute('href')
   await page.goto(base + '/pages')
   const rows = page.getByRole('table', { name: 'Pages', exact: true }).locator('tbody tr')
   const count = await rows.count()

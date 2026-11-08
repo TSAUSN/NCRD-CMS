@@ -19,7 +19,7 @@ async function captureHistory(page: Page) {
 
 async function createPage(page: Page) {
   await signIn(page, 'editor@example.test')
-  await page.getByRole('link', { name: 'Demo site', exact: true }).click()
+  await page.getByRole('main').getByRole('link', { name: 'Demo site', exact: true }).click()
   // App-router links settle asynchronously; a click completing does not mean
   // page.url() has moved off the dashboard yet. Capture only the settled route.
   await expect(page).toHaveURL(/\/sites\/[0-9a-f-]+$/)

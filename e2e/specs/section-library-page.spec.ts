@@ -5,7 +5,7 @@ import { signIn } from './helpers.ts'
 // apply as they change and stay in the address, above three columns of cards.
 test('filters the section library as choices change, keeps them in the address and clears them', async ({ page }) => {
   await signIn(page, 'editor@example.test')
-  await page.getByRole('link', { name: 'Demo site', exact: true }).click()
+  await page.getByRole('main').getByRole('link', { name: 'Demo site', exact: true }).click()
   await expect(page).toHaveURL(/\/sites\/[0-9a-f-]+$/)
   const library = `${page.url()}/sections`
   await page.goto(library)

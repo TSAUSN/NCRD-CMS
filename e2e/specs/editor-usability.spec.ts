@@ -95,7 +95,7 @@ test('only the bound canvas can change editor content through preview messages',
 
 test('workspace errors preserve percent characters without crashing the page', async ({ page }) => {
   await signIn(page, 'editor@example.test')
-  await page.getByRole('link', { name: 'Demo site', exact: true }).click()
+  await page.getByRole('main').getByRole('link', { name: 'Demo site', exact: true }).click()
   await expect(page).toHaveURL(/\/sites\/[0-9a-f-]+$/)
   const workspace = new URL(page.url())
   workspace.searchParams.set('error', 'Upload is 100% complete; retry %2F if needed.')

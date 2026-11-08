@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { clickOnCanvas, openSeededPage, signIn, savedState, typeInInspector } from './helpers.ts'
+import { canvas, clickOnCanvas, openSeededPage, signIn, savedState, typeInInspector } from './helpers.ts'
 
 test('an outdated editor stops retrying, protects publish and schedule, and recovers its unsaved draft after reload', async ({
   page,
@@ -37,6 +37,9 @@ test('an outdated editor stops retrying, protects publish and schedule, and reco
   const recovery = page.getByRole('dialog', { name: 'Review browser recovery', exact: true })
   await expect(recovery.getByText('Draft retained across an update', { exact: true })).toBeVisible()
   await recovery.getByRole('button', { name: 'Apply browser copy', exact: true }).click()
+  await expect(
+    canvas(page).getByRole('heading', { name: 'Draft retained across an update', exact: true }),
+  ).toBeVisible()
   await clickOnCanvas(page, 'heading')
   await expect(page.locator('#slot-0-heading')).toHaveValue('Draft retained across an update')
   await page.getByRole('button', { name: 'Save draft', exact: true }).click()

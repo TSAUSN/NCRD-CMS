@@ -91,7 +91,7 @@ test('coordinated recovery restores earlier live content and preserves a later d
   test.setTimeout(90_000)
   page.setDefaultTimeout(10_000)
   await signIn(page, 'editor@example.test')
-  await page.getByRole('link', { name: 'Demo site', exact: true }).click()
+  await page.getByRole('main').getByRole('link', { name: 'Demo site', exact: true }).click()
   await expect(page).toHaveURL(/\/sites\/[0-9a-f-]+$/)
   const siteUrl = page.url(),
     slug = `recover-page-${Date.now()}`,
