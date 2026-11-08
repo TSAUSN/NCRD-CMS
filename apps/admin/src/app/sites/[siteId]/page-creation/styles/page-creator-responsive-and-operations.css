@@ -137,15 +137,9 @@
   .navlink-button {
     padding-block: 0.7rem;
   }
-  .row-actions .btn {
-    min-height: 2.5rem;
-  }
 }
 
 @media (max-width: 48rem) {
-  .bar-word {
-    display: none;
-  }
   .wrap {
     padding: 1.25rem 1rem 4rem;
   }
@@ -155,24 +149,13 @@
   .bar {
     padding: 0 0.85rem;
   }
-  .bar-user .who {
-    display: none;
-  }
   .row {
     padding: 0.75rem 0.85rem;
     gap: 0.6rem;
   }
-  .row-actions {
-    width: 100%;
-    justify-content: flex-end;
-  }
   .grid,
   .grid-cards {
     grid-template-columns: 1fr;
-  }
-  .overview-strip {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.6rem;
   }
   .page-grid {
     grid-template-columns: 1fr;

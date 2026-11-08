@@ -1,26 +1,3 @@
-.record-key-field label {
-  font-size: 0.75rem;
-  font-weight: 650;
-}
-.record-key-field input {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-}
-.record-key-field small {
-  grid-column: 2;
-  color: var(--ink-3);
-  font-size: 0.68rem;
-}
-.record-fields {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem 1.1rem;
-  padding-top: 1rem;
-}
-.record-fields .collection-field:has(textarea),
-.record-fields .collection-check {
-  grid-column: 1 / -1;
-}
 .collection-field > small {
   color: var(--ink-3);
 }
@@ -28,32 +5,6 @@
 .collection-field.has-error textarea,
 .collection-field.has-error select {
   border-color: var(--danger-line);
-}
-.collection-check {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.65rem;
-  padding: 0.75rem;
-  background: var(--surface-2);
-  border: var(--line-thin) solid var(--line);
-  border-radius: var(--r);
-}
-.collection-check input {
-  margin-top: 0.2rem;
-}
-.collection-check span {
-  display: grid;
-}
-.collection-check small {
-  color: var(--ink-3);
-}
-.record-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.5rem;
-  margin-top: 1rem;
-  padding-top: 0.85rem;
-  border-top: var(--line-thin) solid var(--line-soft);
 }
 .collection-image-field {
   border: var(--line-thin) solid var(--line);
@@ -92,8 +43,7 @@
   font-size: 0.75rem;
 }
 
-.collection-empty,
-.collection-welcome {
+.collection-empty {
   min-height: 28rem;
   padding: 4rem 2rem;
   display: grid;
@@ -101,8 +51,7 @@
   align-content: center;
   text-align: center;
 }
-.collection-empty > span,
-.collection-welcome > span {
+.collection-empty > span {
   width: 3.25rem;
   height: 3.25rem;
   display: grid;
@@ -111,31 +60,16 @@
   background: var(--navy-tint);
   color: var(--navy-700);
 }
-.collection-empty h3,
-.collection-welcome h2 {
+.collection-empty h3 {
   margin: 0.7rem 0 0.25rem;
 }
-.collection-empty p,
-.collection-welcome > p:last-of-type {
+.collection-empty p {
   color: var(--ink-3);
   max-width: 34rem;
 }
 .collection-empty.compact {
   min-height: 16rem;
   padding: 2rem;
-}
-
-.collection-dialog-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 120;
-  display: grid;
-  place-items: center;
-  padding: 2rem;
-  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
-  background: rgba(0, 22, 64, 0.56);
-  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
-  backdrop-filter: blur(3px);
 }
 .collection-dialog {
   width: min(38rem, 100%);

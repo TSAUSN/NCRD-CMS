@@ -36,8 +36,7 @@ body {
   outline-offset: var(--line-focus);
   border-radius: var(--r-xs);
 }
-.bar :focus-visible,
-.overlay-dialog .overlay-head :focus-visible {
+.bar :focus-visible {
   /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
   outline-color: #fff;
 }
@@ -137,9 +136,6 @@ code.mono {
   padding: 0.08em 0.3em;
   border-radius: var(--r-xs);
   border: var(--line-thin) solid var(--line-soft);
-}
-.tnum {
-  font-variant-numeric: tabular-nums;
 }
 
 /* An eyebrow: the small capitalised label that names a group. Above a

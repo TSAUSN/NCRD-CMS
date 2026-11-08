@@ -121,7 +121,6 @@
   /* -- the mark ---------------------------------------------------------- */
 
   /* -- navigation -------------------------------------------------------- */
-  --nav-bg-deep: var(--sa-navy-deep);
 
   /* -- app bar (the editor keeps one) ------------------------------------ */
 
@@ -133,8 +132,6 @@
   /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
   --r-pill: 999px;
   --bar-h: 3.5rem;
-  --pane-tree-w: 17.5rem;
-  --pane-inspector-w: 22.5rem;
 
   /* -- elevation --------------------------------------------------------- */
   /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */

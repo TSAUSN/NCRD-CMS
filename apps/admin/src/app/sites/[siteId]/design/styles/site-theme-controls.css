@@ -161,23 +161,6 @@
   text-decoration: underline;
   text-underline-offset: 0.15em;
 }
-.contrast-chip {
-  display: inline-flex;
-  margin-top: 0.45rem;
-  padding: 0.16rem 0.4rem;
-  border-radius: var(--radius-pill);
-  font-size: 0.64rem;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-}
-.contrast-chip.pass {
-  background: var(--ok-tint);
-  color: var(--ok);
-}
-.contrast-chip.fail {
-  background: var(--danger-tint);
-  color: var(--danger);
-}
 .theme-form-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

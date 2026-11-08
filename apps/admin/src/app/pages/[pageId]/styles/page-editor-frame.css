@@ -280,9 +280,6 @@
   border-top: 0;
   padding-top: 0;
 }
-.pane-section {
-  margin-top: 1.25rem;
-}
 
 @media (max-width: 64rem) {
   /* Two rows, not four and not one.

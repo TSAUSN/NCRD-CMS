@@ -73,9 +73,6 @@
   margin-top: 2rem;
   scroll-margin-top: 1rem;
 }
-.inbox-jump-links {
-  margin-bottom: 1.5rem;
-}
 .nav-count {
   margin-left: auto;
   border-radius: var(--radius-pill);

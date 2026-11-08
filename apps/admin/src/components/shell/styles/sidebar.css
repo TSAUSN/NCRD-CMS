@@ -70,23 +70,8 @@
   padding: 0.5rem 0.6rem 1rem;
   scrollbar-width: thin;
 }
-.sidebar-group + .sidebar-group {
-  margin-top: 0.75rem;
-  padding-top: 0.75rem;
-  border-top: var(--line-thin) solid var(--nav-line);
-}
 /* The product-wide group needs no heading of its own; the site group's
    heading is the site's name, which is the useful one. */
-.sidebar-group:first-child .sidebar-group-label {
-  position: absolute;
-  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
-  width: 1px;
-  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
-  height: 1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-}
 .sidebar-group-label {
   margin: 0 0 0.35rem;
   padding: 0 0.55rem;
@@ -236,10 +221,6 @@
 }
 .app[data-rail='on'] .sidebar-group-label {
   display: none;
-}
-.app[data-rail='on'] .sidebar-group + .sidebar-group {
-  margin-top: 0.6rem;
-  padding-top: 0.6rem;
 }
 
 /* The slim bar that exists only where the sidebar does not. */

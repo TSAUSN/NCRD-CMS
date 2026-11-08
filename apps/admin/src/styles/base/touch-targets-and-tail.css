@@ -114,55 +114,8 @@ details > summary {
   margin: 0;
   border: 0;
 }
-.image-address {
-  font-size: 0.8125rem;
-}
-.image-address > summary {
-  cursor: pointer;
-  color: var(--ink-2);
-  padding: 0.15rem 0;
-}
-.image-address[open] > summary {
-  margin-bottom: 0.35rem;
-}
 
 /* A card's occasional actions, behind one button. */
 .page-manage {
   position: relative;
-}
-.more-toggle {
-  min-width: 2rem;
-  letter-spacing: 0.05em;
-  color: var(--ink-2);
-}
-.more-menu {
-  position: absolute;
-  right: 0;
-  top: calc(100% + 0.3rem);
-  z-index: 20;
-  min-width: 10rem;
-  display: grid;
-  padding: 0.3rem;
-  background: var(--surface);
-  border: var(--line-thin) solid var(--line);
-  border-radius: var(--r-sm);
-  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
-  box-shadow: var(--e3, 0 12px 28px rgba(10, 18, 28, 0.16));
-}
-.more-menu > button {
-  justify-content: flex-start;
-  background: none;
-  border: 0;
-  color: var(--ink);
-  font-weight: 500;
-  padding: 0.45rem 0.6rem;
-  border-radius: var(--r-xs);
-  min-height: 2rem;
-  font-size: 0.875rem;
-}
-.more-menu > button:hover:not(:disabled) {
-  background: var(--surface-3);
-}
-.more-menu > button.is-danger {
-  color: var(--danger);
 }

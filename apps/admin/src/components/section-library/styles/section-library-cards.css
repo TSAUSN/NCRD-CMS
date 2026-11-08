@@ -161,29 +161,6 @@
   padding-top: 0.55rem;
   border-top: var(--line-thin) solid var(--line-soft);
 }
-
-.library-preview {
-  width: min(68rem, 100%);
-  margin: 0 auto;
-  padding: 1.25rem;
-}
-.library-preview-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 0.9rem;
-}
-.library-preview-stage {
-  overflow: hidden;
-  border: var(--line-thin) solid var(--line-strong);
-  border-radius: var(--r);
-  background: var(--surface);
-  box-shadow: var(--e2);
-}
-.library-preview-stage .section-thumb-frame {
-  aspect-ratio: 5 / 2;
-}
 .library-preview-copy {
   display: flex;
   align-items: flex-start;
@@ -425,13 +402,6 @@
 @media (max-width: 60rem) {
   .overlay {
     padding: 0;
-  }
-  .overlay-dialog {
-    width: 100%;
-    height: 100dvh;
-    max-height: none;
-    border-radius: 0;
-    border: 0;
   }
   .overlay-body {
     grid-template-columns: 1fr;

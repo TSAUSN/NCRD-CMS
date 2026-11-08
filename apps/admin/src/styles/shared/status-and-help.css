@@ -72,16 +72,6 @@
   border-color: var(--ok-line);
   color: var(--ok);
 }
-.chip-submitted {
-  background: var(--info-tint);
-  border-color: var(--info-line);
-  color: var(--info);
-}
-.chip-scheduled {
-  background: var(--scheduled-tint);
-  border-color: var(--scheduled-line);
-  color: var(--scheduled);
-}
 .chip-error {
   background: var(--danger-tint);
   border-color: var(--danger-line);
@@ -98,10 +88,6 @@
 }
 .chip-neutral::before {
   display: none;
-}
-.chip-lg {
-  font-size: 0.8125rem;
-  padding: 0.2rem 0.65rem 0.2rem 0.5rem;
 }
 
 /* ============================================================ containers == */

@@ -396,11 +396,6 @@ select {
   cursor: not-allowed;
   background: none;
 }
-.group.group-plain {
-  background: none;
-  padding: 0;
-  gap: 0.1rem;
-}
 
 /* Toolbar clusters, separated by a hairline rather than by guesswork. */
 .cluster {

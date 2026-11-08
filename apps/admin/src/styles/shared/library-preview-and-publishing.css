@@ -145,24 +145,6 @@
   border: 0;
   padding: 0;
 }
-.scheduled-list {
-  list-style: none;
-  margin: 1rem 0 0;
-  padding: 0;
-  display: grid;
-  gap: 0.65rem;
-}
-.scheduled-list > li {
-  display: flex;
-  justify-content: space-between;
-  align-items: start;
-  gap: 0.75rem;
-  border-top: var(--line-thin) solid var(--line);
-  padding-top: 0.65rem;
-}
-.scheduled-list p {
-  margin: 0.2rem 0;
-}
 .release-choices {
   border: 0;
   padding: 0;

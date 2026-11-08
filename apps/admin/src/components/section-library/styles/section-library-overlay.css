@@ -180,11 +180,6 @@
   font-size: 0.75rem;
   justify-content: center;
 }
-.library-drawer .library-preview {
-  width: 100%;
-  padding: 0.75rem;
-  overflow-y: auto;
-}
 .library-drawer .library-preview-copy {
   display: block;
   padding: 0.75rem;
@@ -193,9 +188,6 @@
   width: 100%;
   margin-top: 0.75rem;
   justify-content: center;
-}
-.library-drawer .library-preview-stage .section-thumb-frame {
-  aspect-ratio: 3 / 2;
 }
 /* Where the shelf becomes a full-width tab (tablet), as many columns as fit. */
 @media (max-width: 64rem) {
@@ -234,54 +226,10 @@
   overflow-y: auto;
   overscroll-behavior: contain;
 }
-.confirm-head {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  margin-bottom: 0.75rem;
-}
-.confirm-head h2 {
-  margin: 0;
-  font-size: 1.0625rem;
-  color: var(--sa-navy);
-  letter-spacing: -0.01em;
-}
-.confirm-mark {
-  flex: none;
-  width: 2rem;
-  height: 2rem;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  background: var(--danger-tint);
-  color: var(--danger);
-}
 .confirm p {
   margin: 0 0 0.5rem;
   font-size: 0.875rem;
   color: var(--ink-2);
-}
-.confirm-reassurance {
-  color: var(--ink-3) !important;
-  font-size: 0.8125rem !important;
-}
-.confirm-actions {
-  display: flex;
-  gap: 0.5rem;
-  justify-content: flex-end;
-  margin-top: 1.1rem;
-}
-
-.overlay-dialog {
-  background: var(--paper);
-  border-radius: var(--r-lg);
-  width: min(78rem, 100%);
-  height: min(48rem, 92vh);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  box-shadow: var(--e3);
-  border: var(--line-thin) solid var(--line);
 }
 .overlay-head {
   display: flex;
@@ -369,11 +317,6 @@
   grid-template-columns: 13rem minmax(0, 1fr);
   flex: 1 1 auto;
   min-height: 0;
-}
-.overlay-body.showing-preview {
-  display: block;
-  overflow-y: auto;
-  background: var(--paper-sunk);
 }
 .overlay-categories {
   display: flex;

@@ -71,12 +71,6 @@
 .schema-field-form textarea {
   font-size: 0.78rem;
 }
-.schema-required {
-  display: flex !important;
-  align-items: center;
-  padding-bottom: 0.65rem;
-  white-space: nowrap;
-}
 .schema-help,
 .schema-options {
   grid-column: 1 / -1;
@@ -218,67 +212,10 @@
   margin: 1rem 1.4rem;
   max-width: none;
 }
-.collection-media-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.65rem;
-  padding: 0 1.4rem 1.4rem;
-}
-.collection-media-grid button {
-  display: grid;
-  gap: 0.35rem;
-  padding: 0.45rem;
-  text-align: left;
-  background: var(--surface);
-  color: var(--ink);
-  border: var(--line-thin) solid var(--line);
-  box-shadow: none;
-}
-.collection-media-grid button:hover {
-  border-color: var(--navy-tint-2);
-  box-shadow: var(--e2);
-}
-.collection-media-grid button > span {
-  height: 7rem;
-  display: grid;
-  place-items: center;
-  overflow: hidden;
-  background: var(--surface-3);
-  border-radius: var(--r-sm);
-  color: var(--ink-3);
-}
-.collection-media-grid img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.collection-media-grid strong,
-.collection-media-grid small {
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-.collection-media-grid small {
-  color: var(--ink-3);
-  font-weight: 400;
-}
 
 @media (max-width: 78rem) {
-  .collection-toolbar {
-    flex-wrap: wrap;
-  }
   .collection-search {
     max-width: none;
-  }
-  .collection-result-count {
-    margin-left: 0;
-  }
-  .record-fields {
-    grid-template-columns: 1fr;
-  }
-  .record-fields .collection-field,
-  .record-fields .collection-check {
-    grid-column: 1;
   }
   .schema-designer {
     grid-template-columns: 1fr;
@@ -292,55 +229,8 @@
 }
 
 @media (max-width: 58rem) {
-  .collections-frame {
-    grid-template-columns: 12.5rem minmax(0, 1fr);
-  }
-  .collection-titlebar,
-  .collection-commandbar {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-  .collection-titlebar .actions,
-  .collection-commandbar .actions {
-    width: 100%;
-    justify-content: flex-end;
-  }
-  .collection-filters {
-    overflow-x: auto;
-    max-width: 100%;
-  }
-  .collection-record-body {
-    padding-left: 1rem;
-  }
-  .record-quick-actions {
-    display: none;
-  }
   .schema-field-form {
     grid-template-columns: 1fr 1fr;
-  }
-  .collection-media-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 70rem) {
-  .collections-frame {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .collection-rail {
-    border-right: 0;
-    border-bottom: var(--line-thin) solid var(--line);
-  }
-  .collection-list {
-    grid-template-columns: repeat(auto-fit, minmax(min(12rem, 100%), 1fr));
-  }
-  .collection-list a.is-current::before {
-    left: 0;
-  }
-  .collection-new {
-    margin-top: 0.5rem;
-    width: auto;
-    align-self: flex-start;
   }
 }
 

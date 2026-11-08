@@ -1,35 +1,11 @@
 /* ------------------------------------------------------------ inspector -- */
 
 /* V1's dashed "Add a section" at the top of the rail. */
-.add-section-cta {
-  width: 100%;
-  margin: 0 0 1rem;
-  padding: 0.7rem 0.9rem;
-  min-height: 2.75rem;
-  background: var(--surface);
-  color: var(--sa-red-ink);
-  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
-  border: 1.5px dashed var(--sa-red-line);
-  border-radius: var(--r-md);
-  font-size: 0.9375rem;
-  font-weight: 650;
-}
-.add-section-cta:hover {
-  background: var(--danger-tint);
-  border-color: var(--sa-red-ink);
-  color: var(--sa-red-deep);
-}
 .page-settings {
   margin-top: 1.25rem;
 }
 .page-settings > summary {
   font-size: 0.875rem;
-}
-.hatch-note {
-  margin-left: auto;
-  font-weight: 500;
-  font-size: 0.75rem;
-  color: var(--ink-3);
 }
 .bar-label {
   font-size: 0.8125rem;
@@ -264,10 +240,6 @@
 
 /* Section controls, grouped by what they do rather than laid out as one wrapped
    row of six identical buttons. */
-.tool-rows {
-  display: grid;
-  gap: 0.6rem;
-}
 .section-visibility {
   display: flex;
   align-items: center;
@@ -299,15 +271,6 @@
 .section-visibility button {
   flex: none;
 }
-.tool-row-plain {
-  padding-top: 0.6rem;
-  border-top: var(--line-thin) solid var(--line-soft);
-}
-.tool-row {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0.25rem;
-}
 .tool-row-label {
   font-size: 0.6875rem;
   font-weight: 700;
@@ -319,19 +282,6 @@
   display: flex;
   gap: 0.35rem;
   flex-wrap: wrap;
-}
-.tool-row-layout {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-  font-size: 0.875rem;
-}
-.tool-row-layout > span {
-  min-width: 0;
-  overflow-wrap: anywhere;
-  font-weight: 500;
 }
 .btn-row > button {
   flex: 0 1 auto;

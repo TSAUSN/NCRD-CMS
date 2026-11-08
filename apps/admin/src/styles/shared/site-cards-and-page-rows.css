@@ -146,15 +146,6 @@
   margin: 0.35rem 0 0;
   padding: 0.45rem 0.55rem;
 }
-.input-prefix {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-}
-.input-prefix input {
-  flex: 1;
-  min-width: 0;
-}
 .structured-builder ol {
   list-style: none;
   padding-left: 0.85rem;
@@ -234,9 +225,6 @@
   border: 0;
   margin: 0 auto;
   background: var(--surface);
-}
-.library-preview .section-live-preview-scroll iframe {
-  height: 34rem;
 }
 /* Updating an imported section's fields: what is edited now, and after. */
 .imported-update-fields {

@@ -80,20 +80,6 @@
 .row:hover {
   background: var(--surface-2);
 }
-.row-icon {
-  width: 2.25rem;
-  height: 2.25rem;
-  border-radius: var(--r-sm);
-  flex: none;
-  display: grid;
-  place-items: center;
-  background: var(--navy-tint);
-  color: var(--navy-600);
-}
-.row-main {
-  flex: 1 1 15rem;
-  min-width: 0;
-}
 .row-title {
   font-weight: 650;
   font-size: 0.9375rem;
@@ -104,24 +90,6 @@
 .row-title:hover {
   color: var(--navy-600);
   text-decoration: underline;
-}
-.row-sub {
-  color: var(--ink-3);
-  font-size: 0.8125rem;
-  margin: 0.05rem 0 0;
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  flex-wrap: wrap;
-}
-.row-sub .mono {
-  color: var(--ink-2);
-}
-.row-actions {
-  display: flex;
-  gap: 0.35rem;
-  align-items: center;
-  flex: none;
 }
 
 /* Empty states teach: what the thing is, and what happens next (SPEC §7). */

@@ -49,9 +49,6 @@
 .controls :global(.theme-colour-input input[type='color']) {
   border-radius: var(--radius-control);
 }
-.controls :global(.contrast-chip) {
-  font-size: var(--text-tag);
-}
 .controls :global(.theme-commandbar strong),
 .controls :global(.theme-commandbar small) {
   font-size: var(--text-meta);

@@ -179,7 +179,6 @@
   --panel-line: 2px;
   --sheet-width: 560px;
   --dialog-width: 480px;
-  --canvas-label-width: 280px;
   --canvas-min: 480px;
   --editor-title-size: 22ch;
   --z-popover: 50;
@@ -224,9 +223,6 @@
   --nav-ink-3: var(--text-muted);
   --nav-line: var(--border);
   --nav-active: #e9edf5;
-  --brand-mark-bg: var(--primary);
-  --brand-mark-fg: var(--text-on-dark);
-  --brand-mark-accent: var(--text-on-dark);
   --sa-navy: var(--primary);
   --sa-red: var(--primary);
   --sa-red-ink: var(--publish);

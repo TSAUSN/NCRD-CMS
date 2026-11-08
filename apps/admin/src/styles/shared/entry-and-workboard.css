@@ -6,117 +6,8 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
 }
-.entry-tell {
-  background: var(--bar-bg);
-  color: var(--bar-ink);
-  padding: 3rem 3.5rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 1.25rem;
-  position: relative;
-  overflow: hidden;
-}
 /* One quiet gesture: a wash of the identity red bled into the navy from the
    corner. It carries the brand without a graphic to maintain. */
-.entry-tell::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  /* stylelint-disable declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
-  background:
-    radial-gradient(58rem 40rem at 108% -6%, rgba(238, 58, 67, 0.42), transparent 62%),
-    radial-gradient(46rem 34rem at -12% 112%, rgba(24, 68, 140, 0.55), transparent 60%);
-  /* stylelint-enable declaration-property-value-disallowed-list */
-}
-.entry-tell > * {
-  position: relative;
-}
-.entry-brand {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-}
-.entry-brand .brand-word {
-  font-size: 1.25rem;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-}
-.entry-brand .brand-sub {
-  display: block;
-  font-size: 0.8125rem;
-  color: var(--bar-ink-2);
-  font-weight: 400;
-  letter-spacing: 0;
-}
-.entry-tell h1 {
-  font-size: 2.125rem;
-  line-height: 1.18;
-  color: var(--text-on-dark);
-  margin: 0.5rem 0 0;
-  letter-spacing: -0.02em;
-  font-weight: 700;
-  max-width: 15em;
-}
-.entry-tell p {
-  color: var(--bar-ink-2);
-  max-width: 34rem;
-  margin: 0;
-  font-size: 0.9375rem;
-}
-.entry-points {
-  list-style: none;
-  margin: 0.5rem 0 0;
-  padding: 0;
-  display: grid;
-  gap: 0.7rem;
-}
-.entry-points li {
-  display: flex;
-  gap: 0.6rem;
-  align-items: flex-start;
-  color: var(--bar-ink);
-  font-size: 0.875rem;
-  line-height: 1.45;
-}
-.entry-points .icon-svg {
-  color: var(--brand);
-  margin-top: 0.12rem;
-  flex: none;
-}
-.entry-points strong {
-  font-weight: 650;
-}
-.entry-points span {
-  color: var(--bar-ink-2);
-}
-
-.entry-do {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 3rem 2rem;
-  background: var(--paper);
-}
-.entry-form {
-  width: 100%;
-  max-width: 22rem;
-}
-.entry-form h2 {
-  margin: 0 0 0.35rem;
-  font-size: 1.375rem;
-  letter-spacing: -0.012em;
-}
-.entry-form > p {
-  color: var(--ink-2);
-  font-size: 0.875rem;
-  margin: 0 0 1.5rem;
-}
-.entry-form form {
-  display: block;
-}
 .entry-note {
   margin-top: 1.5rem;
   padding-top: 1.25rem;
@@ -135,24 +26,6 @@
     grid-template-columns: 1fr;
     min-height: 0;
   }
-  .entry-tell {
-    padding: 2.25rem 1.5rem;
-    gap: 1rem;
-  }
-  .entry-tell h1 {
-    font-size: 1.75rem;
-  }
-  .entry-points {
-    display: none;
-  }
-  .entry-do {
-    padding: 2rem 1.5rem 3.5rem;
-    align-items: stretch;
-    min-height: 60dvh;
-  }
-  .entry-form {
-    max-width: none;
-  }
 }
 
 /* ================================================== dashboard and workspace == */
@@ -164,75 +37,7 @@
 .overview {
   margin: 0 0 1.5rem;
 }
-.overview-intro {
-  position: absolute;
-  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
-  width: 1px;
-  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
-  height: 1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-}
-.overview-strip {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
-  gap: 1rem;
-  margin: 0;
-}
 /* Four figures sit two by two rather than three and one when the row is short. */
-@media (max-width: 75rem) {
-  .overview-strip {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-@media (max-width: 30rem) {
-  .overview-strip {
-    grid-template-columns: 1fr;
-  }
-}
-.overview-strip > div {
-  min-width: 0;
-  padding: 1rem 1.15rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  background: var(--surface);
-  border: var(--line-thin) solid var(--line);
-  border-radius: var(--r-lg);
-}
-.overview-strip > div.attention {
-  border-color: var(--warn-line);
-  background: var(--warn-tint);
-}
-.overview-strip dt {
-  color: var(--ink-3);
-  font-size: 0.75rem;
-  font-weight: 650;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-.overview-strip dd {
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-}
-.overview-value {
-  color: var(--navy-800);
-  font-size: 1.85rem;
-  line-height: 1.05;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-}
-.overview-strip .attention .overview-value {
-  color: var(--warn);
-}
-.overview-strip small {
-  color: var(--ink-3);
-  font-size: 0.8125rem;
-  line-height: 1.35;
-}
 .attention-copy {
   color: var(--warn);
 }
