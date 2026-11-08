@@ -36,6 +36,11 @@ list draft commands and dialogs. `collection-record-list.tsx` owns the rows,
 selection and move controls; `collection-record-display.ts` formats record fields
 for the list and editor.
 
+Inside `app/sites/[siteId]/media/`, `media-workspace.tsx` keeps the library state,
+uploads, detail edits and mutation guards together. `media-library-browser.tsx`
+owns search, folders, filters and image results. Bulk selection, status notices
+and confirmation dialogs each have a named component in the same directory.
+
 Browser tests live under `e2e/specs/` in feature folders. Use the
 [test move map](../../maintainers/test-moves.md) to find old round names.
 Test titles and assertions are preserved. Unit tests sit beside

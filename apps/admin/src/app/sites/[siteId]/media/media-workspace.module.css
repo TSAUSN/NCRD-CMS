@@ -45,10 +45,6 @@
   max-height: var(--size-240);
   object-fit: contain;
 }
-.details :global(.media-metadata > fieldset) {
-  display: grid;
-  gap: var(--space-4);
-}
 .details :global(.field) {
   display: grid;
   gap: var(--space-1);

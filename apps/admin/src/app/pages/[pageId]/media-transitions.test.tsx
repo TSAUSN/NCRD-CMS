@@ -66,6 +66,10 @@ vi.mock('../../sites/[siteId]/media/replacement-actions.ts', () => ({
 }))
 import { MediaPicker } from './media-picker.tsx'
 import { MediaWorkspace } from '../../sites/[siteId]/media/media-workspace.tsx'
+import { MediaLibraryBrowser } from '../../sites/[siteId]/media/media-library-browser.tsx'
+import { MediaBulkSelection } from '../../sites/[siteId]/media/media-bulk-selection.tsx'
+import { MediaLifecycleDialogs } from '../../sites/[siteId]/media/media-lifecycle-dialogs.tsx'
+import { MediaNotices } from '../../sites/[siteId]/media/media-notices.tsx'
 
 const asset = (id: string, status: MediaAsset['status'] = 'ready'): MediaAsset => ({
   id,
@@ -128,14 +132,28 @@ function renderWorkspace() {
     canManageShared: false,
   })
 }
+const mediaRegions = new Set<ReactElement['type']>([
+  MediaLibraryBrowser,
+  MediaBulkSelection,
+  MediaLifecycleDialogs,
+  MediaNotices,
+])
+
+function visibleChildren(node: ReactElement<Record<string, any>>): ReactNode {
+  // Follow the extracted regions to the same real buttons, dialogs and status text.
+  if (typeof node.type === 'function' && mediaRegions.has(node.type))
+    return (node.type as (props: Record<string, any>) => ReactNode)(node.props)
+  return node.props.children
+}
+
 function elements(node: ReactNode): ReactElement<Record<string, any>>[] {
   if (Array.isArray(node)) return node.flatMap(elements)
   if (!isValidElement<Record<string, any>>(node)) return []
-  return [node, ...elements(node.props.children), ...elements(node.props.footer)]
+  return [node, ...elements(visibleChildren(node)), ...elements(node.props.footer)]
 }
 function label(node: ReactNode): string {
   if (Array.isArray(node)) return node.map(label).join('')
-  if (isValidElement<{ children?: ReactNode }>(node)) return label(node.props.children)
+  if (isValidElement<Record<string, any>>(node)) return label(visibleChildren(node))
   return typeof node === 'string' || typeof node === 'number' ? String(node) : ''
 }
 function button(tree: ReactNode, name: string) {
@@ -362,7 +380,9 @@ describe('media mutation confirmations', () => {
   })
   it('sends a single bulk delete and keeps confirmed statuses when refresh fails', async () => {
     let tree = renderWorkspace()
-    for (const item of elements(tree).filter(element => element.props.type === 'checkbox')) item.props.onChange()
+    const images = elements(tree).filter(element => element.props.type === 'checkbox')
+    expect(images).toHaveLength(2)
+    for (const item of images) item.props.onChange()
     tree = renderWorkspace()
     button(tree, ' Delete selected').props.onClick()
     tree = renderWorkspace()

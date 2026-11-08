@@ -182,6 +182,7 @@
   margin: 0;
 }
 .details :global(.media-metadata > fieldset) {
+  display: grid;
   gap: var(--space-3);
 }
 .details :global(.media-metadata > fieldset) > label {
