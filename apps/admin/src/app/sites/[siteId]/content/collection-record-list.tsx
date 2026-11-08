@@ -52,16 +52,20 @@ export function CollectionRecordList({
   moveEntry,
   select,
 }: Props) {
-  const { activePositions, activeCount } = useMemo(() => {
+  const { activePositions, activeCount, repeatedKeys } = useMemo(() => {
     const activePositions = new Map<string, number>()
+    const recordKeys = new Set<string>()
+    const repeatedKeys = new Set<string>()
     let activeCount = 0
     for (const entry of entries) {
+      if (recordKeys.has(entry.stableKey)) repeatedKeys.add(entry.stableKey)
+      recordKeys.add(entry.stableKey)
       if (entry.archived) continue
       const key = entryIdentity(entry)
       if (!activePositions.has(key)) activePositions.set(key, activeCount)
       activeCount++
     }
-    return { activePositions, activeCount }
+    return { activePositions, activeCount, repeatedKeys }
   }, [entries])
   const selectedKeys = useMemo(() => new Set(checked), [checked])
   const rejection = reorder.blocked ?? reorder.rejection
@@ -97,10 +101,12 @@ export function CollectionRecordList({
               changed = !entry.archived && entryChanged(entry),
               position = activePositions.get(key) ?? -1,
               photo = imagePreview(recordImage(entry, model), availableMedia)
+            // Keep the row and its open menu when the server assigns a new item its ID.
+            const rowKey = repeatedKeys.has(entry.stableKey) ? `draft:${key}` : `record:${entry.stableKey}`
             const dragRow = reorder.row(key, !canEdit || pending || entry.archived)
             return (
               <article
-                key={key}
+                key={rowKey}
                 role="listitem"
                 className={styles.item + ' ' + ownedStyles.recordRow}
                 data-selected={selectedKeys.has(key)}

@@ -398,6 +398,7 @@ test.describe.serial('Collections admin workspace', () => {
       category: 'Update',
       department: 'Emergency',
     })
+    const addedRow = await record(page, 'Third response story').elementHandle()
     await saveItem(page)
 
     await page.getByRole('button', { name: 'Actions for Third response story', exact: true }).click()
@@ -407,6 +408,7 @@ test.describe.serial('Collections admin workspace', () => {
       'Third response story',
       'Second response story',
     ])
+    expect(await addedRow.evaluate(row => row.isConnected)).toBe(true)
 
     const second = record(page, 'Second response story')
     const secondBounds = await second.boundingBox()
