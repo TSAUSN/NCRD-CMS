@@ -1,14 +1,9 @@
 import type { NavTree } from '@cms/schema'
+import { siteInitials } from '../../../../lib/site-initials.ts'
 import { IconEye } from '../../../../components/icons.tsx'
 
 export function NavigationPreview({ siteName, tree }: { siteName: string; tree: NavTree }) {
-  const initials = siteName
-    .trim()
-    .split(/\s+/)
-    .slice(0, 2)
-    .map(word => Array.from(word)[0] ?? '')
-    .join('')
-    .toLocaleUpperCase()
+  const initials = siteInitials(siteName)
   const visible = tree.filter(node => node.visible)
   return (
     <aside className="navigation-preview" aria-labelledby="navigation-preview-title">
