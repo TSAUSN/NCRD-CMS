@@ -18,6 +18,7 @@ import { CanvasChrome, type CanvasHover } from './canvas-chrome.tsx'
 import type { PageEditorProps, EditorPane } from './editor-types.ts'
 import type { useIsolatedCanvas } from './use-isolated-canvas.ts'
 import type { usePageRecovery } from './use-page-recovery.ts'
+import { useCanvasDocumentRetry } from './use-canvas-document-retry.ts'
 import { VIEWPORTS, type Viewport } from './editor-viewports.ts'
 import foundationStyles from './editor-foundation.module.css'
 
@@ -193,6 +194,12 @@ export function EditorCanvas({ view, frame, fields, overlays }: Props) {
     canInsertAt,
     canMoveSection,
   } = overlays
+  const needsPreview = state.document.sections.length > 0 || Boolean(libraryPreview)
+  const sameOriginSource =
+    !isolated.enabled && canvasAttached && needsPreview && canvasSource.versionId
+      ? `/preview/${canvasSource.versionId}?v=${canvasSource.epoch}&hidden=${showHiddenSections ? '1' : '0'}&site=${sitePreview}${libraryPreview ? '&insert=' + libraryPreview.section_def_id + '&definitionVersion=' + libraryPreview.version + '&at=' + insertAt : ''}`
+      : null
+  const retryDocument = useCanvasDocumentRetry(sameOriginSource, canvasReady > 0, toCanvas)
   return (
     <div id="editor-panel-canvas" className="canvas-pane" role="tabpanel" aria-labelledby="editor-tab-canvas">
       {/* One slim row. Every line above the page is height the page does
@@ -322,32 +329,30 @@ export function EditorCanvas({ view, frame, fields, overlays }: Props) {
           inert={Boolean(sectionTool) || Boolean(libraryPreview) || libraryPreparing}
           ref={canvasViewportRef}
         >
-          {(state.document.sections.length > 0 || libraryPreview) &&
-            canvasSource.versionId &&
-            (canvasReady === 0 || isolated.error) && (
-              <div className="canvas-loading" role={isolated.error ? 'alert' : 'status'}>
-                {canvasSlow || isolated.error ? (
-                  <div className="canvas-loading-retry">
-                    <p>{isolated.error ?? 'The page preview is taking longer than expected.'}</p>
-                    <button
-                      type="button"
-                      className="secondary small"
-                      onClick={() => renderCanvas(currentEditor.current.saved)}
-                    >
-                      Reload preview
-                    </button>
-                    <p className="muted">Your draft stays in the editor.</p>
-                  </div>
-                ) : (
-                  <span>Opening the page preview…</span>
-                )}
-              </div>
-            )}
-          {(state.document.sections.length > 0 || libraryPreview) && canvasSource.versionId ? (
+          {needsPreview && canvasSource.versionId && (canvasReady === 0 || isolated.error) && (
+            <div className="canvas-loading" role={isolated.error ? 'alert' : 'status'}>
+              {canvasSlow || isolated.error ? (
+                <div className="canvas-loading-retry">
+                  <p>{isolated.error ?? 'The page preview is taking longer than expected.'}</p>
+                  <button
+                    type="button"
+                    className="secondary small"
+                    onClick={() => renderCanvas(currentEditor.current.saved)}
+                  >
+                    Reload preview
+                  </button>
+                  <p className="muted">Your draft stays in the editor.</p>
+                </div>
+              ) : (
+                <span>Opening the page preview…</span>
+              )}
+            </div>
+          )}
+          {needsPreview && canvasSource.versionId ? (
             canvasAttached &&
             (!isolated.enabled || isolated.href) && (
               <iframe
-                key={canvasSource.epoch}
+                key={`${canvasSource.epoch}:${retryDocument ? 1 : 0}`}
                 ref={canvasRef}
                 className="canvas"
                 title="Page canvas"
@@ -372,8 +377,10 @@ export function EditorCanvas({ view, frame, fields, overlays }: Props) {
                 }}
                 src={
                   isolated.enabled
-                    ? isolated.href!
-                    : `/preview/${canvasSource.versionId}?v=${canvasSource.epoch}&hidden=${showHiddenSections ? '1' : '0'}&site=${sitePreview}${libraryPreview ? '&insert=' + libraryPreview.section_def_id + '&definitionVersion=' + libraryPreview.version + '&at=' + insertAt : ''}`
+                    ? (isolated.href ?? undefined)
+                    : sameOriginSource
+                      ? sameOriginSource + (retryDocument ? '&retry=1' : '')
+                      : undefined
                 }
               />
             )

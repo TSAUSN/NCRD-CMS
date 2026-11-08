@@ -86,10 +86,11 @@ test.describe('click to select', () => {
 
   test('offers a bounded preview retry and keeps text typed before reconnecting', async ({ page }) => {
     await page.clock.install()
-    let rejectFirst = true
+    let unavailable = true
+    let rejectedDocuments = 0
     await page.route('**/preview/**', async route => {
-      if (rejectFirst) {
-        rejectFirst = false
+      if (unavailable) {
+        rejectedDocuments += 1
         await route.abort()
         return
       }
@@ -99,18 +100,61 @@ test.describe('click to select', () => {
     await expect(page.getByText('Opening the page preview…', { exact: true })).toBeVisible()
     await page.clock.fastForward(21_000)
     await expect(page.getByRole('button', { name: 'Reload preview', exact: true })).toBeVisible()
+    await expect.poll(() => rejectedDocuments).toBe(2)
     await treeLabels(page).first().click()
     await page
       .getByRole('complementary', { name: 'Page structure' })
       .getByRole('button', { name: /^Intro/ })
       .click()
     await page.locator('#slot-0-intro').fill('Keep this draft while the preview reconnects')
+    unavailable = false
     await page.getByRole('button', { name: 'Reload preview', exact: true }).click()
     await expect(canvas(page).locator('[data-cms-slot="intro"]').first()).toHaveText(
       'Keep this draft while the preview reconnects',
     )
     await expect(page.locator('#slot-0-intro')).toHaveValue('Keep this draft while the preview reconnects')
     await expect(page.getByRole('button', { name: 'Reload preview', exact: true })).toHaveCount(0)
+  })
+
+  test('reopens a successful canvas response that never finishes loading', async ({ page }) => {
+    await page.clock.install()
+    let releaseScript!: () => void
+    const heldScript = new Promise<void>(resolve => {
+      releaseScript = resolve
+    })
+    const sources: URL[] = []
+    await page.route('**/__cms-test-canvas-document-stall.js', async route => {
+      await heldScript
+      await route.abort().catch(() => {})
+    })
+    await page.route('**/preview/**', async route => {
+      sources.push(new URL(route.request().url()))
+      if (sources.length === 1) {
+        await route.fulfill({
+          status: 200,
+          contentType: 'text/html',
+          body: '<!doctype html><script src="/__cms-test-canvas-document-stall.js"></script>',
+        })
+      } else await route.continue()
+    })
+    try {
+      await page.reload({ waitUntil: 'domcontentloaded' })
+      await expect.poll(() => sources.length).toBe(1)
+      await expect(page.getByText('Opening the page preview…', { exact: true })).toBeVisible()
+      await typeInInspector(page, 0, 'intro', 'Still here after the stalled canvas')
+      await page.clock.fastForward(7_500)
+      await expect(canvas(page).locator('[data-cms-slot="intro"]').first()).toHaveText(
+        'Still here after the stalled canvas',
+      )
+      await expect(page.getByRole('button', { name: 'Reload preview', exact: true })).toHaveCount(0)
+      expect(sources).toHaveLength(2)
+      expect(sources[1]!.searchParams.get('retry')).toBe('1')
+      sources[1]!.searchParams.delete('retry')
+      expect(sources[1]!.href).toBe(sources[0]!.href)
+      await expect(page.locator('#slot-0-intro')).toHaveValue('Still here after the stalled canvas')
+    } finally {
+      releaseScript()
+    }
   })
 
   test('clicking a field on the page opens its inspector and marks the tree', async ({ page }) => {
