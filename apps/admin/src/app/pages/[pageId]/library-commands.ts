@@ -1,3 +1,4 @@
+import type { CanvasDocumentSource } from './editor-types.ts'
 import { useRef, useState, type Dispatch, type SetStateAction } from 'react'
 import {
   addSection,
@@ -49,7 +50,7 @@ type Inputs = {
     flushForReview: () => Promise<boolean>
     renderCanvas: (snapshot: EditorDocument) => void
     savedVersionId: Current<string | null>
-    setCanvasSource: Set<{ versionId: string | null; epoch: number }>
+    setCanvasSource: Set<CanvasDocumentSource>
     setCanvasReady: Set<number>
     setCanvasFramePending: Set<boolean>
     setRichTextRequest: Set<CanvasRichTextRequest | null>

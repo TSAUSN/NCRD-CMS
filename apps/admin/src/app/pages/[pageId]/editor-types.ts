@@ -54,3 +54,10 @@ export type PageEditorProps = {
   initialSection?: number | null
   initialReleaseRequired?: boolean
 }
+
+/** One rendered version; an automatic retry belongs to the same opening attempt. */
+export type CanvasDocumentSource = {
+  versionId: string | null
+  epoch: number
+  automaticRetry?: boolean
+}

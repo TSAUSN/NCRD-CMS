@@ -4,7 +4,7 @@ import type { FieldLike } from '@cms/schema'
 import type { SitePreviewContext } from '../../../lib/preview-context.ts'
 import type { CanvasAction, CanvasHover } from './canvas-chrome.tsx'
 import type { CanvasRichTextRequest } from './canvas-rich-text.tsx'
-import type { PageEditorProps } from './editor-types.ts'
+import type { CanvasDocumentSource, PageEditorProps } from './editor-types.ts'
 import { VIEWPORTS, type Viewport } from './editor-viewports.ts'
 import type { RichTextToolbarState } from './rich-text-commands.ts'
 import { useIsolatedCanvas } from './use-isolated-canvas.ts'
@@ -80,7 +80,10 @@ export function useEditorCanvasSession({
   /** Set once the canvas is showing something a patch cannot correct. */
   const needsRender = useRef(false)
   /** Which version the canvas is pointed at; a new epoch reloads it. */
-  const [canvasSource, setCanvasSource] = useState({ versionId: props.previewVersionId, epoch: 0 })
+  const [canvasSource, setCanvasSource] = useState<CanvasDocumentSource>({
+    versionId: props.previewVersionId,
+    epoch: 0,
+  })
   /** Bumped each time the canvas announces a document, so the sync effect re-runs. */
   const [canvasReady, setCanvasReady] = useState(0)
   const isolated = useIsolatedCanvas({

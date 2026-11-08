@@ -1,3 +1,4 @@
+import type { CanvasDocumentSource } from './editor-types.ts'
 import { useCallback, useEffect, useLayoutEffect, useRef, type Dispatch, type SetStateAction } from 'react'
 import { PREVIEW_MESSAGE } from '@cms/renderer'
 import type { CanvasMenuAddState } from '../../../components/canvas-menu-add.tsx'
@@ -13,7 +14,7 @@ type Inputs = {
   frame: Omit<Receive['frame'] & Sync['frame'], 'toCanvas'> & {
     isolatedCurrent: { current: ReturnType<typeof useIsolatedCanvas> }
     canvasFramePending: boolean
-    canvasSource: { versionId: string | null; epoch: number }
+    canvasSource: CanvasDocumentSource
     setCanvasSlow: Dispatch<SetStateAction<boolean>>
   }
   document: Omit<Receive['document'], 'currentSlotKind'> & Sync['document']
@@ -78,12 +79,13 @@ export function useEditorCanvasBridge({ frame, document: editorDocument, selecti
     editing,
   })
 
+  const openingEpoch = canvasSource.automaticRetry ? canvasSource.epoch - 1 : canvasSource.epoch
   useEffect(() => {
     setCanvasSlow(false)
     if (!state.document.sections.length || !canvasSource.versionId || canvasReady > 0) return
     const timer = window.setTimeout(() => setCanvasSlow(true), 20_000)
     return () => window.clearTimeout(timer)
-  }, [canvasReady, canvasSource.versionId, canvasSource.epoch, state.document.sections.length])
+  }, [canvasReady, canvasSource.versionId, openingEpoch, state.document.sections.length])
 
   useEffect(() => {
     if (!focusCanvas) return

@@ -1,3 +1,4 @@
+import type { CanvasDocumentSource } from './editor-types.ts'
 import { useCallback, useEffect, useLayoutEffect, useRef, type Dispatch, type SetStateAction } from 'react'
 import type { EditorDocument, EditorSection, EditorState } from '@cms/domain'
 import { PREVIEW_MESSAGE } from '@cms/renderer'
@@ -33,7 +34,7 @@ type Inputs = {
     canvasReady: number
     setCanvasReady: Set<number>
     setCanvasFramePending: Set<boolean>
-    setCanvasSource: Set<{ versionId: string | null; epoch: number }>
+    setCanvasSource: Set<CanvasDocumentSource>
     isolated: { enabled: boolean }
     toCanvas: (message: Record<string, unknown>) => void
   }
@@ -217,13 +218,17 @@ export function useCanvasDocumentSync({ document: page, frame, view }: Inputs) {
    * re-fetch the draft as it stood when the editor opened, which is a render of
    * the work rather than of the work as it is now.
    */
-  const renderCanvas = useCallback((snapshot: EditorDocument) => {
+  const renderCanvas = useCallback((snapshot: EditorDocument, automaticRetry = false) => {
     setRichTextRequest(null)
     setCanvasFramePending(true)
     setCanvasReady(0)
     rendered.current = snapshot
     needsRender.current = false
-    setCanvasSource(current => ({ versionId: savedVersionId.current, epoch: current.epoch + 1 }))
+    setCanvasSource(current => ({
+      versionId: savedVersionId.current,
+      epoch: current.epoch + 1,
+      automaticRetry,
+    }))
   }, [])
   return renderCanvas
 }

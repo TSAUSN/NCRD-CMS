@@ -1,5 +1,13 @@
 'use client'
-import type { ComponentProps, Dispatch, RefObject, ReactNode, SetStateAction } from 'react'
+import type { CanvasDocumentSource } from './editor-types.ts'
+import {
+  useCallback,
+  type ComponentProps,
+  type Dispatch,
+  type RefObject,
+  type ReactNode,
+  type SetStateAction,
+} from 'react'
 import { setSelection, setValue, type EditorDocument, type EditorSection, type EditorState } from '@cms/domain'
 import { slotForId } from '@cms/schema'
 import { PREVIEW_MESSAGE } from '@cms/renderer'
@@ -55,11 +63,11 @@ type Props = {
     isolated: Isolation
     isolatedCurrent: Current<Isolation>
     canvasRef: RefObject<HTMLIFrameElement | null>
-    canvasSource: { versionId: string | null; epoch: number }
+    canvasSource: CanvasDocumentSource
     canvasReady: number
     canvasSlow: boolean
     canvasAttached: boolean
-    renderCanvas: (snapshot: EditorDocument) => void
+    renderCanvas: (snapshot: EditorDocument, automaticRetry?: boolean) => void
     shown: Current<EditorDocument>
     toCanvas: (message: Record<string, unknown>) => void
     canvasAwaitingRender: boolean
@@ -199,11 +207,17 @@ export function EditorCanvas({ view, frame, fields, overlays }: Props) {
     !isolated.enabled && canvasAttached && needsPreview && canvasSource.versionId
       ? `/preview/${canvasSource.versionId}?v=${canvasSource.epoch}&hidden=${showHiddenSections ? '1' : '0'}&site=${sitePreview}${libraryPreview ? '&insert=' + libraryPreview.section_def_id + '&definitionVersion=' + libraryPreview.version + '&at=' + insertAt : ''}`
       : null
-  const retryDocument = useCanvasDocumentRetry(sameOriginSource, canvasReady > 0, toCanvas)
-  // Use the same URL generation as Reload preview for the fresh document.
-  const canvasAddress = retryDocument
-    ? sameOriginSource?.replace(`?v=${canvasSource.epoch}&`, `?v=${canvasSource.epoch + 1}&`)
-    : sameOriginSource
+  const recoverCanvas = useCallback(
+    () => renderCanvas(currentEditor.current.saved, true),
+    [currentEditor, renderCanvas],
+  )
+  useCanvasDocumentRetry(
+    sameOriginSource,
+    canvasReady > 0,
+    Boolean(canvasSource.automaticRetry),
+    toCanvas,
+    recoverCanvas,
+  )
   return (
     <div id="editor-panel-canvas" className="canvas-pane" role="tabpanel" aria-labelledby="editor-tab-canvas">
       {/* One slim row. Every line above the page is height the page does
@@ -356,7 +370,7 @@ export function EditorCanvas({ view, frame, fields, overlays }: Props) {
             canvasAttached &&
             (!isolated.enabled || isolated.href) && (
               <iframe
-                key={`${canvasSource.epoch}:${retryDocument ? 1 : 0}`}
+                key={canvasSource.epoch}
                 ref={canvasRef}
                 className="canvas"
                 title="Page canvas"
@@ -379,7 +393,7 @@ export function EditorCanvas({ view, frame, fields, overlays }: Props) {
                   height: canvasSize.height > 0 ? canvasSize.height / previewScale : '100%',
                   transform: `scale(${previewScale})`,
                 }}
-                src={(isolated.enabled ? isolated.href : canvasAddress) ?? undefined}
+                src={(isolated.enabled ? isolated.href : sameOriginSource) ?? undefined}
               />
             )
           ) : (
