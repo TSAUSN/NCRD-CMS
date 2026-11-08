@@ -18,10 +18,10 @@ export function DataValueField({
   onChange: (binding: DataBinding | null, value?: string, suggestedLabel?: string) => void
   children: ReactNode
 }) {
-  const [open, setOpen] = useState(Boolean(binding)),
-    [numbers, setNumbers] = useState<DataValue[] | null>(null),
-    [error, setError] = useState(''),
-    [loading, setLoading] = useState(false)
+  const [open, setOpen] = useState(Boolean(binding))
+  const [numbers, setNumbers] = useState<DataValue[] | null>(null)
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
   function load() {
     setLoading(true)
     setError('')
@@ -36,11 +36,11 @@ export function DataValueField({
   useEffect(() => {
     if (open && numbers === null && !loading) load()
   }, [open])
-  const numberIds = [...new Set(binding?.parts.flatMap(part => ('valueId' in part ? [part.valueId] : [])) ?? [])],
-    number = numbers?.find(row => row.id === numberIds[0]),
-    prefix = binding?.parts[0] && 'text' in binding.parts[0] ? binding.parts[0].text : '',
-    last = binding?.parts.at(-1),
-    suffix = last && 'text' in last ? last.text : ''
+  const numberIds = [...new Set(binding?.parts.flatMap(part => ('valueId' in part ? [part.valueId] : [])) ?? [])]
+  const number = numbers?.find(row => row.id === numberIds[0])
+  const prefix = binding?.parts[0] && 'text' in binding.parts[0] ? binding.parts[0].text : ''
+  const last = binding?.parts.at(-1)
+  const suffix = last && 'text' in last ? last.text : ''
   const [wordsOpen, setWordsOpen] = useState(Boolean(prefix || suffix))
   useEffect(() => {
     if (prefix || suffix) setWordsOpen(true)

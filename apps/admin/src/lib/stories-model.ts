@@ -12,8 +12,8 @@ export type StoryRecord = {
 const iso = (date: Date) => date.toISOString().slice(0, 10)
 const day = (value: Date) => new Date(Date.UTC(value.getUTCFullYear(), value.getUTCMonth(), value.getUTCDate()))
 function addMonths(date: Date, count: number) {
-  const result = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + count, 1)),
-    last = new Date(Date.UTC(result.getUTCFullYear(), result.getUTCMonth() + 1, 0)).getUTCDate()
+  const result = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + count, 1))
+  const last = new Date(Date.UTC(result.getUTCFullYear(), result.getUTCMonth() + 1, 0)).getUTCDate()
   result.setUTCDate(Math.min(date.getUTCDate(), last))
   return result
 }
@@ -30,11 +30,11 @@ export function hasStoryText(values: Record<string, unknown>): boolean {
   )
 }
 export function storyFeedState(record: StoryRecord, now = new Date()) {
-  const row = { ...record, id: record.id ?? record.stableKey, createdAt: record.editedAt ?? '1970-01-01' },
-    selection = { mode: 'automatic' as const, dateField: 'published_date', maxAgeMonths: 13, limit: 200 },
-    today = day(now),
-    published = typeof record.values.published_date === 'string' ? record.values.published_date : '',
-    date = new Date(published + 'T00:00:00Z')
+  const row = { ...record, id: record.id ?? record.stableKey, createdAt: record.editedAt ?? '1970-01-01' }
+  const selection = { mode: 'automatic' as const, dateField: 'published_date', maxAgeMonths: 13, limit: 200 }
+  const today = day(now)
+  const published = typeof record.values.published_date === 'string' ? record.values.published_date : ''
+  const date = new Date(published + 'T00:00:00Z')
   if (!/^\d{4}-\d{2}-\d{2}$/.test(published) || !Number.isFinite(date.getTime()) || iso(date) !== published)
     return { active: false, leavesOn: '', days: 0, soon: false }
   const active = storyDateInFeed(published, today)

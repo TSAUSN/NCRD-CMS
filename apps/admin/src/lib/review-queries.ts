@@ -251,8 +251,8 @@ export function reviewChangePresentation(userId: string, submissionId: string): 
       ),
     )
     const { pageChangePresentation } = await import('./release-copy.ts')
-    const submitted = manifests.find(item => item.id === row.version_id)?.manifest.page,
-      live = manifests.find(item => item.id === row.published_version_id)?.manifest.page
+    const submitted = manifests.find(item => item.id === row.version_id)?.manifest.page
+    const live = manifests.find(item => item.id === row.published_version_id)?.manifest.page
     const settings = (
       await client.query(
         'SELECT v.settings FROM site_settings h JOIN site_setting_versions v ON v.id=h.published_version_id WHERE h.site_id=$1',

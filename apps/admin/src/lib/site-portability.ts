@@ -134,11 +134,11 @@ export async function inspectArchiveObjects(archive: SiteArchive): Promise<Inspe
     invalid('The archive media object list is incomplete or has duplicates.')
   const totalPixels = [...expected.values()].reduce((sum, row) => sum + row.width * row.height, 0)
   if (totalPixels > 200_000_000) invalid('This archive exceeds the 200 million decoded image pixel limit.')
-  const seen = new Set<string>(),
-    inspected: InspectedObject[] = []
+  const seen = new Set<string>()
+  const inspected: InspectedObject[] = []
   for (const object of archive.objects) {
-    const key = `${object.media_id}:${object.kind}`,
-      metadata = expected.get(key)
+    const key = `${object.media_id}:${object.kind}`
+    const metadata = expected.get(key)
     if (!metadata || seen.has(key)) invalid('The archive includes an unexpected or duplicate media object.')
     seen.add(key)
     const bytes = Buffer.from(object.base64, 'base64')
@@ -229,11 +229,11 @@ export async function prepareSiteArchive(requestId: string, destination: SiteArc
   // Immutable script/CSS bytes may still use the source site's checksum paths.
   // Only exact files in the same historical bundle receive a local alias.
   for (const [index, row] of (content.site_file_versions ?? []).entries()) {
-    const source = archive.content.site_file_versions![index]!,
-      paths = structuredClone(source.bundle.paths ?? []).map(path => ({ ...path, fileId: ids.get(path.fileId)! }))
+    const source = archive.content.site_file_versions![index]!
+    const paths = structuredClone(source.bundle.paths ?? []).map(path => ({ ...path, fileId: ids.get(path.fileId)! }))
     for (const fileId of source.bundle.files) {
-      const file = archive.content.site_files!.find(file => file.id === fileId)!,
-        path = siteFileAddress(file)
+      const file = archive.content.site_files!.find(file => file.id === fileId)!
+      const path = siteFileAddress(file)
       if (!paths.some(item => item.path === path)) paths.push({ path, fileId: ids.get(fileId)! })
     }
     row.bundle.paths = paths

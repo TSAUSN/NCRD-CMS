@@ -11,13 +11,13 @@ import { Dialog } from './ui/dialog.tsx'
 import { Button } from './ui/button.tsx'
 export function DraftLeavePrompt() {
   useSyncExternalStore(subscribeNavigationState, navigationStateVersion, () => 0)
-  const [request, setRequest] = useState<DraftLeaveRequest | null>(null),
-    [pending, setPending] = useState(false),
-    [error, setError] = useState(''),
-    [action, setAction] = useState<'save' | 'discard' | null>(null),
-    lock = useRef(false),
-    epoch = useRef(0),
-    path = usePathname()
+  const [request, setRequest] = useState<DraftLeaveRequest | null>(null)
+  const [pending, setPending] = useState(false)
+  const [error, setError] = useState('')
+  const [action, setAction] = useState<'save' | 'discard' | null>(null)
+  const lock = useRef(false)
+  const epoch = useRef(0)
+  const path = usePathname()
   useEffect(
     () =>
       subscribeDraftLeave(next => {
@@ -73,14 +73,14 @@ export function DraftLeavePrompt() {
     }
   }
   if (!request) return null
-  const read = request.readDrafts(),
-    current = read ?? request.drafts,
-    drafts = current.length ? current : request.drafts,
-    saved = read?.length === 0 || current.every(draft => draft.saved === true),
-    library = drafts.some(draft => draft.saveMode === 'library'),
-    discardLabel = drafts.every(draft => draft.discardLabel === drafts[0]?.discardLabel)
-      ? (drafts[0]?.discardLabel ?? 'Discard changes')
-      : 'Discard changes'
+  const read = request.readDrafts()
+  const current = read ?? request.drafts
+  const drafts = current.length ? current : request.drafts
+  const saved = read?.length === 0 || current.every(draft => draft.saved === true)
+  const library = drafts.some(draft => draft.saveMode === 'library')
+  const discardLabel = drafts.every(draft => draft.discardLabel === drafts[0]?.discardLabel)
+    ? (drafts[0]?.discardLabel ?? 'Discard changes')
+    : 'Discard changes'
   return (
     <Dialog
       title="Before you leave"

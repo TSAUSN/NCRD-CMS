@@ -84,10 +84,10 @@ export function usePageRecovery(options: Options) {
     latest.current = options
   }, [options])
   const mounted = useRef(false)
-  const writeGeneration = useRef(0),
-    loadGeneration = useRef(0),
-    busyGeneration = useRef(0),
-    writing = useRef(0)
+  const writeGeneration = useRef(0)
+  const loadGeneration = useRef(0)
+  const busyGeneration = useRef(0)
+  const writing = useRef(0)
   const [writePending, setWritePending] = useState(false)
   const [storageError, setStorageError] = useState<string | null>(null)
   const [stored, setStored] = useState(false)
@@ -208,8 +208,8 @@ export function usePageRecovery(options: Options) {
   }, [refresh, revalidate])
 
   const openReview = async (record: RecoveryRecord) => {
-    const scope = latest.current.scope,
-      generation = ++loadGeneration.current
+    const scope = latest.current.scope
+    const generation = ++loadGeneration.current
     busyGeneration.current = generation
     setBusy(true)
     setError(null)
@@ -238,8 +238,8 @@ export function usePageRecovery(options: Options) {
   }
   const applyReview = async (acceptChangedBase: boolean) => {
     if (!review || (review.changedBase && !acceptChangedBase) || !latest.current.canApply()) return
-    const scope = latest.current.scope,
-      generation = ++loadGeneration.current
+    const scope = latest.current.scope
+    const generation = ++loadGeneration.current
     busyGeneration.current = generation
     setBusy(true)
     setError(null)
@@ -278,8 +278,8 @@ export function usePageRecovery(options: Options) {
   }
   const discardReview = async () => {
     if (!review) return
-    const scope = latest.current.scope,
-      generation = ++loadGeneration.current
+    const scope = latest.current.scope
+    const generation = ++loadGeneration.current
     busyGeneration.current = generation
     setBusy(true)
     setError(null)

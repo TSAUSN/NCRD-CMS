@@ -71,26 +71,26 @@ export function storyPlacementFeeds(
   for (const value of sections) {
     const section = record(value)
     if (section.hidden === true) continue
-    const values = record(section.values),
-      slug = slugs.get(String(section.section_def_id)) ?? '',
-      kind = slug === 'core-story-world' ? 'world' : slug === 'core-story-split' ? 'split' : 'feed',
-      hiddenAt = Array.isArray(section.hidden_at)
-        ? section.hidden_at.filter((v): v is string => typeof v === 'string')
-        : []
+    const values = record(section.values)
+    const slug = slugs.get(String(section.section_def_id)) ?? ''
+    const kind = slug === 'core-story-world' ? 'world' : slug === 'core-story-split' ? 'split' : 'feed'
+    const hiddenAt = Array.isArray(section.hidden_at)
+      ? section.hidden_at.filter((v): v is string => typeof v === 'string')
+      : []
     if (['sm', 'md', 'lg'].every(size => hiddenAt.includes(size))) continue
     const slots = slotsByVersion.get(String(section.section_def_id) + ':' + String(section.section_def_version))
     function walk(node: unknown, key: string, direct: boolean) {
       const binding = readCollectionBinding(node)
       if (binding) {
         if (binding.readerKey === 'stories') {
-          const slot = slots?.find(slot => slot.id === key),
-            dateWindow =
-              direct &&
-              (slot
-                ? isStoryFeedSlot(slot, slug)
-                : !slots &&
-                  ['core-stories', 'core-newsroom', 'core-story-world', 'core-story-split'].includes(slug) &&
-                  key === 'stories')
+          const slot = slots?.find(slot => slot.id === key)
+          const dateWindow =
+            direct &&
+            (slot
+              ? isStoryFeedSlot(slot, slug)
+              : !slots &&
+                ['core-stories', 'core-newsroom', 'core-story-world', 'core-story-split'].includes(slug) &&
+                key === 'stories')
           feeds.push({
             selection: binding.selection,
             kind,
@@ -135,9 +135,9 @@ export function storyPlacement(
   values: Record<string, unknown>,
   settings: StoriesSettings,
 ) {
-  const now = new Date(context.readAt),
-    today = now.toISOString().slice(0, 10),
-    date = values.published_date
+  const now = new Date(context.readAt)
+  const today = now.toISOString().slice(0, 10)
+  const date = values.published_date
   if (!validDay(date))
     return {
       asOf: today,
@@ -147,39 +147,41 @@ export function storyPlacement(
       hasArticle: context.hasArticle && storyVisible(values),
       privateSite: context.privateSite,
     }
-  const future = date > today,
-    asOf = future ? date : today,
-    at = new Date(asOf + 'T00:00:00Z'),
-    candidate = { ...context.candidate, values },
-    rows = [...context.rows.filter(row => row.id !== candidate.id), candidate].sort(
-      (a, b) => a.sortIndex - b.sortIndex || a.createdAt.localeCompare(b.createdAt) || a.id.localeCompare(b.id),
-    ),
-    eligible = rows.filter(
-      row => storyAllowedInFeeds(row.values, settings) && storyDateInFeed(row.values.published_date, at),
-    ),
-    catalog = storyCatalog(settings),
-    has = (pool: readonly StoryPlacementRow[]) => pool.some(row => row.id === candidate.id)
+  const future = date > today
+  const asOf = future ? date : today
+  const at = new Date(asOf + 'T00:00:00Z')
+  const candidate = { ...context.candidate, values }
+  const rows = [...context.rows.filter(row => row.id !== candidate.id), candidate].sort(
+    (a, b) => a.sortIndex - b.sortIndex || a.createdAt.localeCompare(b.createdAt) || a.id.localeCompare(b.id),
+  )
+  const eligible = rows.filter(
+    row => storyAllowedInFeeds(row.values, settings) && storyDateInFeed(row.values.published_date, at),
+  )
+  const catalog = storyCatalog(settings)
+  const has = (pool: readonly StoryPlacementRow[]) => pool.some(row => row.id === candidate.id)
   const places = context.pages
     .flatMap(page => {
-      const views = new Set<string>(),
-        maximum = storyWidgetMaximum(catalog, page.path)
+      const views = new Set<string>()
+      const maximum = storyWidgetMaximum(catalog, page.path)
       for (const feed of page.feeds) {
         const selection = storyWidgetSelection(feed.selection, feed.kind !== 'feed')
         const selected = selectListRows(
-            selection.mode === 'automatic' ? eligible : rows.filter(row => storyVisible(row.values)),
-            selection,
-            at,
-            settings,
-          ),
-          chosen = feed.dateWindow ? selected.filter(row => storyDateInFeed(row.values.published_date, at)) : selected,
-          pool = feed.kind === 'split' ? orderedStoryWidgetRows(chosen) : chosen,
-          suffix = feed.hiddenAt.length
-            ? ' (hidden on ' +
-              feed.hiddenAt
-                .map(size => (size === 'sm' ? 'phones' : size === 'md' ? 'tablets' : size === 'lg' ? 'desktop' : size))
-                .join(', ') +
-              ')'
-            : ''
+          selection.mode === 'automatic' ? eligible : rows.filter(row => storyVisible(row.values)),
+          selection,
+          at,
+          settings,
+        )
+        const chosen = feed.dateWindow
+          ? selected.filter(row => storyDateInFeed(row.values.published_date, at))
+          : selected
+        const pool = feed.kind === 'split' ? orderedStoryWidgetRows(chosen) : chosen
+        const suffix = feed.hiddenAt.length
+          ? ' (hidden on ' +
+            feed.hiddenAt
+              .map(size => (size === 'sm' ? 'phones' : size === 'md' ? 'tablets' : size === 'lg' ? 'desktop' : size))
+              .join(', ') +
+            ')'
+          : ''
         if (feed.kind === 'feed') {
           if (has(pool)) views.add((feed.heading || 'Stories') + suffix)
           continue
@@ -188,15 +190,15 @@ export function storyPlacement(
           feed.kind === 'split' &&
           has(selectedStoryWidgetRows(pool, 'recent', '', maximum, maximum !== 6 && newsroomSelection(feed.selection)))
         ) {
-          const initial = Math.min(storySplitPageSize(feed.pageSize), maximum),
-            more =
-              selectedStoryWidgetRows(
-                pool,
-                'recent',
-                '',
-                maximum,
-                maximum !== 6 && newsroomSelection(feed.selection),
-              ).findIndex(row => row.id === candidate.id) >= initial
+          const initial = Math.min(storySplitPageSize(feed.pageSize), maximum)
+          const more =
+            selectedStoryWidgetRows(
+              pool,
+              'recent',
+              '',
+              maximum,
+              maximum !== 6 && newsroomSelection(feed.selection),
+            ).findIndex(row => row.id === candidate.id) >= initial
           views.add('Recently Published' + (more ? ' · after Show more stories' : '') + suffix)
         }
         if (feed.kind === 'split')

@@ -23,22 +23,22 @@ export function ListDetail({
   storageKey: string
   panelFrame?: boolean
 }) {
-  const root = useRef<HTMLDivElement>(null),
-    open = Boolean(panel)
+  const root = useRef<HTMLDivElement>(null)
+  const open = Boolean(panel)
   useLayoutEffect(() => {
     if (!open) return
     const node = root.current?.children[1] as HTMLElement | undefined
     if (!node) return
     let frame = 0
     const measure = () =>
-        node.style.setProperty(
-          '--detail-panel-available',
-          Math.max(0, window.innerHeight - node.getBoundingClientRect().top) + 'px',
-        ),
-      update = () => {
-        cancelAnimationFrame(frame)
-        frame = requestAnimationFrame(measure)
-      }
+      node.style.setProperty(
+        '--detail-panel-available',
+        Math.max(0, window.innerHeight - node.getBoundingClientRect().top) + 'px',
+      )
+    const update = () => {
+      cancelAnimationFrame(frame)
+      frame = requestAnimationFrame(measure)
+    }
     measure()
     const observer = new ResizeObserver(update)
     if (node.parentElement) observer.observe(node.parentElement)

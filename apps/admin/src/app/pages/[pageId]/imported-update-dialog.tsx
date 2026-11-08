@@ -30,8 +30,8 @@ export function ImportedUpdateDialog({
   onCancel: () => void
   onApply: () => void
 }) {
-  const box = useRef<HTMLDivElement>(null),
-    cancel = useRef<HTMLButtonElement>(null)
+  const box = useRef<HTMLDivElement>(null)
+  const cancel = useRef<HTMLButtonElement>(null)
   useEffect(() => {
     const opener = document.activeElement
     cancel.current?.focus()
@@ -48,8 +48,8 @@ export function ImportedUpdateDialog({
       }
       if (event.key !== 'Tab') return
       const items = [...(box.current?.querySelectorAll<HTMLElement>('button:not([disabled]),iframe') ?? [])]
-      const first = items[0],
-        last = items.at(-1)
+      const first = items[0]
+      const last = items.at(-1)
       if (!first || !last) return
       if (!items.includes(document.activeElement as HTMLElement)) {
         event.preventDefault()

@@ -5,21 +5,21 @@ import type { Drawer } from './dialog.tsx'
 import listInspectorStyles from '../workspace-styles/list-inspector.module.css'
 /** A nonmodal inspector keeps its list available; the caller owns leave/save decisions. */
 export function DetailPanel({ title, children, footer, onClose, pending }: ComponentProps<typeof Drawer>) {
-  const id = useId(),
-    panel = useRef<HTMLElement>(null)
+  const id = useId()
+  const panel = useRef<HTMLElement>(null)
   useLayoutEffect(() => {
     const node = panel.current
     if (!node) return
     let frame = 0
     const measure = () =>
-        node.style.setProperty(
-          '--detail-panel-available',
-          Math.max(0, window.innerHeight - node.getBoundingClientRect().top) + 'px',
-        ),
-      update = () => {
-        cancelAnimationFrame(frame)
-        frame = requestAnimationFrame(measure)
-      }
+      node.style.setProperty(
+        '--detail-panel-available',
+        Math.max(0, window.innerHeight - node.getBoundingClientRect().top) + 'px',
+      )
+    const update = () => {
+      cancelAnimationFrame(frame)
+      frame = requestAnimationFrame(measure)
+    }
     measure()
     const observer = new ResizeObserver(update)
     if (node.parentElement) observer.observe(node.parentElement)

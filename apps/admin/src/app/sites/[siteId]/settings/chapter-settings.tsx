@@ -57,28 +57,28 @@ function ChapterDefaults({
   revision: string
   defaultMode: 'division' | 'chapter-editors'
 }) {
-  const router = useRouter(),
-    [result, setResult] = useState<Result | null>(null),
-    [pending, start] = useTransition(),
-    inFlight = useRef(false)
-  const initial = { mode: defaultMode, revision },
-    setup = useBrowserSetup({
-      storageKey: 'cms.chapter-defaults.' + actorId + '.' + siteId,
-      initial,
-      label: 'Chapter defaults',
-      pending: () => pending || inFlight.current,
-      read: value => {
-        const data = value as typeof initial
-        return data &&
-          ['division', 'chapter-editors'].includes(data.mode) &&
-          typeof data.revision === 'string' &&
-          /^\d{1,30}$/.test(data.revision)
-          ? { mode: data.mode, revision: data.revision }
-          : null
-      },
-    }),
-    { mode } = setup.value,
-    busy = pending || setup.loading
+  const router = useRouter()
+  const [result, setResult] = useState<Result | null>(null)
+  const [pending, start] = useTransition()
+  const inFlight = useRef(false)
+  const initial = { mode: defaultMode, revision }
+  const setup = useBrowserSetup({
+    storageKey: 'cms.chapter-defaults.' + actorId + '.' + siteId,
+    initial,
+    label: 'Chapter defaults',
+    pending: () => pending || inFlight.current,
+    read: value => {
+      const data = value as typeof initial
+      return data &&
+        ['division', 'chapter-editors'].includes(data.mode) &&
+        typeof data.revision === 'string' &&
+        /^\d{1,30}$/.test(data.revision)
+        ? { mode: data.mode, revision: data.revision }
+        : null
+    },
+  })
+  const { mode } = setup.value
+  const busy = pending || setup.loading
   function save() {
     if (inFlight.current || busy) return
     inFlight.current = true
@@ -193,22 +193,22 @@ function ChapterDefaults({
   )
 }
 function NewDivision({ siteId, actorId }: { actorId: string; siteId: string }) {
-  const router = useRouter(),
-    [result, setResult] = useState<Result | null>(null),
-    [pending, start] = useTransition(),
-    inFlight = useRef(false),
-    initial = { name: '' }
+  const router = useRouter()
+  const [result, setResult] = useState<Result | null>(null)
+  const [pending, start] = useTransition()
+  const inFlight = useRef(false)
+  const initial = { name: '' }
   const setup = useBrowserSetup({
-      storageKey: 'cms.chapter-new-division.' + actorId + '.' + siteId,
-      initial,
-      label: 'New division team',
-      pending: () => pending || inFlight.current,
-      read: value => {
-        const data = value as typeof initial
-        return data && typeof data.name === 'string' && data.name.length <= 120 ? { name: data.name } : null
-      },
-    }),
-    busy = pending || setup.loading
+    storageKey: 'cms.chapter-new-division.' + actorId + '.' + siteId,
+    initial,
+    label: 'New division team',
+    pending: () => pending || inFlight.current,
+    read: value => {
+      const data = value as typeof initial
+      return data && typeof data.name === 'string' && data.name.length <= 120 ? { name: data.name } : null
+    },
+  })
+  const busy = pending || setup.loading
   function save() {
     if (inFlight.current || busy) return
     inFlight.current = true
@@ -282,29 +282,29 @@ function NewDivision({ siteId, actorId }: { actorId: string; siteId: string }) {
 }
 
 function DivisionTeam({ team, siteId, actorId }: { actorId: string; team: ChapterTeam; siteId: string }) {
-  const router = useRouter(),
-    [result, setResult] = useState<Result | null>(null),
-    [pending, start] = useTransition(),
-    inFlight = useRef(false),
-    initial = { email: '', name: '' }
+  const router = useRouter()
+  const [result, setResult] = useState<Result | null>(null)
+  const [pending, start] = useTransition()
+  const inFlight = useRef(false)
+  const initial = { email: '', name: '' }
   const setup = useBrowserSetup({
-      storageKey: 'cms.chapter-division-staff.' + actorId + '.' + siteId + '.' + team.id,
-      initial,
-      label: team.name + ' staff choices',
-      pending: () => pending || inFlight.current,
-      read: value => {
-        const data = value as typeof initial
-        return data &&
-          typeof data.email === 'string' &&
-          data.email.length <= 254 &&
-          typeof data.name === 'string' &&
-          data.name.length <= 120
-          ? { email: data.email, name: data.name }
-          : null
-      },
-    }),
-    { email, name } = setup.value,
-    busy = pending || setup.loading
+    storageKey: 'cms.chapter-division-staff.' + actorId + '.' + siteId + '.' + team.id,
+    initial,
+    label: team.name + ' staff choices',
+    pending: () => pending || inFlight.current,
+    read: value => {
+      const data = value as typeof initial
+      return data &&
+        typeof data.email === 'string' &&
+        data.email.length <= 254 &&
+        typeof data.name === 'string' &&
+        data.name.length <= 120
+        ? { email: data.email, name: data.name }
+        : null
+    },
+  })
+  const { email, name } = setup.value
+  const busy = pending || setup.loading
   function save(person: { email: string; name: string }, enabled: boolean) {
     if (inFlight.current || busy) return
     inFlight.current = true

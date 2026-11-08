@@ -33,10 +33,10 @@ export async function readSawsoStoriesSource(fetcher: typeof fetch = fetch): Pro
   })
   if (!response.ok || !response.body || Number(response.headers.get('content-length') ?? 0) > 20000000)
     throw new Error('source unavailable')
-  const reader = response.body.getReader(),
-    decoder = new TextDecoder('utf-8', { fatal: true })
-  let size = 0,
-    wire = ''
+  const reader = response.body.getReader()
+  const decoder = new TextDecoder('utf-8', { fatal: true })
+  let size = 0
+  let wire = ''
   try {
     for (;;) {
       const { done, value } = await reader.read()
@@ -85,8 +85,8 @@ async function applyStorySourceCheck(
   const list = (
     await client.query('SELECT app.lock_story_source_check($1,$2,$3) AS value', [siteId, collectionId, requestId])
   ).rows[0]!.value
-  const model = CollectionModel.parse({ fields: list.fields, presentation: list.sort }),
-    settings = model.presentation.stories
+  const model = CollectionModel.parse({ fields: list.fields, presentation: list.sort })
+  const settings = model.presentation.stories
   if (settings?.source !== 'sawso')
     throw new DomainError('invalid_state', 'The source connection changed. Saved stories are unchanged.')
   const owned = (
@@ -102,12 +102,12 @@ async function applyStorySourceCheck(
     )
   ).rows
   const baselines: StorySourceBaseline[] = stored.map(row => ({
-      sourceId: row.source_id,
-      stableKey: row.stable_key,
-      fields: row.fields,
-    })),
-    ids = new Set(baselines.map(b => b.sourceId)),
-    keys = new Set(baselines.map(b => b.stableKey))
+    sourceId: row.source_id,
+    stableKey: row.stable_key,
+    fields: row.fields,
+  }))
+  const ids = new Set(baselines.map(b => b.sourceId))
+  const keys = new Set(baselines.map(b => b.stableKey))
   baselines.push(
     ...initialSawsoSourceBaselines(owned.map(row => row.stable_key)).filter(
       b => !ids.has(b.sourceId) && !keys.has(b.stableKey),

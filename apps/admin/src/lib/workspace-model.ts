@@ -1,9 +1,9 @@
 export function pageTree<T extends { id: string; parent_page_id: string | null }>(
   pages: readonly T[],
 ): { page: T; depth: number }[] {
-  const ids = new Set(pages.map(page => page.id)),
-    seen = new Set<string>(),
-    result: { page: T; depth: number }[] = []
+  const ids = new Set(pages.map(page => page.id))
+  const seen = new Set<string>()
+  const result: { page: T; depth: number }[] = []
   const walk = (parent: string | null, depth: number) => {
     for (const page of pages) {
       if (seen.has(page.id)) continue

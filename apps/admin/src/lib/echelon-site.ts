@@ -13,8 +13,8 @@ export async function ensureEchelonSite(
   if (!(await client.query('SELECT app.is_super_admin() AS allowed')).rows[0]?.allowed)
     throw new Error('Only a Super Admin can set up the chapters site.')
   await client.query("SELECT pg_advisory_xact_lock(hashtextextended('cms-echelon-chapters-setup',8))")
-  const setup = echelonSiteSetup(),
-    existing = (await client.query('SELECT id,staging_hostname FROM sites WHERE slug=$1', [setup.slug])).rows[0]
+  const setup = echelonSiteSetup()
+  const existing = (await client.query('SELECT id,staging_hostname FROM sites WHERE slug=$1', [setup.slug])).rows[0]
   if (existing) {
     await client.query('SELECT app.enable_chapters($1)', [existing.id])
     await installCoreLibrary(client)

@@ -23,9 +23,9 @@ export function PresetFooterCards({
   onChange: (footer: FooterConfigV1) => void
 }) {
   const set = (next: FooterConfigV1) => {
-      if (canManage) onChange(next)
-    },
-    published = pages.filter(page => page.published)
+    if (canManage) onChange(next)
+  }
+  const published = pages.filter(page => page.published)
   const linkCount = footer.groups.reduce((count, group) => count + group.links.length, 0)
   const empty = (label = 'New link'): GlobalElementLink => ({ label, target: { type: 'url', url: '/' } })
   const legal = (key: 'privacy' | 'accessibility' | 'terms', link: GlobalElementLink | null) =>
@@ -319,11 +319,9 @@ function PresetLink({
             disabled={disabled}
             value={link.target.type}
             onChange={event => {
-              const first = pages[0],
-                target: NavTarget =
-                  event.target.value === 'page' && first
-                    ? { type: 'page', page_id: first.id }
-                    : { type: 'url', url: '/' }
+              const first = pages[0]
+              const target: NavTarget =
+                event.target.value === 'page' && first ? { type: 'page', page_id: first.id } : { type: 'url', url: '/' }
               onChange({ ...link, target })
             }}
           >

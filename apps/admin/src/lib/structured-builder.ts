@@ -114,8 +114,8 @@ export function removeBuilderNode(doc: StructuredDocument, path: number[]): Stru
 
 export function moveBuilderNode(doc: StructuredDocument, path: number[], direction: -1 | 1): StructuredDocument {
   return changeChildren(doc, path.slice(0, -1), nodes => {
-    const index = path.at(-1)!,
-      target = index + direction
+    const index = path.at(-1)!
+    const target = index + direction
     if (!nodes[target]) return nodes
     const next = [...nodes]
     ;[next[index], next[target]] = [next[target]!, next[index]!]
@@ -124,8 +124,8 @@ export function moveBuilderNode(doc: StructuredDocument, path: number[], directi
 }
 
 export function addBuilderBlock(doc: StructuredDocument, parent: number[], kind: BuilderBlock): StructuredDocument {
-  let field: StructuredFieldDef | null = null,
-    node: StructuredNode
+  let field: StructuredFieldDef | null = null
+  let node: StructuredNode
   if (kind === 'group' || kind === 'columns') {
     node = {
       type: 'element',
@@ -134,8 +134,8 @@ export function addBuilderBlock(doc: StructuredDocument, parent: number[], kind:
       children: kind === 'columns' ? [0, 1].map(() => ({ type: 'element', tag: 'div', children: [] })) : [],
     }
   } else {
-    let name: string = kind,
-      number = 1
+    let name: string = kind
+    let number = 1
     while (doc.fields.some(item => item.name === name)) name = `${kind}${++number}`
     field = {
       name,

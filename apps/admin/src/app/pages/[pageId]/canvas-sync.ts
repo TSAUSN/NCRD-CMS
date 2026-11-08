@@ -43,8 +43,8 @@ export function planCanvasUpdate(shown: EditorDocument, next: EditorDocument, ki
     for (const slot of new Set([...Object.keys(before.values), ...Object.keys(section.values)])) {
       // Editorial sample markers do not change field markup or caret position.
       if (slot === '__cms_sample_fields') {
-        const oldMarkers = Array.isArray(before.values[slot]) ? (before.values[slot] as unknown[]) : [],
-          newMarkers = Array.isArray(section.values[slot]) ? (section.values[slot] as unknown[]) : []
+        const oldMarkers = Array.isArray(before.values[slot]) ? (before.values[slot] as unknown[]) : []
+        const newMarkers = Array.isArray(section.values[slot]) ? (section.values[slot] as unknown[]) : []
         if (
           [...oldMarkers, ...newMarkers].some(
             name =>

@@ -9,8 +9,8 @@ export function localChapterRecordingOrigin(env: Environment = process.env): str
   )
     return null
   try {
-    const origin = new URL(env['ADMIN_ORIGIN'] ?? ''),
-      db = new URL(env['DATABASE_URL_WORKER'] ?? '')
+    const origin = new URL(env['ADMIN_ORIGIN'] ?? '')
+    const db = new URL(env['DATABASE_URL_WORKER'] ?? '')
     return origin.protocol === 'http:' &&
       ['localhost', '127.0.0.1'].includes(origin.hostname) &&
       !origin.username &&

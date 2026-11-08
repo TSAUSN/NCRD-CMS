@@ -6,8 +6,8 @@ import { safeUrl } from '@cms/renderer'
 export function siteImagePreviews(projection: unknown): Record<string, string> {
   const parsed = SiteFileProjection.safeParse(projection)
   if (!parsed.success) return {}
-  const { bundle, files } = parsed.data,
-    byId = new Map(files.map(file => [file.id, file]))
+  const { bundle, files } = parsed.data
+  const byId = new Map(files.map(file => [file.id, file]))
   if (byId.size !== files.length || bundle.files.length !== files.length || bundle.files.some(id => !byId.has(id)))
     return {}
   const entries = (bundle.paths ?? []).flatMap(mount => {

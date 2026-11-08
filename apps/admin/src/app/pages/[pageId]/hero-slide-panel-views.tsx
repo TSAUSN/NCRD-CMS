@@ -99,16 +99,16 @@ export function HeroSlideEditor({ model, active }: { model: HeroSlidesModel; act
     dates,
     schedule,
   } = model
-  const dateProblem = heroSlideDateProblem(values, slot.id, active),
-    hasDates =
-      dates.has(active) ||
-      values[field(active, 'scheduled')] === 'on' ||
-      Boolean(values[field(active, 'starts_at')] || values[field(active, 'ends_at')]),
-    contentProblem =
-      heroSlideContentProblem(values, slot.id, active) ||
-      (slot.constraints?.heroEditingParity === true
-        ? heroSlideParityProblem(values, slot.id, active, publishedValues?.[field(active, 'intro')])
-        : null)
+  const dateProblem = heroSlideDateProblem(values, slot.id, active)
+  const hasDates =
+    dates.has(active) ||
+    values[field(active, 'scheduled')] === 'on' ||
+    Boolean(values[field(active, 'starts_at')] || values[field(active, 'ends_at')])
+  const contentProblem =
+    heroSlideContentProblem(values, slot.id, active) ||
+    (slot.constraints?.heroEditingParity === true
+      ? heroSlideParityProblem(values, slot.id, active, publishedValues?.[field(active, 'intro')])
+      : null)
   return (
     <div ref={boundary} onKeyDownCapture={escape} className={shared.stack + ' ' + workspaceFormsStyles.compactForm}>
       <EditorPanelActions>

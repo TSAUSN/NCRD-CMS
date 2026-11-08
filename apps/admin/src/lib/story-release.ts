@@ -22,8 +22,8 @@ export async function storyReleaseSelection(
   if (!row) throw new DomainError('not_found', 'This story is unavailable to this site.')
   if (!row.story_date)
     throw new DomainError('invalid_state', 'Choose a story date before publishing or scheduling this story.')
-  const candidates = await releaseCandidates(client, siteId),
-    selected: ReleaseItem[] = []
+  const candidates = await releaseCandidates(client, siteId)
+  const selected: ReleaseItem[] = []
   if (row.changed) {
     const items = candidates.find(item => item.type === 'collection_entries' && item.id === row.collection_id)
     if (!items) throw new DomainError('stale_revision', 'Stories changed. Save and review this story again.')

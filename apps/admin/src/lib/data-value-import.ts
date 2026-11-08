@@ -37,17 +37,17 @@ export function previewNumberFile(text: string, current: readonly NumberValue[])
   return rows.map(input => {
     if (!input || typeof input !== 'object' || Array.isArray(input))
       throw new Error('Each row needs a label, value and source.')
-    const raw = input as Record<string, unknown>,
-      label = String(raw.label ?? '').trim(),
-      matches = current.filter(row => row.label.toLowerCase() === label.toLowerCase()),
-      old = current.find(row => row.id === raw.id) ?? (matches.length === 1 ? matches[0] : undefined),
-      id = old?.id ?? crypto.randomUUID(),
-      value =
-        typeof raw.value === 'number' && Number.isFinite(raw.value)
-          ? String(raw.value)
-          : typeof raw.value === 'string'
-            ? raw.value.trim()
-            : ''
+    const raw = input as Record<string, unknown>
+    const label = String(raw.label ?? '').trim()
+    const matches = current.filter(row => row.label.toLowerCase() === label.toLowerCase())
+    const old = current.find(row => row.id === raw.id) ?? (matches.length === 1 ? matches[0] : undefined)
+    const id = old?.id ?? crypto.randomUUID()
+    const value =
+      typeof raw.value === 'number' && Number.isFinite(raw.value)
+        ? String(raw.value)
+        : typeof raw.value === 'string'
+          ? raw.value.trim()
+          : ''
     if (!label || label.length > 120 || !value || value.length > 100 || seen.has(id))
       throw new Error('Use one row per number, with a label and value.')
     seen.add(id)

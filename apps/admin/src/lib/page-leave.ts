@@ -10,8 +10,8 @@ export function pageLeaveSnapshot(
 ): PageLeaveSnapshot {
   const document = structuredClone(current.document)
   for (const [index, section] of document.sections.entries()) {
-    const originalIndex = opening.sectionOrigins.indexOf(current.sectionOrigins[index]!),
-      original = opening.document.sections[originalIndex]
+    const originalIndex = opening.sectionOrigins.indexOf(current.sectionOrigins[index]!)
+    const original = opening.document.sections[originalIndex]
     for (const slot of forms.get(section.section_def_id + ':' + section.section_def_version)?.slots ?? []) {
       if (!repeatItemSpec(slot)) continue
       const oldKeys = repeatItemKeys(original?.values[slot.id])

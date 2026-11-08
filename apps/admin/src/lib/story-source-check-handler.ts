@@ -2,8 +2,8 @@ import { DomainError, fromSqlError } from '@cms/domain'
 import { isStrictSameOriginRequest } from './request-origin.ts'
 import { readBoundedRequestBody } from './request-body.ts'
 import type { StorySourceCheck } from './story-source-check.ts'
-const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
-  headers = { 'cache-control': 'private, no-store', 'x-content-type-options': 'nosniff' }
+const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+const headers = { 'cache-control': 'private, no-store', 'x-content-type-options': 'nosniff' }
 const fail = (status: number, error: string) => Response.json({ error }, { status, headers })
 export function createStorySourceCheckHandler(deps: {
   trustProxyHeaders?: boolean

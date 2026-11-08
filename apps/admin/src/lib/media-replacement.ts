@@ -193,8 +193,8 @@ export function applyImageReplacement(
             ),
           ])
         if (keys.includes('frame')) {
-          const header = plan.frames.find(frame => frame.kind === 'header'),
-            footer = plan.frames.find(frame => frame.kind === 'footer')
+          const header = plan.frames.find(frame => frame.kind === 'header')
+          const footer = plan.frames.find(frame => frame.kind === 'footer')
           if (!header || !footer) invalid('The header and footer could not be loaded. Try again.')
           await client.query('SELECT * FROM app.save_global_elements_draft($1,$2,$3,$4,$5)', [
             siteId,

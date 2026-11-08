@@ -124,8 +124,8 @@ export function getGlobalElementsWorkspace(userId: string, siteId: string): Prom
         [siteId],
       )
     ).rows[0]
-    const parsedFiles = SiteFileBundle.safeParse(fileRow?.bundle),
-      original = parsedFiles.success ? parsedFiles.data.original : undefined
+    const parsedFiles = SiteFileBundle.safeParse(fileRow?.bundle)
+    const original = parsedFiles.success ? parsedFiles.data.original : undefined
     const pages = pageRows.rows.map(page => ({
       id: page.id,
       kind: page.kind,

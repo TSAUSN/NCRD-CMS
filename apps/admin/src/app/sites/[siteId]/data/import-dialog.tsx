@@ -20,12 +20,12 @@ export function NumberImportDialog({
   onClose: () => void
   onApply: (next: DataValue[]) => Promise<{ ok: boolean; message?: string }>
 }) {
-  const [address, setAddress] = useState(''),
-    [rows, setRows] = useState<DataValue[]>([]),
-    [error, setError] = useState(''),
-    [pending, setPending] = useState(false),
-    changes = rows.filter(row => JSON.stringify(row) !== JSON.stringify(current.find(old => old.id === row.id))),
-    valid = rows.length > 0 && DataValues.safeParse(mergeNumberFile(current, rows)).success
+  const [address, setAddress] = useState('')
+  const [rows, setRows] = useState<DataValue[]>([])
+  const [error, setError] = useState('')
+  const [pending, setPending] = useState(false)
+  const changes = rows.filter(row => JSON.stringify(row) !== JSON.stringify(current.find(old => old.id === row.id)))
+  const valid = rows.length > 0 && DataValues.safeParse(mergeNumberFile(current, rows)).success
   async function save() {
     if (pending || !valid) return { ok: false, message: 'Add a source for every number before saving.' }
     setPending(true)

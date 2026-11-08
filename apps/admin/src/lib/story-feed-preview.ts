@@ -43,48 +43,48 @@ export async function buildStoryFeedPreview(
     ).rows[0]
     if (!head?.id) return null
     const definitions = (
-        await client.query<SectionDefView & { slots: SlotDef[] }>(
-          `SELECT DISTINCT ON(d.slug) d.id AS section_def_id,d.slug,v.version,v.compiled_ast,v.compiled_css AS css,v.slots,v.sanitizer_policy_version,v.css_policy_version,v.definition_kind,v.structured_doc,v.structured_schema_version FROM section_defs d JOIN section_def_versions v ON v.section_def_id=d.id WHERE d.scope='global' AND d.status='active' AND d.slug=ANY($1::text[]) ORDER BY d.slug,v.version DESC`,
+      await client.query<SectionDefView & { slots: SlotDef[] }>(
+        `SELECT DISTINCT ON(d.slug) d.id AS section_def_id,d.slug,v.version,v.compiled_ast,v.compiled_css AS css,v.slots,v.sanitizer_policy_version,v.css_policy_version,v.definition_kind,v.structured_doc,v.structured_schema_version FROM section_defs d JOIN section_def_versions v ON v.section_def_id=d.id WHERE d.scope='global' AND d.status='active' AND d.slug=ANY($1::text[]) ORDER BY d.slug,v.version DESC`,
+        [
           [
-            [
-              'core-stories',
-              'core-text-block',
-              ...(world ? ['core-story-world'] : []),
-              ...(split ? ['core-story-split'] : []),
-            ],
+            'core-stories',
+            'core-text-block',
+            ...(world ? ['core-story-world'] : []),
+            ...(split ? ['core-story-split'] : []),
           ],
-        )
-      ).rows,
-      feed = definitions.find(d => d.slug === 'core-stories'),
-      notice = definitions.find(d => d.slug === 'core-text-block')
+        ],
+      )
+    ).rows
+    const feed = definitions.find(d => d.slug === 'core-stories')
+    const notice = definitions.find(d => d.slug === 'core-text-block')
     if (!feed || !notice) return null
     const paths = (
-        await client.query(
-          'SELECT slug,draft_version_id FROM pages WHERE site_id=$1 AND archived_at IS NULL AND draft_version_id IS NOT NULL',
-          [siteId],
-        )
-      ).rows,
-      map = new Map(
-        paths.map(p => ['/' + p.slug, '/preview/' + p.draft_version_id + '?visit=1&site=draft&lists=draft']),
+      await client.query(
+        'SELECT slug,draft_version_id FROM pages WHERE site_id=$1 AND archived_at IS NULL AND draft_version_id IS NOT NULL',
+        [siteId],
       )
-    const matching = filterStoryList(state.rows, filters, state.settings, state.publishedSettings),
-      eligible = (filters.main || filters.secondary || widget ? matching : orderedNewsroomStories(matching)).filter(
-        row => storyAllowedInFeeds(row.values, state.settings) && storyDateInFeed(row.values.published_date),
-      ),
-      pages = Math.max(1, Math.ceil(eligible.length / 24)),
-      page = Math.min(Math.max(1, pageNumber), pages),
-      chosen = world
-        ? eligible
-            .filter(row => !world.main.length || storyTagIds(row.values, 'main').some(id => world.main.includes(id)))
-            .slice(0, STORY_WIDGET_SOURCE_LIMIT)
-        : split
-          ? eligible.slice(0, STORY_WIDGET_SOURCE_LIMIT)
-          : eligible.slice((page - 1) * 24, page * 24)
+    ).rows
+    const map = new Map(
+      paths.map(p => ['/' + p.slug, '/preview/' + p.draft_version_id + '?visit=1&site=draft&lists=draft']),
+    )
+    const matching = filterStoryList(state.rows, filters, state.settings, state.publishedSettings)
+    const eligible = (filters.main || filters.secondary || widget ? matching : orderedNewsroomStories(matching)).filter(
+      row => storyAllowedInFeeds(row.values, state.settings) && storyDateInFeed(row.values.published_date),
+    )
+    const pages = Math.max(1, Math.ceil(eligible.length / 24))
+    const page = Math.min(Math.max(1, pageNumber), pages)
+    const chosen = world
+      ? eligible
+          .filter(row => !world.main.length || storyTagIds(row.values, 'main').some(id => world.main.includes(id)))
+          .slice(0, STORY_WIDGET_SOURCE_LIMIT)
+      : split
+        ? eligible.slice(0, STORY_WIDGET_SOURCE_LIMIT)
+        : eligible.slice((page - 1) * 24, page * 24)
     const entries = chosen.map(row => {
-      const v = row.values,
-        main = storyTagIds(v, 'main'),
-        secondary = storyTagIds(v, 'secondary'),
-        photo = v.photo && typeof v.photo === 'object' && !Array.isArray(v.photo) ? v.photo : null
+      const v = row.values
+      const main = storyTagIds(v, 'main')
+      const secondary = storyTagIds(v, 'secondary')
+      const photo = v.photo && typeof v.photo === 'object' && !Array.isArray(v.photo) ? v.photo : null
       return {
         id: row.id,
         stableKey: row.stableKey,
@@ -141,43 +141,46 @@ export async function buildStoryFeedPreview(
       entries,
     }
     const status = {
-        all: 'All stories',
-        review: 'Needs review',
-        untagged: 'Missing tags',
-        live: 'Live',
-        hidden: 'Hidden',
-        removed: 'No longer in feed',
-      }[filters.status],
-      labels = [
-        status,
-        filters.q ? 'Search: ' + filters.q : '',
-        filters.main
-          ? filters.main === '__none'
-            ? 'No ' + state.settings.mainLabel
-            : (state.settings.mainTags.find(t => t.id === filters.main)?.label ?? 'Unavailable main tag')
-          : '',
-        filters.secondary
-          ? filters.secondary === '__none'
-            ? 'No ' + state.settings.secondaryLabel
-            : (state.settings.secondaryTags.find(t => t.id === filters.secondary)?.label ?? 'Unavailable secondary tag')
-          : '',
-      ].filter(Boolean),
-      query = storyListQuery(filters),
-      back = '/sites/' + siteId + '/stories' + (query.size ? '?' + query.toString() : '')
+      all: 'All stories',
+      review: 'Needs review',
+      untagged: 'Missing tags',
+      live: 'Live',
+      hidden: 'Hidden',
+      removed: 'No longer in feed',
+    }[filters.status]
+    const labels = [
+      status,
+      filters.q ? 'Search: ' + filters.q : '',
+      filters.main
+        ? filters.main === '__none'
+          ? 'No ' + state.settings.mainLabel
+          : (state.settings.mainTags.find(t => t.id === filters.main)?.label ?? 'Unavailable main tag')
+        : '',
+      filters.secondary
+        ? filters.secondary === '__none'
+          ? 'No ' + state.settings.secondaryLabel
+          : (state.settings.secondaryTags.find(t => t.id === filters.secondary)?.label ?? 'Unavailable secondary tag')
+        : '',
+    ].filter(Boolean)
+    const query = storyListQuery(filters)
+    const back = '/sites/' + siteId + '/stories' + (query.size ? '?' + query.toString() : '')
     const link = (number: number, label: string) => {
-        const q = new URLSearchParams(query)
-        if (number > 1) q.set('page', String(number))
-        return (
-          '<a href="' +
-          escapeAttribute('/preview/stories/' + siteId + (q.size ? '?' + q.toString() : '')) +
-          '">' +
-          label +
-          '</a>'
-        )
-      },
-      paging = [page > 1 ? link(page - 1, 'Previous stories') : '', page < pages ? link(page + 1, 'More stories') : '']
-        .filter(Boolean)
-        .join(' · ')
+      const q = new URLSearchParams(query)
+      if (number > 1) q.set('page', String(number))
+      return (
+        '<a href="' +
+        escapeAttribute('/preview/stories/' + siteId + (q.size ? '?' + q.toString() : '')) +
+        '">' +
+        label +
+        '</a>'
+      )
+    }
+    const paging = [
+      page > 1 ? link(page - 1, 'Previous stories') : '',
+      page < pages ? link(page + 1, 'More stories') : '',
+    ]
+      .filter(Boolean)
+      .join(' · ')
     const message =
       '<p>Private draft preview. ' +
       matching.length +

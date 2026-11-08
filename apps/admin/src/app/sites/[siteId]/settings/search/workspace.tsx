@@ -27,20 +27,20 @@ export function SearchSharingWorkspace({
   initial: SiteSettingsWorkspace
 }) {
   const draft = useSettingsDraft(
-      siteId,
-      archived,
-      initial,
-      'search',
-      'Search & sharing',
-      input(initial.settings.search),
-      value => {
-        const verification = parseSiteVerificationTags(value.tags)
-        return verification ? { verification, hints: value.hints } : null
-      },
-      input,
-      'Use a quoted verification tag from Google, Bing, Yandex or Pinterest.',
-    ),
-    value = draft.value
+    siteId,
+    archived,
+    initial,
+    'search',
+    'Search & sharing',
+    input(initial.settings.search),
+    value => {
+      const verification = parseSiteVerificationTags(value.tags)
+      return verification ? { verification, hints: value.hints } : null
+    },
+    input,
+    'Use a quoted verification tag from Google, Bing, Yandex or Pinterest.',
+  )
+  const value = draft.value
   return (
     <SettingsEditor
       siteId={siteId}

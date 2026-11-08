@@ -160,9 +160,9 @@ export function sectionTools({ draft, sections, clipboard }: Inputs) {
   }
   function canvasAction(action: CanvasAction, index: number) {
     if (action === 'link-copy' && !props.originalDesign && canManageSections) {
-      const anchor = currentEditor.current.document.sections[index]?.values.__cms_anchor,
-        identity = currentEditor.current.document.identity,
-        path = identity ? (identity.address ? '/' + identity.address : '/') : props.metadataContext.path
+      const anchor = currentEditor.current.document.sections[index]?.values.__cms_anchor
+      const identity = currentEditor.current.document.identity
+      const path = identity ? (identity.address ? '/' + identity.address : '/') : props.metadataContext.path
       if (validSectionAnchor(anchor) && props.sitePublicOrigin && navigator.clipboard) {
         void navigator.clipboard
           .writeText(props.sitePublicOrigin + path + '#' + anchor)
@@ -249,8 +249,8 @@ export function sectionTools({ draft, sections, clipboard }: Inputs) {
     )
     setPasting(true)
     try {
-      const section = copiedSection.section,
-        definition = await copiedSectionLayout(props.pageId, section.section_def_id, section.section_def_version)
+      const section = copiedSection.section
+      const definition = await copiedSectionLayout(props.pageId, section.section_def_id, section.section_def_version)
       if (!definition) {
         setResult({ ok: false, kind: 'error', message: 'The copied layout is unavailable on this site.' })
         return

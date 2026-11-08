@@ -18,8 +18,8 @@ export function ReleaseReadinessSummary({
   canPreview: boolean
   applied: boolean
 }) {
-  const findings = checks.filter(check => check.report.findings.length || !check.report.ok),
-    first = checks[0]
+  const findings = checks.filter(check => check.report.findings.length || !check.report.ok)
+  const first = checks[0]
   const preview = (check: ReleaseCheck) =>
     planned && canPreview ? `/releases/${releaseId}/preview/${check.pageId}` : `/preview/${check.versionId}?readonly=1`
   return (

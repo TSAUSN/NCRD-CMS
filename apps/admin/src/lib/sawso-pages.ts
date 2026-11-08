@@ -41,8 +41,8 @@ export function sawsoSection(
   }
 }
 export function sawsoFeed(defs: CorePageDefinition[], sector: string | null, limit: 3 | 6 | 9 = 6, exclude?: string) {
-  const name = STORY_SECTORS.find(s => s.id === sector)?.label.toLowerCase() ?? '[sector]',
-    url = '/newsroom' + (sector ? '?sector=' + sector : '')
+  const name = STORY_SECTORS.find(s => s.id === sector)?.label.toLowerCase() ?? '[sector]'
+  const url = '/newsroom' + (sector ? '?sector=' + sector : '')
   return sawsoSection(defs, 'stories', 'Stories', {
     heading: sector ? 'Stories about ' + name : 'Latest stories',
     stories: storiesBinding(sector, limit, exclude),
@@ -53,27 +53,27 @@ export function sawsoFeed(defs: CorePageDefinition[], sector: string | null, lim
   })
 }
 function sawsoOverview(defs: CorePageDefinition[], sector: string): SectionInstance[] {
-  const source = sectorSources[sector]!,
-    copy = SAWSO_APPROVED.pages[(source + '-overview') as keyof typeof SAWSO_APPROVED.pages] as {
-      heading: string
-      paragraphs: readonly string[]
-    },
-    name = STORY_SECTORS.find(s => s.id === sector)!.label
+  const source = sectorSources[sector]!
+  const copy = SAWSO_APPROVED.pages[(source + '-overview') as keyof typeof SAWSO_APPROVED.pages] as {
+    heading: string
+    paragraphs: readonly string[]
+  }
+  const name = STORY_SECTORS.find(s => s.id === sector)!.label
   return [
     sawsoSection(defs, 'page-header', 'Page header', { heading: name, intro: '' }, { surface: 'accent' }),
     sawsoSection(defs, 'text-block', 'Overview', { heading: copy.heading, body: paragraphs(copy.paragraphs) }),
   ]
 }
 function sawsoPrograms(defs: CorePageDefinition[], sector: string): SectionInstance[] {
-  const source = sectorSources[sector]!,
-    copy = SAWSO_APPROVED.pages[(source + '-programs') as keyof typeof SAWSO_APPROVED.pages] as {
-      cards: readonly { title: string; paragraphs: readonly string[] }[]
-      support: {
-        heading: string
-        paragraphs: readonly string[]
-        links: readonly { label: string; url: string }[]
-      } | null
-    }
+  const source = sectorSources[sector]!
+  const copy = SAWSO_APPROVED.pages[(source + '-programs') as keyof typeof SAWSO_APPROVED.pages] as {
+    cards: readonly { title: string; paragraphs: readonly string[] }[]
+    support: {
+      heading: string
+      paragraphs: readonly string[]
+      links: readonly { label: string; url: string }[]
+    } | null
+  }
   const cards = copy.cards.map((c, i) => ({ key: 'i' + (i + 1), title: c.title, description: c.paragraphs.join(' ') }))
   const help = sawsoSection(defs, 'icon-cards', 'How we help', {
     heading: 'How we help',
@@ -108,8 +108,8 @@ function sawsoPrograms(defs: CorePageDefinition[], sector: string): SectionInsta
 }
 /** Core scaffold creates required internal destinations; later pages build on these heads. */
 export async function ensureSawsoCorePages(client: Queryable, siteId: string) {
-  const defs = await corePageDefinitions(client),
-    hub = SAWSO_APPROVED.pages['hub-overview']
+  const defs = await corePageDefinitions(client)
+  const hub = SAWSO_APPROVED.pages['hub-overview']
   const specs: { slug: string; title: string; content: SectionInstance[]; note: string }[] = [
     {
       slug: '',
@@ -324,9 +324,9 @@ function newsroom(defs: CorePageDefinition[], home = false) {
   })
 }
 function completeSawsoPages(defs: CorePageDefinition[], media: SawsoMediaMap = {}): Map<string, SectionInstance[]> {
-  const result = new Map<string, SectionInstance[]>(),
-    hub = SAWSO_APPROVED.pages['hub-overview'],
-    copy = SAWSO_HOME_APPROVED.sections
+  const result = new Map<string, SectionInstance[]>()
+  const hub = SAWSO_APPROVED.pages['hub-overview']
+  const copy = SAWSO_HOME_APPROVED.sections
   const slides = copy['Hero slides'].split('\n').map(line => {
     const m = /^\d\. \*\*([^*]+)\*\* (.+) Buttons: (.+)$/.exec(line)
     if (!m) throw new Error('Review the approved homepage slides.')
@@ -345,9 +345,9 @@ function completeSawsoPages(defs: CorePageDefinition[], media: SawsoMediaMap = {
       heading: 'The Salvation Army World Service Office',
       ...Object.fromEntries(
         slides.flatMap((slide, i) => {
-          const n = i + 1,
-            story = slideStories[i]!,
-            path = '/stories/' + new URL(story.link).pathname.split('/').at(-1)
+          const n = i + 1
+          const story = slideStories[i]!
+          const path = '/stories/' + new URL(story.link).pathname.split('/').at(-1)
           return [
             ['title' + n, slide.title],
             ['intro' + n, slide.intro],
@@ -377,19 +377,19 @@ function completeSawsoPages(defs: CorePageDefinition[], media: SawsoMediaMap = {
     heading: 'About us',
     body: para(about!.trim()) + '<h3>Why SAWSO?</h3>' + para(why!.trim()),
   })
-  const visionLines = copy.Vision.split('\n'),
-    vision = sawsoSection(defs, 'feature-tiles', 'Vision', {
-      heading: 'Vision',
-      link: { label: '', url: '' },
-      intro: para(visionLines[0]!),
-      ...repeated(
-        visionLines.slice(1).map((line, i) => ({
-          title: '',
-          body: para(line.slice(2)),
-          icon: ['lightbulb', 'network', 'dollar-sign', 'handshake'][i],
-        })),
-      ),
-    })
+  const visionLines = copy.Vision.split('\n')
+  const vision = sawsoSection(defs, 'feature-tiles', 'Vision', {
+    heading: 'Vision',
+    link: { label: '', url: '' },
+    intro: para(visionLines[0]!),
+    ...repeated(
+      visionLines.slice(1).map((line, i) => ({
+        title: '',
+        body: para(line.slice(2)),
+        icon: ['lightbulb', 'network', 'dollar-sign', 'handshake'][i],
+      })),
+    ),
+  })
   const steps = copy['How We Meet Global Needs'].split('\n').map(line => {
     const m = /^\d\. \*\*([^*]+)\*\* (.+)$/.exec(line)!
     return { title: m[1]!, body: para(m[2]!) }
@@ -417,31 +417,31 @@ function completeSawsoPages(defs: CorePageDefinition[], media: SawsoMediaMap = {
       'links',
     ),
   )
-  const contactLines = copy['Contact Us'].split('\n'),
-    contacts = contactLines.map(line => {
-      const m = /^- \*\*([^*]+):\*\* (.+)$/.exec(line)!
-      const title = m[1]!,
-        body = m[2]!.split(' · button: ')[0]!,
-        button = m[2]!.split(' · button: ')[1],
-        escaped = markdown(body),
-        formatted = (
-          title === 'Mail' ? escaped.replace(', 615 Slaters Lane, ', ',<br> 615 Slaters Lane,<br> ') : escaped
-        )
-          .replace(/([A-Za-z0-9.]+@[A-Za-z0-9.]+)/g, '<a href="mailto:$1">$1</a>')
-          .replace(/ · /g, '<br>')
-      return {
-        title,
-        body: '<p>' + formatted + '</p>',
-        action: {
-          label: button ?? '',
-          url: button
-            ? title === 'Media'
-              ? 'mailto:mediarelations@salvationarmyusa.org'
-              : 'https://give.sawso.org'
-            : '',
-        },
-      }
-    })
+  const contactLines = copy['Contact Us'].split('\n')
+  const contacts = contactLines.map(line => {
+    const m = /^- \*\*([^*]+):\*\* (.+)$/.exec(line)!
+    const title = m[1]!
+    const body = m[2]!.split(' · button: ')[0]!
+    const button = m[2]!.split(' · button: ')[1]
+    const escaped = markdown(body)
+    const formatted = (
+      title === 'Mail' ? escaped.replace(', 615 Slaters Lane, ', ',<br> 615 Slaters Lane,<br> ') : escaped
+    )
+      .replace(/([A-Za-z0-9.]+@[A-Za-z0-9.]+)/g, '<a href="mailto:$1">$1</a>')
+      .replace(/ · /g, '<br>')
+    return {
+      title,
+      body: '<p>' + formatted + '</p>',
+      action: {
+        label: button ?? '',
+        url: button
+          ? title === 'Media'
+            ? 'mailto:mediarelations@salvationarmyusa.org'
+            : 'https://give.sawso.org'
+          : '',
+      },
+    }
+  })
   const contact = sawsoSection(defs, 'contact-cards', 'Contact Us', {
     heading: 'Contact Us',
     link: { label: '', url: '' },
@@ -493,21 +493,21 @@ function completeSawsoPages(defs: CorePageDefinition[], media: SawsoMediaMap = {
     ),
   ])
   for (const sector of STORY_SECTORS) {
-    const [, overview] = sawsoOverview(defs, sector.id),
-      program = SAWSO_APPROVED.pages[
-        (sectorSources[sector.id] + '-programs') as keyof typeof SAWSO_APPROVED.pages
-      ] as (typeof SAWSO_APPROVED.pages)['health-programs'],
-      support = program.support
-    const heroPhoto = S3 + sectorPhotos[sector.id],
-      banner = sawsoSection(defs, 'photo-banner', 'Sector introduction', {
-        heading: sector.label,
-        kicker: 'Ways We Help',
-        intro: '',
-        photo: sawsoMediaPhoto(media, heroPhoto),
-        primary: { label: support?.links[0]?.label ?? '', url: support ? 'https://give.sawso.org' : '' },
-        secondary: { label: sector.id === 'family-care' ? '' : 'Stories', url: '#' + sector.id + '-stories' },
-        ...(media[heroPhoto] ? {} : { __cms_sample_fields: ['photo'] }),
-      })
+    const [, overview] = sawsoOverview(defs, sector.id)
+    const program = SAWSO_APPROVED.pages[
+      (sectorSources[sector.id] + '-programs') as keyof typeof SAWSO_APPROVED.pages
+    ] as (typeof SAWSO_APPROVED.pages)['health-programs']
+    const support = program.support
+    const heroPhoto = S3 + sectorPhotos[sector.id]
+    const banner = sawsoSection(defs, 'photo-banner', 'Sector introduction', {
+      heading: sector.label,
+      kicker: 'Ways We Help',
+      intro: '',
+      photo: sawsoMediaPhoto(media, heroPhoto),
+      primary: { label: support?.links[0]?.label ?? '', url: support ? 'https://give.sawso.org' : '' },
+      secondary: { label: sector.id === 'family-care' ? '' : 'Stories', url: '#' + sector.id + '-stories' },
+      ...(media[heroPhoto] ? {} : { __cms_sample_fields: ['photo'] }),
+    })
     const help = sawsoSection(defs, 'feature-tiles', 'How we help', {
       heading: 'How We Help',
       link: { label: '', url: '' },
@@ -582,8 +582,8 @@ export async function ensureSawsoPublicPages(
   media: SawsoMediaMap = {},
   refreshGenerated = false,
 ) {
-  const defs = await corePageDefinitions(client),
-    specs = completeSawsoPages(defs, media)
+  const defs = await corePageDefinitions(client)
+  const specs = completeSawsoPages(defs, media)
   for (const [slug, content] of specs) {
     let old = (
       await client.query(
@@ -592,8 +592,8 @@ export async function ensureSawsoPublicPages(
       )
     ).rows[0]
     if (!old) {
-      const title = String(content[0]?.values.heading ?? slug),
-        id = (await client.query('SELECT app.create_page($1,$2,$3) AS id', [siteId, slug, title])).rows[0]!.id
+      const title = String(content[0]?.values.heading ?? slug)
+      const id = (await client.query('SELECT app.create_page($1,$2,$3) AS id', [siteId, slug, title])).rows[0]!.id
       old = { id, revision: 0, note: 'SAWSO core page scaffold', meta: { title, description: title } }
     }
     if (

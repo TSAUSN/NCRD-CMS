@@ -20,11 +20,11 @@ export function ReleaseComparisonDialog({
   onClose: () => void
 }) {
   const router = useRouter()
-  const [data, setData] = useState<ReleasePresentation | undefined>(undefined),
-    [error, setError] = useState(''),
-    [stale, setStale] = useState(false),
-    [attempt, setAttempt] = useState(0),
-    [device, setDevice] = useState('1280')
+  const [data, setData] = useState<ReleasePresentation | undefined>(undefined)
+  const [error, setError] = useState('')
+  const [stale, setStale] = useState(false)
+  const [attempt, setAttempt] = useState(0)
+  const [device, setDevice] = useState('1280')
   useEffect(() => {
     let active = true
     setData(undefined)

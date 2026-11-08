@@ -35,8 +35,8 @@ export async function sectionInsertionPreview(
     )
   ).rows[0]
   if (!definition) return null
-  const initial = markSampleValues(sectionStartingValues(definition.slots)),
-    media = JSON.stringify(initial).includes('/cms-samples/') ? await echelonSiteMedia(client, siteId) : null
+  const initial = markSampleValues(sectionStartingValues(definition.slots))
+  const media = JSON.stringify(initial).includes('/cms-samples/') ? await echelonSiteMedia(client, siteId) : null
   const sections = [...manifest.sections]
   sections.splice(at, 0, {
     def: definition,

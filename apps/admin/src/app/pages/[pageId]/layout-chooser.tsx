@@ -75,10 +75,10 @@ export function LayoutChooser({
   )
 }
 function MiniPreview({ html, name }: { html: string; name: string }) {
-  const host = useRef<HTMLDivElement>(null),
-    frame = useRef<HTMLIFrameElement>(null)
-  const [width, setWidth] = useState(320),
-    [height, setHeight] = useState(240)
+  const host = useRef<HTMLDivElement>(null)
+  const frame = useRef<HTMLIFrameElement>(null)
+  const [width, setWidth] = useState(320)
+  const [height, setHeight] = useState(240)
   useEffect(() => {
     if (!host.current) return
     const observer = new ResizeObserver(() => setWidth(host.current?.clientWidth ?? 320))

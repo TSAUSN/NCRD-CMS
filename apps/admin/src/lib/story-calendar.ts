@@ -19,19 +19,19 @@ export function validStoryDay(day: unknown): day is string {
 }
 export function calendarDay(date: Date, zone = 'UTC'): string {
   const parts = new Intl.DateTimeFormat('en-US', {
-      timeZone: zone,
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    }).formatToParts(date),
-    part = (name: string) => parts.find(p => p.type === name)!.value
+    timeZone: zone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(date)
+  const part = (name: string) => parts.find(p => p.type === name)!.value
   return part('year') + '-' + part('month') + '-' + part('day')
 }
 export function calendarMonth(month: string): Array<string | null> {
   if (!validStoryDay(month + '-01')) return []
-  const date = new Date(month + '-01T12:00:00Z'),
-    offset = (date.getUTCDay() + 6) % 7,
-    count = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 0)).getUTCDate()
+  const date = new Date(month + '-01T12:00:00Z')
+  const offset = (date.getUTCDay() + 6) % 7
+  const count = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 0)).getUTCDate()
   return [
     ...Array<null>(offset).fill(null),
     ...Array.from({ length: count }, (_, i) => month + '-' + String(i + 1).padStart(2, '0')),

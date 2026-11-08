@@ -8,8 +8,8 @@ import { reviewTime } from '../../../../lib/review-time.ts'
 import type { LocalChapterMail } from '../../../../lib/local-chapter-mail.ts'
 import styles from './outbox.module.css'
 export function LocalMessages({ items }: { items: LocalChapterMail[] }) {
-  const [copied, setCopied] = useState<string | null>(null),
-    [fallback, setFallback] = useState<string | null>(null)
+  const [copied, setCopied] = useState<string | null>(null)
+  const [fallback, setFallback] = useState<string | null>(null)
   const copy = async (item: LocalChapterMail) => {
     if (!item.link) return
     try {

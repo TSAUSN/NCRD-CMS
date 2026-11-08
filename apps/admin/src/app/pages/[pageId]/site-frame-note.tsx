@@ -20,10 +20,10 @@ export function SiteFrameNote({
     back.current?.focus({ preventScroll: true })
   }, [])
   const [loaded, setLoaded] = useState<Extract<Awaited<ReturnType<typeof loadPageFrameNote>>, { ok: true }> | null>(
-      null,
-    ),
-    [error, setError] = useState<string | null>(null),
-    [attempt, setAttempt] = useState(0)
+    null,
+  )
+  const [error, setError] = useState<string | null>(null)
+  const [attempt, setAttempt] = useState(0)
   useEffect(() => {
     let active = true
     setLoaded(null)
@@ -41,8 +41,8 @@ export function SiteFrameNote({
       active = false
     }
   }, [pageId, attempt])
-  const title = part === 'header' ? 'Header' : 'Footer',
-    count = loaded?.[part]
+  const title = part === 'header' ? 'Header' : 'Footer'
+  const count = loaded?.[part]
   return (
     <aside
       className="pane"

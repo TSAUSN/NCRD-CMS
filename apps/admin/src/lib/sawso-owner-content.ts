@@ -45,9 +45,9 @@ export async function applySawsoOwnerContent(
     async c => (await c.query("SELECT id FROM sites WHERE slug='sawso' AND archived_at IS NULL")).rows[0],
   )
   if (!site) throw Error('Start the existing SAWSO demo first.')
-  const local: SawsoMediaMap = {},
-    uploads = createPostgresAdminMediaUploadRepository(),
-    statuses = createPostgresMediaUploadStatusRepository()
+  const local: SawsoMediaMap = {}
+  const uploads = createPostgresAdminMediaUploadRepository()
+  const statuses = createPostgresMediaUploadStatusRepository()
   const mediaProblems: { source: string; problem: string }[] = []
   for (const photo of photos) {
     try {
@@ -108,25 +108,25 @@ export async function applySawsoOwnerContent(
       )
     ).rows
     if (protectedRows.length !== 9) throw Error('The nine approved ministry/hub pages must already exist.')
-    const protectedHash = hash(protectedRows),
-      collection = (
-        await c.query(
-          "SELECT id,entry_revision,published_entry_revision,draft_schema_version_id,published_schema_version_id FROM collections WHERE site_id=$1 AND reader_key='stories'",
-          [site.id],
-        )
-      ).rows[0]
+    const protectedHash = hash(protectedRows)
+    const collection = (
+      await c.query(
+        "SELECT id,entry_revision,published_entry_revision,draft_schema_version_id,published_schema_version_id FROM collections WHERE site_id=$1 AND reader_key='stories'",
+        [site.id],
+      )
+    ).rows[0]
     const entries = (
       await c.query(
         'SELECT e.id,e.stable_key,e.draft_version_id,e.published_version_id,v.values FROM collection_entries e JOIN collection_entry_versions v ON v.id=e.draft_version_id WHERE e.collection_id=$1 AND e.archived_at IS NULL ORDER BY e.sort_index,e.id',
         [collection.id],
       )
     ).rows
-    const releaseKeys = new Set<string>(),
-      collectionPrivate =
-        collection.entry_revision !== collection.published_entry_revision ||
-        collection.draft_schema_version_id !== collection.published_schema_version_id
-    const changedStories: string[] = [],
-      skippedStories: { title: string; reason: string }[] = []
+    const releaseKeys = new Set<string>()
+    const collectionPrivate =
+      collection.entry_revision !== collection.published_entry_revision ||
+      collection.draft_schema_version_id !== collection.published_schema_version_id
+    const changedStories: string[] = []
+    const skippedStories: { title: string; reason: string }[] = []
     const rows = entries.map(entry => {
       const captured = content.stories.find(s => s.key === entry.stable_key)
       if (collectionPrivate) {
@@ -173,9 +173,9 @@ export async function applySawsoOwnerContent(
       ])
       releaseKeys.add('collection_entries:' + collection.id)
     }
-    const defs = await corePageDefinitions(c),
-      pages: string[] = [],
-      skippedPages: string[] = []
+    const defs = await corePageDefinitions(c)
+    const pages: string[] = []
+    const skippedPages: string[] = []
     async function save(slug: string, sections: SectionInstance[]) {
       const old = (
         await c.query(
@@ -263,13 +263,13 @@ export async function applySawsoOwnerContent(
       }
     }
     const globals = (
-        await c.query(
-          'SELECT g.kind,g.revision,g.draft_version_id,g.published_version_id,v.content FROM global_elements g JOIN global_element_versions v ON v.id=g.draft_version_id WHERE g.site_id=$1',
-          [site.id],
-        )
-      ).rows,
-      header = globals.find(g => g.kind === 'header')!,
-      footer = globals.find(g => g.kind === 'footer')!
+      await c.query(
+        'SELECT g.kind,g.revision,g.draft_version_id,g.published_version_id,v.content FROM global_elements g JOIN global_element_versions v ON v.id=g.draft_version_id WHERE g.site_id=$1',
+        [site.id],
+      )
+    ).rows
+    const header = globals.find(g => g.kind === 'header')!
+    const footer = globals.find(g => g.kind === 'footer')!
     let privacyChanged = false
     if (
       header.draft_version_id === header.published_version_id &&

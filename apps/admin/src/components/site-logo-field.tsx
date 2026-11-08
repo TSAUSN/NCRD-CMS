@@ -24,22 +24,22 @@ export function SiteLogoField({
   onChange: (id: string | null) => void
   fallback?: 'name' | 'full' | 'compact'
 }) {
-  const id = useId(),
-    [open, setOpen] = useState(false),
-    [chosen, setChosen] = useState<Choice | null>(null),
-    [failed, setFailed] = useState<string | null>(null)
-  const label = compact ? 'Compact logo' : 'Full logo',
-    destination = compact ? 'compact logo' : 'full logo',
-    selected = value
-      ? chosen?.id === value
-        ? chosen
-        : (choices.find(item => item.id === value) ?? {
-            id: value,
-            name: 'Selected logo',
-            url: '/media/' + encodeURIComponent(value) + '/thumbnail',
-            alt: siteName,
-          })
-      : null
+  const id = useId()
+  const [open, setOpen] = useState(false)
+  const [chosen, setChosen] = useState<Choice | null>(null)
+  const [failed, setFailed] = useState<string | null>(null)
+  const label = compact ? 'Compact logo' : 'Full logo'
+  const destination = compact ? 'compact logo' : 'full logo'
+  const selected = value
+    ? chosen?.id === value
+      ? chosen
+      : (choices.find(item => item.id === value) ?? {
+          id: value,
+          name: 'Selected logo',
+          url: '/media/' + encodeURIComponent(value) + '/thumbnail',
+          alt: siteName,
+        })
+    : null
   function remember(asset: MediaAsset) {
     setChosen({ id: asset.id, name: asset.name, url: asset.previewUrl ?? asset.deliveryUrl ?? '', alt: asset.altText })
     setFailed(null)

@@ -16,8 +16,8 @@ export default async function SitesPage() {
     listSiteDirectory(session.principal.userId),
     roleLabel(session.principal.userId),
   ])
-  const active = sites.filter(site => site.status !== 'archived'),
-    archived = sites.filter(site => site.status === 'archived')
+  const active = sites.filter(site => site.status !== 'archived')
+  const archived = sites.filter(site => site.status === 'archived')
   return (
     <AppShell email={session.email} role={role} groups={navigationFor(undefined, session.principal)}>
       <main id="main" className="wrap">

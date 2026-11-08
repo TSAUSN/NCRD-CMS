@@ -10,17 +10,17 @@ import styles from './command-search.module.css'
 import { IconPage, IconCollection, IconPlus } from './icons.tsx'
 
 export function CommandSearch() {
-  const pathname = usePathname(),
-    id = useId()
-  const [open, setOpen] = useState(false),
-    [query, setQuery] = useState(''),
-    [results, setResults] = useState<SearchResult[]>([])
-  const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading'),
-    [active, setActive] = useState(0),
-    [retry, setRetry] = useState(0)
-  const sequence = useRef(0),
-    input = useRef<HTMLInputElement>(null),
-    links = useRef<(HTMLAnchorElement | null)[]>([])
+  const pathname = usePathname()
+  const id = useId()
+  const [open, setOpen] = useState(false)
+  const [query, setQuery] = useState('')
+  const [results, setResults] = useState<SearchResult[]>([])
+  const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
+  const [active, setActive] = useState(0)
+  const [retry, setRetry] = useState(0)
+  const sequence = useRef(0)
+  const input = useRef<HTMLInputElement>(null)
+  const links = useRef<(HTMLAnchorElement | null)[]>([])
   function close() {
     sequence.current++
     setOpen(false)

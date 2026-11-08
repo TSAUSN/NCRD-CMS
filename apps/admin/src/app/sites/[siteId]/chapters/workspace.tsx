@@ -30,8 +30,8 @@ function status(row: ChapterRow): StatusLabel {
       : 'Live'
 }
 function ChapterStatus({ row }: { row: ChapterRow }) {
-  const linked = chapterUsesLinkedPage(row.config.destination),
-    label = linked ? (row.config.destination === 'division' ? 'Division’s page' : 'Own website') : status(row)
+  const linked = chapterUsesLinkedPage(row.config.destination)
+  const label = linked ? (row.config.destination === 'division' ? 'Division’s page' : 'Own website') : status(row)
   return (
     <Badge tone={linked ? 'info' : label === 'Live' ? 'live' : label === 'Draft' ? 'neutral' : 'pending'} title={label}>
       {label === 'Live · changes not published' ? 'Changes not live' : label}
@@ -60,17 +60,17 @@ export function ChaptersWorkspace({
   defaultMode?: ChapterSetup['updateMode']
   canAssignDivision?: boolean
 }) {
-  const [inviting, setInviting] = useState<ChapterRow | null>(null),
-    [selected, setSelected] = useState<ChapterRow | null | undefined>(),
-    [query, setQuery] = useState(''),
-    [filter, setFilter] = useState('all'),
-    [message, setMessage] = useState(''),
-    [accessRevision, setAccessRevision] = useState(0)
-  const [headerTarget, setHeaderTarget] = useState<HTMLElement | null>(null),
-    [inspected, setInspected] = useState<string | null | undefined>()
+  const [inviting, setInviting] = useState<ChapterRow | null>(null)
+  const [selected, setSelected] = useState<ChapterRow | null | undefined>()
+  const [query, setQuery] = useState('')
+  const [filter, setFilter] = useState('all')
+  const [message, setMessage] = useState('')
+  const [accessRevision, setAccessRevision] = useState(0)
+  const [headerTarget, setHeaderTarget] = useState<HTMLElement | null>(null)
+  const [inspected, setInspected] = useState<string | null | undefined>()
   useEffect(() => setHeaderTarget(headerActionsId ? document.getElementById(headerActionsId) : null), [headerActionsId])
-  const [savedRows, setSavedRows] = useState<ChapterRow[]>([]),
-    currentRows = chapterRowsAfterSave(rows, savedRows)
+  const [savedRows, setSavedRows] = useState<ChapterRow[]>([])
+  const currentRows = chapterRowsAfterSave(rows, savedRows)
   // A fresh RLS result replaces temporary acknowledgements, including revoked access.
   useEffect(() => setSavedRows([]), [rows])
   const shown = currentRows.filter(
@@ -81,8 +81,8 @@ export function ChaptersWorkspace({
         (filter === 'draft' &&
           (!row.publishedConfig || (!chapterUsesLinkedPage(row.config.destination) && !row.pagePublished)))),
   )
-  const details = native && inspected !== null ? (shown.find(row => row.id === inspected) ?? shown[0] ?? null) : null,
-    add = canAdd && <Button onClick={() => setSelected(null)}>+ Add a chapter</Button>
+  const details = native && inspected !== null ? (shown.find(row => row.id === inspected) ?? shown[0] ?? null) : null
+  const add = canAdd && <Button onClick={() => setSelected(null)}>+ Add a chapter</Button>
   return (
     <div className={workspace.denseStack + ' ' + workspaceFormsStyles.compactForm}>
       {headerTarget && createPortal(add, headerTarget)}
@@ -284,9 +284,9 @@ function ChapterDetails({
   onSetup: () => void
   onInvite: () => void
 }) {
-  const [people, setPeople] = useState<ChapterEditor[] | null>(null),
-    [error, setError] = useState(''),
-    [attempt, setAttempt] = useState(0)
+  const [people, setPeople] = useState<ChapterEditor[] | null>(null)
+  const [error, setError] = useState('')
+  const [attempt, setAttempt] = useState(0)
   useEffect(() => {
     let active = true
     setPeople(null)
@@ -304,9 +304,9 @@ function ChapterDetails({
       active = false
     }
   }, [row.id, attempt])
-  const division = divisions.find(item => item.id === row.divisionId),
-    page = row.config.pageId && !chapterUsesLinkedPage(row.config.destination),
-    canInviteHere = row.config.updateMode === 'chapter-editors' && page
+  const division = divisions.find(item => item.id === row.divisionId)
+  const page = row.config.pageId && !chapterUsesLinkedPage(row.config.destination)
+  const canInviteHere = row.config.updateMode === 'chapter-editors' && page
   return (
     <DetailPanel
       title={row.config.name}

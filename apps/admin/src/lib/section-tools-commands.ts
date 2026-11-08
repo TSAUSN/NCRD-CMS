@@ -51,17 +51,17 @@ async function sourcePage(client: Queryable, input: SectionToolSource) {
   ).rows[0]?.allowed
   if (!allowed)
     throw new DomainError('not_authorized', 'A Site admin manages section links and copies on native pages.')
-  const content = PageContent.parse(source.content),
-    section = content[input.index]
+  const content = PageContent.parse(source.content)
+  const section = content[input.index]
   if (!section) throw new DomainError('stale_revision', 'This section moved. Return to the page and choose it again.')
   return { source, content, section }
 }
 async function linkPlan(client: Queryable, input: SectionToolSource, newName?: string) {
-  const { source, content, section } = await sourcePage(client, input),
-    oldName = typeof section.values.__cms_anchor === 'string' ? section.values.__cms_anchor : '',
-    path = source.slug ? '/' + source.slug : '/',
-    name = section.label || String(section.values.heading ?? section.values.title ?? 'Section'),
-    suggested = oldName || nextSectionAnchor(name, content)
+  const { source, content, section } = await sourcePage(client, input)
+  const oldName = typeof section.values.__cms_anchor === 'string' ? section.values.__cms_anchor : ''
+  const path = source.slug ? '/' + source.slug : '/'
+  const name = section.label || String(section.values.heading ?? section.values.title ?? 'Section')
+  const suggested = oldName || nextSectionAnchor(name, content)
   if (
     newName &&
     (!validSectionAnchor(newName) ||
@@ -72,28 +72,28 @@ async function linkPlan(client: Queryable, input: SectionToolSource, newName?: s
       'Use a unique link name starting with a letter, with lowercase letters, numbers and hyphens.',
     )
   const paths = [
-      path,
-      ...(
-        await client.query<{ path: string }>('SELECT path FROM published_routes WHERE site_id=$1 AND page_id=$2', [
-          source.site_id,
-          source.id,
-        ])
-      ).rows.map(row => row.path),
-    ],
-    hosts = (
-      await client.query<{ hostname: string }>(
-        "SELECT staging_hostname AS hostname FROM sites WHERE id=$1 AND staging_hostname IS NOT NULL UNION SELECT hostname_normalized AS hostname FROM domains WHERE site_id=$1 AND removed_at IS NULL AND status='live'",
-        [source.site_id],
-      )
-    ).rows.map(row => row.hostname),
-    context: SectionLinkContext = {
-      targetPaths: [...new Set(paths)],
-      pagePath: path,
-      hosts,
-      oldName,
-      oldNames: sectionAnchorNames(section.values),
-      newName: newName ?? oldName,
-    }
+    path,
+    ...(
+      await client.query<{ path: string }>('SELECT path FROM published_routes WHERE site_id=$1 AND page_id=$2', [
+        source.site_id,
+        source.id,
+      ])
+    ).rows.map(row => row.path),
+  ]
+  const hosts = (
+    await client.query<{ hostname: string }>(
+      "SELECT staging_hostname AS hostname FROM sites WHERE id=$1 AND staging_hostname IS NOT NULL UNION SELECT hostname_normalized AS hostname FROM domains WHERE site_id=$1 AND removed_at IS NULL AND status='live'",
+      [source.site_id],
+    )
+  ).rows.map(row => row.hostname)
+  const context: SectionLinkContext = {
+    targetPaths: [...new Set(paths)],
+    pagePath: path,
+    hosts,
+    oldName,
+    oldNames: sectionAnchorNames(section.values),
+    newName: newName ?? oldName,
+  }
   const pages = (
     await client.query<SavedPage>(
       'SELECT p.id,p.site_id,p.title,p.slug,p.revision::text,p.draft_version_id,v.content,v.meta FROM pages p JOIN page_versions v ON v.id=p.draft_version_id WHERE p.site_id=$1 AND p.archived_at IS NULL ORDER BY p.id',
@@ -129,17 +129,17 @@ async function linkPlan(client: Queryable, input: SectionToolSource, newName?: s
       : { count: 0, unsafe: false },
   }))
   const navigation = (
-      await client.query(
-        'SELECT n.id,n.revision::text,n.mode,v.tree FROM navigations n JOIN navigation_versions v ON v.id=n.draft_version_id WHERE n.site_id=$1',
-        [source.site_id],
-      )
-    ).rows[0],
-    navScan = oldName
-      ? rewriteSectionLinks(navigation.tree, { ...context, fragmentOnly: false })
-      : { value: navigation.tree, count: 0, unsafe: false },
-    navCount = oldName
-      ? rewriteSectionLinks(navigation.tree, { ...countContext, fragmentOnly: false })
-      : { count: 0, unsafe: false }
+    await client.query(
+      'SELECT n.id,n.revision::text,n.mode,v.tree FROM navigations n JOIN navigation_versions v ON v.id=n.draft_version_id WHERE n.site_id=$1',
+      [source.site_id],
+    )
+  ).rows[0]
+  const navScan = oldName
+    ? rewriteSectionLinks(navigation.tree, { ...context, fragmentOnly: false })
+    : { value: navigation.tree, count: 0, unsafe: false }
+  const navCount = oldName
+    ? rewriteSectionLinks(navigation.tree, { ...countContext, fragmentOnly: false })
+    : { count: 0, unsafe: false }
   const lists = (
     await client.query(
       'SELECT c.id,c.name,c.entry_revision::text,c.draft_schema_version_id,v.fields FROM collections c JOIN collection_schema_versions v ON v.id=c.draft_schema_version_id WHERE c.site_id=$1 ORDER BY c.id',
@@ -149,56 +149,54 @@ async function linkPlan(client: Queryable, input: SectionToolSource, newName?: s
   const collections = []
   for (const list of lists) {
     const rows = (
-        await client.query(
-          'SELECT e.id,e.stable_key,v.values FROM collection_entries e JOIN collection_entry_versions v ON v.id=e.draft_version_id WHERE e.collection_id=$1 AND e.archived_at IS NULL ORDER BY e.sort_index,e.created_at,e.id',
-          [list.id],
-        )
-      ).rows,
-      urlKeys = (list.fields as { key: string; type: string }[])
-        .filter(field => ['url', 'link'].includes(field.type))
-        .map(field => field.key),
-      scanRows = (ctx: SectionLinkContext) => {
-        let count = 0,
-          unsafe = false
-        const value = rows.map(row => {
-          const path =
-              typeof row.values.story_url === 'string' && row.values.story_url.startsWith('/')
-                ? row.values.story_url
-                : null,
-            scan = rewriteSectionLinks(row, {
-              ...ctx,
-              urlKeys,
-              pagePath: path ?? ctx.pagePath,
-              fragmentOnly: Boolean(path),
-            })
-          count += scan.count
-          unsafe ||= scan.unsafe
-          return scan.value
+      await client.query(
+        'SELECT e.id,e.stable_key,v.values FROM collection_entries e JOIN collection_entry_versions v ON v.id=e.draft_version_id WHERE e.collection_id=$1 AND e.archived_at IS NULL ORDER BY e.sort_index,e.created_at,e.id',
+        [list.id],
+      )
+    ).rows
+    const urlKeys = (list.fields as { key: string; type: string }[])
+      .filter(field => ['url', 'link'].includes(field.type))
+      .map(field => field.key)
+    const scanRows = (ctx: SectionLinkContext) => {
+      let count = 0
+      let unsafe = false
+      const value = rows.map(row => {
+        const path =
+          typeof row.values.story_url === 'string' && row.values.story_url.startsWith('/') ? row.values.story_url : null
+        const scan = rewriteSectionLinks(row, {
+          ...ctx,
+          urlKeys,
+          pagePath: path ?? ctx.pagePath,
+          fragmentOnly: Boolean(path),
         })
-        return { value, count, unsafe }
-      },
-      scan = oldName ? scanRows(context) : { value: rows, count: 0, unsafe: false },
-      countScan = oldName ? scanRows(countContext) : { count: 0, unsafe: false }
+        count += scan.count
+        unsafe ||= scan.unsafe
+        return scan.value
+      })
+      return { value, count, unsafe }
+    }
+    const scan = oldName ? scanRows(context) : { value: rows, count: 0, unsafe: false }
+    const countScan = oldName ? scanRows(countContext) : { count: 0, unsafe: false }
     if (countScan.count || countScan.unsafe) collections.push({ ...list, scan, countScan })
   }
-  const pageRefs = counts.filter(item => item.count || item.unsafe),
-    frameRefs = frames.filter(row => row.countScan.count || row.countScan.unsafe),
-    references =
-      pageRefs.reduce((sum, item) => sum + item.count, 0) +
-      frameRefs.reduce((sum, item) => sum + item.countScan.count, 0) +
-      navCount.count +
-      collections.reduce((sum, list) => sum + list.countScan.count, 0),
-    affected = [
-      ...pageRefs.map(item => item.page.title),
-      ...frameRefs.map(row => (row.kind === 'header' ? 'Header' : 'Footer')),
-      ...(navCount.count ? ['Menu'] : []),
-      ...collections.map(list => list.name),
-    ],
-    unsafe =
-      pageRefs.some(item => item.unsafe) ||
-      frameRefs.some(row => row.countScan.unsafe) ||
-      navCount.unsafe ||
-      collections.some(list => list.countScan.unsafe)
+  const pageRefs = counts.filter(item => item.count || item.unsafe)
+  const frameRefs = frames.filter(row => row.countScan.count || row.countScan.unsafe)
+  const references =
+    pageRefs.reduce((sum, item) => sum + item.count, 0) +
+    frameRefs.reduce((sum, item) => sum + item.countScan.count, 0) +
+    navCount.count +
+    collections.reduce((sum, list) => sum + list.countScan.count, 0)
+  const affected = [
+    ...pageRefs.map(item => item.page.title),
+    ...frameRefs.map(row => (row.kind === 'header' ? 'Header' : 'Footer')),
+    ...(navCount.count ? ['Menu'] : []),
+    ...collections.map(list => list.name),
+  ]
+  const unsafe =
+    pageRefs.some(item => item.unsafe) ||
+    frameRefs.some(row => row.countScan.unsafe) ||
+    navCount.unsafe ||
+    collections.some(list => list.countScan.unsafe)
   const fingerprint = createHash('sha256')
     .update(
       JSON.stringify({
@@ -237,8 +235,8 @@ export async function renameSectionLinkDrafts(
       'invalid_state',
       'Use a link name starting with a letter, with lowercase letters, numbers and hyphens.',
     )
-  const plan = await linkPlan(client, input, input.name),
-    { review, source } = plan
+  const plan = await linkPlan(client, input, input.name)
+  const { review, source } = plan
   if (review.fingerprint !== input.fingerprint)
     throw new DomainError(
       'stale_revision',
@@ -270,8 +268,8 @@ export async function renameSectionLinkDrafts(
     ).rows[0]!
     if (item.page.id === source.id) sourceSaved = saved
   }
-  const header = plan.frames.find(row => row.kind === 'header'),
-    footer = plan.frames.find(row => row.kind === 'footer')
+  const header = plan.frames.find(row => row.kind === 'header')
+  const footer = plan.frames.find(row => row.kind === 'footer')
   if (header && footer && plan.frames.some(row => row.scan.count > 0))
     await client.query('SELECT * FROM app.save_global_elements_draft($1,$2,$3,$4,$5,true)', [
       source.site_id,
@@ -316,13 +314,13 @@ export async function renameSectionLinkDrafts(
   }
 }
 export async function sectionCopyChoices(client: Queryable, input: SectionToolSource) {
-  const { source } = await sourcePage(client, input),
-    rows = (
-      await client.query<{ id: string; title: string; revision: string; content: unknown }>(
-        "SELECT p.id,p.title,p.revision::text,v.content FROM pages p JOIN page_versions v ON v.id=p.draft_version_id WHERE p.site_id=$1 AND p.id<>$2 AND p.archived_at IS NULL AND p.slug NOT LIKE 'stories/%' AND NOT EXISTS(SELECT 1 FROM collections c JOIN collection_entries e ON e.collection_id=c.id JOIN collection_entry_versions ev ON ev.id=e.draft_version_id WHERE c.site_id=p.site_id AND c.reader_key='stories' AND ev.values->>'story_url'=app.page_path(p.slug)) ORDER BY p.title,p.id",
-        [source.site_id, source.id],
-      )
-    ).rows
+  const { source } = await sourcePage(client, input)
+  const rows = (
+    await client.query<{ id: string; title: string; revision: string; content: unknown }>(
+      "SELECT p.id,p.title,p.revision::text,v.content FROM pages p JOIN page_versions v ON v.id=p.draft_version_id WHERE p.site_id=$1 AND p.id<>$2 AND p.archived_at IS NULL AND p.slug NOT LIKE 'stories/%' AND NOT EXISTS(SELECT 1 FROM collections c JOIN collection_entries e ON e.collection_id=c.id JOIN collection_entry_versions ev ON ev.id=e.draft_version_id WHERE c.site_id=p.site_id AND c.reader_key='stories' AND ev.values->>'story_url'=app.page_path(p.slug)) ORDER BY p.title,p.id",
+      [source.site_id, source.id],
+    )
+  ).rows
   return {
     ok: true as const,
     pages: rows.map(page => ({
@@ -339,8 +337,8 @@ export async function copySectionDraft(
   client: Queryable,
   input: SectionToolSource & { targetPageId: string; targetRevision: string; at: number },
 ) {
-  const { source, section } = await sourcePage(client, input),
-    allowed = await sectionCopyChoices(client, input)
+  const { source, section } = await sourcePage(client, input)
+  const allowed = await sectionCopyChoices(client, input)
   if (!allowed.pages.some(page => page.id === input.targetPageId))
     throw new DomainError('not_authorized', 'Choose another ordinary page on this site.')
   const target = (
@@ -354,11 +352,11 @@ export async function copySectionDraft(
   const before = PageContent.parse(target.content)
   if (!Number.isInteger(input.at) || input.at < 0 || input.at > before.length)
     throw new DomainError('invalid_state', 'Choose a place on the destination page.')
-  const state = addSection(createEditorState({ sections: before, meta: target.meta }), section, input.at),
-    copied = PageContent.parse(state.document.sections),
-    inserted = copied[input.at]!,
-    oldName = section.values.__cms_anchor,
-    newName = inserted.values.__cms_anchor
+  const state = addSection(createEditorState({ sections: before, meta: target.meta }), section, input.at)
+  const copied = PageContent.parse(state.document.sections)
+  const inserted = copied[input.at]!
+  const oldName = section.values.__cms_anchor
+  const newName = inserted.values.__cms_anchor
   if (typeof oldName === 'string' && typeof newName === 'string' && oldName !== newName)
     inserted.values = rewriteSectionLinks(inserted.values, {
       targetPaths: [target.slug ? '/' + target.slug : '/'],

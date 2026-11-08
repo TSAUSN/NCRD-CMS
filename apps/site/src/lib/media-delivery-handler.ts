@@ -35,8 +35,8 @@ export function createPublicMediaGetHandler(deps: Deps) {
     if (!UUID.test(mediaId) || !isGovernedMediaVariant(variantName)) return hidden()
     const site = await deps.resolveSite(request.headers)
     if (!site) return hidden()
-    const raw = await deps.repository.native?.(site.host, `/media/${mediaId}/${variantName}`),
-      mapping = SiteNativeTarget.safeParse(raw)
+    const raw = await deps.repository.native?.(site.host, `/media/${mediaId}/${variantName}`)
+    const mapping = SiteNativeTarget.safeParse(raw)
     if (raw != null && !mapping.success) return hidden()
     if (mapping.success && (mapping.data.kind !== 'media' || mapping.data.variant !== variantName)) return hidden()
     const target = mapping.success && mapping.data.kind === 'media' ? mapping.data.mediaId : mediaId

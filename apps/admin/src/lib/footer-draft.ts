@@ -12,8 +12,8 @@ export async function saveFooterDraft(client: Queryable, input: FooterDraft) {
       [input.siteId],
     )
   ).rows
-  const header = rows.find(row => row.kind === 'header'),
-    footer = rows.find(row => row.kind === 'footer')
+  const header = rows.find(row => row.kind === 'header')
+  const footer = rows.find(row => row.kind === 'footer')
   if (!header || !footer) throw new DomainError('not_found', 'The footer is unavailable.')
   if (Number(header.revision) !== input.headerRevision || Number(footer.revision) !== input.footerRevision)
     throw new DomainError('stale_revision', 'Someone else saved the header or footer. Reload to compare your work.')

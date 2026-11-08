@@ -59,8 +59,8 @@ export function parseSawsoStoriesFeed(wire: string): SourceStory[] {
   if (!data || typeof data !== 'object' || !Array.isArray((data as { objects?: unknown }).objects)) return invalid()
   const objects = (data as { objects: unknown[] }).objects
   if (objects.length > 2000) return invalid()
-  const chosen: { story: SourceStory; order: number; index: number }[] = [],
-    seen = new Set<string>()
+  const chosen: { story: SourceStory; order: number; index: number }[] = []
+  const seen = new Set<string>()
   for (const [index, item] of objects.entries()) {
     if (!item || typeof item !== 'object' || Array.isArray(item)) return invalid()
     const row = item as Record<string, unknown>
@@ -73,10 +73,10 @@ export function parseSawsoStoriesFeed(wire: string): SourceStory[] {
           : ''
     if (!/^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$/.test(sourceId) || seen.has(sourceId)) return invalid()
     seen.add(sourceId)
-    const title = text(row.title, 500),
-      summary = text(row.description || row.synopsis || '', 2000),
-      date = text(row.publishDate ?? '', 100).slice(0, 10),
-      parsed = new Date(date + 'T00:00:00Z')
+    const title = text(row.title, 500)
+    const summary = text(row.description || row.synopsis || '', 2000)
+    const date = text(row.publishDate ?? '', 100).slice(0, 10)
+    const parsed = new Date(date + 'T00:00:00Z')
     if (
       !title ||
       !summary ||
@@ -85,15 +85,15 @@ export function parseSawsoStoriesFeed(wire: string): SourceStory[] {
       parsed.toISOString().slice(0, 10) !== date
     )
       return invalid()
-    const alias = text(row.urlAlias ?? '', 500),
-      redirect = text(row.redirectUrl ?? '', 2048),
-      link = address(redirect || 'https://sawso.org/sawso/story/' + alias),
-      image = address(text(row.headerImage ?? '', 2048).replace(/[+ ]/g, '%20'), true)
+    const alias = text(row.urlAlias ?? '', 500)
+    const redirect = text(row.redirectUrl ?? '', 2048)
+    const link = address(redirect || 'https://sawso.org/sawso/story/' + alias)
+    const image = address(text(row.headerImage ?? '', 2048).replace(/[+ ]/g, '%20'), true)
     if (!redirect && !alias) return invalid()
     let order = 999
     try {
-      const meta = JSON.parse(typeof row.customHeadContent === 'string' ? row.customHeadContent : ''),
-        value = Number.parseFloat(String(meta?.idx))
+      const meta = JSON.parse(typeof row.customHeadContent === 'string' ? row.customHeadContent : '')
+      const value = Number.parseFloat(String(meta?.idx))
       if (Number.isFinite(value)) order = value
     } catch {}
     chosen.push({
@@ -130,8 +130,8 @@ function slug(value: string): string {
   )
 }
 function unused(base: string, used: Set<string>): string {
-  let value = base,
-    n = 2
+  let value = base
+  let n = 2
   while (used.has(value)) value = base + '-' + n++
   used.add(value)
   return value
@@ -153,19 +153,19 @@ export function mergeStorySource(
     new Set(baselines.map(b => b.stableKey)).size !== baselines.length
   )
     return invalid()
-  const next = entries.map(entry => ({ ...entry, values: { ...entry.values } })),
-    byKey = new Map(next.map(entry => [entry.stableKey, entry])),
-    bySource = new Map(baselines.map(b => [b.sourceId, b])),
-    nextBaselines = new Map(baselines.map(b => [b.sourceId, { ...b, fields: { ...b.fields } }])),
-    seen = new Set<string>(),
-    keys = new Set([...occupiedKeys, ...next.map(entry => entry.stableKey)]),
-    paths = new Set(occupiedPaths.map(path => (path.startsWith('/') ? path : '/' + path))),
-    newPages: { stableKey: string; path: string; title: string }[] = [],
-    preserved: { sourceId: string; field: StorySourceField }[] = []
+  const next = entries.map(entry => ({ ...entry, values: { ...entry.values } }))
+  const byKey = new Map(next.map(entry => [entry.stableKey, entry]))
+  const bySource = new Map(baselines.map(b => [b.sourceId, b]))
+  const nextBaselines = new Map(baselines.map(b => [b.sourceId, { ...b, fields: { ...b.fields } }]))
+  const seen = new Set<string>()
+  const keys = new Set([...occupiedKeys, ...next.map(entry => entry.stableKey)])
+  const paths = new Set(occupiedPaths.map(path => (path.startsWith('/') ? path : '/' + path)))
+  const newPages: { stableKey: string; path: string; title: string }[] = []
+  const preserved: { sourceId: string; field: StorySourceField }[] = []
   for (const entry of next) if (typeof entry.values.story_url === 'string') paths.add(entry.values.story_url)
-  let added = 0,
-    updated = 0,
-    removed = 0
+  let added = 0
+  let updated = 0
+  let removed = 0
   for (const story of incoming) {
     if (seen.has(story.sourceId)) return invalid()
     seen.add(story.sourceId)
@@ -191,23 +191,23 @@ export function mergeStorySource(
       })
     } else {
       if (next.length >= 2000) return invalid()
-      const stableKey = unused('feed-' + slug(story.sourceId), keys),
-        alias = story.alias.split(/[?#]/)[0]!.split('/').filter(Boolean).at(-1) || story.fields.title,
-        path = unused('/stories/' + slug(alias), paths),
-        initial = {
-          ...story.fields,
-          body: '',
-          body_is_sample: false,
-          photo_is_sample: false,
-          photo_note: '',
-          countries: '',
-          story_url: path,
-          reviewed: false,
-          hidden: false,
-          feed_removed: false,
-        },
-        suggested = suggestStoryTags(initial, settings),
-        values = withStoryTagIds(withStoryTagIds(initial, 'main', suggested.main), 'secondary', suggested.secondary)
+      const stableKey = unused('feed-' + slug(story.sourceId), keys)
+      const alias = story.alias.split(/[?#]/)[0]!.split('/').filter(Boolean).at(-1) || story.fields.title
+      const path = unused('/stories/' + slug(alias), paths)
+      const initial = {
+        ...story.fields,
+        body: '',
+        body_is_sample: false,
+        photo_is_sample: false,
+        photo_note: '',
+        countries: '',
+        story_url: path,
+        reviewed: false,
+        hidden: false,
+        feed_removed: false,
+      }
+      const suggested = suggestStoryTags(initial, settings)
+      const values = withStoryTagIds(withStoryTagIds(initial, 'main', suggested.main), 'secondary', suggested.secondary)
       values.region_label = settings.secondaryTags
         .filter(tag => suggested.secondary.includes(tag.id))
         .map(tag => tag.label)

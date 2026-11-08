@@ -19,12 +19,12 @@ export function ScaledPreview({
   bounded?: boolean
   width?: number
 }) {
-  const space = useRef<HTMLDivElement>(null),
-    observer = useRef<ResizeObserver | null>(null),
-    [available, setAvailable] = useState(0),
-    [height, setHeight] = useState(500),
-    [state, setState] = useState<'loading' | 'ready' | 'error' | 'article'>('loading'),
-    [retry, setRetry] = useState(0)
+  const space = useRef<HTMLDivElement>(null)
+  const observer = useRef<ResizeObserver | null>(null)
+  const [available, setAvailable] = useState(0)
+  const [height, setHeight] = useState(500)
+  const [state, setState] = useState<'loading' | 'ready' | 'error' | 'article'>('loading')
+  const [retry, setRetry] = useState(0)
   useEffect(() => {
     const node = space.current
     if (!node) return
@@ -64,8 +64,8 @@ export function ScaledPreview({
             style={{ width, height, transform: `scale(${scale})` }}
             onLoad={event => {
               observer.current?.disconnect()
-              const doc = event.currentTarget.contentDocument,
-                body = doc?.body
+              const doc = event.currentTarget.contentDocument
+              const body = doc?.body
               if (!body || (!doc.querySelector(readySelector) && !doc.querySelector('#cms-main'))) {
                 setState('error')
                 return

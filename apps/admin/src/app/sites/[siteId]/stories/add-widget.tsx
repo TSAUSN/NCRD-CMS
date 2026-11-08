@@ -16,14 +16,14 @@ export function AddStoryWidget({
   choice: WorldChoice | SplitChoice
   onSaved: (page: { pageId: string; title: string }) => void
 }) {
-  const label = kind === 'world' ? 'World View' : 'Split View',
-    [open, setOpen] = useState(false),
-    [pages, setPages] = useState<Page[]>([]),
-    [loading, setLoading] = useState(false),
-    [pending, setPending] = useState(false),
-    [error, setError] = useState(''),
-    [pageId, setPageId] = useState(''),
-    [search, setSearch] = useState('')
+  const label = kind === 'world' ? 'World View' : 'Split View'
+  const [open, setOpen] = useState(false)
+  const [pages, setPages] = useState<Page[]>([])
+  const [loading, setLoading] = useState(false)
+  const [pending, setPending] = useState(false)
+  const [error, setError] = useState('')
+  const [pageId, setPageId] = useState('')
+  const [search, setSearch] = useState('')
   async function load() {
     setLoading(true)
     setError('')

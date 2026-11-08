@@ -101,11 +101,11 @@ export function InspectorSectionContent({
                 onChange={next => props.onChange(slot.id, next)}
               />
             )
-            const bound = bindings[slot.id],
-              eligible =
-                bound ||
-                (slot.kind === 'text' &&
-                  (/^(number|value|amount|total|figure)$/i.test(slot.label) || slot.id.split('__').at(-1) === 'value'))
+            const bound = bindings[slot.id]
+            const eligible =
+              bound ||
+              (slot.kind === 'text' &&
+                (/^(number|value|amount|total|figure)$/i.test(slot.label) || slot.id.split('__').at(-1) === 'value'))
             return !props.originalDesign && props.pageId && eligible ? (
               <DataValueField
                 id={id}

@@ -49,13 +49,13 @@ export function ContentRepeatPanel({
   onDiscardEmpty?: (origin: string, slotId: string, key: string) => void
   renderItem: (key: string) => ReactNode
 }) {
-  const [active, setActive] = useState<string | null>(null),
-    [newKey, setNewKey] = useState<string | null>(null),
-    boundary = useRef<HTMLDivElement>(null)
+  const [active, setActive] = useState<string | null>(null)
+  const [newKey, setNewKey] = useState<string | null>(null)
+  const boundary = useRef<HTMLDivElement>(null)
   const iconField = spec.fields.find(isIconSlot)
-  const keys = repeatItemKeys(values[slot.id], spec.max),
-    noun = spec.unit.toLowerCase(),
-    first = (key: string) => (spec.fields[0] ? repeatItemSlotId(slot.id, key, spec.fields[0].id) : null)
+  const keys = repeatItemKeys(values[slot.id], spec.max)
+  const noun = spec.unit.toLowerCase()
+  const first = (key: string) => (spec.fields[0] ? repeatItemSlotId(slot.id, key, spec.fields[0].id) : null)
   const article = /^[aeiou]/.test(noun) ? 'an' : 'a'
   const pending = useRef({ newKey, onDiscardEmpty, origin, slotId: slot.id })
   pending.current = { newKey, onDiscardEmpty, origin, slotId: slot.id }
@@ -126,13 +126,13 @@ export function ContentRepeatPanel({
   function summary(key: string) {
     for (const field of spec.fields) {
       if (field.kind === 'image' || field.constraints?.presentation || field.constraints?.destinationOnly) continue
-      const value = values[repeatItemSlotId(slot.id, key, field.id)],
-        text =
-          typeof value === 'string'
-            ? value
-            : value && typeof value === 'object'
-              ? String((value as { label?: unknown }).label ?? '')
-              : ''
+      const value = values[repeatItemSlotId(slot.id, key, field.id)]
+      const text =
+        typeof value === 'string'
+          ? value
+          : value && typeof value === 'object'
+            ? String((value as { label?: unknown }).label ?? '')
+            : ''
       const words = text
         .replace(/<[^>]*>/g, ' ')
         .replace(/\s+/g, ' ')

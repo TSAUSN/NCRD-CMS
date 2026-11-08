@@ -11,8 +11,8 @@ export const dynamic = 'force-dynamic'
 export default async function SiteScripts({ params }: { params: Promise<{ siteId: string }> }) {
   const session = await currentSession()
   if (!session?.principal.isSuperAdmin) notFound()
-  const { siteId } = await params,
-    site = await getSite(session.principal.userId, siteId)
+  const { siteId } = await params
+  const site = await getSite(session.principal.userId, siteId)
   if (!site) notFound()
   const [role, data] = await Promise.all([
     roleLabel(session.principal.userId),

@@ -5,14 +5,14 @@ import { markSampleValues, sectionStartingValues } from '@cms/schema'
 export async function echelonSiteMedia(client: Queryable, siteId: string): Promise<EchelonMediaValues | null> {
   if (!(await client.query('SELECT chapters_enabled FROM sites WHERE id=$1', [siteId])).rows[0]?.chapters_enabled)
     return null
-  const sources = ECHELON_REFERENCE_MEDIA.map(row => row.source),
-    rows = (
-      await client.query<{ id: string; source: string; alt_text: string; focal: { x: number; y: number } }>(
-        "SELECT id,source,alt_text,focal FROM media WHERE site_id=$1 AND source=ANY($2::text[]) AND status='ready' AND deleted_at IS NULL ORDER BY created_at,id",
-        [siteId, sources],
-      )
-    ).rows,
-    result: EchelonMediaValues = {}
+  const sources = ECHELON_REFERENCE_MEDIA.map(row => row.source)
+  const rows = (
+    await client.query<{ id: string; source: string; alt_text: string; focal: { x: number; y: number } }>(
+      "SELECT id,source,alt_text,focal FROM media WHERE site_id=$1 AND source=ANY($2::text[]) AND status='ready' AND deleted_at IS NULL ORDER BY created_at,id",
+      [siteId, sources],
+    )
+  ).rows
+  const result: EchelonMediaValues = {}
   for (const row of rows) {
     const reference = ECHELON_REFERENCE_MEDIA.find(item => item.source === row.source)
     if (reference && row.alt_text.trim())

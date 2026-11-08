@@ -78,9 +78,9 @@ export function AppSidebar({
   const { open, rail, compact, sidebar, closeButton, closeDrawer, toggleRail } = layout
   const openSearch = () => window.dispatchEvent(new Event(COMMAND_SEARCH_EVENT))
   const contentSite = Boolean(currentSite?.content)
-  const siteWide = new Set(['Header & menu', 'Footer', 'Site look']),
-    publishing = new Set(['Publish', 'Settings']),
-    advanced = siteItems.filter(item => item.label === 'Sections' || item.label === 'Template')
+  const siteWide = new Set(['Header & menu', 'Footer', 'Site look'])
+  const publishing = new Set(['Publish', 'Settings'])
+  const advanced = siteItems.filter(item => item.label === 'Sections' || item.label === 'Template')
 
   const siteBadge = siteInitials(currentSite?.label ?? '')
   function siteSwitcher() {

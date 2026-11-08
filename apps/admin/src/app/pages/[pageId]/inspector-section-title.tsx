@@ -29,8 +29,8 @@ export function InspectorSectionTitle({
   focusedTitle: Slots[number]
 }) {
   const { state, entry } = props
-  const headingLink = slots.find(slot => ['link', 'button'].includes(slot.kind) && slot.id === 'link'),
-    name = sectionDisplayName(section, entry)
+  const headingLink = slots.find(slot => ['link', 'button'].includes(slot.kind) && slot.id === 'link')
+  const name = sectionDisplayName(section, entry)
   return (
     <aside
       ref={inspector}

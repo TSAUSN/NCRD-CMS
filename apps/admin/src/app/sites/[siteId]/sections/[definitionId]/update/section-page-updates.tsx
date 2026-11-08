@@ -20,19 +20,19 @@ export function SectionPageUpdates({
   pages: SectionUpdatePage[]
 }) {
   const notice = useRef<HTMLParagraphElement>(null)
-  const router = useRouter(),
-    [selected, setSelected] = useState<string[]>([]),
-    [message, setMessage] = useState(''),
-    [failed, setFailed] = useState(false),
-    [staleReview, setStaleReview] = useState(false),
-    [pending, startTransition] = useTransition(),
-    [confirm, setConfirm] = useState(false)
+  const router = useRouter()
+  const [selected, setSelected] = useState<string[]>([])
+  const [message, setMessage] = useState('')
+  const [failed, setFailed] = useState(false)
+  const [staleReview, setStaleReview] = useState(false)
+  const [pending, startTransition] = useTransition()
+  const [confirm, setConfirm] = useState(false)
   const [refreshPending, startRefresh] = useTransition()
   const busy = pending || refreshPending
-  const [review, setReview] = useState<SectionUpdatePage | null>(null),
-    [preview, setPreview] = useState<Preview | null>(null),
-    [attempt, setAttempt] = useState(0),
-    [device, setDevice] = useState('1280')
+  const [review, setReview] = useState<SectionUpdatePage | null>(null)
+  const [preview, setPreview] = useState<Preview | null>(null)
+  const [attempt, setAttempt] = useState(0)
+  const [device, setDevice] = useState('1280')
   useEffect(() => {
     setSelected([])
   }, [pages])
@@ -67,8 +67,8 @@ export function SectionPageUpdates({
     setFailed(false)
     startRefresh(() => router.refresh())
   }
-  const chosen = pages.filter(page => selected.includes(page.pageId)),
-    base = `/sites/${siteId}/sections/${definitionId}`
+  const chosen = pages.filter(page => selected.includes(page.pageId))
+  const base = `/sites/${siteId}/sections/${definitionId}`
   function apply() {
     startTransition(async () => {
       try {

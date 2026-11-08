@@ -28,11 +28,11 @@ export function PageManagement({
   archived?: boolean
   navigation?: { liveHref?: string }
 }) {
-  const router = useRouter(),
-    [mode, setMode] = useState<Mode>(null),
-    [result, setResult] = useState<ActionResult | null>(null),
-    [pending, start] = useTransition(),
-    busy = useRef(false)
+  const router = useRouter()
+  const [mode, setMode] = useState<Mode>(null)
+  const [result, setResult] = useState<ActionResult | null>(null)
+  const [pending, start] = useTransition()
+  const busy = useRef(false)
   const error = result && !result.ok ? result.message : undefined
   function run(action: (form: FormData) => Promise<ActionResult>) {
     if (busy.current) return

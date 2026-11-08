@@ -218,8 +218,8 @@ export function useSiteImportDraft(actorId: string) {
     setSaving(true)
     setError(null)
     try {
-      const text = await file.text(),
-        content = parseSiteArchive(JSON.parse(text))
+      const text = await file.text()
+      const content = parseSiteArchive(JSON.parse(text))
       changed()
       accepted.current = false
       source.current = text

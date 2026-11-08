@@ -189,8 +189,8 @@ function MetadataForm({
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const inFlight = useRef(false)
-  const [saved, setSaved] = useState(() => ({ value: structuredClone(value), tags: tagInput })),
-    currentAsset = useRef(asset)
+  const [saved, setSaved] = useState(() => ({ value: structuredClone(value), tags: tagInput }))
+  const currentAsset = useRef(asset)
   const dirty = JSON.stringify(value) !== JSON.stringify(saved.value) || tagInput !== saved.tags
   useNavigationGuard(() => ({
     dirty,

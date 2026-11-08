@@ -45,8 +45,8 @@ export async function reviewTemplateUpdate(): Promise<
   }
 }
 export async function createTemplateDrafts(input: unknown) {
-  const session = await currentSession(),
-    parsed = selection.safeParse(input)
+  const session = await currentSession()
+  const parsed = selection.safeParse(input)
   if (!session?.principal.isSuperAdmin)
     return { ok: false as const, message: 'Only a super admin can apply a template update.' }
   if (!parsed.success) return { ok: false as const, message: 'Review the update and choose the sites again.' }
@@ -61,8 +61,8 @@ export async function createTemplateDrafts(input: unknown) {
   }
 }
 export async function createNationalSite(requestId: string, input: unknown) {
-  const session = await currentSession(),
-    parsed = startInput.safeParse(input)
+  const session = await currentSession()
+  const parsed = startInput.safeParse(input)
   if (!session?.principal.isSuperAdmin) return { ok: false as const, message: 'Only a super admin can start a site.' }
   if (authProvider().name !== 'local' && !recentlyAuthenticated(session.authenticatedAt))
     return { ok: false as const, message: 'Confirm your sign-in in another tab, then return. Your setup stays here.' }

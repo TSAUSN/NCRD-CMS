@@ -62,8 +62,8 @@ export async function POST(request: Request, context: { params: Promise<{ pageId
   try {
     if (!request.body || request.headers.get('content-type')?.split(';')[0] !== 'application/json')
       throw new Error('body')
-    const reader = request.body.getReader(),
-      chunks: Uint8Array[] = []
+    const reader = request.body.getReader()
+    const chunks: Uint8Array[] = []
     let size = 0
     try {
       for (;;) {

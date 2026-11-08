@@ -22,24 +22,24 @@ export function useSettingsDraft<T>(
   fromPayload: (payload: unknown) => T,
   invalidMessage: string,
 ) {
-  const router = useRouter(),
-    [value, setValue] = useState(initialValue),
-    [baseline, setBaseline] = useState(JSON.stringify(initialValue)),
-    [revision, setRevision] = useState(initial.revision),
-    [changed, setChanged] = useState(initial.changed),
-    [notice, setNotice] = useState(''),
-    [error, setError] = useState(false),
-    [pending, startTransition] = useTransition(),
-    busy = useRef(false),
-    review = useRef<{ revision: string; id: string } | null>(null),
-    payload = toPayload(value)
-  const dirty = JSON.stringify(value) !== baseline,
-    valid =
-      payload !== null &&
-      SitePublicSettings.safeParse({
-        ...initial.settings,
-        ...(block === 'general' ? (payload as object) : { [block]: payload }),
-      }).success
+  const router = useRouter()
+  const [value, setValue] = useState(initialValue)
+  const [baseline, setBaseline] = useState(JSON.stringify(initialValue))
+  const [revision, setRevision] = useState(initial.revision)
+  const [changed, setChanged] = useState(initial.changed)
+  const [notice, setNotice] = useState('')
+  const [error, setError] = useState(false)
+  const [pending, startTransition] = useTransition()
+  const busy = useRef(false)
+  const review = useRef<{ revision: string; id: string } | null>(null)
+  const payload = toPayload(value)
+  const dirty = JSON.stringify(value) !== baseline
+  const valid =
+    payload !== null &&
+    SitePublicSettings.safeParse({
+      ...initial.settings,
+      ...(block === 'general' ? (payload as object) : { [block]: payload }),
+    }).success
   useEffect(() => {
     const warn = (event: BeforeUnloadEvent) => {
       if (dirty || pending || busy.current) event.preventDefault()

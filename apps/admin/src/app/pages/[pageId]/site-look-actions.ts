@@ -44,14 +44,14 @@ export async function savePageSiteLook(input: {
     const site = await getSite(session.principal.userId, page.site_id)
     if (!site?.original_design)
       return { ok: false as const, message: 'Use Header & menu or Footer at site level to change these shared areas.' }
-    const header = HeaderConfig.parse(input.header),
-      footer = FooterConfig.parse(input.footer),
-      menu = NavTree.parse(input.menu)
+    const header = HeaderConfig.parse(input.header)
+    const footer = FooterConfig.parse(input.footer)
+    const menu = NavTree.parse(input.menu)
     const result = await mapErrors(() =>
       asUser({ userId: session.principal.userId, requestId: randomUUID() }, async client => {
-        let headerRevision = input.headerRevision,
-          footerRevision = input.footerRevision,
-          menuRevision = input.menuRevision
+        let headerRevision = input.headerRevision
+        let footerRevision = input.footerRevision
+        let menuRevision = input.menuRevision
         // Both commands share one transaction: a stale menu rolls back frame edits too.
         if (input.frameChanged) {
           const row = (

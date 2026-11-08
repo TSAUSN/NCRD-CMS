@@ -134,10 +134,10 @@ export function EditorInspectorFields({ selection, page, navigation }: Props) {
         setState(current => {
           const index = current.sectionOrigins.indexOf(origin)
           if (index < 0) return current
-          const section = current.document.sections[index]!,
-            slot = slotsByDef
-              .get(sectionVersionKey(section.section_def_id, section.section_def_version))
-              ?.slots.find(field => field.id === slotId)
+          const section = current.document.sections[index]!
+          const slot = slotsByDef
+            .get(sectionVersionKey(section.section_def_id, section.section_def_version))
+            ?.slots.find(field => field.id === slotId)
           if (!slot || !repeatItemSpec(slot) || repeatItemHasContent(section.values, slot, key)) return current
           const next = setSectionValues(
             current,

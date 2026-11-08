@@ -40,8 +40,8 @@ export function MediaUploadPanel({
   const [progress, setProgress] = useState<UploadProgress | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [done, setDone] = useState(false)
-  const inFlight = useRef(false),
-    accepted = useRef(false)
+  const inFlight = useRef(false)
+  const accepted = useRef(false)
   const busy = progress !== null
   const leaveState = (): NavigationGuardState => ({
     dirty: Boolean(file) && !done && !accepted.current,

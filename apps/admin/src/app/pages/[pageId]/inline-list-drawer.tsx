@@ -27,12 +27,12 @@ export function InlineListDrawer({
   onClose: () => void
   onSaved: () => void
 }) {
-  const busy = useRef(false),
-    [saved, setSaved] = useState<string | null>(null)
+  const busy = useRef(false)
+  const [saved, setSaved] = useState<string | null>(null)
   const [loaded, setLoaded] = useState<Awaited<ReturnType<typeof loadInlineList>> | null>(null)
   const [values, setValues] = useState<Record<string, unknown>>({})
-  const [error, setError] = useState<string | null>(null),
-    [pending, setPending] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [pending, setPending] = useState(false)
   const [documentField, setDocumentField] = useState<string | null>(null)
   const [pictureField, setPictureField] = useState<string | null>(null)
   useEffect(() => {

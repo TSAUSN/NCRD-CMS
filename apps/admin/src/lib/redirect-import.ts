@@ -36,18 +36,18 @@ export function previewRedirectCsv(
   existing: RedirectRow[],
 ): RedirectImportRow[] {
   if (source.length > 262144) throw new Error('Use a spreadsheet with at most 200 redirects.')
-  const rows = parseCsvRows(source.replace(/^\uFEFF/, '')),
-    header = rows.shift()?.map(value => value.trim().toLowerCase())
+  const rows = parseCsvRows(source.replace(/^\uFEFF/, ''))
+  const header = rows.shift()?.map(value => value.trim().toLowerCase())
   if (!header || header.length !== 2 || header[0] !== 'old address' || header[1] !== 'new address')
     throw new Error('Use two columns named Old address and New address, then save the spreadsheet as CSV.')
   if (!rows.length || rows.length > 200) throw new Error('Add between 1 and 200 redirect rows.')
   const seen = new Set<string>()
   return rows.map((cells, index) => {
-    const old = redirectPath(cells[0] ?? ''),
-      rawNew = (cells[1] ?? '').trim().toLowerCase(),
-      newPath = rawNew === '/' ? '/' : rawNew.replace(/\/+$/, '')
-    const page = pages.find(page => page.path === newPath || page.publishedPath === newPath),
-      current = existing.find(row => row.oldPath === old)
+    const old = redirectPath(cells[0] ?? '')
+    const rawNew = (cells[1] ?? '').trim().toLowerCase()
+    const newPath = rawNew === '/' ? '/' : rawNew.replace(/\/+$/, '')
+    const page = pages.find(page => page.path === newPath || page.publishedPath === newPath)
+    const current = existing.find(row => row.oldPath === old)
     let issue =
       cells.length !== 2
         ? 'Use exactly two cells on this row.'

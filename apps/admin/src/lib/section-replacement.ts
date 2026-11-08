@@ -53,8 +53,8 @@ export function planSectionReplacement(
       sampleMapping[field.id] = sourceId
       if (Object.hasOwn(values, sourceId)) nextValues[field.id] = structuredClone(values[sourceId])
       // A repeated list brings its items, with each item field both layouts declare alike (LIB-02).
-      const from = repeatItemSpec(before.find(source => source.id === sourceId)!),
-        to = repeatItemSpec(field)
+      const from = repeatItemSpec(before.find(source => source.id === sourceId)!)
+      const to = repeatItemSpec(field)
       if (from && to) {
         for (const key of repeatItemKeys(values[sourceId], to.max)) {
           for (const item of to.fields) {
@@ -123,8 +123,8 @@ export function replacementSection(
   if (section.label !== undefined) next.label = section.label
   if (section.hidden !== undefined) next.hidden = section.hidden
   if (section.hidden_at !== undefined) next.hidden_at = [...section.hidden_at]
-  const appearance: SectionAppearance = {},
-    droppedAppearance: string[] = []
+  const appearance: SectionAppearance = {}
+  const droppedAppearance: string[] = []
   for (const [key, value] of Object.entries(section.appearance ?? {}) as [keyof SectionAppearance, never][]) {
     if (value === undefined) continue
     if (supported(key, target.appearance_support)) appearance[key] = value

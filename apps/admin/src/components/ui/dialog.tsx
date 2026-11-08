@@ -63,8 +63,8 @@ export function Dialog({
             node.getClientRects().length > 0 &&
             !node.closest('[inert]'),
         )
-        const first = focusable[0],
-          last = focusable.at(-1)
+        const first = focusable[0]
+        const last = focusable.at(-1)
         if (!first || !last) {
           event.preventDefault()
           return

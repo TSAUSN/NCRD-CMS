@@ -16,9 +16,9 @@ export function IconPicker({
   disabled?: boolean
   onChange: (value: string) => void
 }) {
-  const [open, setOpen] = useState(false),
-    [search, setSearch] = useState(''),
-    [recent, setRecent] = useState<CmsIconName[]>([])
+  const [open, setOpen] = useState(false)
+  const [search, setSearch] = useState('')
+  const [recent, setRecent] = useState<CmsIconName[]>([])
   useEffect(() => {
     try {
       const stored: unknown = JSON.parse(localStorage.getItem(recentKey) ?? '[]')

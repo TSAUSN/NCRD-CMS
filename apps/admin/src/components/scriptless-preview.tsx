@@ -20,7 +20,7 @@ export function ScriptlessPreview({ srcDoc, ...props }: Omit<ComponentProps<'ifr
  * containing it keeps its scroll position. */
 export function revealPreviewSection(frame: HTMLIFrameElement, index: number | undefined): void {
   if (index === undefined) return
-  const view = frame.contentWindow,
-    section = frame.contentDocument?.getElementById(`s${index}`)
+  const view = frame.contentWindow
+  const section = frame.contentDocument?.getElementById(`s${index}`)
   if (view && section) view.scrollTo({ top: section.getBoundingClientRect().top + view.scrollY, behavior: 'instant' })
 }

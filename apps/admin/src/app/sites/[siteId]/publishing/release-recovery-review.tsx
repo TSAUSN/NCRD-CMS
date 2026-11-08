@@ -27,9 +27,9 @@ export function ReleaseRecoveryReview({
   const [error, setError] = useState('')
   const [pending, setPending] = useState(false)
   const [confirm, setConfirm] = useState(false)
-  const lock = useRef(false),
-    requestId = useRef<string | null>(null),
-    planId = useRef<string | null>(null)
+  const lock = useRef(false)
+  const requestId = useRef<string | null>(null)
+  const planId = useRef<string | null>(null)
   const alive = useRef(true)
   useEffect(() => {
     alive.current = true

@@ -37,8 +37,8 @@ export async function saveHeaderMenuDraft(client: Queryable, input: HeaderMenuDr
       [input.siteId],
     )
   ).rows
-  const old = rows.find(row => row.kind === 'header'),
-    footer = rows.find(row => row.kind === 'footer')
+  const old = rows.find(row => row.kind === 'header')
+  const footer = rows.find(row => row.kind === 'footer')
   if (!old || !footer) throw new DomainError('not_found', 'The site header is unavailable.')
   if (Number(old.revision) !== input.headerRevision || Number(footer.revision) !== input.footerRevision)
     throw new DomainError('stale_revision', 'Someone else saved the header or footer. Reload to compare your work.')
@@ -68,8 +68,8 @@ export async function saveHeaderMenuDraft(client: Queryable, input: HeaderMenuDr
           throw new DomainError('invalid_state', 'Choose a logo and add its description before saving.')
       }
   }
-  let headerRevision = input.headerRevision,
-    footerRevision = input.footerRevision
+  let headerRevision = input.headerRevision
+  let footerRevision = input.footerRevision
   if (!isDeepStrictEqual(old.content, input.header)) {
     const saved = (
       await client.query('SELECT * FROM app.save_global_elements_draft($1,$2,$3,$4,$5,true)', [

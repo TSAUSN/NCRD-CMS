@@ -72,20 +72,14 @@ export function useNewsroomOrder({ siteId, initial, rights }: NewsroomOrderProps
     setError('')
     setNotice('Saving Newsroom order…')
     try {
-      const base = saved.current,
-        result =
-          next.kind === 'order'
-            ? await saveStoryNewsroomOrder(
-                siteId,
-                base.collectionId,
-                base.catalogRevision,
-                base.entryRevision,
-                next.ids,
-              )
-            : await saveStoryListPatch(siteId, base.collectionId, next.id, base.catalogRevision, base.entryRevision, {
-                action: 'featured',
-                value: next.value,
-              })
+      const base = saved.current
+      const result =
+        next.kind === 'order'
+          ? await saveStoryNewsroomOrder(siteId, base.collectionId, base.catalogRevision, base.entryRevision, next.ids)
+          : await saveStoryListPatch(siteId, base.collectionId, next.id, base.catalogRevision, base.entryRevision, {
+              action: 'featured',
+              value: next.value,
+            })
       if (!result.ok) {
         setError(result.message)
         setNotice('Your proposed order is not confirmed. Retry, or use the saved order.')
@@ -158,8 +152,8 @@ export function useNewsroomOrder({ siteId, initial, rights }: NewsroomOrderProps
   }
   function move(id: string, to: number) {
     if (!editable || pending || intent.current) return
-    const ids = featured.map(row => row.id),
-      from = ids.indexOf(id)
+    const ids = featured.map(row => row.id)
+    const from = ids.indexOf(id)
     if (from < 0 || to < 0 || to >= ids.length || from === to) return
     ids.splice(from, 1)
     ids.splice(to, 0, id)

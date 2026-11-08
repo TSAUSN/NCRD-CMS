@@ -153,8 +153,8 @@ function ListChanges({
   const fields = [...new Map([...before.fields, ...after.fields].map(field => [field.key, field])).values()]
   const ids = [...new Set([...newItems.map(entry => entry.id), ...oldItems.map(entry => entry.id)])]
   const changed = ids.flatMap(id => {
-    const oldItem = oldItems.find(entry => entry.id === id),
-      newItem = newItems.find(entry => entry.id === id)
+    const oldItem = oldItems.find(entry => entry.id === id)
+    const newItem = newItems.find(entry => entry.id === id)
     const present = (value: unknown) => value !== undefined && value !== null && value !== ''
     const values = fields.filter(field =>
       !oldItem
@@ -163,8 +163,8 @@ function ListChanges({
           ? present(oldItem.values?.[field.key])
           : JSON.stringify(oldItem.values?.[field.key]) !== JSON.stringify(newItem.values?.[field.key]),
     )
-    const oldPosition = oldItems.findIndex(entry => entry.id === id),
-      newPosition = newItems.findIndex(entry => entry.id === id)
+    const oldPosition = oldItems.findIndex(entry => entry.id === id)
+    const newPosition = newItems.findIndex(entry => entry.id === id)
     if (!values.length && oldPosition === newPosition) return []
     return [{ id, oldItem, newItem, values, oldPosition, newPosition }]
   })

@@ -206,8 +206,8 @@ function StoryPlacements({ model }: { model: StoryDraftModel }) {
     () => (placementContext ? storyPlacement(placementContext, placementValues, catalog) : null),
     [placementContext, catalog, placementSignature],
   )
-  const mainPlaces = placement?.places.filter(place => !place.article) ?? [],
-    relatedPlaces = placement?.places.filter(place => place.article) ?? []
+  const mainPlaces = placement?.places.filter(place => !place.article) ?? []
+  const relatedPlaces = placement?.places.filter(place => place.article) ?? []
   return (
     <>
       <Card title="Where it will show" density="editor">

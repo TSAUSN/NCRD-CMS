@@ -62,9 +62,9 @@ export function LinkDestinationPicker({
   sectionJumps?: boolean
   allowedKinds?: readonly Kind[]
 }) {
-  const current = record(value),
-    url = String(current.url ?? ''),
-    target = targets.find(page => page.path === url.split(/[?#]/)[0])
+  const current = record(value)
+  const url = String(current.url ?? '')
+  const target = targets.find(page => page.path === url.split(/[?#]/)[0])
   const [kind, setKind] = useState<Kind>(() => {
     const inferred = kindFor(url, targets)
     return allowedKinds?.length && (!url || !allowedKinds.includes(inferred)) ? allowedKinds[0]! : inferred
@@ -227,10 +227,10 @@ export function LinkSettings({
   allowedKinds?: readonly Kind[]
   destinationLabel?: string
 }) {
-  const current = record(value),
-    url = String(current.url ?? ''),
-    label = String(current.label ?? ''),
-    target = targets.find(page => page.path === url.split(/[?#]/)[0])
+  const current = record(value)
+  const url = String(current.url ?? '')
+  const label = String(current.label ?? '')
+  const target = targets.find(page => page.path === url.split(/[?#]/)[0])
   const [editing, setEditing] = useState<{ before: unknown; cancel?: () => void } | null>(null)
   const refused = refusedLinkUrl(url, allowedKinds)
   function close() {

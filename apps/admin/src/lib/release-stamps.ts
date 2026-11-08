@@ -18,8 +18,8 @@ export function releaseStamps(
   items: ReleaseItem[],
 ): Promise<Record<string, ReleaseStamp>> {
   return asUser({ userId }, async client => {
-    const result: Record<string, ReleaseStamp> = {},
-      rows: Record<string, { author_id: string | null; created_at: Date }> = {}
+    const result: Record<string, ReleaseStamp> = {}
+    const rows: Record<string, { author_id: string | null; created_at: Date }> = {}
     for (const [kind, table] of Object.entries(tables)) {
       const ids = items
         .filter(item => item.type === kind)

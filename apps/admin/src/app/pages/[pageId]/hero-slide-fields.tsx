@@ -38,11 +38,11 @@ export function HeroSlideFields({
   publishedIntro?: unknown
   selectedField?: string | null
 }) {
-  const field = (id: string) => values[repeatItemSlotId(repeat, item, id)],
-    p = heroSlidePresentation(values, repeat, item),
-    photoSelected =
-      selectedField === repeatItemSlotId(repeat, item, 'photo') ||
-      selectedField === repeatItemSlotId(repeat, item, 'phone_photo')
+  const field = (id: string) => values[repeatItemSlotId(repeat, item, id)]
+  const p = heroSlidePresentation(values, repeat, item)
+  const photoSelected =
+    selectedField === repeatItemSlotId(repeat, item, 'photo') ||
+    selectedField === repeatItemSlotId(repeat, item, 'phone_photo')
   const [photoOpen, setPhotoOpen] = useState(!photoUrl || photoSelected)
   useEffect(() => {
     if (!photoUrl || photoSelected) setPhotoOpen(true)
@@ -126,19 +126,19 @@ export function HeroSlideFields({
         </>
       )}
       {(['primary', 'secondary'] as const).map((id, index) => {
-        const value = field(id),
-          link = value && typeof value === 'object' ? (value as Record<string, unknown>) : {},
-          color = index ? p.secondColor : p.mainColor,
-          shown = index ? p.second : p.main,
-          label = index ? 'Second button' : 'Main button'
-        const palette = color === 'red' ? HERO_BUTTON_PALETTE.red : HERO_BUTTON_PALETTE.white,
-          ink = p.shade === 'white' ? HERO_BUTTON_PALETTE.white.foreground : HERO_BUTTON_PALETTE.red.foreground,
-          preview: CSSProperties = {
-            background: color === 'outline' ? 'transparent' : palette.background,
-            color: color === 'outline' ? ink : palette.foreground,
-            borderColor: color === 'outline' ? 'currentColor' : palette.border,
-            cursor: 'default',
-          }
+        const value = field(id)
+        const link = value && typeof value === 'object' ? (value as Record<string, unknown>) : {}
+        const color = index ? p.secondColor : p.mainColor
+        const shown = index ? p.second : p.main
+        const label = index ? 'Second button' : 'Main button'
+        const palette = color === 'red' ? HERO_BUTTON_PALETTE.red : HERO_BUTTON_PALETTE.white
+        const ink = p.shade === 'white' ? HERO_BUTTON_PALETTE.white.foreground : HERO_BUTTON_PALETTE.red.foreground
+        const preview: CSSProperties = {
+          background: color === 'outline' ? 'transparent' : palette.background,
+          color: color === 'outline' ? ink : palette.foreground,
+          borderColor: color === 'outline' ? 'currentColor' : palette.border,
+          cursor: 'default',
+        }
         return (
           <Card key={id} density="editor" className={workspaceFormsStyles.compactForm} aria-label={label}>
             <label className={selectionControlsStyles.toggleRow}>

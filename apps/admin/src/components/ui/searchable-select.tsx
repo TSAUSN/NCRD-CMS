@@ -23,8 +23,8 @@ export function SearchableSelect({
   disabled?: boolean
   autoFocus?: boolean
 }) {
-  const selected = options.find(option => option.value === value)?.label ?? '',
-    [query, setQuery] = useState(selected)
+  const selected = options.find(option => option.value === value)?.label ?? ''
+  const [query, setQuery] = useState(selected)
   useEffect(() => {
     if (value) setQuery(selected)
   }, [value, selected])

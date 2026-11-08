@@ -17,14 +17,14 @@ export function useBrowserSetup<T>({
   label: string
   pending: () => boolean
 }) {
-  const [value, setValue] = useState(initial),
-    [baseline, setBaseline] = useState(initial),
-    [loading, setLoading] = useState(true),
-    [saved, setSaved] = useState(false),
-    [error, setError] = useState(''),
-    finished = useRef(false)
-  const signature = JSON.stringify(value),
-    dirty = !finished.current && signature !== JSON.stringify(baseline)
+  const [value, setValue] = useState(initial)
+  const [baseline, setBaseline] = useState(initial)
+  const [loading, setLoading] = useState(true)
+  const [saved, setSaved] = useState(false)
+  const [error, setError] = useState('')
+  const finished = useRef(false)
+  const signature = JSON.stringify(value)
+  const dirty = !finished.current && signature !== JSON.stringify(baseline)
   useEffect(() => {
     setLoading(true)
     let next = initial
@@ -35,8 +35,8 @@ export function useBrowserSetup<T>({
       const source = localStorage.getItem(storageKey)
       if (source !== null) {
         setSaved(true)
-        const record = JSON.parse(source),
-          restored = record?.version === 1 ? read(record.value) : null
+        const record = JSON.parse(source)
+        const restored = record?.version === 1 ? read(record.value) : null
         if (!restored) throw new Error('Invalid recovery')
         next = restored
       }

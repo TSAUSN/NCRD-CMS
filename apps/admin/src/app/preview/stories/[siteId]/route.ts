@@ -15,23 +15,23 @@ const headers = {
   'x-robots-tag': 'noindex, nofollow',
 }
 export async function GET(request: Request, { params }: { params: Promise<{ siteId: string }> }) {
-  const session = await currentSession(),
-    { siteId } = await params
+  const session = await currentSession()
+  const { siteId } = await params
   if (!session || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(siteId))
     return new Response('<p>This preview is unavailable. <a href="/sign-in">Sign in</a> and try again.</p>', {
       status: 404,
       headers,
     })
-  const userId = session.principal.userId,
-    [site, rights] = await Promise.all([getSite(userId, siteId), collectionRights(userId, siteId)])
+  const userId = session.principal.userId
+  const [site, rights] = await Promise.all([getSite(userId, siteId), collectionRights(userId, siteId)])
   if (!site || (!rights.editEntries && !rights.manageSchema && !rights.publish))
     return new Response(
       '<p>This preview is unavailable for this account. <a href="/sites">Return to your sites</a>.</p>',
       { status: 404, headers },
     )
-  const query = new URL(request.url).searchParams,
-    rawPage = Number(query.get('page') ?? 1),
-    page = Number.isSafeInteger(rawPage) && rawPage > 0 ? rawPage : 1
+  const query = new URL(request.url).searchParams
+  const rawPage = Number(query.get('page') ?? 1)
+  const page = Number.isSafeInteger(rawPage) && rawPage > 0 ? rawPage : 1
   try {
     const html = await buildStoryFeedPreview(
       userId,

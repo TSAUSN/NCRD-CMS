@@ -52,8 +52,8 @@ export async function POST(request: Request, context: { params: Promise<{ siteId
   const versionId = typeof input.versionId === 'string' ? input.versionId : ''
   const header = HeaderConfig.safeParse(input.header)
   const footer = FooterConfig.safeParse(input.footer)
-  const tokens = input.tokens === undefined ? null : ThemeTokens.safeParse(input.tokens),
-    menu = input.menu === undefined ? null : NavTree.safeParse(input.menu)
+  const tokens = input.tokens === undefined ? null : ThemeTokens.safeParse(input.tokens)
+  const menu = input.menu === undefined ? null : NavTree.safeParse(input.menu)
   if ((tokens && !tokens.success) || (menu && !menu.success))
     return new Response('Invalid site look preview.', { status: 400 })
   if (!UUID.test(versionId) || !header.success || !footer.success) {

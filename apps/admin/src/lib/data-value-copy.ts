@@ -4,20 +4,20 @@ export function dataValueChangeWords(
   after: unknown,
   usage: Record<string, { id: string; title: string }[]>,
 ) {
-  const old = siteDataValues(before),
-    next = siteDataValues(after),
-    ids = [...new Set([...old, ...next].map(row => row.id))],
-    cells: { label: string; before: string; after: string }[] = [],
-    words: string[] = []
+  const old = siteDataValues(before)
+  const next = siteDataValues(after)
+  const ids = [...new Set([...old, ...next].map(row => row.id))]
+  const cells: { label: string; before: string; after: string }[] = []
+  const words: string[] = []
   const shown = (row: DataValue) => row.value + (row.unit ? ' ' + row.unit : '')
   for (const id of ids) {
-    const a = old.find(row => row.id === id),
-      b = next.find(row => row.id === id)
+    const a = old.find(row => row.id === id)
+    const b = next.find(row => row.id === id)
     if (JSON.stringify(a) === JSON.stringify(b)) continue
-    const name = b?.label ?? a?.label ?? 'Number',
-      pages = usage[id] ?? [],
-      count = pages.length + ' ' + (pages.length === 1 ? 'page' : 'pages'),
-      valueChanged = !a || !b || shown(a) !== shown(b)
+    const name = b?.label ?? a?.label ?? 'Number'
+    const pages = usage[id] ?? []
+    const count = pages.length + ' ' + (pages.length === 1 ? 'page' : 'pages')
+    const valueChanged = !a || !b || shown(a) !== shown(b)
     words.push(
       valueChanged
         ? a && b

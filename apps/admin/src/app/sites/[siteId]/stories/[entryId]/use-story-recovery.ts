@@ -40,12 +40,12 @@ export function useStoryRecovery({
   setValue,
   value,
 }: StoryRecoveryInput) {
-  const seenServerRevision = useRef(initialRevision),
-    [recovery, setRecovery] = useState<
-      ({ saved: StoryEditInput; revision: string } & ReturnType<typeof recoverStoryDraft>) | null
-    >(null),
-    [recoveryOpen, setRecoveryOpen] = useState(false),
-    [choices, setChoices] = useState<Partial<Record<StoryDraftGroup, 'mine' | 'saved'>>>({})
+  const seenServerRevision = useRef(initialRevision)
+  const [recovery, setRecovery] = useState<
+    ({ saved: StoryEditInput; revision: string } & ReturnType<typeof recoverStoryDraft>) | null
+  >(null)
+  const [recoveryOpen, setRecoveryOpen] = useState(false)
+  const [choices, setChoices] = useState<Partial<Record<StoryDraftGroup, 'mine' | 'saved'>>>({})
 
   useEffect(() => {
     if (newDraft || pending || inFlight.current || initialRevision === seenServerRevision.current) return

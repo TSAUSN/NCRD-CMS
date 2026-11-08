@@ -22,13 +22,13 @@ export function HeroCopyDialog({
   values: Record<string, unknown>
   onClose: () => void
 }) {
-  const [pages, setPages] = useState<{ id: string; title: string; revision: string }[] | null>(null),
-    [selected, setSelected] = useState(''),
-    [error, setError] = useState(''),
-    [retry, setRetry] = useState(0),
-    [pending, setPending] = useState(false),
-    [result, setResult] = useState<Extract<Awaited<ReturnType<typeof copyHeroSlide>>, { ok: true }> | null>(null),
-    busy = useRef(false)
+  const [pages, setPages] = useState<{ id: string; title: string; revision: string }[] | null>(null)
+  const [selected, setSelected] = useState('')
+  const [error, setError] = useState('')
+  const [retry, setRetry] = useState(0)
+  const [pending, setPending] = useState(false)
+  const [result, setResult] = useState<Extract<Awaited<ReturnType<typeof copyHeroSlide>>, { ok: true }> | null>(null)
+  const busy = useRef(false)
   useEffect(() => {
     let active = true
     setPages(null)

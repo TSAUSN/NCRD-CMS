@@ -127,9 +127,9 @@ export async function saveChapterInTransaction(
     if (!page) throw new DomainError('not_found', 'Chapter page not found.')
     let content: SectionInstance[]
     if (created || !page.content) {
-      const definitions = await corePageDefinitions(client),
-        media = await echelonSiteMedia(client, siteId),
-        photos = media && echelonChapterPhotos(media)
+      const definitions = await corePageDefinitions(client)
+      const media = await echelonSiteMedia(client, siteId)
+      const photos = media && echelonChapterPhotos(media)
       content = photos
         ? echelonChapterTemplate(definitions, photos, config)
         : echelonChapterContent(config, definitions, boardCount).map(section => ({
@@ -186,10 +186,10 @@ export async function ensureChapterDemoPages(client: Queryable, siteId: string):
     // A deliberate, one-time upgrade of untouched generated drafts only. Never
     // rewrite an authored draft or automatically advance other section pins.
     if (page?.revision !== '1' || page.note !== 'Chapter setup saved') continue
-    const content = PageContent.parse(page.content),
-      social = content.find(
-        section => section.values.__cms_chapter_part === 'social' && section.section_def_id === navigation.id,
-      )
+    const content = PageContent.parse(page.content)
+    const social = content.find(
+      section => section.values.__cms_chapter_part === 'social' && section.section_def_id === navigation.id,
+    )
     if (!social || social.section_def_version === navigation.version) continue
     const old = (
       await client.query('SELECT slots FROM section_def_versions WHERE section_def_id=$1 AND version=$2', [

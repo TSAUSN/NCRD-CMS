@@ -48,18 +48,18 @@ export function visitorPreview({ props, draft, canvas, view }: Inputs) {
     const visitorOrigin = props.visitorPreviewOrigin ?? props.isolatedCanvasOrigin
     if (visitorOrigin) {
       try {
-        const channel = crypto.randomUUID(),
-          response = await fetch(`/api/pages/${props.pageId}/canvas`, {
-            method: 'POST',
-            headers: { 'content-type': 'application/json' },
-            body: JSON.stringify({
-              action: 'open',
-              versionId: version,
-              sitePreview,
-              showHidden: previewHidden,
-              channel,
-            }),
-          })
+        const channel = crypto.randomUUID()
+        const response = await fetch(`/api/pages/${props.pageId}/canvas`, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({
+            action: 'open',
+            versionId: version,
+            sitePreview,
+            showHidden: previewHidden,
+            channel,
+          }),
+        })
         const ticket = response.ok ? readCanvasTicket(await response.json(), visitorOrigin, channel) : null
         if (!ticket) throw Error('unavailable')
         isolatedCurrent.current.trackVisitor(tab, ticket)

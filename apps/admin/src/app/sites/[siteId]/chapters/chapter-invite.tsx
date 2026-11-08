@@ -19,11 +19,11 @@ export function ChapterInvite({
   onClose: () => void
   onSaved: (message: string) => void
 }) {
-  const [name, setName] = useState(''),
-    [email, setEmail] = useState(''),
-    [people, setPeople] = useState<ChapterEditor[]>([]),
-    [error, setError] = useState(''),
-    [pending, start] = useTransition()
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [people, setPeople] = useState<ChapterEditor[]>([])
+  const [error, setError] = useState('')
+  const [pending, start] = useTransition()
   useEffect(() => {
     let active = true
     void loadChapterEditorsAction(row.id)

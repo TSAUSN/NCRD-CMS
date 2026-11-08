@@ -15,8 +15,8 @@ type Dependencies = {
   ) => Promise<SiteFileView>
 }
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
-const limit = 25 * 1024 * 1024,
-  headers = { 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' }
+const limit = 25 * 1024 * 1024
+const headers = { 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' }
 const fail = (status: number, message: string) => Response.json({ error: message }, { status, headers })
 export function createSiteFileUploadHandler(deps: Dependencies) {
   return async (request: Request, siteId: string): Promise<Response> => {
@@ -26,8 +26,8 @@ export function createSiteFileUploadHandler(deps: Dependencies) {
     if (!session?.isSuperAdmin || !uuid.test(siteId)) return fail(404, 'This file destination is unavailable.')
     if (request.headers.get('content-type') !== 'application/octet-stream')
       return fail(415, 'Choose a local file to upload.')
-    let name = '',
-      source = ''
+    let name = ''
+    let source = ''
     try {
       name = decodeURIComponent(request.headers.get('x-site-file-name') ?? '')
       source = decodeURIComponent(request.headers.get('x-site-file-source') ?? '')

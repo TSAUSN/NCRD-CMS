@@ -40,8 +40,8 @@ export function createContactHandler(deps: {
         }
         chunks.push(chunk.value)
       }
-    const input = new URLSearchParams(Buffer.concat(chunks).toString('utf8')),
-      path = input.get('page') ?? '/'
+    const input = new URLSearchParams(Buffer.concat(chunks).toString('utf8'))
+    const path = input.get('page') ?? '/'
     if (!/^\/(?!\/)[^?#\\\x00-\x20]*$/.test(path) || path.length > 2048)
       return new Response('This page address is invalid.', { status: 400 })
     const values = Object.fromEntries(

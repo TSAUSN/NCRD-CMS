@@ -49,28 +49,28 @@ export function StoriesComingUp({
   available: boolean
   today: string
 }) {
-  const router = useRouter(),
-    [month, setMonth] = useState(today.slice(0, 7)),
-    [zone, setZone] = useState('UTC'),
-    [selected, setSelected] = useState<string | null>(null),
-    [day, setDay] = useState(''),
-    [pending, setPending] = useState(false),
-    [message, setMessage] = useState(''),
-    [firstSite, setFirstSite] = useState(false),
-    [search, setSearch] = useState(''),
-    busy = useRef(false),
-    request = useRef<{ key: string; id: string } | null>(null),
-    base = '/sites/' + siteId + '/stories'
+  const router = useRouter()
+  const [month, setMonth] = useState(today.slice(0, 7))
+  const [zone, setZone] = useState('UTC')
+  const [selected, setSelected] = useState<string | null>(null)
+  const [day, setDay] = useState('')
+  const [pending, setPending] = useState(false)
+  const [message, setMessage] = useState('')
+  const [firstSite, setFirstSite] = useState(false)
+  const [search, setSearch] = useState('')
+  const busy = useRef(false)
+  const request = useRef<{ key: string; id: string } | null>(null)
+  const base = '/sites/' + siteId + '/stories'
   useEffect(() => {
     setZone(Intl.DateTimeFormat().resolvedOptions().timeZone)
   }, [])
   useNavigationGuard(() => ({ dirty: false, pending: busy.current }))
-  const ready = readyUndatedStories(state.rows, jobs),
-    filtered = ready.filter(row => String(row.values.title).toLowerCase().includes(search.toLowerCase())),
-    chosen = ready.find(row => row.id === selected),
-    canSchedule = rights.publish && available,
-    live = state.rows.filter(row => storyListLive(row, state.publishedSettings)).length,
-    needsReview = state.rows.filter(row => storyInSource(row.values) && row.values.reviewed !== true).length
+  const ready = readyUndatedStories(state.rows, jobs)
+  const filtered = ready.filter(row => String(row.values.title).toLowerCase().includes(search.toLowerCase()))
+  const chosen = ready.find(row => row.id === selected)
+  const canSchedule = rights.publish && available
+  const live = state.rows.filter(row => storyListLive(row, state.publishedSettings)).length
+  const needsReview = state.rows.filter(row => storyInSource(row.values) && row.values.reviewed !== true).length
   function choose(id: string, date = '') {
     if (!canSchedule || !ready.some(row => row.id === id)) return
     setSelected(id)
@@ -113,10 +113,10 @@ export function StoriesComingUp({
       setPending(false)
     }
   }
-  const monthJobs = jobs.filter(job => calendarDay(new Date(job.runAt), zone).startsWith(month)),
-    published = state.rows.filter(
-      row => row.published && String(row.published.published_date ?? '').startsWith(month),
-    ).length
+  const monthJobs = jobs.filter(job => calendarDay(new Date(job.runAt), zone).startsWith(month))
+  const published = state.rows.filter(
+    row => row.published && String(row.published.published_date ?? '').startsWith(month),
+  ).length
   return (
     <>
       <StoriesHeader

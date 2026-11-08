@@ -33,15 +33,15 @@ export function CsvDialog({
   onClose: () => void
   onImport: (entries: CollectionEntryDraft[]) => void
 }) {
-  const [source, setSource] = useState(''),
-    [baseline, setBaseline] = useState(''),
-    [restored, setRestored] = useState(false),
-    [reading, setReading] = useState(false),
-    [error, setError] = useState('')
-  const key = actorId ? 'cms.csv-draft.' + actorId + '.' + siteId + '.' + collectionId : '',
-    alive = useRef(true),
-    readInFlight = useRef(false),
-    dirty = source !== baseline
+  const [source, setSource] = useState('')
+  const [baseline, setBaseline] = useState('')
+  const [restored, setRestored] = useState(false)
+  const [reading, setReading] = useState(false)
+  const [error, setError] = useState('')
+  const key = actorId ? 'cms.csv-draft.' + actorId + '.' + siteId + '.' + collectionId : ''
+  const alive = useRef(true)
+  const readInFlight = useRef(false)
+  const dirty = source !== baseline
   useEffect(() => {
     alive.current = true
     return () => {

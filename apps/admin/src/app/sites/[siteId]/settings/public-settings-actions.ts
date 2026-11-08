@@ -19,11 +19,11 @@ export async function savePublicSiteSettings(
     if (!['social', 'general', 'search', 'dataValues'].includes(block))
       throw new DomainError('invalid_state', 'Choose a supported Settings tab.')
     const result = await asUser({ userId: session.principal.userId, requestId: randomUUID() }, async client => {
-      const current = await siteSettingsWorkspace(client, siteId),
-        general =
-          block === 'general'
-            ? SitePublicSettings.pick({ name: true, general: true }).required({ general: true }).safeParse(value)
-            : null
+      const current = await siteSettingsWorkspace(client, siteId)
+      const general =
+        block === 'general'
+          ? SitePublicSettings.pick({ name: true, general: true }).required({ general: true }).safeParse(value)
+          : null
       if (general && !general.success) throw new DomainError('invalid_state', 'Check the General settings fields.')
       const parsed = SitePublicSettings.safeParse({
         ...current.settings,

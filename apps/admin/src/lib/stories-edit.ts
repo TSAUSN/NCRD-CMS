@@ -28,8 +28,8 @@ export function storyDetailValues(
   original: Record<string, unknown> = {},
   catalog?: StoriesSettings,
 ) {
-  const sectors = catalog?.mainTags ?? STORY_SECTORS,
-    regions = catalog?.secondaryTags ?? STORY_REGIONS
+  const sectors = catalog?.mainTags ?? STORY_SECTORS
+  const regions = catalog?.secondaryTags ?? STORY_REGIONS
   if (input?.author !== undefined && (typeof input.author !== 'string' || input.author.length > 120))
     throw new DomainError('invalid_state', 'Use up to 120 characters for Author.')
   if (
@@ -60,28 +60,28 @@ export function storyDetailValues(
       'invalid_state',
       'Check the title, summary (up to 155 characters), tags and region before saving.',
     )
-  const tags = [...new Set(input.tags)],
-    values = {
-      ...original,
-      ...(input.author !== undefined ? { author: input.author.trim() } : {}),
-      title: input.title.trim(),
-      summary: input.summary.trim(),
-      tags: tags.join(','),
-      region: input.region,
-      region_label: regions.find(r => r.id === input.region)?.label ?? '',
-      published_date: input.published_date,
-      countries: input.countries.trim(),
-      body: sanitizeRichText(input.body),
-      body_is_sample: input.body_is_sample,
-      sector_links: tags
-        .map(id => {
-          const label = escapeText(sectors.find(s => s.id === id)?.label ?? id)
-          return !catalog || (catalog.source === 'sawso' && STORY_SECTORS.some(t => t.id === id))
-            ? '<a href="/ways-we-help/' + id + '">' + label + '</a>'
-            : label
-        })
-        .join(' '),
-    }
+  const tags = [...new Set(input.tags)]
+  const values = {
+    ...original,
+    ...(input.author !== undefined ? { author: input.author.trim() } : {}),
+    title: input.title.trim(),
+    summary: input.summary.trim(),
+    tags: tags.join(','),
+    region: input.region,
+    region_label: regions.find(r => r.id === input.region)?.label ?? '',
+    published_date: input.published_date,
+    countries: input.countries.trim(),
+    body: sanitizeRichText(input.body),
+    body_is_sample: input.body_is_sample,
+    sector_links: tags
+      .map(id => {
+        const label = escapeText(sectors.find(s => s.id === id)?.label ?? id)
+        return !catalog || (catalog.source === 'sawso' && STORY_SECTORS.some(t => t.id === id))
+          ? '<a href="/ways-we-help/' + id + '">' + label + '</a>'
+          : label
+      })
+      .join(' '),
+  }
   const secondary = [...new Set(input.regions ?? (input.region ? [input.region] : storyTagIds(original, 'secondary')))]
   return catalog
     ? {
@@ -110,15 +110,15 @@ export async function saveStoryDetails(
   ).rows[0]
   if (!list) throw new DomainError('not_found', 'This story is unavailable.')
   const rows = (
-      await client.query(
-        'SELECT e.id,e.stable_key,v.values FROM collection_entries e JOIN collection_entry_versions v ON v.id=e.draft_version_id WHERE e.collection_id=$1 AND e.archived_at IS NULL ORDER BY e.sort_index,e.created_at,e.id',
-        [collectionId],
-      )
-    ).rows,
-    target = rows.find(row => row.id === entryId)
+    await client.query(
+      'SELECT e.id,e.stable_key,v.values FROM collection_entries e JOIN collection_entry_versions v ON v.id=e.draft_version_id WHERE e.collection_id=$1 AND e.archived_at IS NULL ORDER BY e.sort_index,e.created_at,e.id',
+      [collectionId],
+    )
+  ).rows
+  const target = rows.find(row => row.id === entryId)
   if (!target) throw new DomainError('not_found', 'This story is unavailable.')
-  const titleChanged = typeof input?.title === 'string' && input.title.trim() !== target.values.title,
-    summaryChanged = typeof input?.summary === 'string' && input.summary.trim() !== target.values.summary
+  const titleChanged = typeof input?.title === 'string' && input.title.trim() !== target.values.title
+  const summaryChanged = typeof input?.summary === 'string' && input.summary.trim() !== target.values.summary
   // Lock the article before the list, matching release lock order. Preserve its
   // content and unrelated metadata while keeping edited story/search words aligned.
   const article =
@@ -130,12 +130,12 @@ export async function saveStoryDetails(
           )
         ).rows[0]
       : null
-  const whole = CollectionModel.safeParse(list.fields),
-    model = whole.success ? whole.data : CollectionModel.parse({ fields: list.fields, presentation: list.sort }),
-    values: Record<string, unknown> = storyDetailValues(input, target.values, model.presentation.stories)
+  const whole = CollectionModel.safeParse(list.fields)
+  const model = whole.success ? whole.data : CollectionModel.parse({ fields: list.fields, presentation: list.sort })
+  const values: Record<string, unknown> = storyDetailValues(input, target.values, model.presentation.stories)
   if (input.photo !== undefined) {
-    const photo = await resolveStoryPhoto(client, siteId, input.photo),
-      old = target.values.photo
+    const photo = await resolveStoryPhoto(client, siteId, input.photo)
+    const old = target.values.photo
     values.photo = photo
     if (old?.src !== photo.src) {
       values.photo_is_sample = false

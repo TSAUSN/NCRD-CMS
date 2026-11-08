@@ -28,17 +28,17 @@ export function useNationalTemplate({ initial, siteId, actorId }: NationalTempla
   const [restored, setRestored] = useState(false)
   const creating = useRef(false)
   const created = useRef(false)
-  const key = 'cms.template-start.' + actorId + '.' + siteId,
-    input = {
-      name,
-      slug,
-      source,
-      ...(source === 'copy' ? { sourceSiteId: copy } : {}),
-      bringWords: words,
-      bringStories: stories,
-    },
-    signature = JSON.stringify({ input, slugTouched }),
-    dirty = open === 'start' && !created.current && signature !== baseline
+  const key = 'cms.template-start.' + actorId + '.' + siteId
+  const input = {
+    name,
+    slug,
+    source,
+    ...(source === 'copy' ? { sourceSiteId: copy } : {}),
+    bringWords: words,
+    bringStories: stories,
+  }
+  const signature = JSON.stringify({ input, slugTouched })
+  const dirty = open === 'start' && !created.current && signature !== baseline
   const saveSetup = async () => {
     const parsed = NationalSiteStart.safeParse(input)
     if (!parsed.success) {
@@ -129,8 +129,8 @@ export function useNationalTemplate({ initial, siteId, actorId }: NationalTempla
     setRestored(false)
     restoreInput(fresh, false)
     try {
-      const saved = JSON.parse(localStorage.getItem(key) ?? 'null'),
-        parsed = NationalSiteStart.safeParse(saved?.input)
+      const saved = JSON.parse(localStorage.getItem(key) ?? 'null')
+      const parsed = NationalSiteStart.safeParse(saved?.input)
       if (saved?.version === 1 && parsed.success) {
         restoreInput(parsed.data, saved.slugTouched === true)
         request.current = NationalStartRequestId.safeParse(saved.requestId).success ? saved.requestId : null

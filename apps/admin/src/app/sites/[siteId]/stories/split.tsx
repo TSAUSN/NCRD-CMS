@@ -28,11 +28,11 @@ export function StoriesSplit({
   canCreate: boolean
   initial: SplitChoice
 }) {
-  const [choice, setChoice] = useState(initial),
-    [preview, setPreview] = useState(initial),
-    [full, setFull] = useState(false),
-    [saved, setSaved] = useState<{ pageId: string; title: string } | null>(null),
-    base = '/sites/' + siteId + '/stories'
+  const [choice, setChoice] = useState(initial)
+  const [preview, setPreview] = useState(initial)
+  const [full, setFull] = useState(false)
+  const [saved, setSaved] = useState<{ pageId: string; title: string } | null>(null)
+  const base = '/sites/' + siteId + '/stories'
   useEffect(() => {
     const timer = setTimeout(() => {
       setPreview(choice)
@@ -47,9 +47,10 @@ export function StoriesSplit({
     setChoice(current => ({ ...current, [key]: next }))
     setSaved(null)
   }
-  const live = state.rows.filter(row => storyListLive(row, state.publishedSettings)).length,
-    needsReview = state.rows.filter(row => storyInSource(row.values) && row.values.reviewed !== true).length,
-    mainView = state.settings.mainLabel === 'Project Sectors' ? 'By Project Sector' : 'By ' + state.settings.mainLabel
+  const live = state.rows.filter(row => storyListLive(row, state.publishedSettings)).length
+  const needsReview = state.rows.filter(row => storyInSource(row.values) && row.values.reviewed !== true).length
+  const mainView =
+    state.settings.mainLabel === 'Project Sectors' ? 'By Project Sector' : 'By ' + state.settings.mainLabel
   const url = (settings: SplitChoice) => '/preview/stories/' + siteId + '?' + splitChoiceQuery(settings)
   return (
     <>

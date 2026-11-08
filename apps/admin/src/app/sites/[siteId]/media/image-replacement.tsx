@@ -28,13 +28,13 @@ export function ImageReplacement({
   onClose: () => void
   onSaved: () => void
 }) {
-  const [image, setImage] = useState<ImagePlacementValue | null>(null),
-    [review, setReview] = useState<ImageReplacementReview | null>(null),
-    [keys, setKeys] = useState<string[]>([]),
-    [busy, setBusy] = useState(false),
-    [error, setError] = useState<string | null>(null),
-    [retry, setRetry] = useState(0),
-    [saved, setSaved] = useState<number | null>(null)
+  const [image, setImage] = useState<ImagePlacementValue | null>(null)
+  const [review, setReview] = useState<ImageReplacementReview | null>(null)
+  const [keys, setKeys] = useState<string[]>([])
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [retry, setRetry] = useState(0)
+  const [saved, setSaved] = useState<number | null>(null)
   const [replacementName, setReplacementName] = useState('Replacement')
   const lock = useRef(false)
   useNavigationGuard(() => ({ dirty: false, pending: busy }))

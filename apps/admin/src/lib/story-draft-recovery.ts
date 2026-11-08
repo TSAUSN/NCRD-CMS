@@ -19,8 +19,8 @@ function assign(target: StoryEditInput, source: StoryEditInput, fields: readonly
 }
 /** Preserve both editors' independent fields; overlapping edits require a choice. */
 export function recoverStoryDraft(base: StoryEditInput, local: StoryEditInput, saved: StoryEditInput) {
-  const merged = { ...local },
-    conflicts: StoryDraftGroup[] = []
+  const merged = { ...local }
+  const conflicts: StoryDraftGroup[] = []
   for (const group of STORY_DRAFT_GROUPS) {
     const changed = (value: StoryEditInput) => group.fields.some(field => !same(value[field], base[field]))
     if (!changed(local)) assign(merged, saved, group.fields)

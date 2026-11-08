@@ -7,8 +7,8 @@ import { SAWSO_APPROVED, STORIES_MODEL, sawsoStoryRows } from '@cms/seeds/sawso-
 import { createSiteFromSetupInTransaction } from './site-creation.ts'
 
 function sawsoSiteSetup(slug = 'sawso'): SiteSetup {
-  const base = starterSiteSetup('resource'),
-    wordmark = 'The Salvation Army World Service Office'
+  const base = starterSiteSetup('resource')
+  const wordmark = 'The Salvation Army World Service Office'
   return SiteSetup.parse({
     ...base,
     name: 'SAWSO',
@@ -48,8 +48,8 @@ export async function ensureSawsoSite(
     return { siteId: found.id, hostname: found.staging_hostname, collectionId: list }
   }
   await installCoreLibrary(client)
-  const setup = sawsoSiteSetup(slug),
-    site = await createSiteFromSetupInTransaction(client, requestId, setup, slug + '.staging.localhost')
+  const setup = sawsoSiteSetup(slug)
+  const site = await createSiteFromSetupInTransaction(client, requestId, setup, slug + '.staging.localhost')
   const collectionId = await ensureStoriesList(client, site.siteId)
   return { ...site, collectionId }
 }

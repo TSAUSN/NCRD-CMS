@@ -9,8 +9,8 @@ export async function GET(request: Request) {
   if (!origin) notFound()
   const provider = authProvider()
   if (provider.name !== 'local' || !provider.issue) notFound()
-  let destination = '/sign-in?error=expired-link',
-    sessionToken: string | undefined
+  let destination = '/sign-in?error=expired-link'
+  let sessionToken: string | undefined
   try {
     const code = new URL(request.url).searchParams.get('code') ?? ''
     const identity = await asUser(

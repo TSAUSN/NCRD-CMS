@@ -34,8 +34,8 @@ export function createCanvasResourceHandler(deps: {
   return async (request: Request, token: string, path: string[]): Promise<Response> => {
     const host = deps.host(request.headers)
     if (!host || !CANVAS_TOKEN.test(token)) return canvasNotFound()
-    const prefix = `/__cms/read/${token}/`,
-      pathname = new URL(request.url).pathname
+    const prefix = `/__cms/read/${token}/`
+    const pathname = new URL(request.url).pathname
     const original = pathname.startsWith(prefix) ? pathname.slice(prefix.length - 1) : null
     if (original && SiteFilePath.safeParse(original).success && deps.repository.path) {
       const mapped = await deps.repository.path(host, token, original)
@@ -49,8 +49,8 @@ export function createCanvasResourceHandler(deps: {
         response.headers.set('referrer-policy', 'no-referrer')
         if (response.ok && response.headers.get('content-type') === 'text/css') {
           try {
-            const css = canvasStylesheet(await response.text(), token, { paths: mapped.paths, basePath: original }),
-              headers = new Headers(response.headers)
+            const css = canvasStylesheet(await response.text(), token, { paths: mapped.paths, basePath: original })
+            const headers = new Headers(response.headers)
             headers.delete('etag')
             headers.delete('content-length')
             return new Response(css, { headers })
@@ -89,8 +89,8 @@ export function createCanvasResourceHandler(deps: {
       return response
     }
     if (path[0] === 'assets' && path.length === 2) {
-      const raw = await deps.repository.native?.(host, token, '/' + path.join('/')),
-        mapping = SiteNativeTarget.safeParse(raw)
+      const raw = await deps.repository.native?.(host, token, '/' + path.join('/'))
+      const mapping = SiteNativeTarget.safeParse(raw)
       if (raw != null && !mapping.success) return canvasNotFound()
       if (mapping.success && mapping.data.kind !== 'asset') return canvasNotFound()
       const target = mapping.success && mapping.data.kind === 'asset' ? mapping.data.assetId : path[1]!
@@ -104,8 +104,8 @@ export function createCanvasResourceHandler(deps: {
       return response
     }
     if (path[0] === 'media' && path.length === 3 && isGovernedMediaVariant(path[2]!)) {
-      const raw = await deps.repository.native?.(host, token, '/' + path.join('/')),
-        mapping = SiteNativeTarget.safeParse(raw)
+      const raw = await deps.repository.native?.(host, token, '/' + path.join('/'))
+      const mapping = SiteNativeTarget.safeParse(raw)
       if (raw != null && !mapping.success) return canvasNotFound()
       if (mapping.success && (mapping.data.kind !== 'media' || mapping.data.variant !== path[2]))
         return canvasNotFound()

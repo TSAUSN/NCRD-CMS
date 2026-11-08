@@ -192,15 +192,15 @@ async function withStoryScope(client: Queryable, release: ReleaseRow): Promise<R
  * article and dependency pins are independently checked before this is used. */
 async function plannedSelectionInput(client: Queryable, release: ReleaseRow): Promise<ReleaseItem[]> {
   if (!release.scope_before_hash) return release.snapshot
-  const item = release.snapshot.find(item => item.type === 'collection_entries' && item.entryIds),
-    head = item
-      ? (
-          await client.query<{ entry_revision: string }>(
-            'SELECT entry_revision FROM collections WHERE id=$1 AND site_id=$2',
-            [item.id, release.site_id],
-          )
-        ).rows[0]
-      : null
+  const item = release.snapshot.find(item => item.type === 'collection_entries' && item.entryIds)
+  const head = item
+    ? (
+        await client.query<{ entry_revision: string }>(
+          'SELECT entry_revision FROM collections WHERE id=$1 AND site_id=$2',
+          [item.id, release.site_id],
+        )
+      ).rows[0]
+    : null
   if (!head) throw new DomainError('stale_revision', 'This story is unavailable. Review it again.')
   return release.snapshot.map(choice => (choice === item ? { ...choice, revision: head.entry_revision } : choice))
 }
@@ -494,8 +494,8 @@ export async function planSiteRelease(
     await client.query('SELECT app.lock_release_site($1)', [siteId])
     const existing = (await client.query<ReleaseRow>('SELECT * FROM site_releases WHERE id=$1', [id])).rows[0]
     if (existing) {
-      const receipt = await withStoryScope(client, existing),
-        sameStoryContext = Boolean(receipt.scope_before_hash && (await reviewedContextMatches(client, receipt)))
+      const receipt = await withStoryScope(client, existing)
+      const sameStoryContext = Boolean(receipt.scope_before_hash && (await reviewedContextMatches(client, receipt)))
       if (
         existing.site_id !== siteId ||
         existing.created_by !== userId ||
@@ -557,17 +557,17 @@ async function reviewedSiteRelease(client: Queryable, id: string, override: stri
   const ignored: ReleaseCheck[] = []
   if (baselines)
     simulation.checks = simulation.checks.map(check => {
-      const reviewed = release.preview_report.find(old => old.pageId === check.pageId)?.report,
-        baseline = baselines.get(check.pageId),
-        existing = check.report.blocking.filter(
-          finding =>
-            !reviewed?.blocking.some(old => sameFinding(old, finding)) &&
-            baseline?.blocking.some(old => sameFinding(old, finding)),
-        )
+      const reviewed = release.preview_report.find(old => old.pageId === check.pageId)?.report
+      const baseline = baselines.get(check.pageId)
+      const existing = check.report.blocking.filter(
+        finding =>
+          !reviewed?.blocking.some(old => sameFinding(old, finding)) &&
+          baseline?.blocking.some(old => sameFinding(old, finding)),
+      )
       if (!existing.length) return check
       ignored.push({ ...check, report: { ...check.report, findings: existing, blocking: existing, advisory: [] } })
-      const findings = check.report.findings.filter(finding => !existing.some(old => sameFinding(old, finding))),
-        blocking = findings.filter(finding => finding.severity === 'blocking')
+      const findings = check.report.findings.filter(finding => !existing.some(old => sameFinding(old, finding)))
+      const blocking = findings.filter(finding => finding.severity === 'blocking')
       return { ...check, report: { ...check.report, findings, blocking, ok: blocking.length === 0 } }
     })
   if (
@@ -619,8 +619,8 @@ async function reviewedSiteRelease(client: Queryable, id: string, override: stri
 /** The full immutable report remains on the release; its audit entry is bounded. */
 function releaseReadinessAudit(checks: ReleaseCheck[]) {
   const rules: Record<string, { blocking: number; advisory: number }> = {}
-  let blocking = 0,
-    advisory = 0
+  let blocking = 0
+  let advisory = 0
   for (const check of checks)
     for (const severity of ['blocking', 'advisory'] as const)
       for (const finding of check.report[severity]) {

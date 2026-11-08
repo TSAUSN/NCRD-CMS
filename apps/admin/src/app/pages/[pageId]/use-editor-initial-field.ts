@@ -15,7 +15,8 @@ export function useEditorInitialField(
           ? `meta-${field}`
           : null
     if (!target) return
-    let observer: ResizeObserver | undefined, settle: ReturnType<typeof setTimeout> | undefined
+    let observer: ResizeObserver | undefined
+    let settle: ReturnType<typeof setTimeout> | undefined
     const focus = () => {
       const element = document.getElementById(target)
       if (!element) return

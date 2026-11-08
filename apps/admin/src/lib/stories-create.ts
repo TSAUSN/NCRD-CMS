@@ -34,15 +34,15 @@ export async function createStoryDraft(
     )
   ).rows[0]
   if (!list) throw new DomainError('not_found', 'The Stories list is unavailable.')
-  const fingerprint = storyDraftFingerprint(input),
-    prior = (
-      await client.query('SELECT app.read_story_draft_receipt($1,$2,$3,$4) AS receipt', [
-        siteId,
-        collectionId,
-        requestId,
-        fingerprint,
-      ])
-    ).rows[0]?.receipt
+  const fingerprint = storyDraftFingerprint(input)
+  const prior = (
+    await client.query('SELECT app.read_story_draft_receipt($1,$2,$3,$4) AS receipt', [
+      siteId,
+      collectionId,
+      requestId,
+      fingerprint,
+    ])
+  ).rows[0]?.receipt
   if (prior)
     return {
       entryId: String(prior.entry_id),
@@ -73,8 +73,8 @@ export async function createStoryDraft(
     )
   ).rows[0]
   if (!media) throw new DomainError('invalid_state', 'Choose a ready photo from this site’s Media.')
-  const whole = CollectionModel.safeParse(list.fields),
-    model = whole.success ? whole.data : CollectionModel.parse({ fields: list.fields, presentation: list.sort })
+  const whole = CollectionModel.safeParse(list.fields)
+  const model = whole.success ? whole.data : CollectionModel.parse({ fields: list.fields, presentation: list.sort })
   if (model.fields.find(field => field.key === 'old_address')?.required)
     throw new DomainError(
       'invalid_state',
@@ -90,32 +90,32 @@ export async function createStoryDraft(
     {},
     model.presentation.stories,
   )
-  const key = 'story-' + randomUUID(),
-    slug =
-      'stories/' +
-      (details.title
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-|-$/g, '')
-        .slice(0, 100)
-        .replace(/-$/, '') || 'story') +
-      '-' +
-      key.slice(-8)
+  const key = 'story-' + randomUUID()
+  const slug =
+    'stories/' +
+    (details.title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '')
+      .slice(0, 100)
+      .replace(/-$/, '') || 'story') +
+    '-' +
+    key.slice(-8)
   const values = {
-      ...details,
-      old_address: '',
-      image_url: '',
-      story_url: '/' + slug,
-      photo: {
-        src: '/media/' + media.id + '/wide',
-        alt: input.photoAlt.trim(),
-        decorative: false,
-        ...(imageFocus(input.photoFocus) ? { focal: imageFocus(input.photoFocus) } : {}),
-      },
-      photo_is_sample: false,
-      photo_note: '',
+    ...details,
+    old_address: '',
+    image_url: '',
+    story_url: '/' + slug,
+    photo: {
+      src: '/media/' + media.id + '/wide',
+      alt: input.photoAlt.trim(),
+      decorative: false,
+      ...(imageFocus(input.photoFocus) ? { focal: imageFocus(input.photoFocus) } : {}),
     },
-    checked = parseCollectionEntryValues(model.fields, values)
+    photo_is_sample: false,
+    photo_note: '',
+  }
+  const checked = parseCollectionEntryValues(model.fields, values)
   if (!checked.ok) throw new DomainError('invalid_state', checked.problems[0] ?? 'Check the story fields.')
   const rows = (
     await client.query(
@@ -141,8 +141,8 @@ export async function createStoryDraft(
   ).rows[0]!.id
   const pageId = (await client.query('SELECT app.create_private_story_page($1,$2) AS id', [collectionId, entryId]))
     .rows[0]!.id
-  const defs = await corePageDefinitions(client),
-    more = sawsoFeed(defs, input.tags[0] ?? null, 3, key)
+  const defs = await corePageDefinitions(client)
+  const more = sawsoFeed(defs, input.tags[0] ?? null, 3, key)
   more.values.heading = 'More stories'
   if (!input.tags.length || model.presentation.stories?.source !== 'sawso')
     more.values.empty_line = 'Check back soon for more stories.'

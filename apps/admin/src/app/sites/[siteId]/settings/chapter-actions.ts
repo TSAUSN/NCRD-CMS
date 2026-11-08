@@ -100,8 +100,8 @@ export async function saveChapterChecks(input: {
   }
 }
 export async function recordChapterMessages(input: { siteId: string; cycle?: string }) {
-  const { localChapterMailOrigin } = await import('../../../../lib/local-chapter-mail.ts'),
-    origin = localChapterMailOrigin()
+  const { localChapterMailOrigin } = await import('../../../../lib/local-chapter-mail.ts')
+  const origin = localChapterMailOrigin()
   const session = await currentSession()
   if (!session || !origin)
     return { ok: false as const, message: 'Recorded messages are available only in the local demo.' }

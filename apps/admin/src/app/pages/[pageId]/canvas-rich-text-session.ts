@@ -14,11 +14,11 @@ export function mountCanvasRichText(input: {
   y: number | null
   onChange: (value: string) => void
 }) {
-  const { node } = input,
-    presentation = richTextPresentation(input.constraints)
+  const { node } = input
+  const presentation = richTextPresentation(input.constraints)
   const attributes = [...node.attributes].map(attribute => [attribute.name, attribute.value] as const)
-  let value = input.value,
-    disabled = input.disabled
+  let value = input.value
+  let disabled = input.disabled
   const editor = new Editor({
     element: { mount: node },
     injectCSS: false,

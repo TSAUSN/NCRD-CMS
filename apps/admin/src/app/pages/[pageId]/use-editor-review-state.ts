@@ -17,9 +17,9 @@ export function useEditorReviewState(
   const [publishedVersionId, setPublishedVersionId] = useState(props.publishedVersionId)
   const [approvedVersionId, setApprovedVersionId] = useState(props.trustedCodeApproved ? props.previewVersionId : null)
   const [publishReviewOpen, setPublishReviewOpen] = useState(false)
-  const reviewFlight = useRef(false),
-    [reviewBusy, setReviewBusy] = useState(false),
-    [pageReview, setPageReview] = useState<PagePublishReview | null>(null)
+  const reviewFlight = useRef(false)
+  const [reviewBusy, setReviewBusy] = useState(false)
+  const [pageReview, setPageReview] = useState<PagePublishReview | null>(null)
   const [sampleConfirmation, setSampleConfirmation] = useState<SampleConfirmation | null>(null)
   const remainingSamples = sections
     .flatMap((section, index) =>

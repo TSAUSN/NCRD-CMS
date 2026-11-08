@@ -36,8 +36,8 @@ export function richTextToolbarState(editor: Editor): RichTextToolbarState {
 }
 export function isRichTextCommand(value: unknown): value is RichTextCommand {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return false
-  const command = value as Record<string, unknown>,
-    keys = Object.keys(command)
+  const command = value as Record<string, unknown>
+  const keys = Object.keys(command)
   if (command['type'] === 'block')
     return keys.length === 2 && ['paragraph', 'heading-2', 'heading-3', 'heading-4'].includes(String(command['value']))
   if (command['type'] === 'link')

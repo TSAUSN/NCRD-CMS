@@ -323,8 +323,8 @@ async function resourcesFor(deps: ThumbnailDeps, sectionDefId: string, version: 
 // A card is drawn about 1200px wide, so the 960px rendition is plenty; the
 // limits keep one picture's document small whatever a store holds.
 const RENDITIONS = ['card', 'wide', 'thumbnail', 'original'] as const
-const IMAGE_BYTES = 2 * 1024 * 1024,
-  FONT_BYTES = 1024 * 1024
+const IMAGE_BYTES = 2 * 1024 * 1024
+const FONT_BYTES = 1024 * 1024
 
 /**
  * Embed the site's fonts and the section's own pictures as data, read from the

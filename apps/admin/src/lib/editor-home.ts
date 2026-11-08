@@ -10,21 +10,21 @@ export async function editorialStoryHome(userId: string, siteId: string, slug: s
   const list = await getStoriesWorkspace(userId, siteId)
   if (!list) return null
   const rows: StoryListRow[] = list.entries
-      .filter(row => !row.archived)
-      .map(row => ({
-        id: row.id!,
-        stableKey: row.stableKey,
-        values: storyListValues(row.values),
-        published: row.publishedArchived || !row.publishedValues ? null : storyListValues(row.publishedValues),
-        changed: JSON.stringify(row.values) !== JSON.stringify(row.publishedValues),
-        hasText: hasStoryText(row.values),
-        photoPreview: null,
-      })),
-    settings = storiesCatalog(list.draft, slug),
-    published = storiesCatalog(list.published ?? list.draft, slug),
-    overview = storiesOverview(rows, settings, published),
-    jobs = await storyCalendarJobs(userId, siteId, list.id, rows),
-    month = new Date().toISOString().slice(0, 7)
+    .filter(row => !row.archived)
+    .map(row => ({
+      id: row.id!,
+      stableKey: row.stableKey,
+      values: storyListValues(row.values),
+      published: row.publishedArchived || !row.publishedValues ? null : storyListValues(row.publishedValues),
+      changed: JSON.stringify(row.values) !== JSON.stringify(row.publishedValues),
+      hasText: hasStoryText(row.values),
+      photoPreview: null,
+    }))
+  const settings = storiesCatalog(list.draft, slug)
+  const published = storiesCatalog(list.published ?? list.draft, slug)
+  const overview = storiesOverview(rows, settings, published)
+  const jobs = await storyCalendarJobs(userId, siteId, list.id, rows)
+  const month = new Date().toISOString().slice(0, 7)
   return {
     articlePaths: rows.flatMap(row => (typeof row.values.story_url === 'string' ? [row.values.story_url] : [])),
     missing: overview.missing.length,

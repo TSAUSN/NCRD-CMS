@@ -22,12 +22,12 @@ export async function saveStoryCalendarDay(
   if (!list) throw new DomainError('not_found', 'This story is unavailable.')
   if (!list.allowed) throw new DomainError('not_authorized', 'Your role cannot schedule this story.')
   const rows = (
-      await client.query(
-        'SELECT e.id,e.stable_key,e.published_version_id,v.values FROM collection_entries e JOIN collection_entry_versions v ON v.id=e.draft_version_id WHERE e.collection_id=$1 AND e.archived_at IS NULL ORDER BY e.sort_index,e.created_at,e.id',
-        [collectionId],
-      )
-    ).rows,
-    target = rows.find(row => row.id === entryId)
+    await client.query(
+      'SELECT e.id,e.stable_key,e.published_version_id,v.values FROM collection_entries e JOIN collection_entry_versions v ON v.id=e.draft_version_id WHERE e.collection_id=$1 AND e.archived_at IS NULL ORDER BY e.sort_index,e.created_at,e.id',
+      [collectionId],
+    )
+  ).rows
+  const target = rows.find(row => row.id === entryId)
   if (!target) throw new DomainError('not_found', 'This story is unavailable.')
   if (target.published_version_id || (target.values.published_date && target.values.published_date !== day))
     throw new DomainError('invalid_state', 'Open this dated story to change its publication plan.')

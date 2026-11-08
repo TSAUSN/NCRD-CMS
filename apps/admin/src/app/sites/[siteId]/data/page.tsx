@@ -10,8 +10,8 @@ export const dynamic = 'force-dynamic'
 export default async function DataValuesPage({ params }: { params: Promise<{ siteId: string }> }) {
   const session = await currentSession()
   if (!session) notFound()
-  const { siteId } = await params,
-    site = await getSite(session.principal.userId, siteId)
+  const { siteId } = await params
+  const site = await getSite(session.principal.userId, siteId)
   if (
     !site ||
     site.original_design ||

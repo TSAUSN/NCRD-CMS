@@ -21,8 +21,8 @@ function error(status: number, message: string) {
 }
 async function boundedJson(request: Request): Promise<unknown> {
   if (!request.body) throw new Error('empty-body')
-  const reader = request.body.getReader(),
-    chunks: Uint8Array[] = []
+  const reader = request.body.getReader()
+  const chunks: Uint8Array[] = []
   let length = 0
   try {
     for (;;) {

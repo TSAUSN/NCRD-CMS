@@ -202,10 +202,10 @@ export function CanvasChrome({
         {insertionMarker !== null &&
           (() => {
             const box =
-                insertionMarker === sections.length
-                  ? geometry.boxes.get(sections.length - 1)
-                  : geometry.boxes.get(insertionMarker),
-              top = insertionMarker === sections.length ? box?.bottom : box?.top
+              insertionMarker === sections.length
+                ? geometry.boxes.get(sections.length - 1)
+                : geometry.boxes.get(insertionMarker)
+            const top = insertionMarker === sections.length ? box?.bottom : box?.top
             return top !== undefined && top >= 0 && top < geometry.height ? (
               <div className={styles.insertion} data-choosing="true" style={{ top }}>
                 <Button variant="secondary" size="s" disabled>

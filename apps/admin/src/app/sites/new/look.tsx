@@ -24,9 +24,9 @@ const key = (name: string) => name.toLowerCase().replace(/[^a-z0-9]+/g, '-')
 /** The Look step: brand colour, type pairing and button shape as choices a
  * newcomer judges by eye, beside a sample that changes as they choose. */
 export function LookChoices({ theme, onChange }: { theme: Theme; onChange: (theme: Theme) => void }) {
-  const brand = brandColourFor(theme),
-    pairing = typePairingFor(theme),
-    shape = buttonShapeFor(theme)
+  const brand = brandColourFor(theme)
+  const pairing = typePairingFor(theme)
+  const shape = buttonShapeFor(theme)
   // What the editor typed, kept until it becomes the colour or another choice replaces it.
   const [typed, setTyped] = useState<{ base: string; text: string } | null>(null)
   const shown = typed && typed.base === theme.colors.primary ? typed.text : theme.colors.primary
@@ -171,8 +171,8 @@ export function LookChoices({ theme, onChange }: { theme: Theme; onChange: (them
  * creation.
  */
 export function SitePreview({ setup }: { setup: SiteSetup }) {
-  const { theme } = setup,
-    { colors, fonts, buttons } = theme
+  const { theme } = setup
+  const { colors, fonts, buttons } = theme
   const name = setup.name.trim() || 'Your site name'
   const home = setup.pages.find(page => page.slug === '') ?? setup.pages[0]
   const fill = buttons.color === 'accent' ? colors.accent : colors.primary

@@ -217,8 +217,8 @@ export async function prepareStoryPublication(siteId: string, entryId: string, r
         firstSiteReview: true,
         message: 'This site is still private. Review its first site publication before publishing individual stories.',
       }
-    const { storyReleaseSelection } = await import('../../../../lib/story-release.ts'),
-      { planSiteRelease } = await import('../../../../lib/releases.ts')
+    const { storyReleaseSelection } = await import('../../../../lib/story-release.ts')
+    const { planSiteRelease } = await import('../../../../lib/releases.ts')
     const selected = await asUser({ userId: session.principal.userId }, client =>
       storyReleaseSelection(client, siteId, entryId),
     )
@@ -298,10 +298,10 @@ export async function updateStoryWriting(
   const session = await currentSession()
   if (!session) return { ok: false as const, message: 'Sign in before updating Stories.' }
   try {
-    const { updateStoriesWriting } = await import('../../../../lib/story-newsroom-commands.ts'),
-      result = await asUser({ userId: session.principal.userId, requestId: randomUUID() }, client =>
-        updateStoriesWriting(client, siteId, collectionId, revision, entryRevision),
-      )
+    const { updateStoriesWriting } = await import('../../../../lib/story-newsroom-commands.ts')
+    const result = await asUser({ userId: session.principal.userId, requestId: randomUUID() }, client =>
+      updateStoriesWriting(client, siteId, collectionId, revision, entryRevision),
+    )
     revalidatePath('/sites/' + siteId + '/stories', 'layout')
     return { ok: true as const, ...result }
   } catch (error) {
@@ -322,10 +322,10 @@ export async function saveStoryNewsroomOrder(
   const session = await currentSession()
   if (!session) return { ok: false as const, message: 'Sign in before saving Newsroom order.' }
   try {
-    const { saveNewsroomOrder } = await import('../../../../lib/story-newsroom-commands.ts'),
-      result = await asUser({ userId: session.principal.userId, requestId: randomUUID() }, client =>
-        saveNewsroomOrder(client, siteId, collectionId, revision, entryRevision, ids),
-      )
+    const { saveNewsroomOrder } = await import('../../../../lib/story-newsroom-commands.ts')
+    const result = await asUser({ userId: session.principal.userId, requestId: randomUUID() }, client =>
+      saveNewsroomOrder(client, siteId, collectionId, revision, entryRevision, ids),
+    )
     revalidatePath('/sites/' + siteId + '/stories', 'layout')
     revalidatePath('/sites/' + siteId + '/publishing')
     return { ok: true as const, ...result }
@@ -377,10 +377,10 @@ export async function sendStorySubmission(
   const session = await currentSession()
   if (!session) return { ok: false as const, message: 'Sign in again before sending this story for review.' }
   try {
-    const { submitSingleStoryReview } = await import('../../../../lib/story-review.ts'),
-      submitted = await asUser({ userId: session.principal.userId, requestId: randomUUID() }, client =>
-        submitSingleStoryReview(client, siteId, collectionId, entryId, prepared, note),
-      )
+    const { submitSingleStoryReview } = await import('../../../../lib/story-review.ts')
+    const submitted = await asUser({ userId: session.principal.userId, requestId: randomUUID() }, client =>
+      submitSingleStoryReview(client, siteId, collectionId, entryId, prepared, note),
+    )
     revalidatePath('/inbox')
     revalidatePath('/sites/' + siteId + '/stories', 'layout')
     revalidatePath('/pages/' + prepared.pageId)

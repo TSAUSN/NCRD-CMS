@@ -9,8 +9,8 @@ import type { DemoPhoto } from '../src/lib/sawso-demo.ts'
 import { processMediaUpload } from '../../worker/src/media.ts'
 import { createPostgresMediaProcessingRepository } from '../../worker/src/media-repository.ts'
 import { planSiteRelease, executeSiteRelease } from '../src/lib/releases.ts'
-const root = new URL('../../../', import.meta.url),
-  folder = new URL('demo/sawso-content/', root)
+const root = new URL('../../../', import.meta.url)
+const folder = new URL('demo/sawso-content/', root)
 async function main() {
   for (const key of ['DATABASE_URL', 'DATABASE_URL_AUTHENTICATED', 'DATABASE_URL_WORKER']) {
     const url = new URL(process.env[key] ?? '')
@@ -27,9 +27,9 @@ async function main() {
     process.env.MEDIA_ROOT !== '/private/tmp/cms-v2-live-adaptation-demo/demo-media'
   )
     throw Error('Use the retained demo filesystem Media store; no hosted store is allowed.')
-  const receipt = JSON.parse(await readFile(new URL('receipt.json', folder), 'utf8')),
-    content = await readFile(new URL('content.json', folder)),
-    photos = await readFile(new URL('photos.json.gz', folder))
+  const receipt = JSON.parse(await readFile(new URL('receipt.json', folder), 'utf8'))
+  const content = await readFile(new URL('content.json', folder))
+  const photos = await readFile(new URL('photos.json.gz', folder))
   for (const [bytes, expected] of [
     [content, receipt.contentSha256],
     [photos, receipt.photosSha256],
@@ -40,8 +40,8 @@ async function main() {
     ?.id
   if (!actor) throw Error('Start the retained demo first.')
   await asUser({ userId: actor }, client => installCoreLibrary(client))
-  const media = configuredMediaStore(),
-    repository = createPostgresMediaProcessingRepository(poolFor('worker'), 'sawso-owner-content')
+  const media = configuredMediaStore()
+  const repository = createPostgresMediaProcessingRepository(poolFor('worker'), 'sawso-owner-content')
   const result = await applySawsoOwnerContent(
     actor,
     JSON.parse(content.toString()) as SawsoOwnerContent,
@@ -49,8 +49,8 @@ async function main() {
     media,
     id => processMediaUpload(id, { media, repository }),
   )
-  const items = result.releaseItems,
-    plan = items.length ? await planSiteRelease(actor, randomUUID(), result.siteId, items) : null
+  const items = result.releaseItems
+  const plan = items.length ? await planSiteRelease(actor, randomUUID(), result.siteId, items) : null
   if (plan) {
     const blockers = plan.preview_report.flatMap(c => c.report.blocking)
     if (blockers.some(f => f.rule !== 'sample_content'))

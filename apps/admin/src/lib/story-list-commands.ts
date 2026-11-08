@@ -33,20 +33,20 @@ export async function patchStoryList(
   if (!list) throw new DomainError('not_found', 'Stories is unavailable.')
   if (String(list.revision) !== catalogRevision || String(list.entry_revision) !== entryRevision)
     throw new DomainError('stale_revision', 'Someone else changed Stories. Your tag choices have not been saved.')
-  const model = CollectionModel.parse({ fields: list.fields, presentation: list.sort }),
-    settings = model.presentation.stories
+  const model = CollectionModel.parse({ fields: list.fields, presentation: list.sort })
+  const settings = model.presentation.stories
   if (!settings)
     throw new DomainError(
       'invalid_state',
       'A Site admin needs to finish the Stories update before tags can be saved here.',
     )
   const rows = (
-      await client.query(
-        `SELECT e.id,e.stable_key,v.values,p.values AS published_values FROM collection_entries e JOIN collection_entry_versions v ON v.id=e.draft_version_id LEFT JOIN collection_entry_versions p ON p.id=e.published_version_id WHERE e.collection_id=$1 AND e.archived_at IS NULL ORDER BY e.sort_index,e.created_at,e.id`,
-        [collectionId],
-      )
-    ).rows,
-    target = rows.find(e => e.id === entryId)
+    await client.query(
+      `SELECT e.id,e.stable_key,v.values,p.values AS published_values FROM collection_entries e JOIN collection_entry_versions v ON v.id=e.draft_version_id LEFT JOIN collection_entry_versions p ON p.id=e.published_version_id WHERE e.collection_id=$1 AND e.archived_at IS NULL ORDER BY e.sort_index,e.created_at,e.id`,
+      [collectionId],
+    )
+  ).rows
+  const target = rows.find(e => e.id === entryId)
   if (!target) throw new DomainError('not_found', 'This story is unavailable.')
   if (parsed.data.action === 'featured') {
     if (!model.fields.some(field => field.key === 'newsroom_rank' && field.type === 'number'))
@@ -87,11 +87,11 @@ export async function patchStoryList(
       ])
     ).rows[0]!
     const entries = next.map((row, index) => ({
-        id: row.id,
-        values: storyListValues(row.values),
-        changed: !isDeepStrictEqual(row.values, rows[index]!.published_values),
-      })),
-      saved = entries.find(row => row.id === entryId)!
+      id: row.id,
+      values: storyListValues(row.values),
+      changed: !isDeepStrictEqual(row.values, rows[index]!.published_values),
+    }))
+    const saved = entries.find(row => row.id === entryId)!
     return {
       catalogRevision,
       entryRevision: String(result.entry_revision),
@@ -118,8 +118,8 @@ export async function patchStoryList(
     )
     values.sector_links = storyTagIds(values, 'main')
       .map(id => {
-        const label = escapeText(settings.mainTags.find(t => t.id === id)?.label ?? id),
-          path = 'ways-we-help/' + id
+        const label = escapeText(settings.mainTags.find(t => t.id === id)?.label ?? id)
+        const path = 'ways-we-help/' + id
         return paths.has(path) ? '<a href="/' + path + '">' + label + '</a>' : label
       })
       .join(' ')

@@ -27,12 +27,12 @@ export function StoryListRowView({
   featureEditable?: boolean
   onChange: (patch: StoryListPatch) => void
 }) {
-  const [failed, setFailed] = useState<string | null>(null),
-    v = row.values,
-    title = String(v.title ?? 'Untitled story'),
-    photo = v.photo && typeof v.photo === 'object' ? (v.photo as { alt?: string }) : null,
-    href = '/sites/' + siteId + '/stories/' + row.id,
-    live = storyListLive(row, publishedSettings)
+  const [failed, setFailed] = useState<string | null>(null)
+  const v = row.values
+  const title = String(v.title ?? 'Untitled story')
+  const photo = v.photo && typeof v.photo === 'object' ? (v.photo as { alt?: string }) : null
+  const href = '/sites/' + siteId + '/stories/' + row.id
+  const live = storyListLive(row, publishedSettings)
   return (
     <article className={styles.row} data-story-id={row.id} aria-label={title}>
       <Link className={styles.photo} href={href} aria-label={'Edit story: ' + title}>

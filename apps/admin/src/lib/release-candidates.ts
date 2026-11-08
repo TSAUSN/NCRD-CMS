@@ -60,8 +60,8 @@ export async function releaseCandidates(client: Queryable, siteId: string): Prom
       [siteId],
     )
   ).rows
-  const header = frame.find(row => row.kind === 'header'),
-    footer = frame.find(row => row.kind === 'footer')
+  const header = frame.find(row => row.kind === 'header')
+  const footer = frame.find(row => row.kind === 'footer')
   if (header && footer && (header.draft !== header.published || footer.draft !== footer.published)) {
     items.push({
       key: `frame:${siteId}`,

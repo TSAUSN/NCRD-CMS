@@ -44,15 +44,15 @@ export function PeopleWorkspace({
 }) {
   const [headerTarget, setHeaderTarget] = useState<HTMLElement | null>(null)
   useEffect(() => setHeaderTarget(headerActionsId ? document.getElementById(headerActionsId) : null), [headerActionsId])
-  const router = useRouter(),
-    [refreshing, startRefresh] = useTransition()
+  const router = useRouter()
+  const [refreshing, startRefresh] = useTransition()
   const [search, setSearch] = useState('')
   const [siteFilter, setSiteFilter] = useState('')
   const [selection, setSelection] = useState<Selection>(null)
   const editorLeave = useRef<() => NavigationGuardState>(() => ({ dirty: false, pending: false }))
   const [notice, setNotice] = useState<string | null>(null)
-  const [actionBusy, setBusy] = useState(false),
-    busyRef = useRef(false)
+  const [actionBusy, setBusy] = useState(false)
+  const busyRef = useRef(false)
   const busy = actionBusy || refreshing
   function changeBusy(value: boolean) {
     busyRef.current = value

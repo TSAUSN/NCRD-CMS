@@ -22,11 +22,11 @@ export function LibraryPreviewDialog({
   onChoose: () => void
 }) {
   const [previewReady, setPreviewReady] = useState(false)
-  const box = useRef<HTMLDialogElement>(null),
-    back = useRef<HTMLButtonElement>(null)
+  const box = useRef<HTMLDialogElement>(null)
+  const back = useRef<HTMLButtonElement>(null)
   useEffect(() => {
-    const opener = document.activeElement,
-      dialog = box.current
+    const opener = document.activeElement
+    const dialog = box.current
     if (dialog && !dialog.open) dialog.showModal()
     back.current?.focus()
     return () => {

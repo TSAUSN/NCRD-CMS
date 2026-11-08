@@ -68,9 +68,9 @@ export function filterStoryList(
 ): StoryListRow[] {
   const q = filters.q.trim().toLocaleLowerCase('en-US')
   return rows.filter(row => {
-    const v = row.values,
-      main = knownStoryTags(v, 'main', settings),
-      secondary = knownStoryTags(v, 'secondary', settings)
+    const v = row.values
+    const main = knownStoryTags(v, 'main', settings)
+    const secondary = knownStoryTags(v, 'secondary', settings)
     if (
       q &&
       ![v.title, v.summary].some(value => typeof value === 'string' && value.toLocaleLowerCase('en-US').includes(q))

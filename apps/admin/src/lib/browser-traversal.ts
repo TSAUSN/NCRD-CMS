@@ -16,7 +16,8 @@ export function guardHistoryTraversal(
   confirm: () => boolean,
 ): 'irrelevant' | 'allowed' | 'canceled' | 'unavailable' {
   if (event.navigationType !== 'traverse') return 'irrelevant'
-  let current: URL, destination: URL
+  let current: URL
+  let destination: URL
   try {
     current = new URL(currentUrl)
     destination = new URL(event.destination.url)

@@ -6,12 +6,12 @@ export const dynamic = 'force-dynamic'
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 const headers = { 'cache-control': 'private, no-store', 'x-content-type-options': 'nosniff' }
 export async function GET(request: Request, context: { params: Promise<{ siteId: string }> }) {
-  const session = await currentSession(),
-    { siteId } = await context.params
-  const params = new URL(request.url).searchParams,
-    definitionId = params.get('definition') ?? ''
-  const version = Number(params.get('version')),
-    fieldId = params.get('field') ?? ''
+  const session = await currentSession()
+  const { siteId } = await context.params
+  const params = new URL(request.url).searchParams
+  const definitionId = params.get('definition') ?? ''
+  const version = Number(params.get('version'))
+  const fieldId = params.get('field') ?? ''
   const hidden = () => Response.json({ error: 'Collection choices were not found.' }, { status: 404, headers })
   if (
     !session ||

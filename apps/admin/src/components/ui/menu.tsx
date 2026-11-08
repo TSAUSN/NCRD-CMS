@@ -17,8 +17,8 @@ export function Menu({
   boundary?: RefObject<HTMLElement | null>
   avoid?: RefObject<HTMLElement | null>
 }) {
-  const ref = useRef<HTMLDetailsElement>(null),
-    body = useRef<HTMLDivElement>(null)
+  const ref = useRef<HTMLDetailsElement>(null)
+  const body = useRef<HTMLDivElement>(null)
   const [placement, setPlacement] = useState<{ top: number; left: number; height: number; width: number } | null>(null)
   function close(restoreFocus = false) {
     ref.current?.removeAttribute('open')
@@ -33,18 +33,18 @@ export function Menu({
     }
     // The browser's top layer escapes scroll containers such as the Pages table.
     if (!body.current.matches(':popover-open')) body.current.showPopover()
-    const anchor = ref.current.querySelector('summary')!.getBoundingClientRect(),
-      bounds = boundary?.current?.getBoundingClientRect() ?? {
-        top: 0,
-        bottom: innerHeight,
-        width: innerWidth,
-        left: 0,
-        right: innerWidth,
-      }
+    const anchor = ref.current.querySelector('summary')!.getBoundingClientRect()
+    const bounds = boundary?.current?.getBoundingClientRect() ?? {
+      top: 0,
+      bottom: innerHeight,
+      width: innerWidth,
+      left: 0,
+      right: innerWidth,
+    }
     const gap = Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--space-2')) || 0
-    const popup = body.current.getBoundingClientRect(),
-      width = Math.max(0, bounds.width - gap * 2),
-      popupWidth = Math.min(popup.width, width)
+    const popup = body.current.getBoundingClientRect()
+    const width = Math.max(0, bounds.width - gap * 2)
+    const popupWidth = Math.min(popup.width, width)
     const left = Math.max(bounds.left + gap, Math.min(anchor.right - popupWidth, bounds.right - gap - popupWidth))
     const obstruction = avoid?.current?.getBoundingClientRect()
     const bottom =
@@ -53,14 +53,14 @@ export function Menu({
         : bounds.bottom
     // A table can move its trigger while another tab's saved data refreshes it.
     // Keep the top-layer actions reachable even when that trigger leaves view.
-    const limitTop = Math.max(0, bounds.top) + gap,
-      limitBottom = Math.max(limitTop, Math.min(innerHeight, bottom) - gap)
-    const anchorTop = Math.max(limitTop, Math.min(anchor.top, limitBottom)),
-      anchorBottom = Math.max(limitTop, Math.min(anchor.bottom, limitBottom))
-    const below = Math.max(0, limitBottom - anchorBottom - gap),
-      above = Math.max(0, anchorTop - limitTop - gap),
-      up = body.current.scrollHeight > below && above > below,
-      height = up ? above : below
+    const limitTop = Math.max(0, bounds.top) + gap
+    const limitBottom = Math.max(limitTop, Math.min(innerHeight, bottom) - gap)
+    const anchorTop = Math.max(limitTop, Math.min(anchor.top, limitBottom))
+    const anchorBottom = Math.max(limitTop, Math.min(anchor.bottom, limitBottom))
+    const below = Math.max(0, limitBottom - anchorBottom - gap)
+    const above = Math.max(0, anchorTop - limitTop - gap)
+    const up = body.current.scrollHeight > below && above > below
+    const height = up ? above : below
     const popupHeight = Math.min(body.current.scrollHeight, height)
     const top = Math.max(
       limitTop,

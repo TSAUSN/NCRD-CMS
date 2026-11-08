@@ -26,8 +26,8 @@ export function PagesTable({
   editorCanvasOrigin?: string | null
   compactActions?: boolean
 }) {
-  const [search, setSearch] = useState(''),
-    [filter, setFilter] = useState('all')
+  const [search, setSearch] = useState('')
+  const [filter, setFilter] = useState('all')
   const rows = useMemo(
     () =>
       pageTree(

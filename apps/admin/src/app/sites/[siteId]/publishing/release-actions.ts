@@ -27,8 +27,8 @@ export async function prepareRelease(siteId: string, id: string, items: ReleaseI
     return { ok: false, message: 'Select up to 200 release items.' }
   try {
     const release = await planSiteRelease(session.principal.userId, id, siteId, items)
-    const { releasePresentations } = await import('../../../../lib/release-presentation.ts'),
-      presentations = await releasePresentations(session.principal.userId, siteId, release.snapshot)
+    const { releasePresentations } = await import('../../../../lib/release-presentation.ts')
+    const presentations = await releasePresentations(session.principal.userId, siteId, release.snapshot)
     revalidatePath(`/sites/${siteId}/publishing`)
     return {
       ok: true,

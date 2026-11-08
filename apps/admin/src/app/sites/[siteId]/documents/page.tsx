@@ -16,8 +16,8 @@ export const dynamic = 'force-dynamic'
 export default async function DocumentsPage({ params }: { params: Promise<{ siteId: string }> }) {
   const session = await currentSession()
   if (!session) notFound()
-  const { siteId } = await params,
-    userId = session.principal.userId
+  const { siteId } = await params
+  const userId = session.principal.userId
   const site = await getSite(userId, siteId)
   if (!site) notFound()
   const [initial, role, rights] = await Promise.all([

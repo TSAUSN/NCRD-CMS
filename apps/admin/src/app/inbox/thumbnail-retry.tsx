@@ -13,8 +13,8 @@ export function ThumbnailRetry({
   retryId: string | null
   retryStatus: string | null
 }) {
-  const router = useRouter(),
-    inFlight = useRef(false)
+  const router = useRouter()
+  const inFlight = useRef(false)
   const [pending, startTransition] = useTransition()
   const [notice, setNotice] = useState<{ ok: boolean; message: string } | null>(null)
   function retry() {

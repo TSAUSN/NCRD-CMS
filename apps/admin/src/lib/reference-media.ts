@@ -64,19 +64,19 @@ export async function importReferenceMedia(input: {
       throw new Error('The local reference file changed: ' + image.file)
     files.set(image.key, bytes)
   }
-  const media = configuredMediaStore(),
-    repository = createPostgresAdminMediaUploadRepository(),
-    begin = createBeginMediaUploadHandler({
-      currentSession: async () => ({ userId: input.userId }),
-      repository,
-      media,
-    }),
-    receive = createReceiveMediaUploadHandler({ repository, media }),
-    status = createPostgresMediaUploadStatusRepository(),
-    processor = createPostgresMediaProcessingRepository(poolFor('worker'), 'local-reference-import'),
-    delivery = createPostgresAdminMediaDeliveryRepository(),
-    origin = process.env['ADMIN_ORIGIN'] ?? 'http://localhost:3000',
-    rows: ImportedReferenceImage[] = []
+  const media = configuredMediaStore()
+  const repository = createPostgresAdminMediaUploadRepository()
+  const begin = createBeginMediaUploadHandler({
+    currentSession: async () => ({ userId: input.userId }),
+    repository,
+    media,
+  })
+  const receive = createReceiveMediaUploadHandler({ repository, media })
+  const status = createPostgresMediaUploadStatusRepository()
+  const processor = createPostgresMediaProcessingRepository(poolFor('worker'), 'local-reference-import')
+  const delivery = createPostgresAdminMediaDeliveryRepository()
+  const origin = process.env['ADMIN_ORIGIN'] ?? 'http://localhost:3000'
+  const rows: ImportedReferenceImage[] = []
   for (const image of input.images) {
     if ((input.machineLoad?.() ?? loadavg()[0]!) > 12)
       throw new Error('Machine load is above 12. Import paused before the next image.')
@@ -95,9 +95,9 @@ export async function importReferenceMedia(input: {
         'The recorded reference image changed or was removed. Review it before importing again: ' + image.file,
       )
     if (existing.length) {
-      const old = input.previous?.find(row => row.key === image.key),
-        asset = existing[0]!,
-        original = await delivery.resolve(input.userId, asset.id, 'original')
+      const old = input.previous?.find(row => row.key === image.key)
+      const asset = existing[0]!
+      const original = await delivery.resolve(input.userId, asset.id, 'original')
       if (
         existing.length !== 1 ||
         !old ||
@@ -115,33 +115,33 @@ export async function importReferenceMedia(input: {
       await input.onItem?.([...rows])
       continue
     }
-    const bytes = files.get(image.key)!,
-      mime = /\.png$/i.test(image.file) ? 'image/png' : /\.webp$/i.test(image.file) ? 'image/webp' : 'image/jpeg',
-      body = JSON.stringify({
-        originalName: image.name ?? image.file,
-        contentType: mime,
-        bytes: bytes.length,
-        altText: image.altText,
-        decorative: false,
-        focal: image.focal,
-        folder: input.profile.folder,
-        attribution: image.needsReplacement ? input.profile.replacementAttribution : input.profile.attribution,
-        source: image.source,
-        tags: [...input.profile.tags, ...(image.needsReplacement ? ['needs replacement'] : [])],
+    const bytes = files.get(image.key)!
+    const mime = /\.png$/i.test(image.file) ? 'image/png' : /\.webp$/i.test(image.file) ? 'image/webp' : 'image/jpeg'
+    const body = JSON.stringify({
+      originalName: image.name ?? image.file,
+      contentType: mime,
+      bytes: bytes.length,
+      altText: image.altText,
+      decorative: false,
+      focal: image.focal,
+      folder: input.profile.folder,
+      attribution: image.needsReplacement ? input.profile.replacementAttribution : input.profile.attribution,
+      source: image.source,
+      tags: [...input.profile.tags, ...(image.needsReplacement ? ['needs replacement'] : [])],
+    })
+    const started = await begin(
+      new Request(origin + '/api/sites/' + input.siteId + '/media/uploads', {
+        method: 'POST',
+        headers: { origin, 'content-type': 'application/json', 'content-length': String(Buffer.byteLength(body)) },
+        body,
       }),
-      started = await begin(
-        new Request(origin + '/api/sites/' + input.siteId + '/media/uploads', {
-          method: 'POST',
-          headers: { origin, 'content-type': 'application/json', 'content-length': String(Buffer.byteLength(body)) },
-          body,
-        }),
-        input.siteId,
-      ),
-      intent = (await started.json()) as {
-        intentId: string
-        upload: { url: string; headers: Record<string, string> }
-        error?: { message: string }
-      }
+      input.siteId,
+    )
+    const intent = (await started.json()) as {
+      intentId: string
+      upload: { url: string; headers: Record<string, string> }
+      error?: { message: string }
+    }
     if (started.status !== 201) throw new Error(intent.error?.message ?? 'The reference upload could not start.')
     const received = await receive(
       new Request(new URL(intent.upload.url, origin), {

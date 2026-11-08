@@ -26,8 +26,8 @@ export function addEditorRepeatItem(
     }
   }
   if (added.key && options.empty && !options.from) {
-    const next = { ...added.values },
-      names = (repeatItemSpec(slot)?.fields ?? []).map(field => repeatItemSlotId(slot.id, added.key!, field.id))
+    const next = { ...added.values }
+    const names = (repeatItemSpec(slot)?.fields ?? []).map(field => repeatItemSlotId(slot.id, added.key!, field.id))
     for (const field of repeatItemSpec(slot)?.fields ?? []) {
       const name = repeatItemSlotId(slot.id, added.key, field.id)
       next[name] = field.kind === 'image' ? null : ['link', 'button'].includes(field.kind) ? { label: '', url: '' } : ''
@@ -38,8 +38,8 @@ export function addEditorRepeatItem(
     added.values = next
   }
   if (added.key && isHeroSlides(slot) && !options.from) {
-    const next = { ...added.values },
-      names = HERO_SLIDE_FIELDS.map(field => repeatItemSlotId(slot.id, added.key!, field))
+    const next = { ...added.values }
+    const names = HERO_SLIDE_FIELDS.map(field => repeatItemSlotId(slot.id, added.key!, field))
     for (const [index, field] of HERO_SLIDE_FIELDS.entries())
       next[names[index]!] =
         field === 'enabled'

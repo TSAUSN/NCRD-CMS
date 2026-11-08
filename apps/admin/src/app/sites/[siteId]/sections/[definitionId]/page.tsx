@@ -22,9 +22,9 @@ const kinds: Record<string, string> = {
 export default async function SectionDetail({ params }: { params: Promise<{ siteId: string; definitionId: string }> }) {
   const session = await currentSession()
   if (!session) notFound()
-  const { siteId, definitionId } = await params,
-    userId = session.principal.userId,
-    site = await getSite(userId, siteId)
+  const { siteId, definitionId } = await params
+  const userId = session.principal.userId
+  const site = await getSite(userId, siteId)
   if (!site) notFound()
   const [library, source, versions, rights, role] = await Promise.all([
     listSectionLibrary(userId, siteId),
@@ -35,10 +35,10 @@ export default async function SectionDetail({ params }: { params: Promise<{ site
   ])
   const entry = library.find(item => item.section_def_id === definitionId)
   if (!entry || !source) notFound()
-  const base = `/sites/${siteId}/sections/${definitionId}`,
-    canEdit =
-      rights.global ||
-      (entry.scope === 'site' && rights.site && source.kind === 'structured' && source.placement === 'page')
+  const base = `/sites/${siteId}/sections/${definitionId}`
+  const canEdit =
+    rights.global ||
+    (entry.scope === 'site' && rights.site && source.kind === 'structured' && source.placement === 'page')
   return (
     <AppShell email={session.email} role={role} groups={navigationFor(site, session.principal)}>
       <main id="main" className="wrap">

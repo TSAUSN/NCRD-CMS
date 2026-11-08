@@ -31,8 +31,8 @@ export function navigationDecision(states: Iterable<NavigationGuardState>): Navi
  * React commits a transition's pending state.
  */
 export function createNavigationGuardRegistry() {
-  const readers = new Map<symbol, () => NavigationGuardState>(),
-    listeners = new Set<() => void>()
+  const readers = new Map<symbol, () => NavigationGuardState>()
+  const listeners = new Set<() => void>()
   let version = 0
   const touch = () => {
     version++

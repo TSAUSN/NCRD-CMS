@@ -131,8 +131,8 @@ export function Inspector(props: InspectorProps) {
         : null
       if (!field) return false
       const scroller = panel.querySelector<HTMLElement>(':scope > [role="tabpanel"]') ?? panel
-      const bounds = field.getBoundingClientRect(),
-        viewport = scroller.getBoundingClientRect()
+      const bounds = field.getBoundingClientRect()
+      const viewport = scroller.getBoundingClientRect()
       if (bounds.top < viewport.top || bounds.bottom > viewport.bottom) {
         scroller.scrollTop += bounds.top - viewport.top - 16
       }

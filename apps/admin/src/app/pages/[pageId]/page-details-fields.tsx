@@ -14,14 +14,14 @@ export function PageDetailsFields({
   onSave: (input: PageDetailsInput) => Promise<Awaited<ReturnType<typeof savePageDetailsAction>> | null>
 }) {
   const [loaded, setLoaded] = useState<Extract<Awaited<ReturnType<typeof loadPageDetails>>, { ok: true }> | null>(null)
-  const [title, setTitle] = useState(''),
-    [address, setAddress] = useState(''),
-    [parent, setParent] = useState<string | null>(null),
-    [inMenu, setInMenu] = useState(false)
-  const [saved, setSaved] = useState(''),
-    [pending, setPending] = useState(false),
-    [notice, setNotice] = useState<string | null>(null),
-    [error, setError] = useState<string | null>(null)
+  const [title, setTitle] = useState('')
+  const [address, setAddress] = useState('')
+  const [parent, setParent] = useState<string | null>(null)
+  const [inMenu, setInMenu] = useState(false)
+  const [saved, setSaved] = useState('')
+  const [pending, setPending] = useState(false)
+  const [notice, setNotice] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
   useEffect(() => {
     let active = true
     void loadPageDetails(pageId)
@@ -45,8 +45,8 @@ export function PageDetailsFields({
       active = false
     }
   }, [pageId])
-  const serial = JSON.stringify([title, address, parent, inMenu]),
-    dirty = serial !== saved
+  const serial = JSON.stringify([title, address, parent, inMenu])
+  const dirty = serial !== saved
   const addressProblem =
     address !== '' && !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(address)
       ? 'Use lowercase letters, numbers and single hyphens.'

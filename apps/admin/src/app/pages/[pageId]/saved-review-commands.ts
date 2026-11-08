@@ -62,8 +62,8 @@ export function savedReviewCommands({ draft, review, schedule }: Inputs) {
     startTransition(async () => {
       try {
         if (!(await flushForReview())) return
-        const versionId = savedVersionId.current,
-          currentRevision = String(queue.current.revision())
+        const versionId = savedVersionId.current
+        const currentRevision = String(queue.current.revision())
         if (!versionId) {
           setResult({ ok: false, kind: 'error', message: 'Save a draft before reviewing this page.' })
           return
@@ -133,8 +133,8 @@ export function savedReviewCommands({ draft, review, schedule }: Inputs) {
           setResult({ ok: false, kind: 'error', message: 'Save a draft before scheduling this page.' })
           return
         }
-        const currentRevision = String(queue.current.revision()),
-          signature = versionId + ':' + currentRevision
+        const currentRevision = String(queue.current.revision())
+        const signature = versionId + ':' + currentRevision
         if (scheduleRequest.current?.signature !== signature)
           scheduleRequest.current = { signature, id: crypto.randomUUID() }
         setResult({

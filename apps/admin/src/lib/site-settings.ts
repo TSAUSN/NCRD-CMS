@@ -29,18 +29,18 @@ export async function siteSettingsWorkspace(client: Queryable, siteId: string) {
     ).rows[0]?.content,
   )
   const existing: SiteSocialAccount[] =
-      settings.social ??
-      (footer.success && footer.data.schemaVersion === 1
-        ? footer.data.social.map(account => ({ ...account, handle: '', inFooter: true }))
-        : []),
-    services = [
-      'facebook',
-      'instagram',
-      'x',
-      'linkedin',
-      'youtube',
-      ...(existing.some(row => row.service === 'tiktok') ? ['tiktok'] : []),
-    ] as SiteSocialAccount['service'][]
+    settings.social ??
+    (footer.success && footer.data.schemaVersion === 1
+      ? footer.data.social.map(account => ({ ...account, handle: '', inFooter: true }))
+      : [])
+  const services = [
+    'facebook',
+    'instagram',
+    'x',
+    'linkedin',
+    'youtube',
+    ...(existing.some(row => row.service === 'tiktok') ? ['tiktok'] : []),
+  ] as SiteSocialAccount['service'][]
   const social = services.map(
     service => existing.find(row => row.service === service) ?? { service, url: '', handle: '', inFooter: false },
   )

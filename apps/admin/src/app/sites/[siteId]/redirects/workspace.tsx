@@ -30,12 +30,12 @@ export function RedirectWorkspace({
   pages: RedirectPage[]
   native?: boolean
 }) {
-  const router = useRouter(),
-    [editing, setEditing] = useState<RedirectRow | null | undefined>(),
-    [removing, setRemoving] = useState<RedirectRow | null>(null),
-    [importing, setImporting] = useState(false),
-    [result, setResult] = useState<{ ok: boolean; message: string } | null>(null),
-    [pending, start] = useTransition()
+  const router = useRouter()
+  const [editing, setEditing] = useState<RedirectRow | null | undefined>()
+  const [removing, setRemoving] = useState<RedirectRow | null>(null)
+  const [importing, setImporting] = useState(false)
+  const [result, setResult] = useState<{ ok: boolean; message: string } | null>(null)
+  const [pending, start] = useTransition()
   const removingBusy = useRef(false)
   useNavigationGuard(() => ({ dirty: false, pending: pending || removingBusy.current }))
   useEffect(() => {
@@ -208,31 +208,31 @@ function RedirectForm({
   onClose: () => void
   onSaved: (result: { ok: boolean; message: string }) => void
 }) {
-  const router = useRouter(),
-    [error, setError] = useState(''),
-    [pending, start] = useTransition(),
-    inFlight = useRef(false)
-  const initial = { oldPath: row?.oldPath ?? '', pageId: row?.pageId ?? '', revision: row?.revision ?? '0' },
-    setup = useBrowserSetup({
-      storageKey: 'cms.redirect-setup.' + actorId + '.' + siteId + '.' + (row?.id ?? 'new'),
-      initial,
-      label: 'Redirect setup',
-      pending: () => pending || inFlight.current,
-      read: value => {
-        const data = value as typeof initial
-        return data &&
-          typeof data.oldPath === 'string' &&
-          data.oldPath.length <= 2048 &&
-          typeof data.pageId === 'string' &&
-          data.pageId.length <= 36 &&
-          typeof data.revision === 'string' &&
-          data.revision.length <= 30
-          ? { oldPath: data.oldPath, pageId: data.pageId, revision: data.revision }
-          : null
-      },
-    }),
-    { oldPath, pageId, revision } = setup.value,
-    busy = pending || setup.loading
+  const router = useRouter()
+  const [error, setError] = useState('')
+  const [pending, start] = useTransition()
+  const inFlight = useRef(false)
+  const initial = { oldPath: row?.oldPath ?? '', pageId: row?.pageId ?? '', revision: row?.revision ?? '0' }
+  const setup = useBrowserSetup({
+    storageKey: 'cms.redirect-setup.' + actorId + '.' + siteId + '.' + (row?.id ?? 'new'),
+    initial,
+    label: 'Redirect setup',
+    pending: () => pending || inFlight.current,
+    read: value => {
+      const data = value as typeof initial
+      return data &&
+        typeof data.oldPath === 'string' &&
+        data.oldPath.length <= 2048 &&
+        typeof data.pageId === 'string' &&
+        data.pageId.length <= 36 &&
+        typeof data.revision === 'string' &&
+        data.revision.length <= 30
+        ? { oldPath: data.oldPath, pageId: data.pageId, revision: data.revision }
+        : null
+    },
+  })
+  const { oldPath, pageId, revision } = setup.value
+  const busy = pending || setup.loading
   const close = () => {
     if (requestLocalDraftNavigation(setup.leaveState, onClose)) onClose()
   }
@@ -352,31 +352,31 @@ function RedirectImport({
   onClose: () => void
   onSaved: (result: { ok: boolean; message: string }) => void
 }) {
-  const router = useRouter(),
-    [plan, setPlan] = useState<RedirectImportRow[] | null>(null),
-    [error, setError] = useState(''),
-    [pending, start] = useTransition(),
-    inFlight = useRef(false),
-    importCount = plan?.filter(row => !row.unchanged).length ?? 0
-  const initial = { source: '', fileName: '' },
-    setup = useBrowserSetup({
-      storageKey: 'cms.redirect-csv.' + actorId + '.' + siteId,
-      initial,
-      label: 'Redirect spreadsheet source',
-      pending: () => pending || inFlight.current,
-      read: value => {
-        const data = value as typeof initial
-        return data &&
-          typeof data.source === 'string' &&
-          new Blob([data.source]).size <= 262144 &&
-          typeof data.fileName === 'string' &&
-          data.fileName.length <= 255
-          ? { source: data.source, fileName: data.fileName }
-          : null
-      },
-    }),
-    { source, fileName } = setup.value,
-    busy = pending || setup.loading
+  const router = useRouter()
+  const [plan, setPlan] = useState<RedirectImportRow[] | null>(null)
+  const [error, setError] = useState('')
+  const [pending, start] = useTransition()
+  const inFlight = useRef(false)
+  const importCount = plan?.filter(row => !row.unchanged).length ?? 0
+  const initial = { source: '', fileName: '' }
+  const setup = useBrowserSetup({
+    storageKey: 'cms.redirect-csv.' + actorId + '.' + siteId,
+    initial,
+    label: 'Redirect spreadsheet source',
+    pending: () => pending || inFlight.current,
+    read: value => {
+      const data = value as typeof initial
+      return data &&
+        typeof data.source === 'string' &&
+        new Blob([data.source]).size <= 262144 &&
+        typeof data.fileName === 'string' &&
+        data.fileName.length <= 255
+        ? { source: data.source, fileName: data.fileName }
+        : null
+    },
+  })
+  const { source, fileName } = setup.value
+  const busy = pending || setup.loading
   const close = () => {
     if (requestLocalDraftNavigation(setup.leaveState, onClose)) onClose()
   }

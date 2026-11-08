@@ -42,8 +42,8 @@ export default async function StoriesPage({
   const query = await searchParams
   const session = await currentSession()
   if (!session) notFound()
-  const { siteId } = await params,
-    site = await getSite(session.principal.userId, siteId)
+  const { siteId } = await params
+  const site = await getSite(session.principal.userId, siteId)
   if (!site) notFound()
   const [state, rights, role] = await Promise.all([
     getStoryListState(session.principal.userId, siteId, site.slug),
@@ -51,9 +51,9 @@ export default async function StoriesPage({
     roleLabel(session.principal.userId),
   ])
   if (!state || (!rights.editEntries && !rights.manageSchema && !rights.publish)) notFound()
-  const siteRole = session.principal.memberships.get(siteId),
-    canCreate =
-      session.principal.isSuperAdmin || siteRole === 'site_admin' || siteRole === 'editor' || siteRole === 'contributor'
+  const siteRole = session.principal.memberships.get(siteId)
+  const canCreate =
+    session.principal.isSuperAdmin || siteRole === 'site_admin' || siteRole === 'editor' || siteRole === 'contributor'
   const overview = query.view === 'gaps'
   const uses = overview
     ? await asUser({ userId: session.principal.userId }, async client =>

@@ -27,8 +27,8 @@ export function CoverageTable({
   rows: CoverageRow[]
   initialOpen?: string
 }) {
-  const [open, setOpen] = useState(initialOpen ?? ''),
-    maximum = Math.max(1, ...rows.map(row => row.count))
+  const [open, setOpen] = useState(initialOpen ?? '')
+  const maximum = Math.max(1, ...rows.map(row => row.count))
   return (
     <div className={recordTableStyles.tableWrap}>
       <table className={recordTableStyles.table + ' ' + styles.table} aria-label={label}>

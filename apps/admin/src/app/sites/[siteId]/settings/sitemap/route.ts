@@ -8,8 +8,8 @@ export const dynamic = 'force-dynamic'
 export async function GET(_request: Request, { params }: { params: Promise<{ siteId: string }> }) {
   const session = await currentSession()
   if (!session) notFound()
-  const { siteId } = await params,
-    site = await getSite(session.principal.userId, siteId)
+  const { siteId } = await params
+  const site = await getSite(session.principal.userId, siteId)
   if (
     !site ||
     site.status === 'archived' ||

@@ -13,8 +13,8 @@ const plain = (value: unknown) =>
 // Source reports use capitals for page typography; editor navigation uses readable names.
 function readable(words: string) {
   if (words !== words.toUpperCase() || !/[A-Z]/.test(words)) return words
-  const small = new Set(['a', 'an', 'and', 'at', 'by', 'for', 'from', 'in', 'of', 'on', 'or', 'the', 'to', 'with']),
-    acronyms = new Set(['SAWSO', 'USA', 'UK', 'UN', 'UNICEF', 'HIV', 'AIDS', 'FAQ'])
+  const small = new Set(['a', 'an', 'and', 'at', 'by', 'for', 'from', 'in', 'of', 'on', 'or', 'the', 'to', 'with'])
+  const acronyms = new Set(['SAWSO', 'USA', 'UK', 'UN', 'UNICEF', 'HIV', 'AIDS', 'FAQ'])
   return words
     .split(' ')
     .map((word, index) =>
@@ -31,8 +31,8 @@ function readable(words: string) {
 const same = (left: string, right: string) => left.toLocaleLowerCase() === right.toLocaleLowerCase()
 /** Personal names win; default names describe this section's own content. */
 export function sectionDisplayName(section: Section, layout: Layout): string {
-  const label = section.label?.trim(),
-    type = layout?.name ?? 'Section'
+  const label = section.label?.trim()
+  const type = layout?.name ?? 'Section'
   if (
     layout?.slug === 'core-feature-slider' &&
     (!label || ['Featured stories', 'Feature slider', 'Hero slider'].includes(label))

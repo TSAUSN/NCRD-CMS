@@ -5,8 +5,8 @@ import { applyImageReplacement, reviewImageReplacement } from '../../../../lib/m
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 function parse(input: unknown, save = false) {
   if (!input || typeof input !== 'object' || Array.isArray(input)) throw new Error('Invalid request')
-  const value = input as Record<string, unknown>,
-    allowed = save ? ['siteId', 'from', 'to', 'fingerprint', 'keys'] : ['siteId', 'from', 'to']
+  const value = input as Record<string, unknown>
+  const allowed = save ? ['siteId', 'from', 'to', 'fingerprint', 'keys'] : ['siteId', 'from', 'to']
   if (
     Object.keys(value).some(key => !allowed.includes(key)) ||
     ['siteId', 'from', 'to'].some(key => typeof value[key] !== 'string' || !UUID.test(value[key]))

@@ -12,8 +12,8 @@ export function PageChecklist({
   description: string
   sectionCount: number
 }) {
-  const [report, setReport] = useState<ReadinessReport | null>(null),
-    [error, setError] = useState(false)
+  const [report, setReport] = useState<ReadinessReport | null>(null)
+  const [error, setError] = useState(false)
   useEffect(() => {
     let active = true
     setReport(null)
@@ -31,8 +31,8 @@ export function PageChecklist({
     }
   }, [versionId])
   const incomplete = Boolean(sectionCount && report?.findings.some(finding => finding.rule === 'empty_page'))
-  const images = report?.findings.filter(finding => finding.rule === 'image_without_alt').length ?? 0,
-    heading = report && !report.findings.some(finding => ['missing_h1', 'empty_page'].includes(finding.rule))
+  const images = report?.findings.filter(finding => finding.rule === 'image_without_alt').length ?? 0
+  const heading = report && !report.findings.some(finding => ['missing_h1', 'empty_page'].includes(finding.rule))
   return (
     <section className={styles.content} aria-label="Page checklist">
       <h3>Page checklist</h3>

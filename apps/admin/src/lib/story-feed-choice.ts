@@ -5,11 +5,12 @@ export function storyFeedChoice(value: unknown): {
   tags: StoryTagFilter
   keepEarlierFilter: boolean
 } {
-  const binding = readCollectionBinding(value),
-    selection = binding?.readerKey === 'stories' && binding.selection.mode === 'automatic' ? binding.selection : null,
-    filter = selection?.filter
-  const main = filter?.field === 'tags' ? [filter.value] : [],
-    secondary = filter && ['region', 'regions'].includes(filter.field) ? [filter.value] : []
+  const binding = readCollectionBinding(value)
+  const selection =
+    binding?.readerKey === 'stories' && binding.selection.mode === 'automatic' ? binding.selection : null
+  const filter = selection?.filter
+  const main = filter?.field === 'tags' ? [filter.value] : []
+  const secondary = filter && ['region', 'regions'].includes(filter.field) ? [filter.value] : []
   return {
     selection,
     tags: selection?.storyTags ?? { main, secondary },

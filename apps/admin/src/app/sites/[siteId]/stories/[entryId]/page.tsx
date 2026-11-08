@@ -17,8 +17,8 @@ export default async function StoryPage({
 }) {
   const session = await currentSession()
   if (!session) notFound()
-  const { siteId, entryId } = await params,
-    site = await getSite(session.principal.userId, siteId)
+  const { siteId, entryId } = await params
+  const site = await getSite(session.principal.userId, siteId)
   if (!site || !/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/.test(entryId)) notFound()
   const [list, rights] = await Promise.all([
     getStoriesWorkspace(session.principal.userId, site.id, { entryId }),

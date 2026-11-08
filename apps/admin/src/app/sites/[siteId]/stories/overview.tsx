@@ -30,11 +30,11 @@ export function StoriesOverview({
   initialTag?: string
   leavingOpen?: boolean
 }) {
-  const { settings, rows } = state,
-    base = '/sites/' + siteId + '/stories',
-    coverage = storiesOverview(rows, settings, state.publishedSettings, uses),
-    live = rows.filter(row => storyListLive(row, state.publishedSettings)).length,
-    needsReview = rows.filter(row => storyInSource(row.values) && row.values.reviewed !== true).length
+  const { settings, rows } = state
+  const base = '/sites/' + siteId + '/stories'
+  const coverage = storiesOverview(rows, settings, state.publishedSettings, uses)
+  const live = rows.filter(row => storyListLive(row, state.publishedSettings)).length
+  const needsReview = rows.filter(row => storyInSource(row.values) && row.values.reviewed !== true).length
   const items = (stories: typeof rows) =>
     stories.map(row => ({
       id: row.id,

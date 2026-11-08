@@ -27,11 +27,11 @@ export function storiesOverview(
   uses: readonly StoryFeedUse[] = [],
   now = new Date(),
 ) {
-  const today = now.toISOString().slice(0, 10),
-    eligible = (row: StoryListRow) =>
-      String(row.values.published_date ?? '') <= today && storyFeedState(row, now).active
-  const source = rows.filter(row => storyInSource(row.values)),
-    current = source.filter(eligible)
+  const today = now.toISOString().slice(0, 10)
+  const eligible = (row: StoryListRow) =>
+    String(row.values.published_date ?? '') <= today && storyFeedState(row, now).active
+  const source = rows.filter(row => storyInSource(row.values))
+  const current = source.filter(eligible)
   const live = rows.filter(
     row =>
       row.published && storyAllowedInFeeds(row.published, published) && eligible({ ...row, values: row.published }),
@@ -52,8 +52,8 @@ export function storiesOverview(
           a.path.localeCompare(b.path),
       ),
   }))
-  const noMain = current.filter(row => !knownStoryTags(row.values, 'main', settings).length),
-    noMainLive = live.filter(row => !knownStoryTags(row.published!, 'main', published).length).length
+  const noMain = current.filter(row => !knownStoryTags(row.values, 'main', settings).length)
+  const noMainLive = live.filter(row => !knownStoryTags(row.published!, 'main', published).length).length
   const missing = source.filter(
     row =>
       !knownStoryTags(row.values, 'main', settings).length || !knownStoryTags(row.values, 'secondary', settings).length,

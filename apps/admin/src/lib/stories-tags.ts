@@ -16,8 +16,8 @@ export function newStoryTagId(label: string, used: readonly string[]): string {
       .replace(/^-|-$/g, '')
       .slice(0, 70)
       .replace(/-$/, '') || 'tag'
-  let next = base,
-    suffix = 2
+  let next = base
+  let suffix = 2
   while (used.includes(next)) next = base + '-' + suffix++
   return next
 }
@@ -44,8 +44,8 @@ export async function changeStoriesTags(
   if (!list.allowed) throw new DomainError('not_authorized', 'Only a Site admin can manage tags.')
   if (String(list.revision) !== revision || String(list.entry_revision) !== entryRevision)
     throw new DomainError('stale_revision', 'Stories changed. Reload Manage tags before saving.')
-  const whole = CollectionModel.safeParse(list.fields),
-    model = whole.success ? whole.data : CollectionModel.parse({ fields: list.fields, presentation: list.sort })
+  const whole = CollectionModel.safeParse(list.fields)
+  const model = whole.success ? whole.data : CollectionModel.parse({ fields: list.fields, presentation: list.sort })
   let settings = storiesCatalog(model, list.slug)
   const rows = (
     await client.query(
@@ -64,8 +64,8 @@ export async function changeStoriesTags(
     settings = result.settings
     values = result.stories
   } else {
-    const key = operation.group === 'main' ? 'mainTags' : 'secondaryTags',
-      tags = [...settings[key]]
+    const key = operation.group === 'main' ? 'mainTags' : 'secondaryTags'
+    const tags = [...settings[key]]
     if (operation.action === 'add') {
       if (tags.length >= 100)
         throw new DomainError('invalid_state', 'This group has 100 tags. Remove a tag before adding another.')
@@ -89,8 +89,8 @@ export async function changeStoriesTags(
           ...(operation.group === 'secondary' ? { areas: operation.areas } : {}),
         }
       else if (operation.before !== operation.id) {
-        const [tag] = tags.splice(index, 1),
-          target = operation.before === null ? tags.length : tags.findIndex(t => t.id === operation.before)
+        const [tag] = tags.splice(index, 1)
+        const target = operation.before === null ? tags.length : tags.findIndex(t => t.id === operation.before)
         if (target < 0) throw new DomainError('stale_revision', 'The tag order changed. Reload Manage tags.')
         tags.splice(target, 0, tag!)
       }
@@ -110,15 +110,15 @@ export async function changeStoriesTags(
       .join(', '),
     sector_links: storyTagIds(value, 'main')
       .map(id => {
-        const label = escapeText(settings.mainTags.find(t => t.id === id)?.label ?? id),
-          path = 'ways-we-help/' + id
+        const label = escapeText(settings.mainTags.find(t => t.id === id)?.label ?? id)
+        const path = 'ways-we-help/' + id
         return paths.has(path) ? '<a href="/' + path + '">' + label + '</a>' : label
       })
       .join(' '),
   }))
   const upgraded = withStoriesCatalog(model, settings)
-  const catalogChanged = JSON.stringify(model) !== JSON.stringify(upgraded),
-    storiesChanged = values.some((v, i) => JSON.stringify(v) !== JSON.stringify(rows[i]!.values))
+  const catalogChanged = JSON.stringify(model) !== JSON.stringify(upgraded)
+  const storiesChanged = values.some((v, i) => JSON.stringify(v) !== JSON.stringify(rows[i]!.values))
   const saved = catalogChanged
     ? (
         await client.query('SELECT * FROM app.save_collection_schema($1,$2,$3,$4)', [

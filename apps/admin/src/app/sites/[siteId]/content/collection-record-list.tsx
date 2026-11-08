@@ -95,12 +95,12 @@ export function CollectionRecordList({
           aria-label={listName + ' items'}
         >
           {visible.map(entry => {
-            const key = entryIdentity(entry),
-              title = recordTitle(entry, model),
-              subtitle = recordSubtitle(entry, model),
-              changed = !entry.archived && entryChanged(entry),
-              position = activePositions.get(key) ?? -1,
-              photo = imagePreview(recordImage(entry, model), availableMedia)
+            const key = entryIdentity(entry)
+            const title = recordTitle(entry, model)
+            const subtitle = recordSubtitle(entry, model)
+            const changed = !entry.archived && entryChanged(entry)
+            const position = activePositions.get(key) ?? -1
+            const photo = imagePreview(recordImage(entry, model), availableMedia)
             // Keep the row and its open menu when the server assigns a new item its ID.
             const rowKey = repeatedKeys.has(entry.stableKey) ? `draft:${key}` : `record:${entry.stableKey}`
             const dragRow = reorder.row(key, !canEdit || pending || entry.archived)

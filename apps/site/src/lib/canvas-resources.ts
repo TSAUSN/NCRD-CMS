@@ -45,8 +45,8 @@ export function canvasDocument(
   const change = (start: number, end: number, value: string) => edits.push({ start, end, value })
   const walk = (node: DefaultTreeAdapterMap['node']) => {
     if ('tagName' in node) {
-      const attrs = node.attrs,
-        location = node.sourceCodeLocation
+      const attrs = node.attrs
+      const location = node.sourceCodeLocation
       if (node.tagName === 'html' && location?.startTag)
         change(
           location.startTag.endOffset - 1,

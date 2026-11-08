@@ -76,15 +76,15 @@ export async function readPageSavedReview(userId: string, pageId: string, revisi
   if (String(head.revision) !== revision || head.draft_version_id !== versionId)
     throw new DomainError('stale_revision', 'The saved page changed. Review the latest draft before publishing.')
   const { releasePresentations } = await import('./release-presentation.ts')
-  const key = 'page:' + pageId,
-    presentation = (
-      await releasePresentations(
-        userId,
-        head.site_id,
-        [{ key, type: 'page', id: pageId, label: head.title, revision, versionId }],
-        true,
-      )
-    )[key]
+  const key = 'page:' + pageId
+  const presentation = (
+    await releasePresentations(
+      userId,
+      head.site_id,
+      [{ key, type: 'page', id: pageId, label: head.title, revision, versionId }],
+      true,
+    )
+  )[key]
   if (!presentation) throw new DomainError('not_found', 'The saved page could not be read. Save and try again.')
   return { title: String(head.title), revision, versionId, presentation }
 }

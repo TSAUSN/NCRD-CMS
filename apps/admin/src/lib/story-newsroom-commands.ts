@@ -60,12 +60,12 @@ export async function saveNewsroomOrder(
   if (!model.fields.some(field => field.key === 'newsroom_rank' && field.type === 'number'))
     throw new DomainError('invalid_state', 'A Site admin needs to update Stories first.')
   const rows = (
-      await client.query(
-        'SELECT e.id,e.stable_key,v.values,p.values AS published_values FROM collection_entries e JOIN collection_entry_versions v ON v.id=e.draft_version_id LEFT JOIN collection_entry_versions p ON p.id=e.published_version_id WHERE e.collection_id=$1 AND e.archived_at IS NULL ORDER BY e.sort_index,e.created_at,e.id',
-        [collectionId],
-      )
-    ).rows,
-    featured = rows.filter(row => storyFeatureRank(row.values))
+    await client.query(
+      'SELECT e.id,e.stable_key,v.values,p.values AS published_values FROM collection_entries e JOIN collection_entry_versions v ON v.id=e.draft_version_id LEFT JOIN collection_entry_versions p ON p.id=e.published_version_id WHERE e.collection_id=$1 AND e.archived_at IS NULL ORDER BY e.sort_index,e.created_at,e.id',
+      [collectionId],
+    )
+  ).rows
+  const featured = rows.filter(row => storyFeatureRank(row.values))
   if (featured.length !== ids.length || featured.some(row => !ids.includes(row.id)))
     throw new DomainError('stale_revision', 'The featured stories changed. Review the saved list before reordering.')
   const next = rows.map(row => ({

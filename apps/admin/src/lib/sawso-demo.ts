@@ -30,14 +30,14 @@ export async function ensureSawsoDemo(
 ) {
   const site = await asUser({ userId }, async c => {
     await installCoreLibrary(c)
-    const site = await ensureSawsoSite(c, randomUUID()),
-      head = (await c.query('SELECT initial_release_required FROM sites WHERE id=$1', [site.siteId])).rows[0]!
+    const site = await ensureSawsoSite(c, randomUUID())
+    const head = (await c.query('SELECT initial_release_required FROM sites WHERE id=$1', [site.siteId])).rows[0]!
     return { ...site, initial: head.initial_release_required }
   })
   if (!site.initial) return { id: site.siteId, created: false }
-  const uploads = createPostgresAdminMediaUploadRepository(),
-    statuses = createPostgresMediaUploadStatusRepository(),
-    local: SawsoMediaMap = {}
+  const uploads = createPostgresAdminMediaUploadRepository()
+  const statuses = createPostgresMediaUploadStatusRepository()
+  const local: SawsoMediaMap = {}
   for (const photo of photos) {
     const found = await asUser(
       { userId },
@@ -88,16 +88,16 @@ export async function ensureSawsoDemo(
     await ensureSawsoFrame(c, site.siteId)
     await ensureSawsoRedirects(c, site.siteId)
     const collection = (
-        await c.query("SELECT id,entry_revision FROM collections WHERE site_id=$1 AND reader_key='stories'", [
-          site.siteId,
-        ])
-      ).rows[0]!,
-      entries = (
-        await c.query(
-          'SELECT e.id,e.stable_key,v.values FROM collection_entries e JOIN collection_entry_versions v ON v.id=e.draft_version_id WHERE e.collection_id=$1 AND e.archived_at IS NULL ORDER BY e.sort_index,e.id',
-          [collection.id],
-        )
-      ).rows
+      await c.query("SELECT id,entry_revision FROM collections WHERE site_id=$1 AND reader_key='stories'", [
+        site.siteId,
+      ])
+    ).rows[0]!
+    const entries = (
+      await c.query(
+        'SELECT e.id,e.stable_key,v.values FROM collection_entries e JOIN collection_entry_versions v ON v.id=e.draft_version_id WHERE e.collection_id=$1 AND e.archived_at IS NULL ORDER BY e.sort_index,e.id',
+        [collection.id],
+      )
+    ).rows
     const rows = entries.map(e => {
       const p = sawsoMediaPhoto(local, e.values.image_url)
       return {

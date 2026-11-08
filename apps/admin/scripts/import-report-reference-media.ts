@@ -17,16 +17,16 @@ async function main() {
     throw new Error('Give assets folder,source manifest,existing dump,import record and report year.')
   if ((await stat(dump)).size === 0) throw new Error('Keep a database dump before importing.')
   const actor = (
-      await poolFor('migration').query(
-        "SELECT u.id FROM app_users u JOIN global_roles r ON r.user_id=u.id WHERE u.email=$1 AND r.role='super_admin'",
-        [process.env['CMS_REFERENCE_ACTOR_EMAIL'] ?? 'admin@example.test'],
-      )
-    ).rows[0]?.id,
-    site = (
-      await poolFor('migration').query('SELECT id FROM sites WHERE slug=$1', [
-        process.env['CMS_REFERENCE_SITE_SLUG'] ?? 'sawso',
-      ])
-    ).rows[0]?.id
+    await poolFor('migration').query(
+      "SELECT u.id FROM app_users u JOIN global_roles r ON r.user_id=u.id WHERE u.email=$1 AND r.role='super_admin'",
+      [process.env['CMS_REFERENCE_ACTOR_EMAIL'] ?? 'admin@example.test'],
+    )
+  ).rows[0]?.id
+  const site = (
+    await poolFor('migration').query('SELECT id FROM sites WHERE slug=$1', [
+      process.env['CMS_REFERENCE_SITE_SLUG'] ?? 'sawso',
+    ])
+  ).rows[0]?.id
   if (!actor || !site) throw new Error('The local administrator or site was not found.')
   const images = JSON.parse(await readFile(inputManifest, 'utf8')) as ReferenceImage[]
   if (!Array.isArray(images) || !images.length || images.length > 100)
@@ -51,8 +51,8 @@ async function main() {
     previous,
     onItem: async rows => {
       await mkdir(dirname(resolve(manifest)), { recursive: true })
-      const merged = new Map([...previous, ...rows].map(row => [row.key, row])),
-        saved = images.flatMap(image => (merged.has(image.key) ? [merged.get(image.key)!] : []))
+      const merged = new Map([...previous, ...rows].map(row => [row.key, row]))
+      const saved = images.flatMap(image => (merged.has(image.key) ? [merged.get(image.key)!] : []))
       await writeFile(manifest + '.tmp', JSON.stringify(saved, null, 2) + '\n')
       await rename(manifest + '.tmp', manifest)
       process.stdout.write('Ready ' + rows.length + '/' + images.length + '\n')

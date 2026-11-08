@@ -29,18 +29,18 @@ export function GeneralSettingsWorkspace({
   initial: SiteSettingsWorkspace
 }) {
   const draft = useSettingsDraft(
-      siteId,
-      archived,
-      initial,
-      'general',
-      'General settings',
-      input(initial.settings),
-      value => value,
-      input,
-      'Enter a site name, a valid contact email and a language.',
-    ),
-    value = draft.value,
-    disabled = archived || draft.pending
+    siteId,
+    archived,
+    initial,
+    'general',
+    'General settings',
+    input(initial.settings),
+    value => value,
+    input,
+    'Enter a site name, a valid contact email and a language.',
+  )
+  const value = draft.value
+  const disabled = archived || draft.pending
   function change(key: keyof GeneralInput['general'], next: string) {
     draft.change(current => ({ ...current, general: { ...current.general, [key]: next } }))
   }

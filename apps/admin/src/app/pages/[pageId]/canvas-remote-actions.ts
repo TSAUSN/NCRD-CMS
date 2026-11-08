@@ -185,10 +185,10 @@ export function canvasRemoteActions({ document: editorDocument, frame, editing }
       typeof data['field'] === 'string' &&
       ['add', 'up', 'down', 'duplicate', 'delete'].includes(String(data['action']))
     ) {
-      const section = state.document.sections[index]!,
-        field = slotsByDef
-          .get(sectionVersionKey(section.section_def_id, section.section_def_version))
-          ?.slots.find(field => field.id === data['field'])
+      const section = state.document.sections[index]!
+      const field = slotsByDef
+        .get(sectionVersionKey(section.section_def_id, section.section_def_version))
+        ?.slots.find(field => field.id === data['field'])
       if (
         field &&
         repeatItemSpec(field) &&

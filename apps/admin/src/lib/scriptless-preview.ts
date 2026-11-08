@@ -33,9 +33,9 @@ function previewOrigin(origin?: string): string | null {
 /** Next may name its internal listener localhost; Host is what the browser addressed. */
 export function previewRequestOrigin(request: Request): string | undefined {
   try {
-    const listener = new URL(request.url),
-      authority = request.headers.get('host')?.trim() || listener.host,
-      url = new URL(`${listener.protocol}//${authority}`)
+    const listener = new URL(request.url)
+    const authority = request.headers.get('host')?.trim() || listener.host
+    const url = new URL(`${listener.protocol}//${authority}`)
     if (url.username || url.password || url.pathname !== '/' || url.search || url.hash) return undefined
     return previewOrigin(url.origin) ?? undefined
   } catch {

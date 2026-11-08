@@ -68,8 +68,8 @@ export async function reviewNationalSite(client: Queryable, siteId: string, lock
       [defs.map(def => def.id)],
     )
   ).rows
-  const latest = new Map(defs.map(def => [def.id, def])),
-    slots = new Map(oldSlots.map(def => [def.section_def_id + '@' + def.version, def.slots]))
+  const latest = new Map(defs.map(def => [def.id, def]))
+  const slots = new Map(oldSlots.map(def => [def.section_def_id + '@' + def.version, def.slots]))
   const changes = pages.flatMap(page => {
     let changed = false
     const content = page.content.map(section => {
@@ -99,8 +99,8 @@ export async function reviewNationalSite(client: Queryable, siteId: string, lock
     })
     return changed ? [{ page, content }] : []
   })
-  const current = ThemeTokens.parse(theme.tokens),
-    next = nationalTemplateTheme(current.fonts, current.presentation?.headings === 'small-caps')
+  const current = ThemeTokens.parse(theme.tokens)
+  const next = nationalTemplateTheme(current.fonts, current.presentation?.headings === 'small-caps')
   if (current.presentation?.template?.mayChangeColours) {
     next.colors = current.colors
     next.presentation!.template!.mayChangeColours = true
@@ -135,8 +135,8 @@ export async function applyNationalTemplate(client: Queryable, selections: { id:
     new Set(selections.map(item => item.id)).size !== selections.length
   )
     throw new DomainError('invalid_state', 'Choose one or more sites to update.')
-  let sites = 0,
-    pages = 0
+  let sites = 0
+  let pages = 0
   for (const selection of [...selections].sort((a, b) => a.id.localeCompare(b.id))) {
     const plan = await reviewNationalSite(client, selection.id, true)
     if (plan.review.fingerprint !== selection.fingerprint)
@@ -190,9 +190,9 @@ export async function previewNationalTemplate(client: Queryable, siteId: string)
       navigationPaths: preview.navigationPaths,
       options: SCRIPTLESS_RENDER_OPTIONS,
     }).html
-  const beforeHtml = render(manifest),
-    after = structuredClone(manifest),
-    change = plan.changes.find(change => change.page.id === page.id)
+  const beforeHtml = render(manifest)
+  const after = structuredClone(manifest)
+  const change = plan.changes.find(change => change.page.id === page.id)
   if (change)
     for (const [index, section] of change.content.entries()) {
       if (section.section_def_version === page.content[index]!.section_def_version) continue

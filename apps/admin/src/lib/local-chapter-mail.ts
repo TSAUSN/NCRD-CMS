@@ -12,8 +12,8 @@ export function localChapterMailOrigin(env: Environment = process.env): string |
   )
     return null
   try {
-    const admin = new URL(env['ADMIN_ORIGIN'] ?? ''),
-      database = new URL(env['DATABASE_URL_AUTHENTICATED'] ?? '')
+    const admin = new URL(env['ADMIN_ORIGIN'] ?? '')
+    const database = new URL(env['DATABASE_URL_AUTHENTICATED'] ?? '')
     if (
       admin.protocol !== 'http:' ||
       !['localhost', '127.0.0.1'].includes(admin.hostname) ||

@@ -30,19 +30,19 @@ export function StoriesWorld({
   canCreate: boolean
   initial: WorldChoice
 }) {
-  const [choice, setChoice] = useState(initial),
-    [preview, setPreview] = useState(initial),
-    [open, setOpen] = useState(false),
-    [pages, setPages] = useState<Page[]>([]),
-    [loading, setLoading] = useState(false),
-    [pending, setPending] = useState(false),
-    [error, setError] = useState(''),
-    [pageId, setPageId] = useState(''),
-    [search, setSearch] = useState(''),
-    [saved, setSaved] = useState<{ pageId: string; title: string } | null>(null)
-  const base = '/sites/' + siteId + '/stories',
-    live = state.rows.filter(row => storyListLive(row, state.publishedSettings)).length,
-    needsReview = state.rows.filter(row => storyInSource(row.values) && row.values.reviewed !== true).length
+  const [choice, setChoice] = useState(initial)
+  const [preview, setPreview] = useState(initial)
+  const [open, setOpen] = useState(false)
+  const [pages, setPages] = useState<Page[]>([])
+  const [loading, setLoading] = useState(false)
+  const [pending, setPending] = useState(false)
+  const [error, setError] = useState('')
+  const [pageId, setPageId] = useState('')
+  const [search, setSearch] = useState('')
+  const [saved, setSaved] = useState<{ pageId: string; title: string } | null>(null)
+  const base = '/sites/' + siteId + '/stories'
+  const live = state.rows.filter(row => storyListLive(row, state.publishedSettings)).length
+  const needsReview = state.rows.filter(row => storyInSource(row.values) && row.values.reviewed !== true).length
   useEffect(() => {
     const timer = setTimeout(() => {
       setPreview(choice)
@@ -92,15 +92,15 @@ export function StoriesWorld({
     }
   }
   const mainLabel =
-      state.settings.mainLabel === 'Project Sectors'
-        ? 'Only these project sectors'
-        : 'Only these ' + state.settings.mainLabel.toLowerCase(),
-    mainSummary = choice.main.length
-      ? state.settings.mainTags
-          .filter(t => choice.main.includes(t.id))
-          .map(t => t.label)
-          .join(', ')
-      : 'All'
+    state.settings.mainLabel === 'Project Sectors'
+      ? 'Only these project sectors'
+      : 'Only these ' + state.settings.mainLabel.toLowerCase()
+  const mainSummary = choice.main.length
+    ? state.settings.mainTags
+        .filter(t => choice.main.includes(t.id))
+        .map(t => t.label)
+        .join(', ')
+    : 'All'
   return (
     <>
       <StoriesHeader

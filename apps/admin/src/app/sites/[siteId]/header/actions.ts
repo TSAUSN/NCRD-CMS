@@ -44,8 +44,8 @@ export async function saveHeaderMenu(input: {
 }) {
   const session = await currentSession()
   if (!session) return { ok: false as const, message: 'Sign in before saving.' }
-  const header = HeaderDraftConfig.safeParse(input.header),
-    menu = NavTree.safeParse(input.menu)
+  const header = HeaderDraftConfig.safeParse(input.header)
+  const menu = NavTree.safeParse(input.menu)
   if (!header.success || !menu.success || !['auto', 'manual'].includes(input.mode))
     return { ok: false as const, message: 'Check the menu names and destinations before saving.' }
   if (header.data.schemaVersion === 2) {

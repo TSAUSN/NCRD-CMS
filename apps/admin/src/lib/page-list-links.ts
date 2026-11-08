@@ -47,12 +47,12 @@ export function pageMenuSwitch(
     nodes
       .flatMap(node => [node, ...(node.children ?? [])])
       .find(node => node.target.type === 'page' && node.target.page_id === page.id)
-  const old = existing(tree) ?? existing(published),
-    item = {
-      label: old?.label ?? page.title.slice(0, 80),
-      target: { type: 'page' as const, page_id: page.id },
-      visible: true,
-    }
+  const old = existing(tree) ?? existing(published)
+  const item = {
+    label: old?.label ?? page.title.slice(0, 80),
+    target: { type: 'page' as const, page_id: page.id },
+    visible: true,
+  }
   const parent = published.find(node =>
     node.children?.some(child => child.target.type === 'page' && child.target.page_id === page.id),
   )
@@ -136,26 +136,24 @@ export function footerPageSwitch(
 }
 export function menuChangeWords(before: NavTree, after: NavTree): string[] {
   const flatten = (tree: NavTree): NavNode[] =>
-      tree
-        .flatMap<NavNode>(node => [node, ...(node.children ?? [])])
-        .filter(node => node.visible && !node.dropdownGroup),
-    key = (node: NavNode) => (node.target.type === 'page' ? node.target.page_id : node.target.url),
-    old = flatten(before),
-    next = flatten(after),
-    words: string[] = []
-  const added = next.filter(item => !old.some(node => key(node) === key(item))),
-    removed = old.filter(item => !next.some(node => key(node) === key(item))),
-    changed = added.filter(
-      item =>
-        added.filter(node => node.label === item.label).length === 1 &&
-        removed.filter(node => node.label === item.label).length === 1,
-    )
+    tree.flatMap<NavNode>(node => [node, ...(node.children ?? [])]).filter(node => node.visible && !node.dropdownGroup)
+  const key = (node: NavNode) => (node.target.type === 'page' ? node.target.page_id : node.target.url)
+  const old = flatten(before)
+  const next = flatten(after)
+  const words: string[] = []
+  const added = next.filter(item => !old.some(node => key(node) === key(item)))
+  const removed = old.filter(item => !next.some(node => key(node) === key(item)))
+  const changed = added.filter(
+    item =>
+      added.filter(node => node.label === item.label).length === 1 &&
+      removed.filter(node => node.label === item.label).length === 1,
+  )
   for (const item of changed) words.push('Menu: changed where ' + item.label + ' goes')
   for (const item of added) if (!changed.includes(item)) words.push('Menu: added ' + item.label)
   for (const item of removed)
     if (!changed.some(node => node.label === item.label)) words.push('Menu: removed ' + item.label)
-  const oldCommon = old.filter(item => next.some(node => key(node) === key(item))),
-    nextCommon = next.filter(item => old.some(node => key(node) === key(item)))
+  const oldCommon = old.filter(item => next.some(node => key(node) === key(item)))
+  const nextCommon = next.filter(item => old.some(node => key(node) === key(item)))
   for (const item of nextCommon) {
     const previous =
       oldCommon.find(node => key(node) === key(item) && node.label === item.label) ??
@@ -170,21 +168,21 @@ export function menuChangeWords(before: NavTree, after: NavTree): string[] {
 }
 export function footerLinkChangeWords(before: FooterConfig, after: FooterConfig): string[] {
   const links = (footer: FooterConfig) =>
-      footer.schemaVersion === 2
-        ? readFooterLinks(footer.component.values.links)
-        : footer.groups.flatMap(group =>
-            group.links.map(link => ({ label: link.label, url: JSON.stringify(link.target) })),
-          ),
-    old = links(before),
-    next = links(after)
+    footer.schemaVersion === 2
+      ? readFooterLinks(footer.component.values.links)
+      : footer.groups.flatMap(group =>
+          group.links.map(link => ({ label: link.label, url: JSON.stringify(link.target) })),
+        )
+  const old = links(before)
+  const next = links(after)
   if (!old || !next) return []
-  const added = next.filter(link => !old.some(item => item.url === link.url)),
-    removed = old.filter(link => !next.some(item => item.url === link.url)),
-    changed = added.filter(
-      link =>
-        added.filter(item => item.label === link.label).length === 1 &&
-        removed.filter(item => item.label === link.label).length === 1,
-    )
+  const added = next.filter(link => !old.some(item => item.url === link.url))
+  const removed = old.filter(link => !next.some(item => item.url === link.url))
+  const changed = added.filter(
+    link =>
+      added.filter(item => item.label === link.label).length === 1 &&
+      removed.filter(item => item.label === link.label).length === 1,
+  )
   return [
     ...changed.map(link => 'Footer: changed where ' + link.label + ' goes'),
     ...added.filter(link => !changed.includes(link)).map(link => 'Footer: added ' + link.label),

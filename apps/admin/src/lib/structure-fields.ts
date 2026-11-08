@@ -15,28 +15,28 @@ export function structureFields(slots: readonly FieldLike[], values: Record<stri
     if (!isRepeatItemSlot(slot) || (!heroes.has(slot.repeat.id) && !groupCards))
       return [{ ...slot, memberIds: [slot.id], searchValues: [values[slot.id]] }]
     if (!heroes.has(slot.repeat.id)) {
-      const root = slots.find(field => field.id === slot.repeat.id),
-        spec = root && repeatItemSpec(root),
-        parsed = parseRepeatItemSlotId(slot.id)
+      const root = slots.find(field => field.id === slot.repeat.id)
+      const spec = root && repeatItemSpec(root)
+      const parsed = parseRepeatItemSlotId(slot.id)
       if (!spec || parsed?.fieldId !== spec.fields[0]?.id) return []
       const memberIds = [
         slot.repeat.id,
         ...spec.fields.map(field => repeatItemSlotId(slot.repeat.id, slot.repeat.key, field.id)),
       ]
       const textFields = spec.fields.filter(
-          field => ['text', 'richtext'].includes(field.kind) && !field.constraints?.presentation,
-        ),
-        preferred = textFields.find(field => ['title', 'name', 'heading'].includes(field.id)),
-        words = [preferred, ...textFields]
-          .filter(Boolean)
-          .map(field =>
-            String(values[repeatItemSlotId(slot.repeat.id, slot.repeat.key, field!.id)] ?? '')
-              .replace(/<[^>]*>/g, ' ')
-              .replace(/&nbsp;/g, ' ')
-              .replace(/\s+/g, ' ')
-              .trim(),
-          )
-          .find(Boolean)
+        field => ['text', 'richtext'].includes(field.kind) && !field.constraints?.presentation,
+      )
+      const preferred = textFields.find(field => ['title', 'name', 'heading'].includes(field.id))
+      const words = [preferred, ...textFields]
+        .filter(Boolean)
+        .map(field =>
+          String(values[repeatItemSlotId(slot.repeat.id, slot.repeat.key, field!.id)] ?? '')
+            .replace(/<[^>]*>/g, ' ')
+            .replace(/&nbsp;/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim(),
+        )
+        .find(Boolean)
       return [
         {
           ...slot,
@@ -47,9 +47,9 @@ export function structureFields(slots: readonly FieldLike[], values: Record<stri
       ]
     }
     if (parseRepeatItemSlotId(slot.id)?.fieldId !== 'photo') return []
-    const key = slot.repeat.key,
-      repeat = slot.repeat.id,
-      title = String(values[repeatItemSlotId(repeat, key, 'title')] ?? '').trim() || 'Untitled slide'
+    const key = slot.repeat.key
+    const repeat = slot.repeat.id
+    const title = String(values[repeatItemSlotId(repeat, key, 'title')] ?? '').trim() || 'Untitled slide'
     const memberIds = [repeat, ...HERO_SLIDE_FIELDS.map(field => repeatItemSlotId(repeat, key, field))]
     return [
       {

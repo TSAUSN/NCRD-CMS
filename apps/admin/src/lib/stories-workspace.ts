@@ -32,10 +32,10 @@ export async function getStoryListState(userId: string, siteId: string, slug: st
   const [list, media] = await Promise.all([getStoriesWorkspace(userId, siteId), listMediaAssets(userId, siteId)])
   if (!list) return null
   const photoPreview = (values: Record<string, unknown>) => {
-    const photo = values.photo && typeof values.photo === 'object' ? (values.photo as { src?: unknown }) : null,
-      src = typeof photo?.src === 'string' ? photo.src : ''
-    const id = /^\/media\/([0-9a-f-]{36})\//i.exec(src)?.[1],
-      asset = id ? media.find(m => m.id === id && !m.deletedAt) : null
+    const photo = values.photo && typeof values.photo === 'object' ? (values.photo as { src?: unknown }) : null
+    const src = typeof photo?.src === 'string' ? photo.src : ''
+    const id = /^\/media\/([0-9a-f-]{36})\//i.exec(src)?.[1]
+    const asset = id ? media.find(m => m.id === id && !m.deletedAt) : null
     if (asset) return asset.previewUrl
     return src.startsWith('/cms-samples/') && !src.includes('\\') ? src : null
   }

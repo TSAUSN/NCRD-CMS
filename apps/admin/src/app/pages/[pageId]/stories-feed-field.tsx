@@ -9,10 +9,10 @@ import chips from '../../../components/story-list-row.module.css'
 import type { CollectionBindingOption, StoryFeedTags } from '../../../lib/collection-binding.ts'
 import { storyFeedBinding, storyFeedChoice, storyFeedMaximum } from '../../../lib/story-feed-choice.ts'
 function useStoryFeedTags(siteId: string, definitionId: string, definitionVersion: number, fieldId: string) {
-  const [catalog, setCatalog] = useState<StoryFeedTags | null>(null),
-    [error, setError] = useState<string | null>(null),
-    [loading, setLoading] = useState(true),
-    [reload, setReload] = useState(0)
+  const [catalog, setCatalog] = useState<StoryFeedTags | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [reload, setReload] = useState(0)
   useEffect(() => {
     const controller = new AbortController()
     setLoading(true)
@@ -99,8 +99,8 @@ export function StoryStartRegionField({
   definitionVersion: number
   fieldId: string
 }) {
-  const { catalog, error, loading, retry } = useStoryFeedTags(siteId, definitionId, definitionVersion, fieldId),
-    selected = String(value ?? '')
+  const { catalog, error, loading, retry } = useStoryFeedTags(siteId, definitionId, definitionVersion, fieldId)
+  const selected = String(value ?? '')
   if (loading) return <p role="status">Loading regions…</p>
   if (error)
     return (
@@ -145,10 +145,10 @@ export function StoryPerRegionField({
   fieldId: string
   path: string
 }) {
-  const { catalog, error, loading, retry } = useStoryFeedTags(siteId, definitionId, definitionVersion, fieldId),
-    maximum = catalog ? storyFeedMaximum(catalog, path) : 200,
-    selected = String(value ?? '200'),
-    choices = [200, 3, 6, 9, 12, 24].filter(n => n === 200 || n <= maximum)
+  const { catalog, error, loading, retry } = useStoryFeedTags(siteId, definitionId, definitionVersion, fieldId)
+  const maximum = catalog ? storyFeedMaximum(catalog, path) : 200
+  const selected = String(value ?? '200')
+  const choices = [200, 3, 6, 9, 12, 24].filter(n => n === 200 || n <= maximum)
   if (loading) return <p role="status">Loading story limits…</p>
   if (error)
     return (
@@ -199,9 +199,9 @@ export function StoriesFeedField({
   split?: boolean
 }) {
   const { catalog, error, loading, retry } = useStoryFeedTags(siteId, definitionId, definitionVersion, fieldId)
-  const choice = storyFeedChoice(value),
-    maximum = world || split ? 200 : catalog ? storyFeedMaximum(catalog, path) : 200,
-    limit = world || split ? 200 : (choice.selection?.limit ?? 6)
+  const choice = storyFeedChoice(value)
+  const maximum = world || split ? 200 : catalog ? storyFeedMaximum(catalog, path) : 200
+  const limit = world || split ? 200 : (choice.selection?.limit ?? 6)
   function change(tags: StoryTagFilter, count = limit) {
     onChange(storyFeedBinding(value, tags, Math.min(count, maximum)))
   }
@@ -242,9 +242,9 @@ export function StoriesFeedField({
           : 'Shows the newest matching stories. Choose any tag in each group; leave a group empty to allow any.'}
       </p>
       {(world ? (['main'] as const) : (['main', 'secondary'] as const)).map(group => {
-        const tags = group === 'main' ? catalog.mainTags : catalog.secondaryTags,
-          label = group === 'main' ? catalog.mainLabel : catalog.secondaryLabel,
-          missing = choice.tags[group].filter(id => !tags.some(tag => tag.id === id))
+        const tags = group === 'main' ? catalog.mainTags : catalog.secondaryTags
+        const label = group === 'main' ? catalog.mainLabel : catalog.secondaryLabel
+        const missing = choice.tags[group].filter(id => !tags.some(tag => tag.id === id))
         return (
           <div key={group} role="group" aria-label={label} className={shared.denseStack}>
             <strong>{label}</strong>

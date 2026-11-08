@@ -31,26 +31,24 @@ export function EditorHome({
   reviewCount: number
   siteNotice?: string
 }) {
-  const siteRole = access.memberships.get(site.id),
-    full = siteRole === 'editor' || siteRole === 'contributor',
-    canCreate = full,
-    canSchedule = siteRole === 'editor',
-    scoped = !access.memberships.has(site.id),
-    base = '/sites/' + site.id,
-    assigned = pages.filter(
-      page =>
-        page.site_id === site.id &&
-        !page.slug.startsWith('stories/') &&
-        !stories?.articlePaths.includes('/' + page.slug),
-    ),
-    drafts = assigned.filter(page => page.draft_version_id !== page.published_version_id),
-    chapterSetup =
-      site.chapters_enabled &&
-      ([...(access.divisionScopes?.values() ?? [])].some(scope => scope.siteId === site.id) ||
-        [...(access.pageScopes?.values() ?? [])].some(scope => scope.siteId === site.id && scope.role === 'editor')),
-    pageTask = scoped && assigned.length === 1 ? assigned[0] : null,
-    gap = stories?.gaps[0],
-    attention = Boolean(storyError || stories?.missing || gap || drafts.length || reviewCount)
+  const siteRole = access.memberships.get(site.id)
+  const full = siteRole === 'editor' || siteRole === 'contributor'
+  const canCreate = full
+  const canSchedule = siteRole === 'editor'
+  const scoped = !access.memberships.has(site.id)
+  const base = '/sites/' + site.id
+  const assigned = pages.filter(
+    page =>
+      page.site_id === site.id && !page.slug.startsWith('stories/') && !stories?.articlePaths.includes('/' + page.slug),
+  )
+  const drafts = assigned.filter(page => page.draft_version_id !== page.published_version_id)
+  const chapterSetup =
+    site.chapters_enabled &&
+    ([...(access.divisionScopes?.values() ?? [])].some(scope => scope.siteId === site.id) ||
+      [...(access.pageScopes?.values() ?? [])].some(scope => scope.siteId === site.id && scope.role === 'editor'))
+  const pageTask = scoped && assigned.length === 1 ? assigned[0] : null
+  const gap = stories?.gaps[0]
+  const attention = Boolean(storyError || stories?.missing || gap || drafts.length || reviewCount)
   return (
     <AppShell email={email} role={role} groups={navigationFor(site, access)}>
       <main

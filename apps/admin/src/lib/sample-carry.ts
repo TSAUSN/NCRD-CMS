@@ -6,8 +6,8 @@ export function carrySampleMarkers(
   mapping: Record<string, string> = {},
   introduced: readonly string[] = [],
 ) {
-  const sampled = new Set(sampleFieldNames(source)),
-    fresh = new Set(introduced)
+  const sampled = new Set(sampleFieldNames(source))
+  const fresh = new Set(introduced)
   const fields = Object.keys(target).filter(
     key => key !== SAMPLE_FIELDS_KEY && (sampled.has(mapping[key] ?? key) || fresh.has(key)),
   )

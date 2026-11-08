@@ -169,13 +169,13 @@ export function useDraftSave({ draft, persistence, canvas }: Inputs) {
       message: 'The page preview did not answer. Keep editing and reload its preview before leaving.',
     }
     await withCanvasValues(async () => {
-      const current = currentEditor.current,
-        captured = structuredClone(current.document),
-        snapshot = pageLeaveSnapshot(
-          { document: current.document, sectionOrigins: current.sectionOrigins },
-          openingSnapshot.current!,
-          slotsByDef,
-        )
+      const current = currentEditor.current
+      const captured = structuredClone(current.document)
+      const snapshot = pageLeaveSnapshot(
+        { document: current.document, sectionOrigins: current.sectionOrigins },
+        openingSnapshot.current!,
+        slotsByDef,
+      )
       if (!deepEqual(snapshot.document, current.document))
         setState(state => (deepEqual(state.document, captured) ? { ...state, document: snapshot.document } : state))
       if (deepEqual(snapshot.document, current.saved)) {

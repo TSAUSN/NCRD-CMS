@@ -1,9 +1,9 @@
 import { PREVIEW_MESSAGE } from '@cms/renderer/preview-messages'
 /** Read-only check in the site's own capability preview, without editor chrome. */
 export async function reportPreviewFonts() {
-  const root = document.documentElement,
-    parentOrigin = root.getAttribute('data-cms-parent-origin'),
-    channel = root.getAttribute('data-cms-channel')
+  const root = document.documentElement
+  const parentOrigin = root.getAttribute('data-cms-parent-origin')
+  const channel = root.getAttribute('data-cms-channel')
   if (!parentOrigin || !channel || window.parent === window) return
   let destination: URL
   try {

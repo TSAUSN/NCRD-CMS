@@ -10,8 +10,8 @@ export function readSectionClipboard(
 ): SectionClipboard | null {
   if (!source || source.length > 2_000_000) return null
   try {
-    const value = JSON.parse(source) as SectionClipboard,
-      s = value.section
+    const value = JSON.parse(source) as SectionClipboard
+    const s = value.section
     if (
       value.userId !== userId ||
       value.siteId !== siteId ||

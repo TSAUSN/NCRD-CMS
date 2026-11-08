@@ -99,8 +99,8 @@ export async function applySectionPageUpdates(
     const inputs = await checkedInputs(client, definitionId, targetVersion, pin)
     // Refuse incompatible list bindings or render-policy failures before any save.
     await renderUpgradeSet(client, inputs)
-    const first = await loadSectionUpgrade(client, inputs[0]!),
-      content = [...first.page.content]
+    const first = await loadSectionUpgrade(client, inputs[0]!)
+    const content = [...first.page.content]
     for (const input of inputs) {
       const { section, target, plan } = await loadSectionUpgrade(client, input)
       content[input.index] = { ...section, section_def_version: target.version, values: plan.values }

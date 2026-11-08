@@ -61,14 +61,14 @@ export async function copyHeroSlide(input: {
         )
           throw new DomainError('not_authorized', 'This slide is not available on your page.')
         const definition = (
-            await client.query<{ slots: FieldLike[] }>(
-              'SELECT v.slots FROM section_defs d JOIN section_def_versions v ON v.section_def_id=d.id WHERE d.id=$1 AND v.version=$2 AND d.slug=$3 AND d.scope=$4',
-              [input.definitionId, input.version, 'core-feature-slider', 'global'],
-            )
-          ).rows[0],
-          slot = definition?.slots.find(
-            slot => slot.id === input.slotId && isHeroSlides(slot) && slot.constraints?.heroEditingParity === true,
+          await client.query<{ slots: FieldLike[] }>(
+            'SELECT v.slots FROM section_defs d JOIN section_def_versions v ON v.section_def_id=d.id WHERE d.id=$1 AND v.version=$2 AND d.slug=$3 AND d.scope=$4',
+            [input.definitionId, input.version, 'core-feature-slider', 'global'],
           )
+        ).rows[0]
+        const slot = definition?.slots.find(
+          slot => slot.id === input.slotId && isHeroSlides(slot) && slot.constraints?.heroEditingParity === true,
+        )
         if (!slot) throw new DomainError('invalid_state', 'Review the updated Hero slider before copying this slide.')
         const problem =
           heroSlideContentProblem(input.values, slot.id, input.key) ||
@@ -99,11 +99,11 @@ export async function copyHeroSlide(input: {
             'stale_revision',
             'The destination page changed. Reload the page choices before copying.',
           )
-        const content = PageContent.parse(target.content ?? []),
-          at = content.findIndex(section => section.section_def_id === input.definitionId)
+        const content = PageContent.parse(target.content ?? [])
+        const at = content.findIndex(section => section.section_def_id === input.definitionId)
         const before = at >= 0 ? content[at]! : null
-        let destinationSlot = slot,
-          destinationVersion = input.version
+        let destinationSlot = slot
+        let destinationVersion = input.version
         if (before && before.section_def_version > input.version) {
           const newer = (
             await client.query<{ slots: FieldLike[] }>(
@@ -118,8 +118,8 @@ export async function copyHeroSlide(input: {
           destinationSlot = newer
           destinationVersion = before.section_def_version
         }
-        const values = before ? migrateHeroSlides(before.values) : { heading: target.title, slides: { items: [] } },
-          copied = appendCopiedHeroSlide(input.values, slot, input.key, values, destinationSlot)
+        const values = before ? migrateHeroSlides(before.values) : { heading: target.title, slides: { items: [] } }
+        const copied = appendCopiedHeroSlide(input.values, slot, input.key, values, destinationSlot)
         if (!copied)
           throw new DomainError(
             'invalid_state',

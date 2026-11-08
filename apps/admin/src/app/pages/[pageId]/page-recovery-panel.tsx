@@ -26,13 +26,13 @@ const statusText = (recovery: Recovery) =>
  * appear below the bar, where they cannot be missed.
  */
 export function RecoveryStatus({ recovery, limitedHistory }: { recovery: Recovery; limitedHistory: boolean }) {
-  const box = useRef<HTMLDetailsElement>(null),
-    sheet = useRef<HTMLDivElement>(null)
+  const box = useRef<HTMLDetailsElement>(null)
+  const sheet = useRef<HTMLDivElement>(null)
   // Fixed rather than absolute: the bar's controls scroll sideways on narrow
   // screens, and a panel inside that scroller would be clipped.
   function place() {
-    const summary = box.current?.querySelector('summary'),
-      panel = sheet.current
+    const summary = box.current?.querySelector('summary')
+    const panel = sheet.current
     if (!summary || !panel) return
     const edge = summary.getBoundingClientRect()
     panel.style.top = `${Math.round(edge.bottom + 6)}px`
@@ -181,10 +181,10 @@ function RecoveryDialog({
   onDiscard(): void
   applyReady: boolean
 }) {
-  const dialog = useRef<HTMLDialogElement>(null),
-    cancel = useRef<HTMLButtonElement>(null)
-  const [accept, setAccept] = useState(false),
-    [discard, setDiscard] = useState(false)
+  const dialog = useRef<HTMLDialogElement>(null)
+  const cancel = useRef<HTMLButtonElement>(null)
+  const [accept, setAccept] = useState(false)
+  const [discard, setDiscard] = useState(false)
   useEffect(() => {
     const opener = document.activeElement
     const node = dialog.current

@@ -121,8 +121,8 @@ export function collectionPublicationChanges(entries: readonly CollectionEntryWo
     else {
       if (entry.publishedArchived) changes.push('Restore to the live list')
       for (const field of model.fields) {
-        const before = entry.publishedValues[field.key],
-          after = entry.values[field.key]
+        const before = entry.publishedValues[field.key]
+        const after = entry.values[field.key]
         if (collectionDraftEqual(before, after)) continue
         if (['text', 'date', 'url', 'select', 'number', 'boolean'].includes(field.type)) {
           const text = (value: unknown) => {

@@ -1,7 +1,7 @@
 /** Content archives can be 64 MB. Keep browser recovery out of synchronous
  * localStorage and acknowledge only a completed IndexedDB transaction. */
-const DATABASE = 'cms-site-import-recovery',
-  STORE = 'setups'
+const DATABASE = 'cms-site-import-recovery'
+const STORE = 'setups'
 export type ImportRecovery = {
   version: 1
   source: string
@@ -43,8 +43,8 @@ async function transact(
   const db = await open()
   try {
     return await new Promise((resolve, reject) => {
-      const tx = db.transaction(STORE, mode),
-        request = operation(tx.objectStore(STORE))
+      const tx = db.transaction(STORE, mode)
+      const request = operation(tx.objectStore(STORE))
       let result: unknown
       request.onsuccess = () => {
         result = request.result

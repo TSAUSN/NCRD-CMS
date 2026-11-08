@@ -74,8 +74,8 @@ const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b)
 const object = (v: unknown): Record<string, unknown> =>
   v && typeof v === 'object' && !Array.isArray(v) ? (v as Record<string, unknown>) : {}
 function pictureChange(before: unknown, after: unknown) {
-  const a = object(before),
-    b = object(after)
+  const a = object(before)
+  const b = object(after)
   if (a.src === b.src && a.media_id === b.media_id && a.mediaId === b.mediaId) {
     if (a.alt === b.alt && !same(a.focal ?? a.focus, b.focal ?? b.focus)) return 'changed the focus point'
     if (a.alt !== b.alt) return 'changed the photo description'
@@ -84,9 +84,9 @@ function pictureChange(before: unknown, after: unknown) {
 }
 function oneParagraphChanged(a: unknown, b: unknown) {
   if (typeof a !== 'string' || typeof b !== 'string') return false
-  const pattern = /<p\b[^>]*>[\s\S]*?<\/p>/gi,
-    was = a.match(pattern) ?? [],
-    now = b.match(pattern) ?? []
+  const pattern = /<p\b[^>]*>[\s\S]*?<\/p>/gi
+  const was = a.match(pattern) ?? []
+  const now = b.match(pattern) ?? []
   return (
     was.length === now.length &&
     was.filter((paragraph, index) => paragraph !== now[index]).length === 1 &&
@@ -126,10 +126,10 @@ export function pageContentChanges(
   after: ReviewSection[],
   forms: Record<string, ReviewForm>,
 ): { summary: string[]; cells: ChangeCell[] } {
-  const used = new Set<number>(),
-    cells: ChangeCell[] = [],
-    summary: string[] = [],
-    order: number[] = []
+  const used = new Set<number>()
+  const cells: ChangeCell[] = []
+  const summary: string[] = []
+  const order: number[] = []
   const nameOf = (section: ReviewSection) =>
     section.label || forms[`${section.section_def_id}:${section.section_def_version ?? 1}`]?.name || 'Section'
   for (const section of after) {
@@ -140,9 +140,9 @@ export function pageContentChanges(
       )
     if (previous < 0)
       previous = before.findIndex((old, at) => !used.has(at) && old.section_def_id === section.section_def_id)
-    const form = forms[`${section.section_def_id}:${section.section_def_version ?? 1}`],
-      name = nameOf(section),
-      say = (words: string) => summary.push(name + ': ' + words)
+    const form = forms[`${section.section_def_id}:${section.section_def_version ?? 1}`]
+    const name = nameOf(section)
+    const say = (words: string) => summary.push(name + ': ' + words)
     if (previous < 0) {
       say('added this section')
       cells.push({ label: name, before: 'Not on this page', after: 'Added to this page' })
@@ -150,8 +150,8 @@ export function pageContentChanges(
     }
     used.add(previous)
     order.push(previous)
-    const old = before[previous]!,
-      known = new Set<string>()
+    const old = before[previous]!
+    const known = new Set<string>()
     if (old.values.__cms_anchor !== section.values.__cms_anchor) {
       const next = String(section.values.__cms_anchor ?? '')
       say(
@@ -169,10 +169,10 @@ export function pageContentChanges(
       known.add(slot.id)
       const repeat = repeatItemSpec(slot)
       if (repeat) {
-        const was = repeatItemKeys(old.values[slot.id]),
-          now = repeatItemKeys(section.values[slot.id]),
-          unit = repeat.unit.toLowerCase(),
-          titleField = repeat.fields.find(field => field.kind === 'text' && /title|heading|name/i.test(field.id))
+        const was = repeatItemKeys(old.values[slot.id])
+        const now = repeatItemKeys(section.values[slot.id])
+        const unit = repeat.unit.toLowerCase()
+        const titleField = repeat.fields.find(field => field.kind === 'text' && /title|heading|name/i.test(field.id))
         const title = (values: Record<string, unknown>, key: string) =>
           titleField ? readableReleaseValue(values[repeatItemSlotId(slot.id, key, titleField.id)]) : ''
         const itemName = (values: Record<string, unknown>, key: string) => {
@@ -216,9 +216,9 @@ export function pageContentChanges(
         for (const key of common) {
           let edited = false
           for (const field of repeat.fields) {
-            const id = repeatItemSlotId(slot.id, key, field.id),
-              a = old.values[id],
-              b = section.values[id]
+            const id = repeatItemSlotId(slot.id, key, field.id)
+            const a = old.values[id]
+            const b = section.values[id]
             if (same(a, b)) continue
             const label = unit === 'slide' ? 'slide ' + (now.indexOf(key) + 1) : itemName(section.values, key)
             if (field.kind === 'image') say(pictureChange(a, b) + ' on ' + label)
@@ -233,8 +233,8 @@ export function pageContentChanges(
         }
         continue
       }
-      const a = old.values[slot.id],
-        b = section.values[slot.id]
+      const a = old.values[slot.id]
+      const b = section.values[slot.id]
       if (same(a, b)) continue
       if (slot.kind === 'repeat') {
         say('changed which stories or items show')
@@ -306,12 +306,12 @@ export function pageChangePresentation(
   oldDetails: Record<string, unknown> | null,
   details: Record<string, unknown>,
 ): ReleasePresentation {
-  const diff = pageContentChanges(before ?? [], after, forms),
-    metadata = changedCells(oldDetails ?? {}, details, {
-      title: 'Page name',
-      address: 'Address',
-      description: 'Search description',
-    })
+  const diff = pageContentChanges(before ?? [], after, forms)
+  const metadata = changedCells(oldDetails ?? {}, details, {
+    title: 'Page name',
+    address: 'Address',
+    description: 'Search description',
+  })
   const words = [
     ...(!before ? ['New page'] : []),
     ...diff.summary,
@@ -336,8 +336,8 @@ export function storyEntryPresentation(
   fields: readonly { key: string; label: string; type: string }[],
   names: { main: Record<string, string>; secondary: Record<string, string> },
 ): ReleasePresentation {
-  const title = String(after.title ?? 'Story'),
-    cells: ChangeCell[] = []
+  const title = String(after.title ?? 'Story')
+  const cells: ChangeCell[] = []
   const tags = (value: unknown, choices: Record<string, string>) =>
     typeof value === 'string'
       ? value
@@ -347,13 +347,13 @@ export function storyEntryPresentation(
           .join(', ')
       : ''
   for (const field of fields) {
-    const a = before?.[field.key] ?? (field.type === 'boolean' ? false : ''),
-      b = after[field.key] ?? (field.type === 'boolean' ? false : '')
+    const a = before?.[field.key] ?? (field.type === 'boolean' ? false : '')
+    const b = after[field.key] ?? (field.type === 'boolean' ? false : '')
     if (field.key === 'newsroom_rank' && storyFeatureRank(before ?? {}) === storyFeatureRank(after)) continue
     if (JSON.stringify(a) === JSON.stringify(b)) continue
-    let label = field.label,
-      oldValue: unknown = a,
-      newValue: unknown = b
+    let label = field.label
+    let oldValue: unknown = a
+    let newValue: unknown = b
     if (field.key === 'newsroom_rank') {
       label = 'Newsroom order'
       oldValue = storyFeatureRank(before ?? {}) ? 'Featured position ' + storyFeatureRank(before ?? {}) : 'Not featured'
@@ -368,8 +368,8 @@ export function storyEntryPresentation(
     if (field.key === 'region_label')
       label = fields.find(f => f.key === 'regions' || f.key === 'region')?.label ?? 'Secondary tags'
     if (field.type === 'image') {
-      const oldPhoto = a && typeof a === 'object' ? (a as Record<string, unknown>) : null,
-        next = b && typeof b === 'object' ? (b as Record<string, unknown>) : null
+      const oldPhoto = a && typeof a === 'object' ? (a as Record<string, unknown>) : null
+      const next = b && typeof b === 'object' ? (b as Record<string, unknown>) : null
       if (oldPhoto && next && oldPhoto.src === next.src && oldPhoto.alt === next.alt) {
         label = 'Photo focus'
         oldValue = 'Earlier focus point'
@@ -381,15 +381,15 @@ export function storyEntryPresentation(
     }
     cells.push({ label, before: readableReleaseValue(oldValue), after: readableReleaseValue(newValue) })
   }
-  const changed = [...new Set(cells.map(c => c.label))],
-    words =
-      changed
-        .slice(0, 4)
-        .map(name => name + ' changed')
-        .join(', ') + (changed.length > 4 ? `, and ${changed.length - 4} more changes` : '')
-  const rank = storyFeatureRank(after),
-    oldRank = storyFeatureRank(before ?? {}),
-    onlyOrder = before && changed.length === 1 && changed[0] === 'Newsroom order'
+  const changed = [...new Set(cells.map(c => c.label))]
+  const words =
+    changed
+      .slice(0, 4)
+      .map(name => name + ' changed')
+      .join(', ') + (changed.length > 4 ? `, and ${changed.length - 4} more changes` : '')
+  const rank = storyFeatureRank(after)
+  const oldRank = storyFeatureRank(before ?? {})
+  const onlyOrder = before && changed.length === 1 && changed[0] === 'Newsroom order'
   return {
     summary: onlyOrder
       ? `${title}: ${!rank ? 'removed from featured stories' : !oldRank ? 'featured in the Newsroom' : 'moved to position ' + rank + ' in the Newsroom'}`

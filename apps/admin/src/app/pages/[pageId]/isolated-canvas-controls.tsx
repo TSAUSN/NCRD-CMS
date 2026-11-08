@@ -15,10 +15,10 @@ export type IsolatedCanvasPeer = {
 }
 
 function Controls({ surface, state, peer }: { surface: HTMLElement; state: CanvasControls; peer: IsolatedCanvasPeer }) {
-  const viewport = useRef<HTMLElement>(surface),
-    frame = useRef<HTMLIFrameElement>(null),
-    toolbar = useRef<HTMLDivElement>(null),
-    zoom = useRef<HTMLDivElement>(null)
+  const viewport = useRef<HTMLElement>(surface)
+  const frame = useRef<HTMLIFrameElement>(null)
+  const toolbar = useRef<HTMLDivElement>(null)
+  const zoom = useRef<HTMLDivElement>(null)
   const local = useMemo(() => ({ document, element: surface }), [surface])
   const slotsFor = useMemo(
     () => (section: CanvasControls['sections'][number]) => state.fields[state.sections.indexOf(section)] ?? [],
@@ -58,11 +58,11 @@ function Controls({ surface, state, peer }: { surface: HTMLElement; state: Canva
 /** Actual shared controls run against the child document. The parent receives
  * only closed intents, and keeps all write commands, history and permissions. */
 export function installCanvasControls(peer: IsolatedCanvasPeer): void {
-  let state: CanvasControls | null = null,
-    menu: CanvasMenuAddState | null = null,
-    root: Root | null = null,
-    surface: HTMLElement | null = null,
-    layer: HTMLElement | null = null
+  let state: CanvasControls | null = null
+  let menu: CanvasMenuAddState | null = null
+  let root: Root | null = null
+  let surface: HTMLElement | null = null
+  let layer: HTMLElement | null = null
   const size = () => {
     if (!surface) return
     const scale = state?.scale ?? menu?.scale ?? 1
@@ -141,12 +141,12 @@ export function installCanvasControls(peer: IsolatedCanvasPeer): void {
       state?.listItem &&
       ['edit', 'hide', 'up', 'down'].includes(event.data.action)
     ) {
-      const item = state.listItem,
-        keys = [
-          ...document.querySelectorAll<HTMLElement>('[data-cms-section="' + state.selected + '"] [data-cms-entry]'),
-        ]
-          .filter(node => node.dataset.cmsReader === item.readerKey && node.dataset.cmsListField === item.field)
-          .map(node => node.dataset.cmsEntry!)
+      const item = state.listItem
+      const keys = [
+        ...document.querySelectorAll<HTMLElement>('[data-cms-section="' + state.selected + '"] [data-cms-entry]'),
+      ]
+        .filter(node => node.dataset.cmsReader === item.readerKey && node.dataset.cmsListField === item.field)
+        .map(node => node.dataset.cmsEntry!)
       peer.post('cms:list-action', { action: event.data.action, keys: [...new Set(keys)] })
       return
     }

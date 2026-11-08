@@ -19,13 +19,13 @@ export function appendCopiedHeroSlide(
   if (!repeatItemKeys(source[sourceSlot.id]).includes(key)) return null
   const added = addRepeatItem(target, targetSlot)
   if (!added.key) return null
-  const names = new Set(fields.map(field => repeatItemSlotId(targetSlot.id, added.key!, field.id))),
-    marked = sampleFieldNames(added.values).filter(name => !names.has(name)),
-    sourceSamples = new Set(sampleFieldNames(source)),
-    next = { ...added.values }
+  const names = new Set(fields.map(field => repeatItemSlotId(targetSlot.id, added.key!, field.id)))
+  const marked = sampleFieldNames(added.values).filter(name => !names.has(name))
+  const sourceSamples = new Set(sampleFieldNames(source))
+  const next = { ...added.values }
   for (const field of fields) {
-    const from = repeatItemSlotId(sourceSlot.id, key, field.id),
-      to = repeatItemSlotId(targetSlot.id, added.key, field.id)
+    const from = repeatItemSlotId(sourceSlot.id, key, field.id)
+    const to = repeatItemSlotId(targetSlot.id, added.key, field.id)
     delete next[to]
     if (Object.hasOwn(source, from)) {
       next[to] = structuredClone(source[from])

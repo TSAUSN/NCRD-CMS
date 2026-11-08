@@ -62,8 +62,8 @@ export function toggleCollectionEntry(keys: readonly string[], key: string, sele
   return keys.includes(key) || keys.length >= 200 ? [...keys] : [...keys, key]
 }
 export function moveCollectionEntry(keys: readonly string[], index: number, offset: -1 | 1): string[] {
-  const next = [...keys],
-    destination = index + offset
+  const next = [...keys]
+  const destination = index + offset
   if (index < 0 || index >= next.length || destination < 0 || destination >= next.length) return next
   ;[next[index], next[destination]] = [next[destination]!, next[index]!]
   return next
@@ -124,14 +124,14 @@ export function selectListRows<T extends { id: string; stableKey: string; values
     )
   if (selection.excludeStableKey) chosen = chosen.filter(row => row.stableKey !== selection.excludeStableKey)
   if (selection.dateField) {
-    const field = selection.dateField,
-      date = (row: T) => {
-        const v = row.values && typeof row.values === 'object' ? (row.values as Record<string, unknown>)[field] : null
-        return typeof v === 'string' ? v : ''
-      }
+    const field = selection.dateField
+    const date = (row: T) => {
+      const v = row.values && typeof row.values === 'object' ? (row.values as Record<string, unknown>)[field] : null
+      return typeof v === 'string' ? v : ''
+    }
     if (selection.maxAgeMonths) {
-      const cutoff = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - selection.maxAgeMonths, 1)),
-        last = new Date(Date.UTC(cutoff.getUTCFullYear(), cutoff.getUTCMonth() + 1, 0)).getUTCDate()
+      const cutoff = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - selection.maxAgeMonths, 1))
+      const last = new Date(Date.UTC(cutoff.getUTCFullYear(), cutoff.getUTCMonth() + 1, 0)).getUTCDate()
       cutoff.setUTCDate(Math.min(now.getUTCDate(), last))
       const key = cutoff.toISOString().slice(0, 10)
       chosen = chosen.filter(row => date(row) >= key)

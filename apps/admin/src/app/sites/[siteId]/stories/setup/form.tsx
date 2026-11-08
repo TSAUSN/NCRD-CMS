@@ -8,14 +8,14 @@ import workspaceFormsStyles from '../../../../../components/workspace-styles/wor
 import recordTableStyles from '../../../../../components/workspace-styles/record-table.module.css'
 import selectionControlsStyles from '../../../../../components/workspace-styles/selection-controls.module.css'
 export function StoriesSetup({ siteId }: { siteId: string }) {
-  const router = useRouter(),
-    [mainLabel, setMain] = useState('Main tags'),
-    [secondaryLabel, setSecondary] = useState('Secondary tags'),
-    [publishUnreviewed, setReview] = useState(true),
-    [pending, start] = useTransition(),
-    [error, setError] = useState(''),
-    busy = useRef(false),
-    done = useRef(false)
+  const router = useRouter()
+  const [mainLabel, setMain] = useState('Main tags')
+  const [secondaryLabel, setSecondary] = useState('Secondary tags')
+  const [publishUnreviewed, setReview] = useState(true)
+  const [pending, start] = useTransition()
+  const [error, setError] = useState('')
+  const busy = useRef(false)
+  const done = useRef(false)
   const dirty =
     !done.current && (mainLabel !== 'Main tags' || secondaryLabel !== 'Secondary tags' || !publishUnreviewed)
   useNavigationGuard(() => ({

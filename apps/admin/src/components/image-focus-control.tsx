@@ -18,14 +18,14 @@ export function ImageFocusControl({
   onChange: (value: ImageFocus | null) => void
   disabled?: boolean
 }) {
-  const id = useId(),
-    drag = useRef<{ pointer: number; point: ImageFocus } | null>(null)
-  const [draft, setDraft] = useState<ImageFocus | null>(null),
-    [failed, setFailed] = useState<string | null>(null),
-    [loaded, setLoaded] = useState<string | null>(null)
-  const stored = imageFocus(value),
-    point = draft ?? stored ?? { x: 0.5, y: 0.5 },
-    available = Boolean(src && src !== failed)
+  const id = useId()
+  const drag = useRef<{ pointer: number; point: ImageFocus } | null>(null)
+  const [draft, setDraft] = useState<ImageFocus | null>(null)
+  const [failed, setFailed] = useState<string | null>(null)
+  const [loaded, setLoaded] = useState<string | null>(null)
+  const stored = imageFocus(value)
+  const point = draft ?? stored ?? { x: 0.5, y: 0.5 }
+  const available = Boolean(src && src !== failed)
   const position = imageFocusPosition(point)!
   function place(event: React.PointerEvent<HTMLButtonElement>) {
     const box = event.currentTarget.querySelector('img')?.getBoundingClientRect()

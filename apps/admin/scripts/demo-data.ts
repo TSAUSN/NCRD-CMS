@@ -79,8 +79,8 @@ export async function importSite(
   adminId: string,
   site: (typeof DEMO_SITES)[number],
 ): Promise<{ id: string; created: boolean }> {
-  const bytes = readFileSync(join(ARCHIVES, site.file)),
-    reviewed = reviewedDemoArchive(site, bytes)
+  const bytes = readFileSync(join(ARCHIVES, site.file))
+  const reviewed = reviewedDemoArchive(site, bytes)
   const existing = await asUser(
     { userId: adminId },
     async client =>
@@ -99,8 +99,8 @@ export async function importSite(
   if (site.slug === 'sawso') {
     if (archive.format !== 'cms-demo-media-v1' || !Array.isArray(archive.photos) || archive.photos.length !== 40)
       throw new Error('The reviewed SAWSO photo pack is incomplete.')
-    const media = configuredMediaStore(),
-      repository = createPostgresMediaProcessingRepository(poolFor('worker'), 'demo-sawso-media')
+    const media = configuredMediaStore()
+    const repository = createPostgresMediaProcessingRepository(poolFor('worker'), 'demo-sawso-media')
     return ensureSawsoDemo(adminId, archive.photos as DemoPhoto[], media, id =>
       processMediaUpload(id, { media, repository }),
     )

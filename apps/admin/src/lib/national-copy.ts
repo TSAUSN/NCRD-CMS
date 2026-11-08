@@ -52,8 +52,8 @@ function sampleLayoutValues(slots: SlotDef[], source: Record<string, unknown>) {
 
 /** Copy choices transform content before the existing guarded import command. */
 function nationalCopyContent(input: SiteArchive, bringWords: boolean, bringStories: boolean): SiteArchive {
-  const archive = structuredClone(input),
-    c = archive.content
+  const archive = structuredClone(input)
+  const c = archive.content
   // A new site starts from active pages. Backups still retain archived pages.
   c.pages = c.pages.filter(page => page.archived_at === null && page.status !== 'archived')
   const activePages = new Set(c.pages.map(page => page.id))
@@ -81,8 +81,8 @@ function nationalCopyContent(input: SiteArchive, bringWords: boolean, bringStori
   function prune(value: unknown): unknown {
     if (Array.isArray(value)) return value.map(prune).filter(value => value !== undefined)
     if (!value || typeof value !== 'object') return value
-    const obj = value as Record<string, unknown>,
-      target = obj.target as { type?: unknown; page_id?: unknown } | undefined
+    const obj = value as Record<string, unknown>
+    const target = obj.target as { type?: unknown; page_id?: unknown } | undefined
     if (target?.type === 'page' && typeof target.page_id === 'string' && removed.has(target.page_id)) return undefined
     return Object.fromEntries(
       Object.entries(obj)
@@ -276,13 +276,13 @@ export async function startNationalSite(
     }>('SELECT app.export_site_content($1) AS archive', [input.sourceSiteId])
   ).rows[0]!.archive
   const source: SiteArchive = {
-      format: SITE_ARCHIVE_FORMAT,
-      version: SITE_ARCHIVE_VERSION,
-      exported_at: new Date().toISOString(),
-      content: exported.content,
-      objects: [],
-    },
-    copy = nationalCopyContent(source, input.bringWords, input.bringStories)
+    format: SITE_ARCHIVE_FORMAT,
+    version: SITE_ARCHIVE_VERSION,
+    exported_at: new Date().toISOString(),
+    content: exported.content,
+    objects: [],
+  }
+  const copy = nationalCopyContent(source, input.bringWords, input.bringStories)
   const objectIds = new Set([
     ...copy.content.media.map(row => row.id),
     ...(copy.content.site_assets?.map(row => row.id) ?? []),
@@ -310,8 +310,8 @@ export async function startNationalSite(
       base64: Buffer.from(data).toString('base64'),
     })
   }
-  const portable = structuredClone(copy),
-    globalIds = new Set(source.content.section_defs.filter(def => def.scope === 'global').map(def => def.id))
+  const portable = structuredClone(copy)
+  const globalIds = new Set(source.content.section_defs.filter(def => def.scope === 'global').map(def => def.id))
   // The portable importer isolates definitions and cannot apply global-library
   // layout controls to those temporary copies. Restore them after repinning,
   // within this same private transaction; the source and public pages stay intact.
@@ -338,8 +338,8 @@ export async function startNationalSite(
     )
   ).rows
   for (const page of pages) {
-    const sourcePage = copy.content.pages.find(sourcePage => importedId(requestId, sourcePage.id) === page.id),
-      sourceVersion = copy.content.page_versions.find(version => version.id === sourcePage?.draft_version_id)
+    const sourcePage = copy.content.pages.find(sourcePage => importedId(requestId, sourcePage.id) === page.id)
+    const sourceVersion = copy.content.page_versions.find(version => version.id === sourcePage?.draft_version_id)
     const content = page.content.map((section: { section_def_id: string }, index: number) =>
       globals.has(section.section_def_id)
         ? {

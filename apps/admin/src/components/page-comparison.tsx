@@ -15,10 +15,10 @@ export function PageComparison({
   width: number
   viewportHeight?: number
 }) {
-  const ref = useRef<HTMLDivElement>(null),
-    frameRef = useRef<HTMLIFrameElement>(null)
-  const [box, setBox] = useState(0),
-    [naturalHeight, setNaturalHeight] = useState(0)
+  const ref = useRef<HTMLDivElement>(null)
+  const frameRef = useRef<HTMLIFrameElement>(null)
+  const [box, setBox] = useState(0)
+  const [naturalHeight, setNaturalHeight] = useState(0)
   function measure() {
     const document = frameRef.current?.contentDocument
     if (!document?.body) return

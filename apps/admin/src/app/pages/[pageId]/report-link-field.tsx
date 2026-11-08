@@ -32,10 +32,10 @@ export function ReportLinkField({
   onChange: (value: unknown) => void
   onEditStart?: () => () => void
 }) {
-  const [picking, setPicking] = useState(false),
-    label = kind === 'pdf' ? 'View PDF' : 'View page',
-    current = value && typeof value === 'object' && !Array.isArray(value) ? (value as Record<string, unknown>) : {},
-    fixed = { ...current, label }
+  const [picking, setPicking] = useState(false)
+  const label = kind === 'pdf' ? 'View PDF' : 'View page'
+  const current = value && typeof value === 'object' && !Array.isArray(value) ? (value as Record<string, unknown>) : {}
+  const fixed = { ...current, label }
   const change = (next: unknown) =>
     onChange({ ...(next && typeof next === 'object' && !Array.isArray(next) ? next : {}), label })
   return (

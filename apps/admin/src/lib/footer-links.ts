@@ -25,8 +25,8 @@ export function readFooterLinks(value: unknown): FooterLink[] | null {
       node.children.some(child => child.kind !== 'text')
     )
       return null
-    const url = decodeSourceText(node.attributes[0].value),
-      label = decodeSourceText(node.children.map(child => (child.kind === 'text' ? child.text : '')).join(''))
+    const url = decodeSourceText(node.attributes[0].value)
+    const label = decodeSourceText(node.children.map(child => (child.kind === 'text' ? child.text : '')).join(''))
     if (!label.trim() || label.length > 120 || !NavUrl.safeParse(url).success) return null
     result.push({ label, url })
     if (result.length > 50) return null

@@ -19,14 +19,14 @@ export function RecordBoard({
     if (!node) return
     let frame = 0
     const measure = () =>
-        node.style.setProperty(
-          '--record-board-available',
-          Math.max(160, window.innerHeight - Math.max(0, node.getBoundingClientRect().top) - 16) + 'px',
-        ),
-      update = () => {
-        cancelAnimationFrame(frame)
-        frame = requestAnimationFrame(measure)
-      }
+      node.style.setProperty(
+        '--record-board-available',
+        Math.max(160, window.innerHeight - Math.max(0, node.getBoundingClientRect().top) - 16) + 'px',
+      )
+    const update = () => {
+      cancelAnimationFrame(frame)
+      frame = requestAnimationFrame(measure)
+    }
     measure()
     const observer = new ResizeObserver(update)
     if (node.parentElement) observer.observe(node.parentElement)

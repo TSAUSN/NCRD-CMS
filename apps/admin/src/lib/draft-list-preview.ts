@@ -64,10 +64,10 @@ export async function withDraftListPreview(
         )
       ).rows
       const widget =
-          list.reader_key === 'stories' &&
-          ((section.def.slug === 'core-story-world' && slot.constraints?.['storyWidget'] === 'world') ||
-            (section.def.slug === 'core-story-split' && slot.constraints?.['storyWidget'] === 'split')),
-        selection = storyWidgetSelection(binding.selection, widget)
+        list.reader_key === 'stories' &&
+        ((section.def.slug === 'core-story-world' && slot.constraints?.['storyWidget'] === 'world') ||
+          (section.def.slug === 'core-story-split' && slot.constraints?.['storyWidget'] === 'split'))
+      const selection = storyWidgetSelection(binding.selection, widget)
       const policy =
         list.reader_key === 'stories'
           ? (StoriesSettings.safeParse((list.settings as { stories?: unknown })?.stories).data ??

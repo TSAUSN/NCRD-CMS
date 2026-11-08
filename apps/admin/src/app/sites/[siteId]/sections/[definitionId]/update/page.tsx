@@ -12,9 +12,9 @@ export const dynamic = 'force-dynamic'
 export default async function UpdatePages({ params }: { params: Promise<{ siteId: string; definitionId: string }> }) {
   const session = await currentSession()
   if (!session) notFound()
-  const { siteId, definitionId } = await params,
-    userId = session.principal.userId,
-    site = await getSite(userId, siteId)
+  const { siteId, definitionId } = await params
+  const userId = session.principal.userId
+  const site = await getSite(userId, siteId)
   if (!site || site.status === 'archived') notFound()
   const [source, rights, role] = await Promise.all([
     getDefinitionSource(userId, siteId, definitionId),

@@ -34,28 +34,28 @@ export function ChapterForm({
   onClose: () => void
   onSaved: (row: ChapterRow, message: string) => void
 }) {
-  const router = useRouter(),
-    [config, setConfig] = useState<ChapterSetup>(
-      row?.config ?? {
-        ...ChapterSetup.parse({
-          name: '[Chapter name]',
-          destination: 'page',
-          pageId: null,
-          externalUrl: null,
-          contact: { name: '[Name]', role: '[Role]', email: 'chapter@example.test' },
-          sections: {},
-        }),
-        name: '',
-        updateMode: defaultMode,
-      },
-    ),
-    [divisionId, setDivisionId] = useState(
-      row ? (row.divisionId ?? '') : divisions.length === 1 ? divisions[0]!.id : '',
-    ),
-    [step, setStep] = useState(0),
-    [pending, start] = useTransition(),
-    [error, setError] = useState(''),
-    errorRef = useRef<HTMLParagraphElement>(null)
+  const router = useRouter()
+  const [config, setConfig] = useState<ChapterSetup>(
+    row?.config ?? {
+      ...ChapterSetup.parse({
+        name: '[Chapter name]',
+        destination: 'page',
+        pageId: null,
+        externalUrl: null,
+        contact: { name: '[Name]', role: '[Role]', email: 'chapter@example.test' },
+        sections: {},
+      }),
+      name: '',
+      updateMode: defaultMode,
+    },
+  )
+  const [divisionId, setDivisionId] = useState(
+    row ? (row.divisionId ?? '') : divisions.length === 1 ? divisions[0]!.id : '',
+  )
+  const [step, setStep] = useState(0)
+  const [pending, start] = useTransition()
+  const [error, setError] = useState('')
+  const errorRef = useRef<HTMLParagraphElement>(null)
   useEffect(() => {
     if (error && !pending) errorRef.current?.focus()
   }, [error, pending])
@@ -64,9 +64,9 @@ export function ChapterForm({
     setConfig(previous => ({ ...previous, [key]: value }))
   }
   const divisionPage = config.destination === 'division'
-  const initial = useRef(JSON.stringify({ config, divisionId })),
-    signature = JSON.stringify({ config, divisionId }),
-    dirty = signature !== initial.current
+  const initial = useRef(JSON.stringify({ config, divisionId }))
+  const signature = JSON.stringify({ config, divisionId })
+  const dirty = signature !== initial.current
   const persist = async (): Promise<{ ok: boolean; message?: string }> => {
     setError('')
     if (!row && !canAssignDivision && !divisionId) {
@@ -79,15 +79,15 @@ export function ChapterForm({
       externalUrl: chapterUsesLinkedPage(config.destination) ? config.externalUrl : null,
     })
     if (!parsed.success) {
-      const field = parsed.error.issues[0]?.path.join('.'),
-        message =
-          field === 'externalUrl'
-            ? 'Use the full https address for the ' + (divisionPage ? 'division page.' : 'chapter website.')
-            : field === 'name'
-              ? 'Add a chapter name.'
-              : field === 'contact.email'
-                ? 'Enter a valid contact email address.'
-                : 'Add the required contact name, role and email. Your entries are still here.'
+      const field = parsed.error.issues[0]?.path.join('.')
+      const message =
+        field === 'externalUrl'
+          ? 'Use the full https address for the ' + (divisionPage ? 'division page.' : 'chapter website.')
+          : field === 'name'
+            ? 'Add a chapter name.'
+            : field === 'contact.email'
+              ? 'Enter a valid contact email address.'
+              : 'Add the required contact name, role and email. Your entries are still here.'
       setError(message)
       return { ok: false, message }
     }
@@ -123,22 +123,22 @@ export function ChapterForm({
     }
   }
   const save = () =>
-      start(async () => {
-        await persist()
-      }),
-    readGuard = () => ({
-      dirty,
-      pending,
-      draft: {
-        label: config.name || 'New chapter',
-        saved: false,
-        saveDraft: () =>
-          new Promise<{ ok: boolean; message?: string }>(resolve => start(async () => resolve(await persist()))),
-        discard: () => {
-          initial.current = signature
-        },
-      },
+    start(async () => {
+      await persist()
     })
+  const readGuard = () => ({
+    dirty,
+    pending,
+    draft: {
+      label: config.name || 'New chapter',
+      saved: false,
+      saveDraft: () =>
+        new Promise<{ ok: boolean; message?: string }>(resolve => start(async () => resolve(await persist()))),
+      discard: () => {
+        initial.current = signature
+      },
+    },
+  })
   useNavigationGuard(readGuard)
   useEffect(() => {
     if (!dirty) return

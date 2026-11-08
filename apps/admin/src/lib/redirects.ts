@@ -23,8 +23,8 @@ export function getRedirectWorkspace(userId: string, siteId: string) {
 }
 /** Install only missing mappings backed by the maintainer’s CSV; edited mappings stay. */
 export async function ensureChapterRedirects(client: Queryable, siteId: string) {
-  const data = await redirectWorkspace(client, siteId),
-    finder = data.pages.find(page => page.path === '/chapters')
+  const data = await redirectWorkspace(client, siteId)
+  const finder = data.pages.find(page => page.path === '/chapters')
   const mappings = ECHELON_CHAPTER_SOURCES.map(source => ({
     oldPath: '/chapter/' + source.sourcePath.trim().toLowerCase(),
     page: data.pages.find(page => page.path === '/chapters/' + source.slug),
@@ -51,8 +51,8 @@ export async function ensureSawsoRedirects(client: Queryable, siteId: string): P
   const data = await redirectWorkspace(client, siteId)
   let created = 0
   for (const story of sawsoStoryRows()) {
-    const oldPath = new URL(story.values.old_address).pathname,
-      page = data.pages.find(page => page.path === story.values.story_url)
+    const oldPath = new URL(story.values.old_address).pathname
+    const page = data.pages.find(page => page.path === story.values.story_url)
     if (!page)
       throw new DomainError('invalid_state', 'Create the native story destinations before adding their old addresses.')
     if (data.rows.some(row => row.oldPath === oldPath)) continue

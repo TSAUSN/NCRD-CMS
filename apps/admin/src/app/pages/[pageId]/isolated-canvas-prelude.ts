@@ -67,8 +67,8 @@ if (token && /^[a-f0-9]{64}$/.test(token)) {
   }
   const setAttribute = Element.prototype.setAttribute
   Element.prototype.setAttribute = function (name: string, value: string) {
-    const key = name.toLowerCase(),
-      tag = this.tagName.toLowerCase()
+    const key = name.toLowerCase()
+    const tag = this.tagName.toLowerCase()
     const network =
       (key === 'src' && ['img', 'source', 'script', 'video', 'audio'].includes(tag)) ||
       (key === 'poster' && tag === 'video') ||
@@ -101,14 +101,14 @@ if (token && /^[a-f0-9]{64}$/.test(token)) {
   ) {
     return open.call(this, method, resource(url), async, username, password)
   }
-  const interval = window.setInterval.bind(window),
-    timeout = window.setTimeout.bind(window),
-    clear = window.clearTimeout.bind(window),
-    raf = window.requestAnimationFrame.bind(window)
-  let paused = false,
-    initializing = true,
-    siteCallback = false,
-    editingCode = false
+  const interval = window.setInterval.bind(window)
+  const timeout = window.setTimeout.bind(window)
+  const clear = window.clearTimeout.bind(window)
+  const raf = window.requestAnimationFrame.bind(window)
+  let paused = false
+  let initializing = true
+  let siteCallback = false
+  let editingCode = false
   const runSite = (callback: () => void) => {
     const previous = siteCallback
     siteCallback = true

@@ -28,14 +28,14 @@ type Props = {
 }
 /** Operator Home reports authorized saved work, with no feed refresh or hosting action. */
 export function AdminHome({ email, role, access, sites, pages, reviewCounts, operations }: Props) {
-  const active = sites.filter(site => site.status !== 'archived'),
-    archived = sites.filter(site => site.status === 'archived'),
-    recent = [...pages].sort((a, b) => Date.parse(b.edited_at) - Date.parse(a.edited_at)).slice(0, 6)
+  const active = sites.filter(site => site.status !== 'archived')
+  const archived = sites.filter(site => site.status === 'archived')
+  const recent = [...pages].sort((a, b) => Date.parse(b.edited_at) - Date.parse(a.edited_at)).slice(0, 6)
   const attention = active.flatMap(site => {
-    const base = '/sites/' + site.id,
-      reviews = reviewCounts[site.id] ?? 0,
-      samples = pages.filter(page => page.site_id === site.id && page.live_samples),
-      changed = Number(site.changed_count)
+    const base = '/sites/' + site.id
+    const reviews = reviewCounts[site.id] ?? 0
+    const samples = pages.filter(page => page.site_id === site.id && page.live_samples)
+    const changed = Number(site.changed_count)
     return [
       ...(reviews
         ? [

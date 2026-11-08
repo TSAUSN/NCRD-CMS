@@ -13,22 +13,22 @@ async function main() {
     if (!['127.0.0.1', 'localhost'].includes(url.hostname) || !['/cms_demo', '/cms_e2e'].includes(url.pathname))
       throw new Error('Use only the local demo or isolated check database.')
   }
-  const source = process.argv[2],
-    dump = process.argv[3],
-    manifest = process.argv[4]
+  const source = process.argv[2]
+  const dump = process.argv[3]
+  const manifest = process.argv[4]
   if (!source || !dump || !manifest)
     throw new Error('Give the local assets folder,existing dump,and import record path.')
   if ((await stat(dump)).size === 0) throw new Error('Keep a database dump before importing.')
   const actor = (
-      await poolFor('migration').query('SELECT id FROM app_users WHERE email=$1', [
-        process.env['CMS_REFERENCE_ACTOR_EMAIL'] ?? 'admin@example.test',
-      ])
-    ).rows[0]?.id,
-    site = (
-      await poolFor('migration').query('SELECT id FROM sites WHERE slug=$1', [
-        process.env['CMS_REFERENCE_SITE_SLUG'] ?? 'echelon-chapters',
-      ])
-    ).rows[0]?.id
+    await poolFor('migration').query('SELECT id FROM app_users WHERE email=$1', [
+      process.env['CMS_REFERENCE_ACTOR_EMAIL'] ?? 'admin@example.test',
+    ])
+  ).rows[0]?.id
+  const site = (
+    await poolFor('migration').query('SELECT id FROM sites WHERE slug=$1', [
+      process.env['CMS_REFERENCE_SITE_SLUG'] ?? 'echelon-chapters',
+    ])
+  ).rows[0]?.id
   if (!actor || !site) throw new Error('The local account or Echelon site was not found.')
   let previous: EchelonImportedImage[] = []
   try {
@@ -44,8 +44,8 @@ async function main() {
     previous,
     onItem: async rows => {
       await mkdir(dirname(resolve(manifest)), { recursive: true })
-      const merged = new Map([...previous, ...rows].map(row => [row.key, row])),
-        saved = ECHELON_REFERENCE_MEDIA.flatMap(image => (merged.has(image.key) ? [merged.get(image.key)!] : []))
+      const merged = new Map([...previous, ...rows].map(row => [row.key, row]))
+      const saved = ECHELON_REFERENCE_MEDIA.flatMap(image => (merged.has(image.key) ? [merged.get(image.key)!] : []))
       await writeFile(manifest + '.tmp', JSON.stringify(saved, null, 2) + '\n')
       await rename(manifest + '.tmp', manifest)
       process.stdout.write('Ready ' + rows.length + '/' + ECHELON_REFERENCE_MEDIA.length + '\n')

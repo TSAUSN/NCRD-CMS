@@ -48,8 +48,8 @@ export function planSectionUpgrade(
   const next = new Map(after.map(field => [field.id, field]))
   const kept: Record<string, unknown> = {}
   const sampleMapping: Record<string, string> = {}
-  const changed: string[] = [],
-    added: string[] = []
+  const changed: string[] = []
+  const added: string[] = []
   const absorbed = new Set<string>()
   for (const field of after) {
     const prior = old.get(field.id)

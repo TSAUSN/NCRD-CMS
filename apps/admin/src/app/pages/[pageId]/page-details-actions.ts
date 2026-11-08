@@ -62,8 +62,8 @@ export async function loadPageDetails(pageId: string) {
 export async function savePageDetailsAction(input: PageDetailsInput, expectedRevision: number) {
   const session = await currentSession()
   if (!session) return { ok: false as const, kind: 'error' as const, message: 'Sign in before saving.' }
-  const title = String(input.title).trim(),
-    address = String(input.address).trim().toLowerCase()
+  const title = String(input.title).trim()
+  const address = String(input.address).trim().toLowerCase()
   if (
     !title ||
     title.length > 200 ||

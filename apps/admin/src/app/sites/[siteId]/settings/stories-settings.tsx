@@ -16,12 +16,12 @@ export type StoriesPolicy = {
   changed: boolean
 }
 export function StoriesSettings({ siteId, policy }: { siteId: string; policy: StoriesPolicy | null }) {
-  const router = useRouter(),
-    [value, setValue] = useState(policy?.publishUnreviewed ?? true),
-    [saved, setSaved] = useState(policy?.publishUnreviewed ?? true),
-    [result, setResult] = useState<{ ok: boolean; message: string } | null>(null),
-    [pending, start] = useTransition(),
-    busy = useRef(false)
+  const router = useRouter()
+  const [value, setValue] = useState(policy?.publishUnreviewed ?? true)
+  const [saved, setSaved] = useState(policy?.publishUnreviewed ?? true)
+  const [result, setResult] = useState<{ ok: boolean; message: string } | null>(null)
+  const [pending, start] = useTransition()
+  const busy = useRef(false)
   useEffect(() => {
     setValue(policy?.publishUnreviewed ?? true)
     setSaved(policy?.publishUnreviewed ?? true)

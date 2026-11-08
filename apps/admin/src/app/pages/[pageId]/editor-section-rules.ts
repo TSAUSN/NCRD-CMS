@@ -51,8 +51,8 @@ export function useCanvasSectionProtection({
         (key.key === 'Tab' || key.key === 'Escape' || key.key.startsWith('Arrow') || key.metaKey || key.ctrlKey)
       )
         return
-      const target = event.target as Element,
-        root = target.closest?.('[data-cms-section]')
+      const target = event.target as Element
+      const root = target.closest?.('[data-cms-section]')
       const index = Number(root?.getAttribute('data-cms-section'))
       if (!root || !sectionLocked(index)) return
       event.preventDefault()

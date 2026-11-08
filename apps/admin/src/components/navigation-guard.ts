@@ -47,8 +47,8 @@ export function subscribeDraftLeave(listener: (request: DraftLeaveRequest) => vo
 }
 /** Async save/discard choices resume only the originally requested navigation. */
 export function requestClientNavigation(proceed: () => void, onPrompt?: () => void): boolean {
-  const states = guards.states(),
-    decision = navigationDecision(states)
+  const states = guards.states()
+  const decision = navigationDecision(states)
   if (decision === 'allow') return true
   if (decision === 'wait') {
     window.alert('Please wait for the current action to finish before leaving this screen.')
@@ -82,8 +82,8 @@ export const navigationStateVersion = guards.version
 
 /** Nested panels can leave their own fields while keeping the page's edits. */
 export function requestLocalDraftNavigation(read: () => NavigationGuardState, proceed: () => void): boolean {
-  const state = read(),
-    decision = navigationDecision([state])
+  const state = read()
+  const decision = navigationDecision([state])
   if (decision === 'allow') return true
   if (decision === 'wait') {
     window.alert('Please wait for the current action to finish before leaving this step.')

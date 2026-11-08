@@ -103,11 +103,10 @@ export function RecipePicker({
     })
   }
 
-  const allowed = allowedDefinitionIds ? new Set(allowedDefinitionIds) : null,
-    available =
-      data?.recipes.filter(
-        recipe => !allowed || recipe.content.every(section => allowed.has(section.section_def_id)),
-      ) ?? []
+  const allowed = allowedDefinitionIds ? new Set(allowedDefinitionIds) : null
+  const available =
+    data?.recipes.filter(recipe => !allowed || recipe.content.every(section => allowed.has(section.section_def_id))) ??
+    []
   const previewSrc = previewing
     ? `/api/recipes/${previewing.id}/preview?version=${previewing.current_version_id}&site=${siteId}`
     : ''

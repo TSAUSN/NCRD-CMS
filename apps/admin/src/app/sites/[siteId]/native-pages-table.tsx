@@ -146,8 +146,8 @@ export function NativePagesTable({
             </thead>
             <tbody data-reorder-list className={reorderStyles.list}>
               {rows.map((page, index) => {
-                const locations = controls ? pageMenuLocations(controls.menu, page.id) : [],
-                  under = locations[0]?.split(' › ').slice(0, -1).join(' › ')
+                const locations = controls ? pageMenuLocations(controls.menu, page.id) : []
+                const under = locations[0]?.split(' › ').slice(0, -1).join(' › ')
                 return (
                   <tr key={page.id} {...reorder.row(page.id, !canReorder || pending, false)}>
                     <td>

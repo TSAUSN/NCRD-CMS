@@ -4,8 +4,8 @@ import { ButtonLink, Card, PageHeader } from '../../../../components/ui/index.ts
 import styles from '../../../../components/workspace.module.css'
 import workspaceFormsStyles from '../../../../components/workspace-styles/workspace-forms.module.css'
 export default function FooterUnavailable() {
-  const params = useParams<{ siteId: string }>(),
-    site = typeof params.siteId === 'string' ? '/sites/' + params.siteId : '/sites'
+  const params = useParams<{ siteId: string }>()
+  const site = typeof params.siteId === 'string' ? '/sites/' + params.siteId : '/sites'
   return (
     <main id="main" className={'wrap ' + styles.page + ' ' + workspaceFormsStyles.readableForm}>
       <PageHeader showWayfinding={false} title="Footer is unavailable" />

@@ -12,8 +12,8 @@ export const dynamic = 'force-dynamic'
 export default async function NewStoryPage({ params }: { params: Promise<{ siteId: string }> }) {
   const session = await currentSession()
   if (!session) notFound()
-  const { siteId } = await params,
-    site = await getSite(session.principal.userId, siteId)
+  const { siteId } = await params
+  const site = await getSite(session.principal.userId, siteId)
   if (!site) notFound()
   const role = session.principal.memberships.get(siteId)
   if (!session.principal.isSuperAdmin && role !== 'site_admin' && role !== 'editor' && role !== 'contributor')
@@ -23,11 +23,11 @@ export default async function NewStoryPage({ params }: { params: Promise<{ siteI
     collectionRights(session.principal.userId, siteId),
   ])
   if (!list || !rights.editEntries) notFound()
-  const id = randomUUID(),
-    candidate = { id, stableKey: 'new-' + id, createdAt: new Date().toISOString() },
-    placementContext = await asUser({ userId: session.principal.userId }, c =>
-      readStoryPlacement(c, siteId, list.id, candidate),
-    ).catch(() => null)
+  const id = randomUUID()
+  const candidate = { id, stableKey: 'new-' + id, createdAt: new Date().toISOString() }
+  const placementContext = await asUser({ userId: session.principal.userId }, c =>
+    readStoryPlacement(c, siteId, list.id, candidate),
+  ).catch(() => null)
   return (
     <StoryEditor
       key="new"

@@ -13,8 +13,8 @@ export const dynamic = 'force-dynamic'
 export default async function TagsPage({ params }: { params: Promise<{ siteId: string }> }) {
   const session = await currentSession()
   if (!session) notFound()
-  const { siteId } = await params,
-    site = await getSite(session.principal.userId, siteId)
+  const { siteId } = await params
+  const site = await getSite(session.principal.userId, siteId)
   if (!site) notFound()
   const [list, rights, role] = await Promise.all([
     getStoriesWorkspace(session.principal.userId, siteId),

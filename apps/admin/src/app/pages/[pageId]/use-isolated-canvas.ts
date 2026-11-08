@@ -59,9 +59,9 @@ export function useIsolatedCanvas(input: {
   hidden: boolean
   frame: RefObject<HTMLIFrameElement | null>
 }) {
-  const [href, setHref] = useState<string | null>(null),
-    [error, setError] = useState<string | null>(null),
-    [visitorEpoch, setVisitorEpoch] = useState(0)
+  const [href, setHref] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [visitorEpoch, setVisitorEpoch] = useState(0)
   const peer = useRef<Ticket | null>(null)
   const peerFrame = useRef<HTMLIFrameElement | null>(null)
   const visitors = useRef(new Map<Window, Ticket>())
@@ -76,8 +76,8 @@ export function useIsolatedCanvas(input: {
   useEffect(() => {
     if (!input.origin || !input.version) return
     if (!canvasDocumentReady(input.origin)) return
-    const abort = new AbortController(),
-      channel = crypto.randomUUID()
+    const abort = new AbortController()
+    const channel = crypto.randomUUID()
     peer.current = null
     peerFrame.current = null
     setHref(null)
@@ -133,8 +133,8 @@ export function useIsolatedCanvas(input: {
   )
   const accept = useCallback(
     (event: MessageEvent) => {
-      const ticket = peer.current,
-        data = event.data
+      const ticket = peer.current
+      const data = event.data
       if (
         !ticket ||
         event.source !== input.frame.current?.contentWindow ||
@@ -174,11 +174,11 @@ export function useIsolatedCanvas(input: {
     if (!enabled) return Promise.resolve(true)
     if (!peer.current?.documentId) return Promise.resolve(true)
     return new Promise(resolve => {
-      const request = crypto.randomUUID(),
-        timer = window.setTimeout(() => {
-          flushes.current.delete(request)
-          resolve(false)
-        }, 3000)
+      const request = crypto.randomUUID()
+      const timer = window.setTimeout(() => {
+        flushes.current.delete(request)
+        resolve(false)
+      }, 3000)
       flushes.current.set(request, ok => {
         window.clearTimeout(timer)
         resolve(ok)
@@ -227,10 +227,10 @@ export function useIsolatedCanvas(input: {
         pending = false
       }
     }
-    const timer = window.setInterval(() => void renew(), 240_000),
-      visible = () => {
-        void renew()
-      }
+    const timer = window.setInterval(() => void renew(), 240_000)
+    const visible = () => {
+      void renew()
+    }
     document.addEventListener('visibilitychange', visible)
     return () => {
       window.clearInterval(timer)

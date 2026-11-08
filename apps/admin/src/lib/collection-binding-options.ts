@@ -77,11 +77,11 @@ export async function readCollectionBindingOptions(
       if (!problem && (!fields.success || collectionBindingProblem(repeat, fields.data)))
         problem = 'Some published items use older fields. Save and publish them with the current list fields first.'
     }
-    const whole = CollectionModel.safeParse(collection.draft_fields),
-      draft = whole.success
-        ? whole
-        : CollectionModel.safeParse({ fields: collection.draft_fields, presentation: collection.draft_presentation }),
-      catalog = collection.reader_key === 'stories' && draft.success ? storiesCatalog(draft.data, site.slug) : null
+    const whole = CollectionModel.safeParse(collection.draft_fields)
+    const draft = whole.success
+      ? whole
+      : CollectionModel.safeParse({ fields: collection.draft_fields, presentation: collection.draft_presentation })
+    const catalog = collection.reader_key === 'stories' && draft.success ? storiesCatalog(draft.data, site.slug) : null
     return {
       ...(catalog
         ? {

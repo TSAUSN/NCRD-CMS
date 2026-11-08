@@ -10,8 +10,8 @@ export async function approveSiteFiles(
   input: unknown,
   reviewed: boolean,
 ): Promise<{ ok: true; revision: string; versionId: string } | { ok: false; message: string }> {
-  const session = await currentSession(),
-    bundle = SiteFileBundle.safeParse(input)
+  const session = await currentSession()
+  const bundle = SiteFileBundle.safeParse(input)
   if (!session?.principal.isSuperAdmin) return { ok: false, message: 'Only a Super Admin can approve site scripts.' }
   if (!reviewed || !bundle.success || !/^\d+$/.test(expectedRevision))
     return { ok: false, message: 'Review the complete file list, sources and loading choices before approving.' }

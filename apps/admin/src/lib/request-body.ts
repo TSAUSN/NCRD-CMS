@@ -1,8 +1,8 @@
 /** Consume at most the stated limit, including requests without Content-Length. */
 export async function readBoundedRequestBody(request: Request, limit: number): Promise<Uint8Array> {
   if (!request.body) return new Uint8Array()
-  const reader = request.body.getReader(),
-    chunks: Uint8Array[] = []
+  const reader = request.body.getReader()
+  const chunks: Uint8Array[] = []
   let size = 0
   try {
     for (;;) {

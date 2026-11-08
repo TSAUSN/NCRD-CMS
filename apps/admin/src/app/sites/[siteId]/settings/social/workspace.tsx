@@ -17,19 +17,19 @@ export function SocialAccountsWorkspace({
   initial: SiteSettingsWorkspace
 }) {
   const draft = useSettingsDraft(
-      siteId,
-      archived,
-      initial,
-      'social',
-      'Social accounts',
-      initial.social,
-      value => value,
-      payload => payload as SiteSocialAccount[],
-      'Use an https address for each shown account and a handle without spaces.',
-    ),
-    accounts = draft.value,
-    pending = draft.pending,
-    valid = draft.valid
+    siteId,
+    archived,
+    initial,
+    'social',
+    'Social accounts',
+    initial.social,
+    value => value,
+    payload => payload as SiteSocialAccount[],
+    'Use an https address for each shown account and a handle without spaces.',
+  )
+  const accounts = draft.value
+  const pending = draft.pending
+  const valid = draft.valid
   function change(service: SiteSocialAccount['service'], key: keyof SiteSocialAccount, value: unknown) {
     draft.change(rows => rows.map(row => (row.service === service ? { ...row, [key]: value } : row)))
   }

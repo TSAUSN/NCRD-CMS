@@ -8,8 +8,8 @@ export function localScheduleTime(
 ): { runAt: string; repeated: boolean; label: string } | null {
   const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/.exec(input)
   if (!match) return null
-  const [year, month, day, hour, minute] = match.slice(1).map(Number) as [number, number, number, number, number],
-    wall = Date.UTC(year, month - 1, day, hour, minute)
+  const [year, month, day, hour, minute] = match.slice(1).map(Number) as [number, number, number, number, number]
+  const wall = Date.UTC(year, month - 1, day, hour, minute)
   try {
     const format = new Intl.DateTimeFormat('en-CA', {
       timeZone: zone,
@@ -25,8 +25,8 @@ export function localScheduleTime(
     const parts = (time: number) => new Map(format.formatToParts(new Date(time)).map(part => [part.type, part.value]))
     const offsets = new Set(
       [-2, -1, 0, 1, 2].map(days => {
-        const time = wall + days * 86400000,
-          p = parts(time)
+        const time = wall + days * 86400000
+        const p = parts(time)
         return (
           Date.UTC(
             Number(p.get('year')),
@@ -52,16 +52,16 @@ export function localScheduleTime(
       })
       .sort((a, b) => a - b)
     if (!candidates.length) return null
-    const chosen = candidates.find(time => time > now) ?? candidates[0]!,
-      label = new Intl.DateTimeFormat('en-US', {
-        timeZone: zone,
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-        hour: 'numeric',
-        minute: '2-digit',
-        timeZoneName: 'short',
-      }).format(new Date(chosen))
+    const chosen = candidates.find(time => time > now) ?? candidates[0]!
+    const label = new Intl.DateTimeFormat('en-US', {
+      timeZone: zone,
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      timeZoneName: 'short',
+    }).format(new Date(chosen))
     return { runAt: new Date(chosen).toISOString(), repeated: candidates.length > 1, label }
   } catch {
     return null

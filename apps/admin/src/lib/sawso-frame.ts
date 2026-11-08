@@ -37,18 +37,18 @@ export async function installNationalFrames(client: Queryable) {
 }
 export async function ensureSawsoFrame(client: Queryable, siteId: string) {
   const components = await installNationalFrames(client)
-  const source = SAWSO_HOME_APPROVED.sections.Footer,
-    blocks = source.split('\n\n'),
-    mission = /^\*\*([^*]+)\*\* (.+)$/.exec(blocks[0]!)!
+  const source = SAWSO_HOME_APPROVED.sections.Footer
+  const blocks = source.split('\n\n')
+  const mission = /^\*\*([^*]+)\*\* (.+)$/.exec(blocks[0]!)!
   const targets = [
-      '/',
-      'https://give.sawso.org',
-      '/our-team',
-      '/#contact',
-      'https://www.salvationarmyusa.org',
-      'https://www.salvationarmy.org',
-    ],
-    labels = blocks[1]!.replace('Links: ', '').split(' · ')
+    '/',
+    'https://give.sawso.org',
+    '/our-team',
+    '/#contact',
+    'https://www.salvationarmyusa.org',
+    'https://www.salvationarmy.org',
+  ]
+  const labels = blocks[1]!.replace('Links: ', '').split(' · ')
   const brand = {
     logo: { src: '/cms-themes/sawso/salvation-army-shield.svg', alt: 'The Salvation Army', decorative: false },
     name: 'World Service Office',
@@ -78,13 +78,13 @@ export async function ensureSawsoFrame(client: Queryable, siteId: string) {
     },
   }
   const heads = (
-      await client.query(
-        'SELECT g.kind,g.revision,v.content FROM global_elements g JOIN global_element_versions v ON v.id=g.draft_version_id WHERE g.site_id=$1',
-        [siteId],
-      )
-    ).rows,
-    h = heads.find(r => r.kind === 'header')!,
-    f = heads.find(r => r.kind === 'footer')!
+    await client.query(
+      'SELECT g.kind,g.revision,v.content FROM global_elements g JOIN global_element_versions v ON v.id=g.draft_version_id WHERE g.site_id=$1',
+      [siteId],
+    )
+  ).rows
+  const h = heads.find(r => r.kind === 'header')!
+  const f = heads.find(r => r.kind === 'footer')!
   const nextHeader =
     h.content.schemaVersion === 1
       ? header

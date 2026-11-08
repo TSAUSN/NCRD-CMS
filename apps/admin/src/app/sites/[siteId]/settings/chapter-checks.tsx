@@ -30,33 +30,33 @@ export function ChapterChecks({
   remindersEnabled: boolean
   year: number
 }) {
-  const router = useRouter(),
-    [month, setMonth] = useState('01'),
-    [nextYear, setYear] = useState(String(year)),
-    [preview, setPreview] = useState('editors'),
-    [result, setResult] = useState<{ ok: boolean; message: string } | null>(null),
-    [resultFor, setResultFor] = useState<'settings' | 'contact' | 'review'>('settings'),
-    [pending, start] = useTransition(),
-    inFlight = useRef(false)
-  const initial = { checks: checksEnabled, reminders: remindersEnabled, revision },
-    setup = useBrowserSetup({
-      storageKey: 'cms.chapter-checks.' + actorId + '.' + siteId,
-      initial,
-      label: 'Chapter check settings',
-      pending: () => pending || inFlight.current,
-      read: value => {
-        const data = value as typeof initial
-        return data &&
-          typeof data.checks === 'boolean' &&
-          typeof data.reminders === 'boolean' &&
-          typeof data.revision === 'string' &&
-          /^\d{1,30}$/.test(data.revision)
-          ? { checks: data.checks, reminders: data.reminders, revision: data.revision }
-          : null
-      },
-    }),
-    { checks, reminders } = setup.value,
-    busy = pending || setup.loading
+  const router = useRouter()
+  const [month, setMonth] = useState('01')
+  const [nextYear, setYear] = useState(String(year))
+  const [preview, setPreview] = useState('editors')
+  const [result, setResult] = useState<{ ok: boolean; message: string } | null>(null)
+  const [resultFor, setResultFor] = useState<'settings' | 'contact' | 'review'>('settings')
+  const [pending, start] = useTransition()
+  const inFlight = useRef(false)
+  const initial = { checks: checksEnabled, reminders: remindersEnabled, revision }
+  const setup = useBrowserSetup({
+    storageKey: 'cms.chapter-checks.' + actorId + '.' + siteId,
+    initial,
+    label: 'Chapter check settings',
+    pending: () => pending || inFlight.current,
+    read: value => {
+      const data = value as typeof initial
+      return data &&
+        typeof data.checks === 'boolean' &&
+        typeof data.reminders === 'boolean' &&
+        typeof data.revision === 'string' &&
+        /^\d{1,30}$/.test(data.revision)
+        ? { checks: data.checks, reminders: data.reminders, revision: data.revision }
+        : null
+    },
+  })
+  const { checks, reminders } = setup.value
+  const busy = pending || setup.loading
   function run(
     action: () => Promise<{ ok: boolean; message: string; revision?: string }>,
     kind: 'settings' | 'contact' | 'review' = 'review',

@@ -34,8 +34,8 @@ export function parseCanvasControls(value: unknown): CanvasControls | null {
       typeof value['canReset'] !== 'boolean'
     )
       return null
-    const sections: EditorSection[] = [],
-      fields: FieldLike[][] = []
+    const sections: EditorSection[] = []
+    const fields: FieldLike[][] = []
     for (const row of value['sections']) {
       if (
         !record(row) ||
@@ -52,8 +52,8 @@ export function parseCanvasControls(value: unknown): CanvasControls | null {
         !record(row['values'])
       )
         return null
-      const slots: FieldLike[] = [],
-        values: Record<string, unknown> = Object.create(null)
+      const slots: FieldLike[] = []
+      const values: Record<string, unknown> = Object.create(null)
       for (const field of row['fields']) {
         if (
           !record(field) ||
@@ -73,8 +73,8 @@ export function parseCanvasControls(value: unknown): CanvasControls | null {
           kind: 'repeat',
           ...(field['constraints'] === undefined ? {} : { constraints: field['constraints'] }),
         }
-        const spec = repeatItemSpec(slot),
-          content = row['values'][slot.id]
+        const spec = repeatItemSpec(slot)
+        const content = row['values'][slot.id]
         if (spec) {
           if (!record(content) || !only(content, ['items']) || !Array.isArray(content['items'])) return null
           const keys = repeatItemKeys(content, spec.max)
@@ -102,9 +102,9 @@ export function parseCanvasControls(value: unknown): CanvasControls | null {
       })
       fields.push(slots)
     }
-    const selected = value['selected'],
-      slot = value['slot'],
-      item = value['listItem']
+    const selected = value['selected']
+    const slot = value['slot']
+    const item = value['listItem']
     if (
       (selected !== null &&
         (!Number.isSafeInteger(selected) || Number(selected) < 0 || Number(selected) >= sections.length)) ||

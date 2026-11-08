@@ -111,9 +111,9 @@ export function ReasonDialog({
   onConfirm: () => void
   onCancel: () => void
 }) {
-  const field = useRef<HTMLTextAreaElement>(null),
-    id = useId(),
-    ready = !required || value.trim().length >= minLength
+  const field = useRef<HTMLTextAreaElement>(null)
+  const id = useId()
+  const ready = !required || value.trim().length >= minLength
   useEffect(() => {
     if (!pending) field.current?.focus()
   }, [pending])

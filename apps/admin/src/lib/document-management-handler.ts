@@ -25,10 +25,10 @@ export function createDocumentManagementHandlers(deps: Dependencies) {
       const session = await deps.currentSession()
       if (!session || !UUID.test(siteId)) return failure(404, 'This document library was not found.')
       const params = new URL(request.url).searchParams
-      const search = (params.get('search') ?? '').trim(),
-        category = (params.get('category') ?? '').trim()
-      const archived = params.get('archived') ?? 'false',
-        page = params.get('page') ?? '1'
+      const search = (params.get('search') ?? '').trim()
+      const category = (params.get('category') ?? '').trim()
+      const archived = params.get('archived') ?? 'false'
+      const page = params.get('page') ?? '1'
       if (
         search.length > 200 ||
         category.length > 80 ||
@@ -56,10 +56,10 @@ export function createDocumentManagementHandlers(deps: Dependencies) {
       if (!session || !UUID.test(siteId)) return failure(404, 'This document library was not found.')
       if (!request.body || request.headers.get('content-type')?.split(';')[0] !== 'application/json')
         return failure(400, 'The document change is invalid.')
-      const reader = request.body.getReader(),
-        chunks: Uint8Array[] = []
-      let size = 0,
-        raw: unknown
+      const reader = request.body.getReader()
+      const chunks: Uint8Array[] = []
+      let size = 0
+      let raw: unknown
       try {
         for (;;) {
           const { done, value } = await reader.read()

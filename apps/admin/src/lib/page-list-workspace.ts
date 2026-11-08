@@ -15,19 +15,19 @@ export type PageListControls = {
 }
 export async function readPageListControls(client: Queryable, siteId: string): Promise<PageListControls> {
   const heads = (
-      await client.query(
-        'SELECT g.kind,g.revision,v.content FROM global_elements g JOIN global_element_versions v ON v.id=g.draft_version_id WHERE g.site_id=$1',
-        [siteId],
-      )
-    ).rows,
-    header = heads.find(row => row.kind === 'header'),
-    footer = heads.find(row => row.kind === 'footer'),
-    nav = (
-      await client.query(
-        'SELECT n.revision,v.tree FROM navigations n JOIN navigation_versions v ON v.id=n.draft_version_id WHERE n.site_id=$1',
-        [siteId],
-      )
-    ).rows[0]
+    await client.query(
+      'SELECT g.kind,g.revision,v.content FROM global_elements g JOIN global_element_versions v ON v.id=g.draft_version_id WHERE g.site_id=$1',
+      [siteId],
+    )
+  ).rows
+  const header = heads.find(row => row.kind === 'header')
+  const footer = heads.find(row => row.kind === 'footer')
+  const nav = (
+    await client.query(
+      'SELECT n.revision,v.tree FROM navigations n JOIN navigation_versions v ON v.id=n.draft_version_id WHERE n.site_id=$1',
+      [siteId],
+    )
+  ).rows[0]
   if (!header || !footer || !nav) throw Error('The page links are unavailable. Reload, or open Header & menu.')
   const stories = (
     await client.query<{ id: string; title: string; path: string }>(

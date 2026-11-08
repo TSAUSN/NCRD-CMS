@@ -28,14 +28,14 @@ async function addStoryWidgetToPage(
     throw new DomainError('invalid_state', 'Choose a page and try again.')
   if (!(await client.query('SELECT app.can_administer_site($1) AS allowed', [siteId])).rows[0]?.allowed)
     throw new DomainError('not_authorized', 'A Site admin can add sections to pages.')
-  const world = kind === 'world' ? WorldChoice.parse(input) : null,
-    split = kind === 'split' ? SplitChoice.parse(input) : null,
-    page = (
-      await client.query(
-        `SELECT p.revision,v.id,v.content,v.meta,v.note,v.author_id=app.current_user_id() AS own FROM pages p JOIN page_versions v ON v.id=p.draft_version_id WHERE p.id=$1 AND p.site_id=$2 AND p.archived_at IS NULL`,
-        [pageId, siteId],
-      )
-    ).rows[0]
+  const world = kind === 'world' ? WorldChoice.parse(input) : null
+  const split = kind === 'split' ? SplitChoice.parse(input) : null
+  const page = (
+    await client.query(
+      `SELECT p.revision,v.id,v.content,v.meta,v.note,v.author_id=app.current_user_id() AS own FROM pages p JOIN page_versions v ON v.id=p.draft_version_id WHERE p.id=$1 AND p.site_id=$2 AND p.archived_at IS NULL`,
+      [pageId, siteId],
+    )
+  ).rows[0]
   if (!page) throw new DomainError('not_found', 'This page is unavailable.')
   if (!(await storyWidgetPages(client, siteId)).some(p => p.id === pageId))
     throw new DomainError('invalid_state', 'Stories are not available on chapter pages.')
@@ -46,9 +46,10 @@ async function addStoryWidgetToPage(
     )
   ).rows[0]
   if (!list) throw new DomainError('invalid_state', 'Turn on Stories before adding ' + label + '.')
-  const model = CollectionModel.safeParse(list.fields),
-    settings = (model.success ? model.data : CollectionModel.parse({ fields: list.fields, presentation: list.sort }))
-      .presentation.stories
+  const model = CollectionModel.safeParse(list.fields)
+  const settings = (
+    model.success ? model.data : CollectionModel.parse({ fields: list.fields, presentation: list.sort })
+  ).presentation.stories
   if (
     !settings ||
     (world &&
@@ -72,23 +73,23 @@ async function addStoryWidgetToPage(
       ...(world?.main.length ? { storyTags: { main: world.main, secondary: [] } } : {}),
     },
   }
-  const content = page.content,
-    section = {
-      section_def_id: def.id,
-      section_def_version: def.version,
-      label,
-      hidden: false,
-      hidden_at: [],
-      values: world
-        ? { heading: world.heading, start_region: world.region, per_region: world.limit, stories: selection }
-        : {
-            heading: split!.heading,
-            introduction: split!.introduction,
-            start_view: split!.first,
-            page_size: split!.size,
-            stories: selection,
-          },
-    }
+  const content = page.content
+  const section = {
+    section_def_id: def.id,
+    section_def_version: def.version,
+    label,
+    hidden: false,
+    hidden_at: [],
+    values: world
+      ? { heading: world.heading, start_region: world.region, per_region: world.limit, stories: selection }
+      : {
+          heading: split!.heading,
+          introduction: split!.introduction,
+          start_view: split!.first,
+          page_size: split!.size,
+          stories: selection,
+        },
+  }
 
   if (String(page.revision) !== revision) {
     const before = (

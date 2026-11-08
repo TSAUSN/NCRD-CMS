@@ -74,8 +74,8 @@ export async function loadSectionUpgrade(client: Queryable, input: UpgradeReques
 /** Render a whole reviewed page with all chosen placements updated together. */
 export async function renderUpgradeSet(client: Queryable, inputs: UpgradeRequest[]) {
   if (!inputs.length) throw new DomainError('invalid_state', 'Choose a section update.')
-  const first = inputs[0]!,
-    { page } = await loadSectionUpgrade(client, first)
+  const first = inputs[0]!
+  const { page } = await loadSectionUpgrade(client, first)
   if (inputs.some(input => input.pageId !== first.pageId || input.sourceVersionId !== first.sourceVersionId))
     throw new DomainError('invalid_state', 'Review one saved page at a time.')
   const manifest = (
@@ -83,8 +83,8 @@ export async function renderUpgradeSet(client: Queryable, inputs: UpgradeRequest
       page.version_id,
     ])
   ).rows[0]!.manifest
-  const context = sitePreviewContext(first.previewContext),
-    preview = await readSitePreview(client, page.site_id, context)
+  const context = sitePreviewContext(first.previewContext)
+  const preview = await readSitePreview(client, page.site_id, context)
   if (!preview) throw new DomainError('not_found', 'The selected site look is no longer available.')
   const render = () =>
     renderPage({
@@ -94,12 +94,12 @@ export async function renderUpgradeSet(client: Queryable, inputs: UpgradeRequest
       navigationPaths: { ...preview.navigationPaths, [manifest.page.id]: manifest.page.path },
       options: SCRIPTLESS_RENDER_OPTIONS,
     }).html
-  const beforeHtml = render(),
-    plans: Omit<SectionUpgradePlan, 'values'>[] = []
+  const beforeHtml = render()
+  const plans: Omit<SectionUpgradePlan, 'values'>[] = []
   for (const input of inputs) {
-    const { target, plan } = await loadSectionUpgrade(client, input),
-      previous = manifest.sections[input.index]!,
-      values = { ...plan.values }
+    const { target, plan } = await loadSectionUpgrade(client, input)
+    const previous = manifest.sections[input.index]!
+    const values = { ...plan.values }
     for (const slot of target.slots)
       if (slot.kind === 'repeat' && !repeatItemSpec(slot) && Object.hasOwn(plan.values, slot.id))
         values[slot.id] = previous.instance.values?.[slot.id]

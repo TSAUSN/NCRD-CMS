@@ -12,10 +12,10 @@ export function useSiteLookCanvas(input: {
   retry: number
 }) {
   const [issued, setIssued] = useState<{
-      key: string
-      ticket: NonNullable<ReturnType<typeof readCanvasTicket>>
-    } | null>(null),
-    [failure, setFailure] = useState<{ key: string; message: string } | null>(null)
+    key: string
+    ticket: NonNullable<ReturnType<typeof readCanvasTicket>>
+  } | null>(null)
+  const [failure, setFailure] = useState<{ key: string; message: string } | null>(null)
   const serial = JSON.stringify(input.look)
   const documentKey = JSON.stringify([input.origin, input.siteId, input.pageId, input.versionId, input.purpose, serial])
   const key = documentKey + ':' + input.retry
@@ -26,8 +26,8 @@ export function useSiteLookCanvas(input: {
   useEffect(() => {
     if (!input.origin || !input.pageId || !input.versionId || !input.look) return
     if (!canvasDocumentReady(input.origin)) return
-    const controller = new AbortController(),
-      channel = crypto.randomUUID()
+    const controller = new AbortController()
+    const channel = crypto.randomUUID()
     const deadline = window.setTimeout(() => {
       controller.abort()
       fail('The preview request timed out. Your changes are still here. Try the preview again.')
@@ -67,8 +67,8 @@ export function useSiteLookCanvas(input: {
   }, [key])
   useEffect(() => {
     if (!ticket) return
-    let active = true,
-      pending = false
+    let active = true
+    let pending = false
     const renew = async () => {
       if (pending) return
       pending = true
@@ -91,10 +91,10 @@ export function useSiteLookCanvas(input: {
         pending = false
       }
     }
-    const timer = window.setInterval(() => void renew(), 240_000),
-      visible = () => {
-        if (document.visibilityState === 'visible') void renew()
-      }
+    const timer = window.setInterval(() => void renew(), 240_000)
+    const visible = () => {
+      if (document.visibilityState === 'visible') void renew()
+    }
     document.addEventListener('visibilitychange', visible)
     return () => {
       active = false

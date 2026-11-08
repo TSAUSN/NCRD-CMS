@@ -77,10 +77,10 @@ export function navigationFor(
     // part of one of these (documents beside images, page templates beside
     // sections, domains inside settings) are reached from that screen.
     const base = `/sites/${site.id}`
-    const member = access?.memberships.get(site.id),
-      content = Boolean(
-        !site.original_design && access && !access.isSuperAdmin && member !== 'site_admin' && member !== 'reviewer',
-      )
+    const member = access?.memberships.get(site.id)
+    const content = Boolean(
+      !site.original_design && access && !access.isSuperAdmin && member !== 'site_admin' && member !== 'reviewer',
+    )
     groups.push({
       label: site.name,
       content,

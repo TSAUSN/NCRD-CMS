@@ -27,11 +27,11 @@ export function ResizablePanel({
   className?: string
   onWidthChange?: (width: number) => void
 }) {
-  const [width, setWidth] = useState(initial),
-    [available, setAvailable] = useState<number | null>(null)
-  const host = useRef<HTMLDivElement>(null),
-    limit = !reserveSpace || available === null ? max : Math.max(min, Math.min(max, available - reserveSpace)),
-    currentWidth = clampPanelWidth(width, min, limit)
+  const [width, setWidth] = useState(initial)
+  const [available, setAvailable] = useState<number | null>(null)
+  const host = useRef<HTMLDivElement>(null)
+  const limit = !reserveSpace || available === null ? max : Math.max(min, Math.min(max, available - reserveSpace))
+  const currentWidth = clampPanelWidth(width, min, limit)
   useEffect(() => {
     if (!reserveSpace) return
     const parent = host.current?.parentElement

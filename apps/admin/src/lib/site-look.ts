@@ -194,8 +194,8 @@ export function lookChecks(theme: ThemeTokens): LookCheck[] {
         ? `Button labels pass at ${button.display}.`
         : `Button labels are hard to read at ${button.display}. Ordinary-size text needs at least 4.5:1; choose a darker or lighter colour.`,
     })
-  const onPage = checkContrast(colors.primary, colors.surface),
-    onBand = checkContrast(colors.primary, colors.surfaceAlt)
+  const onPage = checkContrast(colors.primary, colors.surface)
+  const onBand = checkContrast(colors.primary, colors.surfaceAlt)
   const brand = onPage && onBand ? (onBand.ratio < onPage.ratio ? onBand : onPage) : (onPage ?? onBand)
   if (brand)
     checks.push({

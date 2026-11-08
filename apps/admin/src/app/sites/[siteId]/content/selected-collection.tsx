@@ -248,8 +248,8 @@ export function SelectedCollection({ model: workspace }: { model: CollectionsWor
                 disabled={pending}
                 onChange={event => {
                   if (busy()) return
-                  const href = '?collection=' + event.target.value,
-                    go = () => router.push(href)
+                  const href = '?collection=' + event.target.value
+                  const go = () => router.push(href)
                   if (requestClientNavigation(go)) go()
                 }}
               >

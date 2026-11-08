@@ -10,12 +10,12 @@ function announceInboxChange() {
   window.dispatchEvent(new Event('cms:inbox-changed'))
 }
 export function SectionRequestForm({ siteId, preserveEditor = false }: { siteId: string; preserveEditor?: boolean }) {
-  const [title, setTitle] = useState(''),
-    [body, setBody] = useState('')
+  const [title, setTitle] = useState('')
+  const [body, setBody] = useState('')
   const [result, setResult] = useState<RequestResult | null>(null)
   const [pending, startTransition] = useTransition()
-  const requestId = useRef<string | null>(null),
-    inFlight = useRef(false)
+  const requestId = useRef<string | null>(null)
+  const inFlight = useRef(false)
   return (
     <details className="card section-request-form">
       <summary>Request a custom section</summary>
@@ -107,11 +107,11 @@ export type ListedSectionRequest = Omit<SectionRequest, 'created_at' | 'updated_
 }
 export function SectionRequestCard({ request }: { request: ListedSectionRequest }) {
   const router = useRouter()
-  const [status, setStatus] = useState<string>(request.status),
-    [response, setResponse] = useState(request.response)
+  const [status, setStatus] = useState<string>(request.status)
+  const [response, setResponse] = useState(request.response)
   const [result, setResult] = useState<RequestResult | null>(null)
-  const [pending, startTransition] = useTransition(),
-    inFlight = useRef(false)
+  const [pending, startTransition] = useTransition()
+  const inFlight = useRef(false)
   return (
     <article className="card section-request-card" id={`request-${request.id}`}>
       <h3>{request.title}</h3>

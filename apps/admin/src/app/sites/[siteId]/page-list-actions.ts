@@ -177,8 +177,8 @@ export async function createNativePage(input: {
         const allowed = await native(client, input.siteId, false)
         if ((input.start === 'website' || input.inMenu) && !allowed.admin)
           throw new DomainError('not_authorized', 'A Site admin adds links to the site menu.')
-        const controls = await readPageListControls(client, input.siteId),
-          frame = await frames(client, input.siteId)
+        const controls = await readPageListControls(client, input.siteId)
+        const frame = await frames(client, input.siteId)
         if (input.start === 'website') {
           const menu = NavTree.parse([
             ...controls.menu,
@@ -196,10 +196,10 @@ export async function createNativePage(input: {
             message: 'Website link added to the menu draft. There is no page to edit. Review it in Publish.',
           }
         }
-        let pageId: string,
-          content: unknown,
-          meta: Record<string, unknown>,
-          revision: string | number = 0
+        let pageId: string
+        let content: unknown
+        let meta: Record<string, unknown>
+        let revision: string | number = 0
         if (input.start === 'copy') {
           const source = (
             await client.query(

@@ -59,9 +59,9 @@ const hovers = [
   ['underline', 'Underline'],
 ] as const
 export function ThemeButtonChoices({ tokens, disabled, onChange }: Props) {
-  const buttons = tokens.buttons,
-    color = buttons.color === 'accent' ? tokens.colors.accent : tokens.colors.primary,
-    ink = buttons.color === 'accent' ? tokens.colors.accentContrast : tokens.colors.primaryContrast
+  const buttons = tokens.buttons
+  const color = buttons.color === 'accent' ? tokens.colors.accent : tokens.colors.primary
+  const ink = buttons.color === 'accent' ? tokens.colors.accentContrast : tokens.colors.primaryContrast
   const vars = {
     '--sample-fill': color,
     '--sample-ink': ink,

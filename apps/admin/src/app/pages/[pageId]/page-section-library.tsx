@@ -47,17 +47,17 @@ export function PageSectionLibrary({
   pasteControl?: ReactNode
   recipeControl?: ReactNode
 }) {
-  const [search, setSearch] = useState(''),
-    [category, setCategory] = useState(''),
-    [view, setView] = useState<'sections' | 'templates'>('sections')
-  const categories = [...new Set(library.map(entry => entry.category || 'Other'))],
-    shown = library.filter(
-      entry =>
-        (!category || (category === '__favourites' ? entry.is_favourite : (entry.category || 'Other') === category)) &&
-        matchesSectionSearch(entry, search),
-    ),
-    previous = [...placements].filter(p => p.at < at).sort((a, b) => b.at - a.at)[0],
-    next = [...placements].filter(p => p.at > at).sort((a, b) => a.at - b.at)[0]
+  const [search, setSearch] = useState('')
+  const [category, setCategory] = useState('')
+  const [view, setView] = useState<'sections' | 'templates'>('sections')
+  const categories = [...new Set(library.map(entry => entry.category || 'Other'))]
+  const shown = library.filter(
+    entry =>
+      (!category || (category === '__favourites' ? entry.is_favourite : (entry.category || 'Other') === category)) &&
+      matchesSectionSearch(entry, search),
+  )
+  const previous = [...placements].filter(p => p.at < at).sort((a, b) => b.at - a.at)[0]
+  const next = [...placements].filter(p => p.at > at).sort((a, b) => a.at - b.at)[0]
   // Explicit tab stops keep these controls reachable with Safari's default
   // keyboard navigation as well as with full keyboard access enabled.
   return (

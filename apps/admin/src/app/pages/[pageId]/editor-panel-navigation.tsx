@@ -27,20 +27,20 @@ export function EditorPanelNavigation({
   onDone: () => void
   children: ReactNode
 }) {
-  const [target, setTarget] = useState<HTMLDivElement | null>(null),
-    [nested, setNested] = useState<Set<string>>(() => new Set())
+  const [target, setTarget] = useState<HTMLDivElement | null>(null)
+  const [nested, setNested] = useState<Set<string>>(() => new Set())
   const register = useCallback(
-      (id: string, active: boolean) =>
-        setNested(current => {
-          if (current.has(id) === active) return current
-          const next = new Set(current)
-          if (active) next.add(id)
-          else next.delete(id)
-          return next
-        }),
-      [],
-    ),
-    context = useMemo(() => ({ target, register }), [target, register])
+    (id: string, active: boolean) =>
+      setNested(current => {
+        if (current.has(id) === active) return current
+        const next = new Set(current)
+        if (active) next.add(id)
+        else next.delete(id)
+        return next
+      }),
+    [],
+  )
+  const context = useMemo(() => ({ target, register }), [target, register])
   if (!enabled) return children
   return (
     <Context.Provider value={context}>
@@ -61,9 +61,9 @@ export function EditorPanelNavigation({
 }
 /** Nested controls retain their own handlers, validation and cancel semantics. */
 export function EditorPanelActions({ children }: { children: ReactNode }) {
-  const navigation = useContext(Context),
-    id = useId(),
-    register = navigation?.register
+  const navigation = useContext(Context)
+  const id = useId()
+  const register = navigation?.register
   useLayoutEffect(() => {
     register?.(id, true)
     return () => register?.(id, false)

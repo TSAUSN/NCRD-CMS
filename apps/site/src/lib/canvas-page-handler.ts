@@ -84,8 +84,8 @@ export function createCanvasPageHandler(deps: {
       "frame-ancestors 'self'",
       `frame-ancestors ${parent.origin}`,
     ).replace("form-action 'self'", "form-action 'none'")
-    const projection = SiteFileProjection.safeParse(snapshot.shell.site_files),
-      paths = projection.success ? (projection.data.bundle.paths?.map(path => path.path) ?? []) : []
+    const projection = SiteFileProjection.safeParse(snapshot.shell.site_files)
+    const paths = projection.success ? (projection.data.bundle.paths?.map(path => path.path) ?? []) : []
     return new Response(
       request.method === 'HEAD'
         ? null

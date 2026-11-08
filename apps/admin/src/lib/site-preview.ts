@@ -39,8 +39,8 @@ export type SiteDraftPreviewRow = {
 }
 
 export function withSiteDrafts(shell: SiteShell, row: SiteDraftPreviewRow): SiteShell {
-  const settings = SitePublicSettings.safeParse(row.settings),
-    name = settings.success ? settings.data.name : row.name
+  const settings = SitePublicSettings.safeParse(row.settings)
+  const name = settings.success ? settings.data.name : row.name
   const header = normalizeHeaderConfig(row.header, name)
   const footer = normalizeFooterConfig(row.footer, name)
   if (!header || !footer) throw new Error('Saved site draft uses an unsupported header or footer configuration.')

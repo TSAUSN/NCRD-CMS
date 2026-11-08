@@ -16,13 +16,13 @@ export function moveMenuItem(
   action: 'up' | 'down' | 'indent' | 'outdent' | 'remove',
 ): NavTree {
   if (!/^[0-9]+(?:\.[0-9]+)?$/.test(path)) return tree
-  const [parent, child] = path.split('.').map(Number),
-    next = structuredClone(tree)
+  const [parent, child] = path.split('.').map(Number)
+  const next = structuredClone(tree)
   const root = next[parent!]
   if (!root) return tree
   const list = child === undefined ? next : (root.children ?? [])
-  const index = child ?? parent!,
-    node = list[index]
+  const index = child ?? parent!
+  const node = list[index]
   if (!node) return tree
   if (action === 'remove') list.splice(index, 1)
   else if (action === 'up' || action === 'down') {
@@ -58,14 +58,14 @@ export function moveMenuItem(
 /** Drag between siblings only; indent/outdent remain explicit keyboard-friendly actions. */
 export function reorderMenuItem(tree: NavTree, from: string, to: string): NavTree {
   if (!/^\d+(?:\.\d+)?$/.test(from) || !/^\d+(?:\.\d+)?$/.test(to)) return tree
-  const a = from.split('.').map(Number),
-    b = to.split('.').map(Number)
+  const a = from.split('.').map(Number)
+  const b = to.split('.').map(Number)
   if (a.length !== b.length || (a.length === 2 && a[0] !== b[0])) return tree
-  const next = structuredClone(tree),
-    list = a.length === 1 ? next : next[a[0]!]?.children
+  const next = structuredClone(tree)
+  const list = a.length === 1 ? next : next[a[0]!]?.children
   if (!list) return tree
-  const start = a.at(-1)!,
-    end = b.at(-1)!
+  const start = a.at(-1)!
+  const end = b.at(-1)!
   if (!list[start] || !list[end]) return tree
   list.splice(end, 0, list.splice(start, 1)[0]!)
   return next

@@ -94,11 +94,11 @@ export default async function PublishingWorkspace({
     session.principal.isSuperAdmin || ['editor', 'site_admin'].includes(session.principal.memberships.get(siteId) ?? '')
   const canAdminister = session.principal.isSuperAdmin || session.principal.memberships.get(siteId) === 'site_admin'
   const presentations = await releasePresentations(session.principal.userId, siteId, releaseItems)
-  const requestedRelease = releases.find(release => release.id === releaseId),
-    reviewPresentations =
-      requestedRelease?.status === 'planned' && !requestedRelease.stale
-        ? await releasePresentations(session.principal.userId, siteId, requestedRelease.snapshot)
-        : {}
+  const requestedRelease = releases.find(release => release.id === releaseId)
+  const reviewPresentations =
+    requestedRelease?.status === 'planned' && !requestedRelease.stale
+      ? await releasePresentations(session.principal.userId, siteId, requestedRelease.snapshot)
+      : {}
   const listedReleases = releases.map(release => ({
     ...release,
     actorLabel:
@@ -106,8 +106,8 @@ export default async function PublishingWorkspace({
     created_at: release.created_at.toISOString(),
     finished_at: release.finished_at?.toISOString() ?? null,
   }))
-  const native = !site.original_design,
-    stamps = native ? await releaseStamps(session.principal.userId, siteId, releaseItems) : {}
+  const native = !site.original_design
+  const stamps = native ? await releaseStamps(session.principal.userId, siteId, releaseItems) : {}
   const chosenTab =
     tab === 'history'
       ? 'history'

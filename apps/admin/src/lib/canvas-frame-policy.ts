@@ -6,8 +6,8 @@ import { publicSiteOrigin } from './public-site-url.ts'
 export function requestCanvasFrameOrigin(request: NextRequest): Promise<string | null> {
   return canvasFrameOrigin(request.nextUrl.pathname, {
     user: async () => {
-      const provider = configuredAuthProvider(),
-        token = request.cookies.get(provider.name === 'local' ? SESSION_COOKIE : HOSTED_SESSION_COOKIE)?.value
+      const provider = configuredAuthProvider()
+      const token = request.cookies.get(provider.name === 'local' ? SESSION_COOKIE : HOSTED_SESSION_COOKIE)?.value
       if (!token) return null
       const subject = await provider.verify(token)
       return subject ? ((await resolvePrincipal(subject))?.principal.userId ?? null) : null

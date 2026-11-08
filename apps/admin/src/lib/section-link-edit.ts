@@ -39,8 +39,8 @@ export function rewriteSectionLinks<T>(
   value: T,
   context: SectionLinkContext,
 ): { value: T; count: number; unsafe: boolean } {
-  let count = 0,
-    unsafe = false
+  let count = 0
+  let unsafe = false
   const ambiguous = (url: string) => {
     if (context.fragmentOnly !== false || !url.startsWith('#')) return false
     try {
@@ -93,15 +93,15 @@ export function rewriteSectionLinks<T>(
   return { value: visit(value) as T, count, unsafe }
 }
 export function nextSectionAnchor(name: string, sections: readonly SectionInstance[]): string {
-  const used = new Set(sections.flatMap(section => sectionAnchorNames(section.values))),
-    base = name
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, '')
-      .slice(0, 60),
-    first = validSectionAnchor(base) ? base : 'section-link'
-  let candidate = first,
-    n = 1
+  const used = new Set(sections.flatMap(section => sectionAnchorNames(section.values)))
+  const base = name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+    .slice(0, 60)
+  const first = validSectionAnchor(base) ? base : 'section-link'
+  let candidate = first
+  let n = 1
   while (used.has(candidate)) {
     n++
     const ending = '-' + n
@@ -111,8 +111,8 @@ export function nextSectionAnchor(name: string, sections: readonly SectionInstan
 }
 export function changeSectionAnchor(section: SectionInstance, name: string): SectionInstance {
   if (!validSectionAnchor(name)) throw Error('Start with a letter and use lowercase letters, numbers and hyphens.')
-  const aliases = sectionAnchorNames(section.values).filter(old => old !== name),
-    values = { ...section.values, __cms_anchor: name }
+  const aliases = sectionAnchorNames(section.values).filter(old => old !== name)
+  const values = { ...section.values, __cms_anchor: name }
   if (aliases.length) (values as Record<string, unknown>).__cms_anchor_aliases = aliases
   return { ...section, values }
 }

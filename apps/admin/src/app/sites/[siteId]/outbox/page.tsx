@@ -11,8 +11,8 @@ export default async function LocalOutbox({ params }: { params: Promise<{ siteId
   if (!localChapterMailOrigin()) notFound()
   const session = await currentSession()
   if (!session) notFound()
-  const { siteId } = await params,
-    site = await getSite(session.principal.userId, siteId)
+  const { siteId } = await params
+  const site = await getSite(session.principal.userId, siteId)
   const manage =
     session.principal.isSuperAdmin ||
     session.principal.memberships.get(siteId) === 'site_admin' ||

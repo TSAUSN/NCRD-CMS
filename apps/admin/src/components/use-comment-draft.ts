@@ -9,13 +9,13 @@ export function useCommentDraft(
   enabled = true,
   label = 'your unsent comment (saved only in this browser)',
 ) {
-  const [body, setBody] = useState(''),
-    [mentions, setMentions] = useState<string[]>([]),
-    [baseline, setBaseline] = useState(JSON.stringify({ body: '', mentions: [] })),
-    [restored, setRestored] = useState(false)
-  const key = enabled && actorId && requestId ? 'cms.comment-draft.' + actorId + '.' + requestId : '',
-    signature = JSON.stringify({ body, mentions }),
-    dirty = signature !== baseline
+  const [body, setBody] = useState('')
+  const [mentions, setMentions] = useState<string[]>([])
+  const [baseline, setBaseline] = useState(JSON.stringify({ body: '', mentions: [] }))
+  const [restored, setRestored] = useState(false)
+  const key = enabled && actorId && requestId ? 'cms.comment-draft.' + actorId + '.' + requestId : ''
+  const signature = JSON.stringify({ body, mentions })
+  const dirty = signature !== baseline
   useEffect(() => {
     let value = { body: '', mentions: [] as string[] }
     if (key)

@@ -39,8 +39,8 @@ export async function executeReleaseSchedule(
   })
   const reader = response.body?.getReader()
   if (!reader) throw new Error('The scheduled release result could not be confirmed.')
-  let text = '',
-    bytes = 0
+  let text = ''
+  let bytes = 0
   try {
     const decoder = new TextDecoder()
     while (true) {

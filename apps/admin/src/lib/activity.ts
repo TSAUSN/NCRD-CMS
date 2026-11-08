@@ -195,8 +195,8 @@ export async function getActivity(
         51,
       ])
     ).rows
-    const page = rows.slice(0, 50),
-      last = page.at(-1)
+    const page = rows.slice(0, 50)
+    const last = page.at(-1)
     // Preserve PostgreSQL microseconds: converting the cursor through a JS Date
     // would skip rows recorded in the same millisecond as the page boundary.
     return { rows: page, next: rows.length > 50 && last ? `${last.cursor_time}~${last.id}` : null }
