@@ -1,10 +1,39 @@
 import { test, expect } from '@playwright/test'
+import { echelonChapterSetups } from '@cms/seeds/echelon-chapters'
+import { saveChapterInTransaction } from '../../../apps/admin/src/lib/chapters.ts'
 import { echelonFixture } from '../fixtures/echelon.ts'
 import { signIn } from '../helpers.ts'
 
+async function chapterLayoutFixture(slug: 'atlanta' | 'detroit') {
+  const setup = echelonChapterSetups().find(row => row.slug === slug)
+  if (!setup) throw new Error('Missing chapter layout fixture: ' + slug)
+  // Generate only the chapter whose form or detail this test opens.
+  const fixture = await echelonFixture(false, false)
+  try {
+    await fixture.client.query('BEGIN')
+    await fixture.client.query('SET LOCAL ROLE cms_authenticated_user')
+    await fixture.client.query("SELECT set_config('app.user_id',$1,true)", [fixture.actor])
+    await saveChapterInTransaction(fixture.client, fixture.site, null, '0', slug, setup.config)
+    await fixture.client.query('COMMIT')
+    return fixture
+  } catch (error) {
+    try {
+      await fixture.client.query('ROLLBACK')
+    } finally {
+      fixture.client.release()
+      try {
+        await fixture.archive()
+      } finally {
+        await fixture.pool.end()
+      }
+    }
+    throw error
+  }
+}
+
 for (const width of [1440, 1024]) {
   test(`linked chapter details stay inside their panel at ${width}`, async ({ page }) => {
-    const f = await echelonFixture(),
+    const f = await chapterLayoutFixture('detroit'),
       address = 'https://personal-review.example.test/chapters/detroit?review=' + 'a'.repeat(110)
     try {
       await f.client.query('BEGIN')
@@ -68,7 +97,7 @@ for (const width of [1440, 1024]) {
 
 for (const width of [1440, 1024]) {
   test(`chapter setup handles invalid links and switching back to a page at ${width}`, async ({ page }) => {
-    const f = await echelonFixture(true)
+    const f = await chapterLayoutFixture('atlanta')
     try {
       await page.setViewportSize({ width, height: 1000 })
       await signIn(page, 'root@example.test')
