@@ -103,7 +103,26 @@ test('selecting any native card section preserves the real page geometry and kee
         const root = frame.locator('[data-cms-section="' + index + '"]')
         await root.evaluate(node => node.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'instant' }))
         await expect(root).toBeInViewport({ ratio: 0.25 })
-        await root.click({ position: { x: 12, y: 12 } })
+        const sectionPoint = await root.evaluate(node => {
+          const box = node.getBoundingClientRect()
+          const blocked = '[data-cms-slot], [data-cms-entry], [data-cms-frame], .cms-hero-controls'
+          for (const y of [0.08, 0.2, 0.5, 0.8, 0.92]) {
+            for (const x of [0.03, 0.1, 0.9, 0.97, 0.5]) {
+              const position = { x: Math.round(box.width * x), y: Math.round(box.height * y) }
+              const safe = [
+                [0, 0],
+                [-3, -3],
+                [3, 3],
+              ].every(([dx, dy]) => {
+                const hit = node.ownerDocument.elementFromPoint(box.left + position.x + dx!, box.top + position.y + dy!)
+                return hit?.closest('[data-cms-section]') === node && !hit.closest(blocked)
+              })
+              if (safe) return position
+            }
+          }
+          throw new Error('No visible section background to select')
+        })
+        await root.click({ position: sectionPoint })
         await expect
           .poll(() =>
             root.evaluate(
