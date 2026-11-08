@@ -13,12 +13,11 @@ import type { HeaderMenuModel, HeaderMenuProps } from './use-header-menu.ts'
 export function HeaderLogoTab({
   model,
   siteId,
-  siteName,
   media,
   superAdmin,
 }: {
   model: HeaderMenuModel
-} & Pick<HeaderMenuProps, 'siteId' | 'siteName' | 'media' | 'superAdmin'>) {
+} & Pick<HeaderMenuProps, 'siteId' | 'media' | 'superAdmin'>) {
   const {
     header,
     setHeader,

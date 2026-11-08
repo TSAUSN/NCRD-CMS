@@ -1,15 +1,8 @@
 import type { FooterConfigV1, GlobalElementLink, SocialService } from '@cms/schema'
 import { GuardedLink } from './guarded-link.tsx'
-import { SiteLogoField } from './site-logo-field.tsx'
 import { Button, IconButton } from './ui/index.ts'
-import { IconFrame, IconImage, IconLink, IconPlus, IconTrash } from './icons.tsx'
-import {
-  LinkFields,
-  emptyLink,
-  type FramePageChoice,
-  type FrameMediaChoice,
-  type LinkLocation,
-} from './preset-frame-links.tsx'
+import { IconFrame, IconLink, IconPlus, IconTrash } from './icons.tsx'
+import { LinkFields, emptyLink, type FramePageChoice, type LinkLocation } from './preset-frame-links.tsx'
 import styles from './preset-frame-fields.module.css'
 
 export function PresetFooterLayout({

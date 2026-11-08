@@ -1,9 +1,8 @@
 'use client'
 import selectionControlsStyles from '../../../../components/workspace-styles/selection-controls.module.css'
-import { Button, Disclosure, Menu, Field } from '../../../../components/ui/index.ts'
+import { Button, Disclosure, Menu } from '../../../../components/ui/index.ts'
 import { useNavigationGuard, requestClientNavigation } from '../../../../components/navigation-guard.ts'
 import { useEffect, useState } from 'react'
-import { GuardedLink as Link } from '../../../../components/guarded-link.tsx'
 import {
   applyStarterUpgrade,
   CollectionModel,

@@ -8,7 +8,7 @@ import { getSiteShell } from '../../lib/queries.ts'
 import { compileDefinitionDraft, type AuthoredCompilation } from '../../lib/definition-compiler.ts'
 import { renderDefinitionPreview } from '../../lib/definition-preview-render.ts'
 import { sitePreviewContext, type SitePreviewContext } from '../../lib/preview-context.ts'
-import { ActionResult, requireSession, toActionResult, UUID } from '../../lib/action-result.ts'
+import { ActionResult, requireSession, toActionResult } from '../../lib/action-result.ts'
 
 /**
  * Only accept authored markup and CSS. Recompute the compiled AST, scoped stylesheet, render hash,

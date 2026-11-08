@@ -1,6 +1,6 @@
 'use client'
 import contentEditorStyles from '../../../../components/content-editor.module.css'
-import { Button, Disclosure } from '../../../../components/ui/index.ts'
+import { Disclosure } from '../../../../components/ui/index.ts'
 import { checkContrast } from '@cms/domain'
 import { ButtonAppearance, DEFAULT_BUTTON_APPEARANCE } from '@cms/schema'
 

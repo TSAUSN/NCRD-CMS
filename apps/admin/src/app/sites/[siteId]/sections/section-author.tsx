@@ -19,7 +19,7 @@ import {
   type SectionDraft,
 } from '../../../actions/section-definitions.ts'
 import { SectionCreator } from './new/creator.tsx'
-import { sitePreviewLabel, sitePreviewPhrase, type SitePreviewContext } from '../../../../lib/preview-context.ts'
+import { sitePreviewPhrase, type SitePreviewContext } from '../../../../lib/preview-context.ts'
 
 export function SectionAuthor({
   siteId,

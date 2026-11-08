@@ -3,7 +3,6 @@ import { useSectionUpdateDialogs } from './editor-section-update-dialogs.tsx'
 import { useEditorCanvasSession } from './use-editor-canvas-session.ts'
 import { useEditorPanels } from './use-editor-panels.ts'
 import { useEditorLiveRestoreState } from './editor-live-restore.tsx'
-import { sectionTools } from './section-tools.ts'
 import { useSectionLibraryState } from './library-commands.ts'
 import type { SaveSnapshot } from './use-draft-save.ts'
 import { useEditorDraftSession } from './use-editor-draft-session.ts'
@@ -79,17 +78,17 @@ export function usePageEditorSession(props: PageEditorProps) {
   const [scheduleFirstReview, setScheduleFirstReview] = useState(false)
   const { state, setState, openingSnapshot, revision, setRevision, queue } = usePageDraftState(props)
   const sectionRules = editorSectionRules(props)
-  const { sectionLocked, canManageSections, canInsertAt } = sectionRules
+  const { sectionLocked } = sectionRules
   function closeSharedPanel() {
     setState(current => setSelection(current, { section: null, slot: null }))
     setPane('canvas')
   }
   const viewportState = useEditorViewportState()
-  const { viewport, setViewport, setZoom, previewHidden, setPreviewHidden, focusCanvas, setFocusCanvas } = viewportState
+  const { viewport, focusCanvas, setFocusCanvas } = viewportState
   const clipboard = useEditorSectionClipboard(props)
   const [pageDanger, setPageDanger] = useState<'unpublish' | 'archive' | null>(null)
   const siteFrame = useEditorSiteFrameState()
-  const { siteWide, setSiteWide, setMenuEdit, setMenuMove, finishSiteWide, siteWideCurrent } = siteFrame
+  const { siteWide, setSiteWide, setMenuEdit, setMenuMove, siteWideCurrent } = siteFrame
   const [listSelection, setListSelection] = useState<{
     section: number
     readerKey: string
@@ -98,13 +97,7 @@ export function usePageEditorSession(props: PageEditorProps) {
   } | null>(null)
   const [inlineList, setInlineList] = useState<{ readerKey: string; stableKey?: string; unit: string } | null>(null)
   const restore = useEditorLiveRestoreState()
-  const {
-    discardConfirmation,
-    setDiscardConfirmation,
-    sectionConfirmation,
-    setSectionConfirmation,
-    setLiveSourceIndex,
-  } = restore
+  const { discardConfirmation, sectionConfirmation } = restore
   const [pageSettingsOpen, setPageSettingsOpen] = useState(props.initialSettings === true)
   const [showHiddenSections, setShowHiddenSections] = useState(true)
   const [sitePreview, setSitePreview] = useState<SitePreviewContext>(props.initialSitePreview ?? 'published')
@@ -116,19 +109,9 @@ export function usePageEditorSession(props: PageEditorProps) {
   const [result, setResult] = useState<ActionResult | null>(null)
   const [requiresReload, setRequiresReload] = useState(false)
   const libraryState = useSectionLibraryState()
-  const { libraryOpen, setLibraryOpen, libraryPreview, libraryPreparing, libraryStage, insertAt, recipeDefinitions } =
-    libraryState
+  const { libraryOpen, setLibraryOpen, libraryPreview, libraryStage, insertAt, recipeDefinitions } = libraryState
 
   const panels = useEditorPanels(props.originalDesign, libraryOpen, state.selection)
-  const {
-    rightWidth,
-    structureWidth,
-    pendingFieldFocus,
-    structureCollapsed,
-    rightOverlay,
-    libraryOpener,
-    returnLibraryFocus,
-  } = panels
   const [sectionTool, setSectionTool] = useState<{
     kind: 'link' | 'copy'
     index: number
@@ -140,22 +123,13 @@ export function usePageEditorSession(props: PageEditorProps) {
    * than landing on a button that turned disabled under the pointer. */
   const [checkpointing, setCheckpointing] = useState(false)
   const sectionUpdates = useSectionUpdateDialogs()
-  const {
-    upgrade,
-    layoutChooser,
-    layoutTarget,
-    setLayoutTarget,
-    replacement,
-    fieldUpdate,
-    replacementDefinitions,
-    setReplacementDefinitions,
-  } = sectionUpdates
+  const { upgrade, layoutChooser, replacement, fieldUpdate, replacementDefinitions } = sectionUpdates
   const reviewState = useEditorReviewState(props, state.document.sections, scheduleFlight, setScheduling)
-  const { publishedVersionId, setPublishedVersionId, approvedVersionId, setApprovedVersionId } = reviewState.publication
-  const { reviewFlight, reviewBusy, review, setReview, reviewFeedback } = reviewState.review
-  const { overrideOpen, setOverrideOpen } = reviewState.override
-  const { submitOpen, setSubmitOpen } = reviewState.submission
-  const { transitionPending, startTransition } = reviewState.transition
+  const { setApprovedVersionId } = reviewState.publication
+  const { reviewFlight, setReview } = reviewState.review
+  const { overrideOpen } = reviewState.override
+  const { submitOpen } = reviewState.submission
+  const { transitionPending } = reviewState.transition
   const canvasSession = useEditorCanvasSession({
     ...viewportState,
     props,
@@ -165,22 +139,18 @@ export function usePageEditorSession(props: PageEditorProps) {
     showHiddenSections,
   })
   const {
-    frame: { canvasRef, setCanvasFramePending, setCanvasSource, canvasReady, setCanvasReady },
-    geometry: { previewWidth, previewScale },
-    document: { savedVersionId, shown, needsRender, canvasRefreshBlocked },
+    frame: { canvasRef, canvasReady },
+    geometry: { previewScale },
+    document: { savedVersionId, needsRender, canvasRefreshBlocked },
     interaction: {
       isolated,
       isolatedCurrent,
       canvasHistoryBlocked,
       dropOnCanvas,
-      canvasMenuPage,
-      setCanvasMenuPage,
       setRemoteHover,
       setRemoteRichState,
       setRemoteRichUnavailable,
       remoteActions,
-      canvasOperations,
-      changeSitePreview,
       richTextRequest,
       setRichTextRequest,
     },

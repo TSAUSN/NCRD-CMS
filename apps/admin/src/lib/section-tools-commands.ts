@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto'
 import { isDeepStrictEqual } from 'node:util'
 import type { Queryable } from '@cms/platform'
 import { DomainError, addSection, createEditorState } from '@cms/domain'
-import { PageContent, NavTree, sectionAnchorNames, validSectionAnchor, type SectionInstance } from '@cms/schema'
+import { PageContent, NavTree, sectionAnchorNames, validSectionAnchor } from '@cms/schema'
 import {
   changeSectionAnchor,
   nextSectionAnchor,

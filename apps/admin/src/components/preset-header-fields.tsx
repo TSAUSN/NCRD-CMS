@@ -1,7 +1,7 @@
 import type { HeaderConfigV1, GlobalElementLink } from '@cms/schema'
 import { SiteLogoField } from './site-logo-field.tsx'
 import { Button } from './ui/index.ts'
-import { IconFrame, IconImage, IconLink, IconPlus, IconTrash } from './icons.tsx'
+import { IconFrame, IconImage, IconLink, IconPlus } from './icons.tsx'
 import {
   LinkFields,
   emptyLink,

@@ -1,5 +1,5 @@
 import type { GlobalElementLink, NavTarget } from '@cms/schema'
-import { Button, IconButton } from './ui/index.ts'
+import { IconButton } from './ui/index.ts'
 import { IconLink, IconTrash } from './icons.tsx'
 import styles from './preset-frame-fields.module.css'
 

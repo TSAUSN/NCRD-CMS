@@ -102,7 +102,7 @@ export function usePageEditorCommands(session: PageEditorSession) {
     recipe: libraryState,
   })
 
-  const { openLibrary, placeLibraryEntry, insertPreparedRecipe } = libraryActions
+  const { openLibrary, placeLibraryEntry } = libraryActions
   /** The page's search and sharing settings: nothing selected, settings open. */
   function openPageSettings() {
     setSiteWide(null)
@@ -132,7 +132,7 @@ export function usePageEditorCommands(session: PageEditorSession) {
     },
     clipboard: { ...clipboard, insertAt, setReplacementDefinitions, setLibraryOpen },
   })
-  const { canvasAction, applyCanvasAction, pasteSection } = sectionActions
+  const { canvasAction, applyCanvasAction } = sectionActions
   const { duplicateCurrentPage, saveDetails, applyPageDanger } = pageCommands({
     draft: storedDraft,
     lifecycle: {

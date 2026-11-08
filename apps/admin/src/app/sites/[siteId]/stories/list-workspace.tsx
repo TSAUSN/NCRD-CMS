@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useRef, useState, useTransition } from 'react'
-import { storyFeatureRank, type StoryListPatch, type StoriesSettings } from '@cms/schema'
+import { storyFeatureRank, type StoryListPatch } from '@cms/schema'
 import { Button, ButtonLink, Dialog, EmptyState, Note, TextLink } from '../../../../components/ui/index.ts'
 import { StoryListRowView } from '../../../../components/story-list-row.tsx'
 import { useNavigationGuard } from '../../../../components/navigation-guard.ts'
@@ -12,7 +12,6 @@ import {
   storyInSource,
   STORY_LIST_STATUSES,
   type StoryListFilters,
-  type StoryListRow,
 } from '../../../../lib/story-list.ts'
 import type { CollectionRights } from '../../../../lib/collection-queries.ts'
 import type { getStoryListState } from '../../../../lib/stories-workspace.ts'

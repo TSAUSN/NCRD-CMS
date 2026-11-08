@@ -1,5 +1,4 @@
 import { EditorPaneTabs } from './editor-pane-tabs.tsx'
-import { sectionTools } from './section-tools.ts'
 import { EditorCanvas } from './editor-canvas.tsx'
 import { EditorStructure } from './editor-structure.tsx'
 import { siteFrameInspector } from './editor-site-frame-state.ts'
