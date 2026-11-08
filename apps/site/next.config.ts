@@ -5,7 +5,7 @@ import '../../scripts/load-env.ts'
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
-  transpilePackages: ['@cms/schema', '@cms/renderer', '@cms/seeds', '@cms/domain', '@cms/platform'],
+  transpilePackages: ['@cms/schema', '@cms/renderer', '@cms/domain', '@cms/platform'],
   // The public renderer emits complete documents itself; nothing here needs a
   // React runtime in the browser.
   poweredByHeader: false,

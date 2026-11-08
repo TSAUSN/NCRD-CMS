@@ -1,20 +1,3 @@
-.placement-control {
-  margin: 1rem 0;
-}
-.placement-control-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  align-items: center;
-  padding: 0 1.1rem 1.1rem;
-}
-.placement-control-row select {
-  max-width: 16rem;
-}
-.placement-control .notice {
-  margin: 0 1.1rem 1.1rem;
-}
-
 /* Collection documents use the same governed picker dialog as image selection. */
 .collection-document-list {
   list-style: none;
