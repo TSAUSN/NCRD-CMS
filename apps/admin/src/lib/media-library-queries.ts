@@ -20,6 +20,25 @@ const ORDER_SQL: Record<MediaLibraryQuery['sort'], string> = {
   'name-desc': "(m.status = 'deleted'), lower(m.original_name) DESC, m.id DESC",
 }
 
+/** Usage and available variants are counted independently for each visible asset. */
+export const MEDIA_ASSET_DETAILS_SQL = `
+      CROSS JOIN LATERAL (
+        SELECT count(DISTINCT item_id)::int AS used_on_items,
+               count(DISTINCT version_id)::int AS used_in_versions
+          FROM (
+            SELECT item_id,version_id FROM media_usage WHERE media_id=m.id
+            UNION ALL
+            SELECT site_id AS item_id,version_id FROM site_file_media_usage WHERE media_id=m.id
+          ) records
+      ) usage
+      CROSS JOIN LATERAL (
+        SELECT coalesce(bool_or(kind='thumbnail'),false) AS has_thumbnail,
+               coalesce(bool_or(kind='card'),false) AS has_card,
+               coalesce(bool_or(kind='wide'),false) AS has_wide
+          FROM media_variants WHERE media_id=m.id
+      ) variants
+`
+
 // Select the page first. The usage tables and variants are keyed by media ID,
 // so records outside this page never need a usage or rendition lookup.
 export function mediaLibraryPageSql(sort: MediaLibraryQuery['sort']): string {
@@ -36,21 +55,7 @@ export function mediaLibraryPageSql(sort: MediaLibraryQuery['sort']): string {
     SELECT m.*,usage.used_on_items,usage.used_in_versions,
            variants.has_thumbnail,variants.has_card,variants.has_wide
       FROM selected m
-      CROSS JOIN LATERAL (
-        SELECT count(DISTINCT item_id)::int AS used_on_items,
-               count(DISTINCT version_id)::int AS used_in_versions
-          FROM (
-            SELECT item_id,version_id FROM media_usage WHERE media_id=m.id
-            UNION ALL
-            SELECT site_id AS item_id,version_id FROM site_file_media_usage WHERE media_id=m.id
-          ) records
-      ) usage
-      CROSS JOIN LATERAL (
-        SELECT coalesce(bool_or(kind='thumbnail'),false) AS has_thumbnail,
-               coalesce(bool_or(kind='card'),false) AS has_card,
-               coalesce(bool_or(kind='wide'),false) AS has_wide
-          FROM media_variants WHERE media_id=m.id
-      ) variants
+      ${MEDIA_ASSET_DETAILS_SQL}
      ORDER BY ${ORDER_SQL[sort]}`
 }
 
