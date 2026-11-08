@@ -119,6 +119,13 @@ function summary(row: SummaryRow): CollectionSummary {
 
 type SelectedCollection = NonNullable<CollectionWorkspace['selected']>
 
+const collectionEntryChanged = `(e.published_version_id IS NULL AND e.archived_at IS NULL)
+                 OR (e.published_version_id IS NOT NULL AND (
+                    entry_draft.values IS DISTINCT FROM entry_live.values
+                 OR entry_draft.schema_version_id IS DISTINCT FROM entry_live.schema_version_id
+                 OR e.sort_index IS DISTINCT FROM e.published_sort_index
+                 OR (e.archived_at IS NULL) IS DISTINCT FROM (e.published_archived_at IS NULL)))`
+
 async function readCollectionRail(client: Queryable, siteId: string) {
   const { rows } = await client.query<SummaryRow>(
     `SELECT c.id, c.slug, c.reader_key, c.name, c.source, c.revision,
@@ -129,12 +136,7 @@ async function readCollectionRail(client: Queryable, siteId: string) {
             count(e.id) FILTER (WHERE e.archived_at IS NULL)::text AS total_entries,
             count(e.id) FILTER (WHERE e.published_archived_at IS NULL AND e.published_version_id IS NOT NULL)::text AS live_entries,
             count(e.id) FILTER (
-              WHERE (e.published_version_id IS NULL AND e.archived_at IS NULL)
-                 OR (e.published_version_id IS NOT NULL AND (
-                    entry_draft.values IS DISTINCT FROM entry_live.values
-                 OR entry_draft.schema_version_id IS DISTINCT FROM entry_live.schema_version_id
-                 OR e.sort_index IS DISTINCT FROM e.published_sort_index
-                 OR (e.archived_at IS NULL) IS DISTINCT FROM (e.published_archived_at IS NULL)))
+              WHERE ${collectionEntryChanged}
             )::text AS changed_entries
        FROM collections c
        LEFT JOIN collection_schema_versions draft ON draft.id = c.draft_schema_version_id
@@ -161,7 +163,7 @@ async function readCollectionRail(client: Queryable, siteId: string) {
   return { rows, collections }
 }
 
-async function readCollectionEntries(client: Queryable, ids: string[]) {
+async function readCollectionEntries(client: Queryable, ids: string[], entryId?: string) {
   const { rows } = await client.query<{
     id: string
     collection_id: string
@@ -176,18 +178,36 @@ async function readCollectionEntries(client: Queryable, ids: string[]) {
     published_values: unknown
     archived_at: Date | null
     published_archived_at: Date | null
+    changed: boolean
   }>(
-    `SELECT e.id, e.collection_id, e.stable_key, e.revision, e.sort_index, e.published_sort_index, draft.created_at::text AS edited_at, CASE WHEN draft.author_id=app.current_user_id() THEN 'You' ELSE 'Another editor' END AS edited_by,
-            draft.schema_version_id AS draft_schema_version_id, draft.values AS draft_values, live.values AS published_values,
-            e.archived_at, e.published_archived_at
+    `SELECT e.id, e.collection_id, e.stable_key, e.revision, e.sort_index, e.published_sort_index, entry_draft.created_at::text AS edited_at, CASE WHEN entry_draft.author_id=app.current_user_id() THEN 'You' ELSE 'Another editor' END AS edited_by,
+            entry_draft.schema_version_id AS draft_schema_version_id, entry_draft.values AS draft_values, entry_live.values AS published_values,
+            e.archived_at, e.published_archived_at, (${collectionEntryChanged}) AS changed
        FROM collection_entries e
-       LEFT JOIN collection_entry_versions draft ON draft.id = e.draft_version_id
-       LEFT JOIN collection_entry_versions live ON live.id = e.published_version_id
-      WHERE e.collection_id = ANY($1::uuid[])
+       LEFT JOIN collection_entry_versions entry_draft ON entry_draft.id = e.draft_version_id
+       LEFT JOIN collection_entry_versions entry_live ON entry_live.id = e.published_version_id
+      WHERE e.collection_id = ANY($1::uuid[])${entryId ? ' AND e.id = $2 AND e.archived_at IS NULL' : ''}
       ORDER BY e.collection_id, e.archived_at NULLS FIRST, e.sort_index, e.created_at, e.id`,
-    [ids],
+    entryId ? [ids, entryId] : [ids],
   )
   return rows
+}
+
+function collectionEntry(entry: Awaited<ReturnType<typeof readCollectionEntries>>[number]): CollectionEntryWorkspace {
+  return {
+    id: entry.id,
+    stableKey: entry.stable_key,
+    editedAt: new Date(entry.edited_at).toISOString(),
+    editedBy: entry.edited_by,
+    schemaVersionId: entry.draft_schema_version_id,
+    revision: Number(entry.revision),
+    sortIndex: entry.sort_index,
+    publishedSortIndex: entry.published_sort_index,
+    values: (entry.draft_values ?? {}) as Record<string, unknown>,
+    publishedValues: entry.published_values === null ? null : (entry.published_values as Record<string, unknown>),
+    archived: entry.archived_at !== null,
+    publishedArchived: entry.published_archived_at !== null,
+  }
 }
 
 function collectionSelection(
@@ -202,20 +222,7 @@ function collectionSelection(
       selectedRow.published_schema_version_id === null
         ? null
         : parseStoredModel(selectedRow.published_fields, selectedRow.published_sort),
-    entries: entries.map(entry => ({
-      id: entry.id,
-      stableKey: entry.stable_key,
-      editedAt: new Date(entry.edited_at).toISOString(),
-      editedBy: entry.edited_by,
-      schemaVersionId: entry.draft_schema_version_id,
-      revision: Number(entry.revision),
-      sortIndex: entry.sort_index,
-      publishedSortIndex: entry.published_sort_index,
-      values: (entry.draft_values ?? {}) as Record<string, unknown>,
-      publishedValues: entry.published_values === null ? null : (entry.published_values as Record<string, unknown>),
-      archived: entry.archived_at !== null,
-      publishedArchived: entry.published_archived_at !== null,
-    })),
+    entries: entries.map(collectionEntry),
   }
 }
 
@@ -233,6 +240,63 @@ export function getCollectionWorkspace(
     return {
       collections,
       selected: collectionSelection(selected, collections.find(item => item.id === selected.id)!, entries),
+    }
+  })
+}
+
+type CollectionContentRead = 'all' | 'none' | { entryId: string }
+type CollectionContentRow = Pick<
+  SummaryRow,
+  | 'id'
+  | 'revision'
+  | 'entry_revision'
+  | 'draft_schema_version_id'
+  | 'published_schema_version_id'
+  | 'draft_fields'
+  | 'draft_sort'
+  | 'published_fields'
+  | 'published_sort'
+>
+
+/** Read the named collection without counting entries or scanning page usage for the Lists rail. */
+export function getCollectionContent(
+  userId: string,
+  siteId: string,
+  readerKey: string,
+  entriesToRead: CollectionContentRead = 'all',
+) {
+  return asUser({ userId }, async client => {
+    const row = (
+      await client.query<CollectionContentRow>(
+        `SELECT c.id,c.revision,c.entry_revision,c.draft_schema_version_id,c.published_schema_version_id,
+                draft.fields AS draft_fields,draft.sort AS draft_sort,
+                live.fields AS published_fields,live.sort AS published_sort
+           FROM collections c
+           JOIN collection_schema_versions draft ON draft.id=c.draft_schema_version_id
+           LEFT JOIN collection_schema_versions live ON live.id=c.published_schema_version_id
+          WHERE c.site_id=$1 AND c.reader_key=$2`,
+        [siteId, readerKey],
+      )
+    ).rows[0]
+    if (!row) return null
+    const entries =
+      entriesToRead === 'none'
+        ? []
+        : await readCollectionEntries(
+            client,
+            [row.id],
+            typeof entriesToRead === 'object' ? entriesToRead.entryId : undefined,
+          )
+    return {
+      id: row.id,
+      revision: Number(row.revision),
+      entryRevision: Number(row.entry_revision),
+      draftSchemaVersionId: row.draft_schema_version_id,
+      publishedSchemaVersionId: row.published_schema_version_id,
+      draft: parseStoredModel(row.draft_fields, row.draft_sort),
+      published: row.published_schema_version_id ? parseStoredModel(row.published_fields, row.published_sort) : null,
+      changedEntries: entries.filter(entry => entry.changed).length,
+      entries: entries.map(collectionEntry),
     }
   })
 }

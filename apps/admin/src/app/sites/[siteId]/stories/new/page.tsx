@@ -19,7 +19,7 @@ export default async function NewStoryPage({ params }: { params: Promise<{ siteI
   if (!session.principal.isSuperAdmin && role !== 'site_admin' && role !== 'editor' && role !== 'contributor')
     notFound()
   const [list, rights] = await Promise.all([
-    getStoriesWorkspace(session.principal.userId, siteId),
+    getStoriesWorkspace(session.principal.userId, siteId, 'none'),
     collectionRights(session.principal.userId, siteId),
   ])
   if (!list || !rights.editEntries) notFound()

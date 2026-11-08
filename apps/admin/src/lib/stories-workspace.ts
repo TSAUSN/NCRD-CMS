@@ -5,17 +5,15 @@ import { listMediaAssets } from './queries.ts'
 import { storiesCatalog } from './stories-catalog.ts'
 import { storyListValues, type StoryListRow } from './story-list.ts'
 import { hasStoryText } from './stories-model.ts'
-import { getCollectionWorkspace } from './collection-queries.ts'
-export async function getStoriesWorkspace(userId: string, siteId: string) {
-  const id = await asUser(
-    { userId },
-    async c =>
-      (await c.query("SELECT id FROM collections WHERE site_id=$1 AND reader_key='stories'", [siteId])).rows[0]?.id,
-  )
-  if (!id) return null
-  const workspace = await getCollectionWorkspace(userId, siteId, id)
-  return workspace.selected?.readerKey === 'stories' ? workspace.selected : null
+import { getCollectionContent } from './collection-queries.ts'
+export function getStoriesWorkspace(
+  userId: string,
+  siteId: string,
+  entriesToRead?: Parameters<typeof getCollectionContent>[3],
+) {
+  return getCollectionContent(userId, siteId, 'stories', entriesToRead)
 }
+
 export function storyPage(userId: string, siteId: string, path: unknown) {
   if (typeof path !== 'string' || !/^\/stories\/[a-z0-9]+(?:-[a-z0-9]+)*$/.test(path)) return Promise.resolve(null)
   return asUser(
