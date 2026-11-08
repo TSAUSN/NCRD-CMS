@@ -1,7 +1,6 @@
 // Small report text uses its own ink token; bands and controls keep the approved red.
 export const REPORT_TEXT_CSS = '#cms-main .sawso-report,#cms-main.cms-report-page{--ar-red-text:#dc1c2b}'
-// One top-level rule per line. The joined text is byte-identical to the
-// stylesheet these rules came from; report-page-presentation.test.ts pins it.
+// This long data file preserves the approved report cascade; the byte test pins rule order.
 const REPORT_PAGE_RULES = [
   '\n\n#cms-main.cms-report-page{--ar-red:#ed1c2b;--ar-red-text:#ed1c2b;--ar-navy:#34465f;--ar-ink:#111;--ar-grey:#eff1f0;--ar-blue:#dfedf0;--ar-footer:#2a313f;--ar-line:#d3d9dc;color:var(--ar-ink);background:#fff;font-family:var(--font-body,Arial,sans-serif);font-size:17px;line-height:1.6;font-weight:300;text-align:left;overflow-wrap:break-word;width:100%;isolation:isolate}',
   '\n#cms-main.cms-report-page *,#cms-main.cms-report-page *::before,#cms-main.cms-report-page *::after{box-sizing:border-box}',

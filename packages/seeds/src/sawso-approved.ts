@@ -1,4 +1,4 @@
-// Approved local sector copy and October 26 feed. Remote image URLs are data only.
+// This long data file keeps the approved sector copy and feed together; image URLs are reference data only.
 export const SAWSO_APPROVED = {
   pages: {
     'anti-overview': {

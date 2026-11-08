@@ -1,4 +1,4 @@
-/** Revision 8 core catalogue. Global definitions; existing page pins never change. */
+/** This long seed catalogue keeps each governed definition together; existing page pins are immutable. */
 import { REPORT_LIBRARY } from './report-library.ts'
 import { ECHELON_LIBRARY } from './echelon-library.ts'
 import { NATIONAL_LIBRARY } from './national-library.ts'
