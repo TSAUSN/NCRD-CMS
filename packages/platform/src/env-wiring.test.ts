@@ -74,7 +74,9 @@ describe('every direct node entrypoint declares its environment boundary', () =>
         expect(script.command).toContain('src/better-together-cli.ts')
         const entry = read('packages/importer/src/better-together-cli.ts')
         const converter = read('packages/importer/src/better-together.ts')
-        for (const source of [entry, converter])
+        const assets = read('packages/importer/src/better-together-assets.ts')
+        const archive = read('packages/importer/src/better-together-archive.ts')
+        for (const source of [entry, converter, assets, archive])
           expect(source).not.toMatch(
             /process\.env|loadEnvFile|load-env|dotenv|\bfetch\(|from ['"](?:node:)?(?:https?|net|pg)['"]|child_process/,
           )
@@ -82,8 +84,9 @@ describe('every direct node entrypoint declares its environment boundary', () =>
         const compact = (text: string) => text.replace(/\s+/g, '')
         expect(compact(entry)).toContain('process.argv.slice(2)')
         expect(compact(entry)).toContain("readFileSync(resolve(html),'utf8')")
-        expect(compact(converter)).toContain("resolve(cache,'receipts.json')")
-        expect(compact(converter)).toContain('hash(bytes)!==receipt.hash')
+        expect(compact(converter)).toContain('readBetterTogetherAssets(options.root,options.cache,')
+        expect(compact(assets)).toContain("resolve(cache,'receipts.json')")
+        expect(compact(assets)).toContain('hash(bytes)!==receipt.hash')
         return
       }
       if (script.file === 'packages/seeds/package.json' && script.name === 'core:install') {
