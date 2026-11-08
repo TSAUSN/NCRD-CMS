@@ -173,8 +173,14 @@ export function useReorderableList<T>({
 
   function finish(event: DragEvent<HTMLElement>) {
     event.stopPropagation()
+    const active = drag.current
     const rejected = blockedTarget.current
-    if (drag.current && rejected && event.dataTransfer.dropEffect === 'none') reject(rejected)
+    if (active?.list && rejected) {
+      // A refused drop has no drop event. WebKit can report a nonempty effect
+      // on dragend, so confirm the pointer still ends over the refused row.
+      const row = document.elementFromPoint(event.clientX, event.clientY)?.closest<HTMLElement>(rowSelector)
+      if (row?.dataset.reorderRow === rejected.row && row.closest(listSelector) === active.list) reject(rejected)
+    }
     end()
   }
 
