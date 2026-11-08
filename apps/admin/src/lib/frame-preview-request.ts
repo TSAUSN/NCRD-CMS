@@ -35,13 +35,23 @@ export function framePreviewAddress(ticketHref: string, part: 'header' | 'footer
 }
 
 /** Stop queued and active previews before navigation replaces this document. */
-export function queueFramePreview(run: (signal: AbortSignal) => Promise<void>): () => void {
+export function queueFramePreview(
+  run: (signal: AbortSignal) => Promise<void>,
+  timeout?: { afterMs: number; onTimeout: () => void },
+): () => void {
   const controller = new AbortController()
   const timer = window.setTimeout(() => {
-    void run(controller.signal)
+    void run(controller.signal).finally(() => window.clearTimeout(deadline))
   }, 180)
+  const deadline = timeout
+    ? window.setTimeout(() => {
+        cancel()
+        timeout.onTimeout()
+      }, timeout.afterMs)
+    : undefined
   const cancel = () => {
     window.clearTimeout(timer)
+    window.clearTimeout(deadline)
     controller.abort()
   }
   const beforeUnload = (event: BeforeUnloadEvent) => {

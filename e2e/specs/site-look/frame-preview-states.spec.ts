@@ -242,3 +242,63 @@ test('an unfinished preview document can recover before its load event', async (
     await f.pool.end()
   }
 })
+
+test('leaving Header before its queued preview starts does not request a ticket or raise an error', async ({
+  page,
+}) => {
+  const f = await sawsoFixture(true, true)
+  const header = '/sites/' + f.siteId + '/header'
+  const destination = '/sites/' + f.siteId + '/pages'
+  let releaseDestination = () => {}
+  const destinationGate = new Promise<void>(resolve => {
+    releaseDestination = resolve
+  })
+  let destinationRequested = false
+  let tickets = 0
+  const errors: string[] = []
+  try {
+    await page.addInitScript(
+      ({ headerPath }) => {
+        if (window !== window.top || location.pathname !== headerPath) return
+        const browserWindow: Window = window
+        const schedule = browserWindow.setTimeout.bind(browserWindow)
+        browserWindow.setTimeout = (handler: TimerHandler, delay?: number, ...args: unknown[]) => {
+          if (delay !== 180) return schedule(handler, delay, ...args)
+          document.documentElement.dataset.testPreviewQueued = 'true'
+          return schedule(handler, 800, ...args)
+        }
+      },
+      { headerPath: header },
+    )
+    page.on('pageerror', error => errors.push(error.message))
+    await page.route('**/api/sites/' + f.siteId + '/global-elements/preview', async route => {
+      tickets++
+      await route.continue()
+    })
+    await page.route('**' + destination, async route => {
+      destinationRequested = true
+      await destinationGate
+      await route.continue()
+    })
+    await signIn(page, 'root@example.test')
+    await page.goto(header)
+    await expect(page.locator('html')).toHaveAttribute('data-test-preview-queued', 'true')
+    await Promise.all([
+      page.goto(destination),
+      (async () => {
+        await expect.poll(() => destinationRequested).toBe(true)
+        // Leave the old document's timer a chance to run while the next response is held.
+        await new Promise(resolve => setTimeout(resolve, 900))
+        releaseDestination()
+      })(),
+    ])
+    await expect(page.getByRole('heading', { level: 1, name: 'Pages', exact: true })).toBeVisible()
+    expect(tickets).toBe(0)
+    expect(errors).toEqual([])
+  } finally {
+    releaseDestination()
+    await f.pool.query('UPDATE sites SET archived_at=now() WHERE id=$1', [f.siteId])
+    f.client.release()
+    await f.pool.end()
+  }
+})

@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
+import { queueFramePreview } from '../../../../lib/frame-preview-request.ts'
 import type { ThemeTokens, HeaderConfig, FooterConfig, NavTree } from '@cms/schema'
 import { canvasDocumentReady, readCanvasTicket } from '../../../pages/[pageId]/use-isolated-canvas.ts'
 export function useSiteLookCanvas(input: {
@@ -24,46 +25,31 @@ export function useSiteLookCanvas(input: {
   const loading = Boolean(input.origin && input.pageId && input.versionId && input.look && !ticket && !error)
   const fail = (message: string) => setFailure({ key, message })
   useEffect(() => {
-    if (!input.origin || !input.pageId || !input.versionId || !input.look) return
-    if (!canvasDocumentReady(input.origin)) return
-    const controller = new AbortController()
+    const { origin, look, siteId, pageId, versionId, purpose } = input
+    if (!origin || !pageId || !versionId || !look || !canvasDocumentReady(origin)) return
     const channel = crypto.randomUUID()
-    const deadline = window.setTimeout(() => {
-      controller.abort()
-      fail('The preview request timed out. Your changes are still here. Try the preview again.')
-    }, 15000)
-    const timer = window.setTimeout(() => {
-      void (async () => {
+    return queueFramePreview(
+      async signal => {
         try {
-          const response = await fetch(`/api/sites/${input.siteId}/global-elements/preview`, {
+          const response = await fetch(`/api/sites/${siteId}/global-elements/preview`, {
             method: 'POST',
             headers: { 'content-type': 'application/json' },
-            body: JSON.stringify({
-              ...input.look,
-              purpose: input.purpose,
-              versionId: input.versionId,
-              previewContext: 'draft',
-              isolated: true,
-              channel,
-            }),
-            signal: controller.signal,
+            body: JSON.stringify({ ...look, purpose, versionId, previewContext: 'draft', isolated: true, channel }),
+            signal,
           })
-          const next = response.ok ? readCanvasTicket(await response.json(), input.origin!, channel) : null
+          const next = response.ok ? readCanvasTicket(await response.json(), origin, channel) : null
           if (!next) throw Error('unavailable')
-          if (!controller.signal.aborted) setIssued({ key, ticket: next })
+          if (!signal.aborted) setIssued({ key, ticket: next })
         } catch {
-          if (!controller.signal.aborted)
+          if (!signal.aborted)
             fail('The site preview could not be opened. Your choices are still here. Try the preview again.')
-        } finally {
-          window.clearTimeout(deadline)
         }
-      })()
-    }, 180)
-    return () => {
-      window.clearTimeout(timer)
-      window.clearTimeout(deadline)
-      controller.abort()
-    }
+      },
+      {
+        afterMs: 15000,
+        onTimeout: () => fail('The preview request timed out. Your changes are still here. Try the preview again.'),
+      },
+    )
   }, [key])
   useEffect(() => {
     if (!ticket) return

@@ -95,6 +95,26 @@ describe('preview navigation lifecycle', () => {
     expect(signal.aborted).toBe(true)
     cleanup()
   })
+  it('times out a pending preview but stays quiet when the document leaves first', async () => {
+    const run = vi.fn(
+      (signal: AbortSignal) =>
+        new Promise<void>(resolve => signal.addEventListener('abort', () => resolve(), { once: true })),
+    )
+    const onTimeout = vi.fn()
+    const expired = queueFramePreview(run, { afterMs: 500, onTimeout })
+    await vi.advanceTimersByTimeAsync(500)
+    expect(run.mock.calls[0]![0].aborted).toBe(true)
+    expect(onTimeout).toHaveBeenCalledOnce()
+    expired()
+    const leaving = queueFramePreview(run, { afterMs: 500, onTimeout })
+    await vi.advanceTimersByTimeAsync(180)
+    lifecycle.dispatchEvent(new Event('pagehide'))
+    await vi.runAllTimersAsync()
+    expect(run.mock.calls[1]![0].aborted).toBe(true)
+    expect(onTimeout).toHaveBeenCalledOnce()
+    leaving()
+  })
+
   it('keeps a preview when the navigation guard cancels leaving', async () => {
     const run = vi.fn(async (_signal: AbortSignal) => {})
     const cleanup = queueFramePreview(run)
