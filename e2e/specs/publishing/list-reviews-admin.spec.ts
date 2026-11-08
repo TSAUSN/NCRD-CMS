@@ -214,6 +214,8 @@ test('Lists review keeps exact changed values and decisions together while prote
     await page.unroute(fail)
     await page.getByLabel('Add a comment', { exact: true }).fill('')
     await page.getByRole('link', { name: /^\[Second list\]/ }).click()
+    await expect(page).toHaveURL(new RegExp('collectionReview=' + lists[1]!.request))
+    await expect(page.getByRole('heading', { name: '[Second list]', exact: true })).toBeVisible()
     await page.getByRole('button', { name: 'Return with feedback', exact: true }).click()
     const returned = page.getByRole('dialog', { name: 'Return this list for changes?', exact: true })
     await returned.getByLabel('What should change?', { exact: true }).fill('[Check the saved role.]')
