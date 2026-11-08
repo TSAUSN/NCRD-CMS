@@ -1,35 +1,11 @@
 'use client'
-// The section library as a docked working shelf. V1 proved that keeping the
-// catalogue beside the page makes building feel direct; its problem was the
-// ~180px width, not the idea. V2 uses the full inspector column, keeps the page
-// structure and canvas visible, and retains a detailed preview before insert.
-//
-// WHERE THE NEW SECTION GOES, AND WHY THAT IS DECIDED BEFORE THIS OPENS
-//
-// Every Add control still opens with an explicit insertion point, so clicking
-// Insert and all keyboard use stay deterministic. A pointer user may instead
-// drag any card onto the page itself, where a red line shows the gap it will
-// land in (V1 reference 10), or onto a gap in the page-structure tree. The
-// canvas works the gap out from its own section boxes and the editor checks it.
-//
-// This is deliberately non-modal: keyboard focus may leave it for the tree or
-// canvas. Esc closes it and focus returns to the control that opened it.
 import styles from './library-overlay.module.css'
 import { Dialog, Button } from '../../../components/ui/index.ts'
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
-import {
-  IconAlert,
-  IconChevronLeft,
-  IconClose,
-  IconPlus,
-  IconSearch,
-  IconSections,
-} from '../../../components/icons.tsx'
-import { SectionLibraryCard } from '../../../components/section-library-card.tsx'
-import { SectionThumbnail } from '../../../components/section-thumbnail.tsx'
-import { SectionRequestForm } from '../../../components/section-request.tsx'
-import { SectionFavourite } from '../../../components/section-favourite.tsx'
-import { SectionLivePreview } from '../../../components/section-live-preview.tsx'
+import { IconClose } from '../../../components/icons.tsx'
+import { LibraryCatalog } from './library-catalog.tsx'
+import { LibraryPreviewDialog } from './library-preview-dialog.tsx'
+
 import type { LibraryEntry } from './editor.tsx'
 import type { SitePreviewContext } from '../../../lib/preview-context.ts'
 import { compareSectionCategories } from '../../../lib/section-library-order.ts'
@@ -46,7 +22,6 @@ type Props = {
   onClose: () => void
   onChoose: (entry: LibraryEntry) => void
   onFavouriteChange?: (definitionId: string, favourite: boolean) => void
-  /** Page recipes, offered as the library's second view (V1 reference 12). */
   pasteControl?: ReactNode
   recipeControl?: ReactNode
   /**
@@ -131,10 +106,6 @@ export function LibraryOverlay({
     })
   }, [library, search, category, favouritesOnly, favourites])
 
-  // The cursor is an index into a list that shrinks as somebody types, so it has
-  // to be pulled back rather than left pointing past the end — a highlighted
-  // card that is not on screen is a keyboard user pressing Enter and getting
-  // whatever used to be there.
   const active = Math.min(cursor, Math.max(0, shown.length - 1))
 
   useEffect(() => {
@@ -142,13 +113,7 @@ export function LibraryOverlay({
     searchInput.current?.focus()
     const restore = opener.current
     return () => {
-      // Focus goes back where it came from, synchronously.
-      //
-      // Deferring it to a microtask looks safer and is not: React's development
-      // double-invoke runs mount → cleanup → mount, so a deferred restore
-      // landed *after* the second mount had focused the search box and left
-      // the opener focused inside an open dialog. The dialog's DOM is still
-      // present when a cleanup runs, so there is nothing to wait for.
+      // Restore focus before a new mount can move it again.
       if (restore instanceof HTMLElement && document.contains(restore)) restore.focus()
     }
   }, [])
@@ -166,8 +131,6 @@ export function LibraryOverlay({
 
       if (previewing || showingRecipes) return
       if (!dialog.current?.contains(event.target as Node)) return
-      // Request fields are ordinary form controls, not the catalogue's search
-      // box. Enter must submit the request and arrows must move its text caret.
       if (event.target instanceof Element && event.target.closest('.section-request-form')) return
       if (
         event.target instanceof HTMLSelectElement ||
@@ -175,9 +138,7 @@ export function LibraryOverlay({
       )
         return
 
-      // Arrow keys move a highlight through the cards from anywhere in the
-      // dialog, including from the search box, so somebody can type two letters
-      // and press Down without first having to work out how to leave the field.
+      // Let the search field keep focus while its highlighted result moves.
       if (
         event.key === 'ArrowDown' ||
         event.key === 'ArrowUp' ||
@@ -203,10 +164,7 @@ export function LibraryOverlay({
         return
       }
 
-      // Enter adds the highlighted section — but only from somewhere that is
-      // not itself an activatable control. Enter on the Close button has to
-      // close, and Enter on a card has to add *that* card; taking the key over
-      // everywhere would make both of those do something else.
+      // Preserve the native Enter action on a focused control.
       if (event.key === 'Enter') {
         const focused = document.activeElement
         if (focused instanceof HTMLButtonElement || focused instanceof HTMLAnchorElement) return
@@ -242,6 +200,16 @@ export function LibraryOverlay({
     if (choosingPlacement) scrollSurface.current?.scrollTo({ top: 0 })
   }, [choosingPlacement])
 
+  function setFavourite(id: string, value: boolean) {
+    setFavourites(previous => {
+      const next = new Set(previous)
+      if (value) next.add(id)
+      else next.delete(id)
+      return next
+    })
+    onFavouriteChange?.(id, value)
+  }
+
   const shelf = (
     <aside
       id="editor-panel-library"
@@ -251,9 +219,6 @@ export function LibraryOverlay({
       aria-modal="false"
       aria-labelledby="library-title"
     >
-      {/* Where the section will land is the heading, not a footnote: it is the
-            thing the canvas insertion line used to say and the overlay covers
-            the canvas. */}
       <div className="overlay-head">
         <h2 id="library-title">
           {replacing ? 'Change layout' : showingRecipes ? 'Add a page template' : 'Add a section'}{' '}
@@ -307,8 +272,6 @@ export function LibraryOverlay({
             Browse all
           </Button>
         )}
-        {/* V1 offered its catalogue and its page templates side by side in the
-            docked library; so does this, with the recipes as cards. */}
         {!replacing && recipeControl !== undefined && (
           <div className="group library-views" role="group" aria-label="Show in the library">
             <button type="button" aria-pressed={view === 'sections'} onClick={() => setView('sections')}>
@@ -322,215 +285,30 @@ export function LibraryOverlay({
         {showingRecipes ? (
           recipeControl
         ) : (
-          <>
-            {!replacing && <p className="library-drag-hint">Drag a card onto the page to place it, or choose Add.</p>}
-            <div className="overlay-controls">
-              <label className="sr-only" htmlFor="library-search">
-                Search sections
-              </label>
-              <span className="search-field">
-                <IconSearch size={15} />
-                <input
-                  id="library-search"
-                  ref={searchInput}
-                  type="search"
-                  placeholder="Search sections"
-                  value={search}
-                  autoComplete="off"
-                  onChange={event => {
-                    setSearch(event.target.value)
-                    setCursor(0)
-                  }}
-                />
-              </span>
-              <span className="overlay-count" aria-live="polite">
-                {shown.length === library.length
-                  ? `${library.length} ${library.length === 1 ? 'section' : 'sections'}`
-                  : `${shown.length} of ${library.length}`}
-              </span>
-              <span className="overlay-keyhint">
-                <kbd>↑</kbd>
-                <kbd>↓</kbd> to look through them, <kbd>Enter</kbd> to {replacing ? 'review one' : 'add one'}
-              </span>
-            </div>
-
-            <div className="overlay-body">
-              <nav className="overlay-categories" aria-label="Categories">
-                <p className="eyebrow">Categories</p>
-                <button
-                  type="button"
-                  aria-pressed={category === null && !favouritesOnly}
-                  onClick={() => {
-                    setCategory(null)
-                    setFavouritesOnly(false)
-                    setCursor(0)
-                  }}
-                >
-                  <span>All</span> <span className="tally">{library.length}</span>
-                </button>
-                <button
-                  type="button"
-                  aria-pressed={favouritesOnly}
-                  onClick={() => {
-                    setFavouritesOnly(!favouritesOnly)
-                    setCursor(0)
-                  }}
-                >
-                  <span>
-                    <span aria-hidden="true">★</span> Favourites
-                  </span>{' '}
-                  <span className="tally">{favourites.size}</span>
-                </button>
-                {categories.map(([name, count]) => (
-                  <button
-                    key={name}
-                    type="button"
-                    aria-pressed={category === name}
-                    onClick={() => {
-                      setCategory(name)
-                      setCursor(0)
-                    }}
-                  >
-                    <span>{name}</span> <span className="tally">{count}</span>
-                  </button>
-                ))}
-              </nav>
-
-              {/* No `role="list"` here and no `role="listitem"` on the cards. A
-              <button> given a listitem role stops being a button to assistive
-              technology — it keeps looking activatable and stops announcing that
-              it is — and the group is already named by the dialog it is in. */}
-              <div className="overlay-grid" ref={grid}>
-                {shown.length === 0 ? (
-                  <div className="empty-state overlay-empty">
-                    <div className="empty-icon">
-                      <IconSections size={22} />
-                    </div>
-                    {favouritesOnly && !search.trim() && !category ? (
-                      <>
-                        <h3>No favourites yet</h3>
-                        <p>Star a section to keep it here, on this site, for next time.</p>
-                      </>
-                    ) : (
-                      <>
-                        <h3>{search.trim() ? <>Nothing matches “{search}”</> : 'Nothing in this view'}</h3>
-                        <p>
-                          Sections are made by a site owner. If the one you need is not here, ask for it — or clear the
-                          search to see everything.
-                        </p>
-                      </>
-                    )}
-                    <div className="actions">
-                      <button
-                        type="button"
-                        className="secondary"
-                        onClick={() => {
-                          setSearch('')
-                          setCategory(null)
-                          setFavouritesOnly(false)
-                        }}
-                      >
-                        Show everything
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  shown.map((entry, index) => (
-                    <SectionLibraryCard
-                      key={entry.section_def_id}
-                      entry={entry}
-                      draggable={!replacing}
-                      data-active={index === active}
-                      data-testid={`library-card-${entry.slug}`}
-                      onDragStart={event => {
-                        if (replacing) {
-                          event.preventDefault()
-                          return
-                        }
-                        event.dataTransfer.effectAllowed = 'copy'
-                        event.dataTransfer.setData('application/x-cms-section', entry.section_def_id)
-                        event.dataTransfer.setData('text/plain', entry.name)
-                      }}
-                      onMouseEnter={() => setCursor(index)}
-                      thumbnail={
-                        <button
-                          type="button"
-                          className="section-card-preview"
-                          aria-label={`Preview ${entry.name}`}
-                          onClick={event => {
-                            event.currentTarget.focus()
-                            setPreviewing(entry)
-                          }}
-                        >
-                          <SectionThumbnail entry={entry} element="span" eager />
-                        </button>
-                      }
-                      favourite={
-                        <SectionFavourite
-                          key={`${entry.section_def_id}-${favourites.has(entry.section_def_id)}`}
-                          siteId={siteId}
-                          compact
-                          definitionId={entry.section_def_id}
-                          name={entry.name}
-                          initial={favourites.has(entry.section_def_id)}
-                          onChange={value => {
-                            setFavourites(previous => {
-                              const next = new Set(previous)
-                              if (value) next.add(entry.section_def_id)
-                              else next.delete(entry.section_def_id)
-                              return next
-                            })
-                            onFavouriteChange?.(entry.section_def_id, value)
-                          }}
-                        />
-                      }
-                      usage={
-                        entry.used_on_pages > 0 ? (
-                          <span className="section-card-meta">
-                            Used on {entry.used_on_pages} {entry.used_on_pages === 1 ? 'page' : 'pages'}
-                          </span>
-                        ) : undefined
-                      }
-                      actions={
-                        <>
-                          <button
-                            type="button"
-                            className="secondary small"
-                            onClick={event => {
-                              event.currentTarget.focus()
-                              setPreviewing(entry)
-                            }}
-                          >
-                            Preview
-                          </button>
-                          <button
-                            type="button"
-                            className="small"
-                            onClick={() => onChoose(entry)}
-                            aria-label={replacing ? `Use ${entry.name} layout` : `Add ${entry.name} ${placement}`}
-                          >
-                            {replacing ? (
-                              'Use layout'
-                            ) : (
-                              <>
-                                <IconPlus size={13} /> Add
-                              </>
-                            )}
-                          </button>
-                        </>
-                      }
-                    />
-                  ))
-                )}
-                <div className={styles.request}>
-                  <button type="button" className="link" onClick={() => setRequestOpen(!requestOpen)}>
-                    Request a section
-                  </button>
-                  {requestOpen && <SectionRequestForm siteId={siteId} preserveEditor />}
-                </div>
-              </div>
-            </div>
-          </>
+          <LibraryCatalog
+            siteId={siteId}
+            placement={placement}
+            replacing={replacing}
+            searchInput={searchInput}
+            grid={grid}
+            search={search}
+            setSearch={setSearch}
+            shown={shown}
+            library={library}
+            category={category}
+            setCategory={setCategory}
+            categories={categories}
+            favouritesOnly={favouritesOnly}
+            setFavouritesOnly={setFavouritesOnly}
+            favourites={favourites}
+            onSetFavourite={setFavourite}
+            setCursor={setCursor}
+            active={active}
+            setPreviewing={setPreviewing}
+            onChoose={onChoose}
+            requestOpen={requestOpen}
+            toggleRequest={() => setRequestOpen(value => !value)}
+          />
         )}
       </div>
       {previewing && (
@@ -554,120 +332,6 @@ export function LibraryOverlay({
     shelf
   )
 }
-
-/**
- * A section at full width before it is added (V1 reference 11). The page
- * behind is dimmed; the section is shown at desktop, tablet or phone width in
- * the site's chosen appearance, with the fields an editor will be able to fill
- * in. It used to replace the shelf's own list inside its narrow column, where a
- * 1200px band could not be seen. Esc or Back returns to the list, focused where
- * it was.
- */
-function LibraryPreviewDialog({
-  entry,
-  siteId,
-  previewContext,
-  placement,
-  replacing,
-  onBack,
-  onChoose,
-}: {
-  entry: LibraryEntry
-  siteId: string
-  previewContext: SitePreviewContext
-  placement: string
-  replacing: boolean
-  onBack: () => void
-  onChoose: () => void
-}) {
-  const [previewReady, setPreviewReady] = useState(false)
-  const box = useRef<HTMLDialogElement>(null),
-    back = useRef<HTMLButtonElement>(null)
-  useEffect(() => {
-    const opener = document.activeElement,
-      dialog = box.current
-    if (dialog && !dialog.open) dialog.showModal()
-    back.current?.focus()
-    return () => {
-      dialog?.close()
-      if (opener instanceof HTMLElement && document.contains(opener)) opener.focus()
-    }
-  }, [])
-  return (
-    <dialog
-      ref={box}
-      className="section-preview-dialog library-preview-dialog"
-      aria-labelledby="library-preview-title"
-      onCancel={event => {
-        event.preventDefault()
-        onBack()
-      }}
-    >
-      <div className="section-preview-dialog-head">
-        <div>
-          <h3 id="library-preview-title">{entry.name}</h3>
-          <p className="muted">
-            {entry.category || 'Other'} · {entry.scope === 'site' ? 'This site only' : 'Shared across sites'}
-          </p>
-        </div>
-        <button ref={back} type="button" className="secondary small" onClick={onBack}>
-          <IconChevronLeft size={14} /> Back to sections
-        </button>
-      </div>
-      <SectionLivePreview
-        onReady={setPreviewReady}
-        previewContext={previewContext}
-        siteId={siteId}
-        definitionId={entry.section_def_id}
-        name={entry.name}
-      />
-      <div className="library-preview-foot">
-        <div>
-          {entry.slots.length === 0 ? (
-            <p>This section has no page-specific fields.</p>
-          ) : (
-            <p className="library-preview-fields">
-              <span>You can edit</span>
-              {entry.slots.map(slot => (
-                <span className="chip chip-neutral" key={slot.id}>
-                  {slot.label}
-                </span>
-              ))}
-            </p>
-          )}
-          <p className="hint">
-            {entry.used_on_pages === 0
-              ? 'It is not used on another page yet.'
-              : `It is already used on ${entry.used_on_pages} ${entry.used_on_pages === 1 ? 'page' : 'pages'}.`}
-          </p>
-          {entry.carries_trusted_code && (
-            <p className="section-card-warn">
-              <IconAlert size={13} />
-              Contains custom code — needs approval before the page goes live
-            </p>
-          )}
-        </div>
-        <button type="button" disabled={!previewReady} onClick={onChoose}>
-          {replacing ? (
-            <>Review this layout</>
-          ) : (
-            <>
-              <IconPlus size={15} /> Add here {placement}
-            </>
-          )}
-        </button>
-      </div>
-    </dialog>
-  )
-}
-
-/**
- * How many cards are on a row right now, read off the grid rather than assumed.
- *
- * Arrow-down has to move by one row, and the row length is whatever the CSS
- * `auto-fill` produced at this window width. Hard-coding it would make the
- * keyboard and the eye disagree at every size but one.
- */
 function columnCount(node: HTMLElement | null): number {
   if (!node) return 1
   const columns = getComputedStyle(node).gridTemplateColumns
