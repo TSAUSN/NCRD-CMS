@@ -3,7 +3,7 @@ import { DropIndicator, ReorderAnnouncement } from '../../../components/ui/drop-
 import { flatReorderIntent } from '../../../components/ui/flat-reorder.ts'
 import reorderStyles from '../../../components/ui/reorderable-list.module.css'
 import { useReorderableList } from '../../../components/ui/use-reorderable-list.ts'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { GuardedLink as Link } from '../../../components/guarded-link.tsx'
 import { Button, ButtonLink, SearchField, Note, EmptyState, SegmentedControl } from '../../../components/ui/index.ts'
 import { IconDrag, IconChevronRight } from '../../../components/icons.tsx'
@@ -12,9 +12,8 @@ import { pageInMenu, pageMenuLocations } from '../../../lib/page-details.ts'
 import { reviewDate } from '../../../lib/review-time.ts'
 import type { WorkspacePage } from '../../../lib/workspace-queries.ts'
 import type { PageListControls } from '../../../lib/page-list-workspace.ts'
-import { useNavigationGuard } from '../../../components/navigation-guard.ts'
-import { changePageList } from './page-list-actions.ts'
-import { movePageInOrder } from './page-order.ts'
+import { usePageListCommands } from './use-page-list-commands.ts'
+import { isOrdinaryPage } from '../../../lib/ordinary-page.ts'
 import { PageManagement } from './page-management.tsx'
 import styles from '../../../components/workspace.module.css'
 import workspaceFormsStyles from '../../../components/workspace-styles/workspace-forms.module.css'
@@ -38,76 +37,31 @@ export function NativePagesTable({
   liveOrigin: string | null
   editorCanvasOrigin?: string | null
 }) {
-  const [search, setSearch] = useState(''),
-    [tab, setTab] = useState('main'),
-    [controls, setControls] = useState(initial),
-    [pending, setPending] = useState(false),
-    [notice, setNotice] = useState(''),
-    [error, setError] = useState(''),
-    busy = useRef(false)
-  useEffect(() => setControls(initial), [initial])
-  useNavigationGuard(() => ({ dirty: false, pending: pending || busy.current }))
-  const ordinary = useMemo(
-      () =>
-        pages
-          .filter(
-            page =>
-              !page.slug.startsWith('stories/') &&
-              !controls?.stories.some(story => story.path === (page.slug ? '/' + page.slug : '/')),
-          )
-          .sort((a, b) => (controls?.order.indexOf(a.id) ?? 0) - (controls?.order.indexOf(b.id) ?? 0)),
-      [pages, controls],
-    ),
-    sectors = ordinary.filter(page => page.slug.startsWith('ways-we-help/')),
-    main = ordinary.filter(page => !page.slug.startsWith('ways-we-help/')),
-    drafts = ordinary.filter(page => !page.published_version_id),
-    term = search.trim().toLowerCase(),
-    rows = (term ? ordinary : tab === 'sectors' ? sectors : tab === 'drafts' ? drafts : main).filter(
-      page => !term || (page.title + ' ' + page.slug).toLowerCase().includes(term),
-    ),
-    stories = term
-      ? (controls?.stories.filter(story => (story.title + ' ' + story.path).toLowerCase().includes(term)) ?? [])
-      : []
-  async function save(
-    pageId: string,
-    kind: 'menu' | 'footer' | 'move',
-    options: { on?: boolean; beforeId?: string; afterId?: string } = {},
-  ) {
-    if (!controls || busy.current) return
-    busy.current = true
-    setPending(true)
-    setNotice('')
-    setError('')
-    const before = controls
-    if (kind === 'move') {
-      const order = movePageInOrder(before.order, pageId, options)
-      if (order) setControls({ ...before, order })
-    }
-    try {
-      const result = await changePageList({ siteId, pageId, kind, ...options, controls })
-      if (result.ok) {
-        setControls(result.controls)
-        setNotice(result.message)
-      } else {
-        if (kind === 'move') setControls(before)
-        setError(result.message)
-      }
-    } catch {
-      if (kind === 'move') setControls(before)
-      setError('The save could not be confirmed. Reload to compare before trying again.')
-    } finally {
-      busy.current = false
-      setPending(false)
-    }
-  }
+  const [search, setSearch] = useState('')
+  const [tab, setTab] = useState('main')
+  const { controls, pending, notice, error, save } = usePageListCommands(siteId, initial)
+  const ordinary = useMemo(() => {
+    const storyPaths = new Set(controls?.stories.map(story => story.path))
+    const order = controls ? new Map(controls.order.map((id, index) => [id, index])) : null
+    const position = (id: string) => (order ? (order.get(id) ?? -1) : 0)
+    return pages.filter(page => isOrdinaryPage(page.slug, storyPaths)).sort((a, b) => position(a.id) - position(b.id))
+  }, [pages, controls])
+  const sectors = ordinary.filter(page => page.slug.startsWith('ways-we-help/'))
+  const main = ordinary.filter(page => !page.slug.startsWith('ways-we-help/'))
+  const drafts = ordinary.filter(page => !page.published_version_id)
+  const term = search.trim().toLowerCase()
+  const rows = (term ? ordinary : tab === 'sectors' ? sectors : tab === 'drafts' ? drafts : main).filter(
+    page => !term || (page.title + ' ' + page.slug).toLowerCase().includes(term),
+  )
+  const stories = term
+    ? (controls?.stories.filter(story => (story.title + ' ' + story.path).toLowerCase().includes(term)) ?? [])
+    : []
+  const rowIds = rows.map(row => row.id)
   const canReorder = canAdmin && !term && tab !== 'drafts'
   const reorder = useReorderableList({
     mimeType: 'application/x-cms-page',
     decide: point => {
-      const intent = flatReorderIntent(
-        rows.map(row => row.id),
-        point,
-      )
+      const intent = flatReorderIntent(rowIds, point)
       if (intent.status !== 'move') return intent
       return { ...intent, move: { id: point.from, over: point.over, edge: point.edge } }
     },

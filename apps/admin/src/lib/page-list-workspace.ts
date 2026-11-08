@@ -2,6 +2,7 @@ import 'server-only'
 import { asUser, type Queryable } from '@cms/platform'
 import { FooterConfig, NavTree } from '@cms/schema'
 import { footerPageMembership } from './page-list-links.ts'
+import { isOrdinaryPage } from './ordinary-page.ts'
 export type PageListControls = {
   headerRevision: number
   footerRevision: number
@@ -35,16 +36,14 @@ export async function readPageListControls(client: Queryable, siteId: string): P
     )
   ).rows
   const pages = (
-      await client.query<{ id: string; title: string; slug: string; sort_index: number }>(
-        "SELECT id,title,slug,sort_index FROM pages WHERE site_id=$1 AND archived_at IS NULL ORDER BY sort_index,slug<>'',title,id",
-        [siteId],
-      )
-    ).rows,
-    normal = pages.filter(
-      page =>
-        !page.slug.startsWith('stories/') && !stories.some(story => story.path === (page.slug ? '/' + page.slug : '/')),
-    ),
-    config = FooterConfig.parse(footer.content)
+    await client.query<{ id: string; title: string; slug: string; sort_index: number }>(
+      "SELECT id,title,slug,sort_index FROM pages WHERE site_id=$1 AND archived_at IS NULL ORDER BY sort_index,slug<>'',title,id",
+      [siteId],
+    )
+  ).rows
+  const storyPaths = new Set(stories.map(story => story.path))
+  const normal = pages.filter(page => isOrdinaryPage(page.slug, storyPaths))
+  const config = FooterConfig.parse(footer.content)
   return {
     headerRevision: Number(header.revision),
     footerRevision: Number(footer.revision),
