@@ -41,11 +41,18 @@ test('Home matches the Main card hierarchy and shared navigation keeps visible i
       await page.setViewportSize({ width, height: 1000 })
       const title = await main.getByRole('heading', { name: 'Home', level: 1, exact: true }).boundingBox()
       expect(title!.y).toBe(28)
-      const cards = main.locator('article.site-card:visible'),
-        activeCount = Number(
-          (await f.pool.query("SELECT count(*) AS n FROM sites WHERE status<>'archived'")).rows[0]!.n,
+      const cards = main.locator('article.site-card:visible')
+      const active = (
+        await f.pool.query<{ id: string }>(
+          "SELECT id FROM sites WHERE status <> 'archived' AND archived_at IS NULL ORDER BY id",
         )
-      await expect(cards).toHaveCount(activeCount)
+      ).rows.map(site => '/sites/' + site.id)
+      await expect(cards).toHaveCount(active.length)
+      expect(
+        await cards
+          .locator('.site-card-name')
+          .evaluateAll(links => links.map(link => link.getAttribute('href')).sort()),
+      ).toEqual(active)
       const boxes = await cards.evaluateAll(nodes =>
         nodes.map(node => {
           const b = node.getBoundingClientRect()

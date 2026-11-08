@@ -38,8 +38,22 @@ test('revision 8 workspaces: personal Home, Site overview, Pages search and page
   await capture(page, 'site-overview-pages')
   const overview = page.url(),
     nav = page.getByRole('navigation', { name: 'Sections of the CMS' })
+  const inbox = await page.request.get('/api/inbox/summary')
+  expect(inbox.ok()).toBe(true)
+  const { count } = (await inbox.json()) as { count: number }
+  expect(Number.isSafeInteger(count)).toBe(true)
+  const reviews = nav.getByRole('link', { name: 'Reviews', exact: true })
+  await expect(reviews).toHaveCount(count > 0 ? 1 : 0)
+  if (count > 0) await expect(reviews).toHaveAttribute('href', '/inbox')
   const sections = await nav.getByRole('link').evaluateAll(links => links.map(link => link.getAttribute('aria-label')))
-  expect(sections).toEqual(['Home', 'Pages', ...(sections.includes('Lists') ? ['Lists'] : []), 'Media', 'Publish'])
+  expect(sections).toEqual([
+    'Home',
+    'Pages',
+    ...(sections.includes('Lists') ? ['Lists'] : []),
+    'Media',
+    'Publish',
+    ...(count > 0 ? ['Reviews'] : []),
+  ])
   const switcher = page.getByRole('button', { name: 'Switch site · Demo site', exact: true }),
     switchBox = await switcher.boundingBox(),
     overviewBox = await nav.getByRole('link', { name: 'Home', exact: true }).boundingBox()
