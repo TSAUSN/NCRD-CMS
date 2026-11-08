@@ -1,6 +1,10 @@
 import { sourceSampleValue, type SlotDef } from '@cms/schema'
 import { planSectionUpgrade } from './section-upgrade.ts'
 
+export function frameValueRecord(value: unknown): Record<string, unknown> {
+  return value && typeof value === 'object' && !Array.isArray(value) ? (value as Record<string, unknown>) : {}
+}
+
 /** Carry compatible authored fields using the same rules as page upgrades.
  * Navigation is governed separately; frames have no collection bindings. */
 export function carryFrameValues(
