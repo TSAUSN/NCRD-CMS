@@ -58,9 +58,9 @@ type Props = {
   canInspect: boolean
 }
 export function NativeHistory(props: Props) {
-  const [author, setAuthor] = useState('all'),
-    [kind, setKind] = useState('all'),
-    [onlyChanges, setOnlyChanges] = useState(false)
+  const [author, setAuthor] = useState('all')
+  const [kind, setKind] = useState('all')
+  const [onlyChanges, setOnlyChanges] = useState(false)
   const rows = props.versions.filter(
     row =>
       (author === 'all' || (author === 'you' && row.mine) || (author === 'others' && !row.mine)) &&
@@ -69,8 +69,8 @@ export function NativeHistory(props: Props) {
         (kind === 'automatic' && row.kind === 'autosave') ||
         (kind === 'saved' && row.kind !== 'autosave')),
   )
-  const selected = props.selected,
-    compared = props.compared
+  const selected = props.selected
+  const compared = props.compared
   const queue = (
     <>
       <div className={reviewWorkbenchStyles.queueHeading}>
@@ -313,43 +313,11 @@ export function NativeHistory(props: Props) {
             </Card>
           )}
           {props.canInspect && compared && props.changes.length > 0 && (
-            <Disclosure className={ownedStyles.historyCompare} title="All saved fields">
-              <p>Sections are compared by position here. Moving one can also appear as field changes.</p>
-              <div data-scroll="bounded" className={recordTableStyles.tableWrap}>
-                <table
-                  data-density="content"
-                  data-layout="stored"
-                  className={recordTableStyles.table + ' ' + ownedStyles.historyChanges}
-                >
-                  <thead>
-                    <tr>
-                      <th>Field</th>
-                      <th>Version {selected.revision}</th>
-                      <th>Version {compared.revision}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {props.changes.map((change, index) => (
-                      <tr key={index}>
-                        <th scope="row" title={change.label}>
-                          {change.label}
-                        </th>
-                        <td>
-                          <pre tabIndex={0} aria-label={'Stored value in version ' + selected.revision}>
-                            {comparisonText(change.before)}
-                          </pre>
-                        </td>
-                        <td>
-                          <pre tabIndex={0} aria-label={'Stored value in version ' + compared.revision}>
-                            {comparisonText(change.after)}
-                          </pre>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </Disclosure>
+            <StoredVersionFields
+              selectedRevision={selected.revision}
+              comparedRevision={compared.revision}
+              changes={props.changes}
+            />
           )}
           <p className={recordTableStyles.meta}>
             Restoring makes a new draft from the selected version. Nothing in history is deleted. Shared content keeps
@@ -378,6 +346,56 @@ function SavedValue({ value }: { value: string }) {
   return (
     <Disclosure title={preview + '…'}>
       <p>{value}</p>
+    </Disclosure>
+  )
+}
+
+function StoredVersionFields({
+  selectedRevision,
+  comparedRevision,
+  changes,
+}: {
+  selectedRevision: string
+  comparedRevision: string
+  changes: VersionChange[]
+}) {
+  return (
+    <Disclosure className={ownedStyles.historyCompare} title="All saved fields">
+      <p>Sections are compared by position here. Moving one can also appear as field changes.</p>
+      <div data-scroll="bounded" className={recordTableStyles.tableWrap}>
+        <table
+          data-density="content"
+          data-layout="stored"
+          className={recordTableStyles.table + ' ' + ownedStyles.historyChanges}
+        >
+          <thead>
+            <tr>
+              <th>Field</th>
+              <th>Version {selectedRevision}</th>
+              <th>Version {comparedRevision}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {changes.map((change, index) => (
+              <tr key={index}>
+                <th scope="row" title={change.label}>
+                  {change.label}
+                </th>
+                <td>
+                  <pre tabIndex={0} aria-label={'Stored value in version ' + selectedRevision}>
+                    {comparisonText(change.before)}
+                  </pre>
+                </td>
+                <td>
+                  <pre tabIndex={0} aria-label={'Stored value in version ' + comparedRevision}>
+                    {comparisonText(change.after)}
+                  </pre>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </Disclosure>
   )
 }
