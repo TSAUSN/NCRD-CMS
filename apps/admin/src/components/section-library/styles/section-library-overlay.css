@@ -180,15 +180,6 @@
   font-size: 0.75rem;
   justify-content: center;
 }
-.library-drawer .library-preview-copy {
-  display: block;
-  padding: 0.75rem;
-}
-.library-drawer .library-preview-copy > button {
-  width: 100%;
-  margin-top: 0.75rem;
-  justify-content: center;
-}
 /* Where the shelf becomes a full-width tab (tablet), as many columns as fit. */
 @media (max-width: 64rem) {
   .library-drawer .overlay-grid {

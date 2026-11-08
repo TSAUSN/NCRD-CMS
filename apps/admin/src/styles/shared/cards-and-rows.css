@@ -32,14 +32,6 @@
 .card-head .icon-svg {
   color: var(--ink-3);
 }
-.card-quiet {
-  box-shadow: none;
-  background: var(--surface-2);
-}
-.card-pad-0 {
-  padding: 0;
-  overflow: hidden;
-}
 
 .grid {
   display: grid;
@@ -79,17 +71,6 @@
 }
 .row:hover {
   background: var(--surface-2);
-}
-.row-title {
-  font-weight: 650;
-  font-size: 0.9375rem;
-  text-decoration: none;
-  color: var(--ink);
-  display: inline-block;
-}
-.row-title:hover {
-  color: var(--navy-600);
-  text-decoration: underline;
 }
 
 /* Empty states teach: what the thing is, and what happens next (SPEC §7). */

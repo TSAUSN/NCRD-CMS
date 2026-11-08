@@ -50,11 +50,6 @@
   color: var(--bar-ink);
   text-decoration: none;
 }
-.editor-exit-label {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
 .editor-title {
   display: flex;
   align-items: center;
@@ -70,13 +65,6 @@
   color: var(--bar-ink);
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.editor-live-note {
-  color: var(--ink-2);
-  font-size: 0.6875rem;
-  font-weight: 650;
-  letter-spacing: 0.015em;
   white-space: nowrap;
 }
 
@@ -312,9 +300,6 @@
     border-radius: var(--r-sm);
     min-height: 0;
     max-width: none;
-  }
-  .editor-exit-label {
-    display: none;
   }
   .editor-title {
     order: 2;

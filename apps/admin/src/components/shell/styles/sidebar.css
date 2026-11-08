@@ -72,18 +72,6 @@
 }
 /* The product-wide group needs no heading of its own; the site group's
    heading is the site's name, which is the useful one. */
-.sidebar-group-label {
-  margin: 0 0 0.35rem;
-  padding: 0 0.55rem;
-  font-size: 0.6875rem;
-  font-weight: 700;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  color: var(--nav-ink-3);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
 
 .navlink {
   display: flex;
@@ -219,9 +207,6 @@
   justify-content: center;
   padding-inline: 0.35rem;
 }
-.app[data-rail='on'] .sidebar-group-label {
-  display: none;
-}
 
 /* The slim bar that exists only where the sidebar does not. */
 .app-topbar {
@@ -253,9 +238,6 @@
     width: auto;
     height: auto;
     clip-path: none;
-  }
-  .app[data-rail='on'] .sidebar-group-label {
-    display: block;
   }
   .app[data-rail='on'] .navlink,
   .app[data-rail='on'] .whoami {

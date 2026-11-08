@@ -138,48 +138,6 @@
 .replacement-mapping td .hint {
   margin: 0.25rem 0 0;
 }
-.schedule-fields {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.75rem;
-  border: 0;
-  padding: 0;
-}
-.release-choices {
-  border: 0;
-  padding: 0;
-  margin: 1rem 0;
-  display: grid;
-  gap: 0.5rem;
-}
-.release-choices legend {
-  font-weight: 650;
-  margin-bottom: 0.35rem;
-  float: left;
-}
-.release-choices .release-all {
-  justify-self: start;
-  margin-bottom: 0.25rem;
-  clear: both;
-}
-.release-choices small {
-  color: var(--ink-3);
-}
-.release-choices label {
-  display: flex;
-  align-items: start;
-  gap: 0.5rem;
-  font-weight: 500;
-}
-.release-choices input {
-  width: auto;
-  margin-top: 0.25rem;
-}
-.release-choices small {
-  display: block;
-  color: var(--ink-3);
-  font-weight: 400;
-}
 .release-review {
   margin-top: 1rem;
   padding-top: 1rem;
@@ -196,11 +154,6 @@
   padding: 0;
   display: grid;
   gap: 0.4rem;
-}
-@media (max-width: 1050px) {
-  .schedule-fields {
-    grid-template-columns: minmax(0, 1fr);
-  }
 }
 /* The section creator's tool choice sits under its title as one control (V1
    reference 20 named the task first); the preview's appearance sits with it. */

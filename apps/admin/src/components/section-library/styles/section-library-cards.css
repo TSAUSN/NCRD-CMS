@@ -161,40 +161,9 @@
   padding-top: 0.55rem;
   border-top: var(--line-thin) solid var(--line-soft);
 }
-.library-preview-copy {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1.5rem;
-  margin-top: 0.9rem;
-  padding: 1rem 1.1rem;
-  border: var(--line-thin) solid var(--line);
-  border-radius: var(--r);
-  background: var(--surface);
-}
-.library-preview-copy h3 {
-  margin: 0 0 0.25rem;
-  font-size: 1.0625rem;
-}
-.library-preview-copy p {
-  margin: 0;
-  color: var(--ink-2);
-  font-size: 0.875rem;
-}
-.library-preview-copy > button {
-  flex: none;
-}
 
 /* A card on the management screen is a description, not a control: it must not
    lift, glow, or otherwise claim it can be clicked. */
-.section-card-static {
-  cursor: default;
-}
-.section-card-static:hover {
-  border-color: var(--line);
-  box-shadow: var(--e1);
-  transform: none;
-}
 
 /* A category, as a rule with its name and count on it. The old screen used a
    plain <h2> with two and a half rems of air above it, which at three
@@ -229,13 +198,6 @@
   border-radius: var(--r-pill);
   padding: 0.05rem 0.45rem;
   font-variant-numeric: tabular-nums;
-}
-
-.card-drag {
-  cursor: grab;
-}
-.card-drag:active {
-  cursor: grabbing;
 }
 
 /* The section library page (reference 18): one line of filters that apply as
@@ -349,18 +311,6 @@
   gap: 0.3rem;
   padding: 0.7rem 0.8rem 0.75rem;
 }
-.library-card-head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 0.5rem;
-}
-.library-card-head h3 {
-  margin: 0;
-  font-size: 0.9375rem;
-  line-height: 1.3;
-  overflow-wrap: anywhere;
-}
 .library-card button.favourite-star {
   flex: none;
   width: 1.75rem;
@@ -376,27 +326,11 @@
   font-size: 0.75rem;
   gap: 0.3rem;
 }
-.library-card-usage {
-  color: var(--ink-2);
-  text-decoration: underline;
-  text-decoration-color: var(--line-strong);
-  text-underline-offset: 0.2em;
-}
 .library-card .section-card-actions {
   justify-content: flex-start;
   flex-wrap: wrap;
   margin-top: auto;
   padding-top: 0.55rem;
-}
-.library-card-slug {
-  flex: 1 1 4rem;
-  min-width: 0;
-  overflow: hidden;
-  color: var(--ink-3);
-  font-size: 0.6875rem;
-  text-align: right;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 @media (max-width: 60rem) {

@@ -10,28 +10,6 @@
 .collection-edit-handoff .hint {
   margin-bottom: 0;
 }
-.collection-publish-changes {
-  max-height: 38dvh;
-  overflow-y: auto;
-  margin: 0.8rem 0;
-  padding: 0.75rem;
-  background: var(--surface-2);
-  border: var(--line-thin) solid var(--line-soft);
-  border-radius: var(--r-sm);
-  font-size: 0.8125rem;
-  overflow-wrap: anywhere;
-}
-.collection-publish-changes ul {
-  padding-left: 1.1rem;
-  margin: 0;
-}
-.collection-publish-changes > ul > li + li {
-  margin-top: 0.7rem;
-}
-.collection-publish-changes li li {
-  margin-top: 0.25rem;
-  color: var(--ink-2);
-}
 .collection-search {
   position: relative;
   flex: 1 1 18rem;

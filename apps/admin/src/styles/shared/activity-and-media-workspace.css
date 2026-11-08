@@ -111,43 +111,6 @@
   grid-template-columns: 10rem minmax(0, 1fr) 18rem;
   align-items: start;
 }
-.media-folders {
-  padding: 0.85rem 0.6rem;
-  min-width: 0;
-}
-.media-folders-head {
-  display: grid;
-  gap: 0.2rem;
-  padding: 0 0.4rem 0.7rem;
-}
-.media-folders-head small {
-  color: var(--ink-3);
-  font-size: 0.67rem;
-}
-.media-folders > button {
-  display: flex;
-  width: 100%;
-  justify-content: space-between;
-  gap: 0.4rem;
-  margin-bottom: 0.2rem;
-  padding: 0.55rem 0.65rem;
-  color: var(--ink-2);
-  background: transparent;
-  border-color: transparent;
-  text-align: left;
-  font-size: 0.75rem;
-}
-.media-folders > button span {
-  overflow-wrap: anywhere;
-}
-.media-folders > button strong {
-  color: var(--ink-3);
-}
-.media-folders > button:hover,
-.media-folders > button.on {
-  background: var(--navy-tint-2);
-  color: var(--navy-800);
-}
 .media-results {
   min-width: 0;
   border-left: var(--line-thin) solid var(--line);
@@ -250,22 +213,6 @@ ul.media-assets {
   color: var(--ink-3);
   margin-top: 0.3rem;
 }
-.media-detail-tabs {
-  display: flex;
-  gap: 0.3rem;
-  padding-bottom: 0.7rem;
-}
-.media-detail-tabs button {
-  flex: 1;
-  color: var(--ink-2);
-  background: var(--surface-2);
-  border-color: var(--line);
-}
-.media-detail-tabs button[aria-selected='true'] {
-  color: var(--text-on-dark);
-  background: var(--navy-800);
-  border-color: var(--navy-800);
-}
 .media-bulk {
   display: flex;
   flex-wrap: wrap;
@@ -332,21 +279,6 @@ ul.media-assets {
   .media-organizer {
     grid-template-columns: minmax(0, 1fr) 18rem;
   }
-  .media-folders {
-    grid-column: 1 / -1;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.3rem;
-    border-bottom: var(--line-thin) solid var(--line);
-  }
-  .media-folders-head {
-    padding: 0.3rem 0.7rem 0.3rem 0.2rem;
-  }
-  .media-folders > button {
-    width: auto;
-    align-self: center;
-    margin: 0;
-  }
   .media-results {
     border-left: 0;
   }
@@ -358,9 +290,6 @@ ul.media-assets {
   .media-organizer > .media-detail {
     border-left: 0;
     border-top: var(--line-thin) solid var(--line);
-  }
-  .media-folders-head {
-    width: 100%;
   }
   .media-organizer .media-assets.is-grid {
     grid-template-columns: repeat(auto-fill, minmax(min(10rem, 100%), 1fr));

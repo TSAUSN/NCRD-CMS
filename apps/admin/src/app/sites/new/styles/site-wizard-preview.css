@@ -329,17 +329,5 @@
 }
 
 /* The heading of a list, with that list's own primary action beside it. */
-.section-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  margin: 0 0 0.85rem;
-  flex-wrap: wrap;
-}
-.section-bar h2 {
-  margin: 0;
-  font-size: 1rem;
-}
 
 /* ====================================================== the page creator == */

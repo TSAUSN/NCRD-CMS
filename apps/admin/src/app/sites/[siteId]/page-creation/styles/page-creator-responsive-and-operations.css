@@ -157,9 +157,6 @@
   .grid-cards {
     grid-template-columns: 1fr;
   }
-  .page-grid {
-    grid-template-columns: 1fr;
-  }
   .steps {
     flex-direction: column;
   }

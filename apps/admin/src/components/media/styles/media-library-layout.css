@@ -13,41 +13,6 @@
   background: var(--surface);
   box-shadow: var(--e1);
 }
-.media-summary-lead {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.9rem 1rem;
-  color: var(--text-on-dark);
-  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
-  background: radial-gradient(18rem 12rem at 100% 0, rgba(238, 58, 67, 0.35), transparent 65%), var(--navy-800);
-}
-.media-summary-mark {
-  width: 2.65rem;
-  height: 2.65rem;
-  border-radius: var(--r-sm);
-  display: grid;
-  place-items: center;
-  flex: none;
-  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
-  background: rgba(255, 255, 255, 0.12);
-  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
-  border: var(--line-thin) solid rgba(255, 255, 255, 0.15);
-}
-.media-summary-lead > span:last-child {
-  display: flex;
-  flex-direction: column;
-}
-.media-summary-lead strong {
-  font-size: 1.5rem;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-}
-.media-summary-lead small {
-  margin-top: 0.25rem;
-  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
-  color: rgba(255, 255, 255, 0.68);
-}
 .media-summary dl {
   margin: 0;
   display: grid;
@@ -88,28 +53,6 @@
   overflow: hidden;
   background: var(--surface);
   box-shadow: var(--e2);
-}
-.media-upload-head {
-  padding: 1.15rem 1.25rem;
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  color: var(--ink-2);
-  background: linear-gradient(150deg, var(--navy-tint), var(--surface));
-  border-right: var(--line-thin) solid var(--line);
-}
-.media-upload-head .eyebrow {
-  margin: 0 0 0.3rem;
-}
-.media-upload-head h2 {
-  margin: 0;
-  color: var(--navy-800);
-  font-size: 1.15rem;
-}
-.media-upload-head p:last-child {
-  margin: 0.4rem 0 0;
-  font-size: 0.8rem;
-  line-height: 1.5;
 }
 .media-drop {
   margin: 0.8rem;
@@ -155,11 +98,6 @@
 }
 .media-drop .secondary {
   margin-top: 0.45rem;
-}
-.media-upload-form {
-  padding: 0.9rem 1rem 1rem;
-  display: grid;
-  gap: 0.8rem;
 }
 .media-file {
   display: flex;
@@ -354,12 +292,10 @@
   border-bottom: var(--line-thin) solid var(--line);
   background: var(--surface-2);
 }
-.media-filter,
 .media-density {
   display: flex;
   gap: 0.3rem;
 }
-.media-filter button[aria-pressed='true'],
 .media-density button[aria-pressed='true'] {
   color: var(--text-on-dark);
   border-color: var(--navy-800);
@@ -376,11 +312,6 @@
   text-align: right;
   color: var(--ink-3);
   font-size: 0.74rem;
-}
-.media-browser {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 20.5rem;
-  min-height: 32rem;
 }
 .media-assets {
   min-width: 0;

@@ -7,14 +7,6 @@
 .page-settings > summary {
   font-size: 0.875rem;
 }
-.bar-label {
-  font-size: 0.8125rem;
-}
-@media (max-width: 85rem) {
-  .bar-label {
-    display: none;
-  }
-}
 
 /* The few facts the interface cannot show on its own, with nothing selected. */
 .teach {
@@ -240,44 +232,6 @@
 
 /* Section controls, grouped by what they do rather than laid out as one wrapped
    row of six identical buttons. */
-.section-visibility {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.7rem;
-  padding: 0.65rem 0.7rem;
-  border: var(--line-thin) solid var(--line);
-  border-radius: var(--r-sm);
-  background: var(--surface);
-}
-.section-visibility.is-hidden {
-  background: var(--warn-tint);
-  border-color: var(--warn-line);
-}
-.section-visibility > span {
-  min-width: 0;
-  display: grid;
-  gap: 0.1rem;
-}
-.section-visibility strong {
-  font-size: 0.8125rem;
-  color: var(--ink);
-}
-.section-visibility small {
-  font-size: 0.75rem;
-  line-height: 1.35;
-  color: var(--ink-3);
-}
-.section-visibility button {
-  flex: none;
-}
-.tool-row-label {
-  font-size: 0.6875rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-}
 .btn-row {
   display: flex;
   gap: 0.35rem;

@@ -33,23 +33,10 @@
 .controls :global([hidden]) {
   display: none !important;
 }
-.theme :global(.theme-grid),
-.theme :global(.theme-form-grid),
-.theme :global(.theme-form-grid-three) {
+.theme :global(.theme-grid) {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: var(--space-4);
-}
-.theme :global(.theme-colour-grid) {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-4);
-}
-.theme :global(.theme-colour) {
-  min-width: 0;
-  padding: var(--space-4);
-}
-.theme :global(.theme-panel-head) {
-  margin-block-end: var(--space-4);
 }
 .frame :global(aside) {
   padding: 0;

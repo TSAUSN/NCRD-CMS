@@ -120,18 +120,4 @@
   .theme-commandbar .actions > button {
     flex: 1 1 auto;
   }
-  .theme-colour-grid,
-  .theme-form-grid,
-  .theme-form-grid-three {
-    grid-template-columns: 1fr;
-  }
-  .theme-colour {
-    border-right: 0 !important;
-  }
-  .theme-colour:nth-last-child(-n + 2) {
-    border-bottom: var(--line-thin) solid var(--line-soft);
-  }
-  .theme-colour:last-child {
-    border-bottom: 0;
-  }
 }

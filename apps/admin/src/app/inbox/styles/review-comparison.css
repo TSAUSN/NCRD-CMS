@@ -235,60 +235,6 @@
   display: flex;
   gap: 0.5rem;
 }
-.review-empty-state {
-  margin-top: 1rem;
-}
-
-.schedule-gate {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 0.9rem;
-  margin: 0 0 1rem;
-  padding: 0.9rem 1rem;
-  border: var(--line-thin) solid var(--scheduled-line);
-  border-radius: var(--r);
-  background: var(--scheduled-tint);
-}
-.schedule-gate-icon {
-  width: 2.5rem;
-  height: 2.5rem;
-  display: grid;
-  place-items: center;
-  color: var(--scheduled);
-  border: var(--line-thin) solid var(--scheduled-line);
-  border-radius: var(--r-sm);
-  background: var(--surface);
-}
-.schedule-gate .eyebrow {
-  margin: 0 0 0.15rem;
-  color: var(--scheduled);
-}
-.schedule-gate h2 {
-  margin: 0;
-  color: var(--ink);
-  font-size: 0.88rem;
-}
-.schedule-gate p:last-child {
-  max-width: 60rem;
-  margin: 0.28rem 0 0;
-  color: var(--ink-2);
-  font-size: 0.72rem;
-  line-height: 1.45;
-}
-.schedule-gate-state {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  padding: 0.35rem 0.55rem;
-  color: var(--scheduled);
-  border: var(--line-thin) solid var(--scheduled-line);
-  border-radius: var(--r-pill);
-  background: var(--surface);
-  font-size: 0.65rem;
-  font-weight: 750;
-  white-space: nowrap;
-}
 
 /* Tablet portrait becomes a stacked workbench. This is intentionally the
    narrowest authoring layout: phone-sized authoring is outside product scope. */
@@ -330,13 +276,6 @@
   .review-decision-bar {
     margin-inline: -1rem;
     padding-inline: 1rem;
-  }
-  .schedule-gate {
-    grid-template-columns: auto minmax(0, 1fr);
-  }
-  .schedule-gate-state {
-    grid-column: 2;
-    justify-self: start;
   }
 }
 

@@ -213,9 +213,6 @@
   margin-block: var(--space-1);
   margin-inline-start: var(--space-3);
 }
-.structure :global(.tree-label .tree-heading) {
-  line-height: var(--line-meta);
-}
 
 .panes[data-native='true'] {
   --canvas-min: 0;

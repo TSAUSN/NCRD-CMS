@@ -57,10 +57,6 @@
   line-height: var(--line-body);
   margin: 0;
 }
-.embedded :global(.theme-colour[data-compact] > p),
-.embedded :global(.theme-colour[data-compact] > small) {
-  display: none;
-}
 .embedded :is(input, select):disabled {
   opacity: 1;
   color: var(--text-muted);

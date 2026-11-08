@@ -76,74 +76,6 @@
   overflow-x: auto;
 }
 /* One slim row of view controls above the page. */
-.canvas-toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.35rem 1rem;
-  width: 100%;
-  flex: none;
-  font-size: 0.78125rem;
-  color: var(--ink-2);
-}
-.canvas-tool {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-.canvas-tool label,
-label.canvas-tool {
-  margin: 0;
-  font-size: inherit;
-  font-weight: 600;
-  color: var(--ink-3);
-}
-.canvas-tool select {
-  width: auto;
-  min-height: 1.85rem;
-  font-size: inherit;
-  padding: 0.15rem 1.7rem 0.15rem 0.55rem;
-  background-color: var(--surface);
-  border-color: var(--line);
-}
-.canvas-draft-chip {
-  font-size: 0.6875rem;
-  font-weight: 650;
-  color: var(--warn);
-  background: var(--warn-tint);
-  border: var(--line-thin) solid var(--warn-line);
-  border-radius: var(--r-pill);
-  padding: 0.05rem 0.5rem;
-  cursor: help;
-}
-.canvas-width {
-  margin-left: auto;
-  color: var(--ink-3);
-  font-variant-numeric: tabular-nums;
-  font-size: 0.75rem;
-}
-.canvas-toolbar .canvas-focus {
-  min-height: 1.85rem;
-  padding: 0.2rem 0.55rem;
-  color: var(--ink-2);
-}
-.canvas-hidden-toggle {
-  cursor: pointer;
-}
-.canvas-hidden-toggle input {
-  width: 0.95rem;
-  min-height: 0;
-  margin: 0;
-  accent-color: var(--navy-600);
-}
-.editor-site-tools {
-  display: grid;
-  gap: 0.75rem;
-}
-.editor-site-tools a {
-  display: block;
-  line-height: 1.45;
-}
 .canvas-visibility-note {
   display: flex;
   align-items: center;
@@ -334,11 +266,6 @@ label.canvas-tool {
     display: none;
   }
 }
-@media (max-width: 64rem) {
-  .canvas-toolbar .canvas-focus {
-    display: none;
-  }
-}
 iframe.canvas {
   position: absolute;
   top: 0;
@@ -348,20 +275,6 @@ iframe.canvas {
   background: var(--surface);
   display: block;
   transform-origin: top left;
-}
-.canvas-size {
-  flex: none;
-  color: var(--ink-3);
-  font-size: 0.6875rem;
-  font-variant-numeric: tabular-nums;
-}
-.canvas-help {
-  text-align: center;
-  max-width: 44rem;
-  flex: none;
-  margin: 0;
-  font-size: 0.75rem;
-  color: var(--ink-3);
 }
 .canvas-empty {
   background: var(--surface);

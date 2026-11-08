@@ -11,17 +11,7 @@
   /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
   min-height: 24px;
 }
-.row-title {
-  display: inline-flex;
-  align-items: center;
-  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- Keep this exact value until a matching token exists. */
-  min-height: 24px;
-}
 button.link {
-  padding-block: 0.2rem;
-}
-.library-card-usage {
-  display: inline-block;
   padding-block: 0.2rem;
 }
 input[type='file'],
@@ -116,6 +106,3 @@ details > summary {
 }
 
 /* A card's occasional actions, behind one button. */
-.page-manage {
-  position: relative;
-}
