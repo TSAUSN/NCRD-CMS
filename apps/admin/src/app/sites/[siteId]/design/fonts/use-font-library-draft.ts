@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { THEME_FONT_OPTIONS, type ThemeTokens } from '@cms/schema'
 import { ADOBE_KIT_URL, PREVIEW_MESSAGE } from '@cms/renderer'
 import type { FontLibraryWorkspace } from '../../../../../server/queries/font-library.ts'
@@ -34,6 +34,10 @@ export function useFontLibraryDraft({ siteId, initial, chapter, origin }: FontLi
   const newestFrame = useRef<HTMLIFrameElement>(null)
   const connected = tokens.fonts.adobeKit?.enabled === true
   const dirty = JSON.stringify(tokens) !== saved || kit !== ADOBE_KIT_URL
+  const unsaved = useRef(dirty)
+  useLayoutEffect(() => {
+    unsaved.current = dirty
+  }, [dirty])
   const { page, header, footer, menu } = initial
   const host = origin ? new URL(origin).hostname : null
   const canvas = useSiteLookCanvas({
@@ -52,7 +56,9 @@ export function useFontLibraryDraft({ siteId, initial, chapter, origin }: FontLi
       label: 'Font choices',
       saveDraft: persist,
       discard: () => {
-        setTokens(JSON.parse(saved))
+        const savedTokens: ThemeTokens = JSON.parse(saved)
+        unsaved.current = false
+        setTokens(savedTokens)
         setKit(ADOBE_KIT_URL)
         setError('')
         setNotice(null)
@@ -64,11 +70,11 @@ export function useFontLibraryDraft({ siteId, initial, chapter, origin }: FontLi
   }, [canvas.error])
   useEffect(() => {
     function warn(event: BeforeUnloadEvent) {
-      if (dirty || pending) event.preventDefault()
+      if (unsaved.current || busy.current) event.preventDefault()
     }
     window.addEventListener('beforeunload', warn)
     return () => window.removeEventListener('beforeunload', warn)
-  }, [dirty, pending])
+  }, [])
   useEffect(() => {
     if (!connected || !canvas.ticket) return
     setStatus('checking')
@@ -146,6 +152,7 @@ export function useFontLibraryDraft({ siteId, initial, chapter, origin }: FontLi
       const result = await saveThemeDraft(data)
       setNotice(result)
       if (!result.ok) return { ok: false, message: result.message }
+      unsaved.current = false
       setSaved(JSON.stringify(snapshot))
       setKit(ADOBE_KIT_URL)
       setRevision(result.revision)
