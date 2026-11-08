@@ -1,7 +1,26 @@
 # Review speed and Friday database size
 
 For the maintainer and IT.
-Last checked: November 5, 2026, on personal review build `6c20751`.
+Baseline browser measurements below: November 5, 2026, on review build `6c20751`.
+
+## Admin loads without controls or preview
+
+A November 8 Chrome reload rendered Admin HTML but its JavaScript did not start.
+Cloud Run returned 429 for 14 of the 22 JavaScript and CSS requests while the
+single Admin instance was starting. The app never sent the preview request.
+On the same image, raising Admin concurrency from 8 to 32 let all 22 requests
+complete with HTTP 200. This removed the observed asset drops; the first burst
+still took about 20 seconds. One warm Chrome reload opened the real preview in
+1.79 seconds.
+
+New manifests set Admin concurrency to 32. They still use zero warm instances,
+at most one instance, one vCPU, and the same database pool and startup probe.
+Existing services keep their settings on an image release. If an existing service
+shows the same failure, compare the live settings and request logs before
+changing it. Stage the same image on a revision with the updated concurrency,
+verify the other settings match, then move traffic and repeat a fresh Admin
+load. Restore traffic to the previous revision if the checks fail.
+[Cloud Run explains the 429 response](https://docs.cloud.google.com/run/docs/troubleshooting#abort-request).
 
 ## Startup probe trial
 

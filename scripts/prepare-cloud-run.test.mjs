@@ -102,7 +102,7 @@ test('Google on-demand uses the complete private HTTP worker and workload storag
   const worker = output.worker.spec.template.spec
   assert.equal(worker.containerConcurrency, 1)
   assert.equal(output.site.spec.template.spec.containerConcurrency, 80)
-  assert.equal(output.admin.spec.template.spec.containerConcurrency, 8)
+  assert.equal(output.admin.spec.template.spec.containerConcurrency, 32)
   assert.equal(worker.containers[0].args[0], 'worker-http')
   assert.equal(output.worker.metadata.annotations['run.googleapis.com/invoker-iam-disabled'], 'false')
   const names = manifest => manifest.spec.template.spec.containers[0].env.map(item => item.name)

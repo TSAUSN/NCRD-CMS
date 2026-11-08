@@ -97,9 +97,9 @@ export function cloudRunManifests(config) {
         },
         spec: {
           serviceAccountName: identity(role),
-          // One page can request dozens of pictures and fonts at once. Keep the
-          // public instance available for those requests while its DB pool stays bounded.
-          containerConcurrency: role === 'worker' ? 1 : role === 'site' ? 80 : 8,
+          // Keep room for a page's parallel static requests during startup.
+          // Web instance counts and the database pools stay bounded separately.
+          containerConcurrency: { admin: 32, site: 80, worker: 1 }[role],
           timeoutSeconds: role === 'worker' ? 180 : 300,
           containers: [
             {
