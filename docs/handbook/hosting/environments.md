@@ -19,6 +19,16 @@ the job login. Only migration/recovery uses the database owner connection. Cloud
 SQL uses its reviewed socket/proxy transport; TCP connections retain verified TLS.
 Preserve RLS, narrow commands and exact target checks.
 
+Admin accepts an optional comma-separated `CMS_WORKSPACE_SITE_ORDER` for Home
+and the site switcher. It changes the ordering of sites someone can already
+see. The first slug is the default editorial Home site. Leave the value unset
+to keep the existing order, or set an empty value to use names only.
+
+A site that declares the national template in its draft design is eligible for
+template review. Older installations may list eligible slugs in
+`CMS_NATIONAL_TEMPLATE_LEGACY_SITES`. Set it to an empty value once those sites
+declare the template themselves. The Super admin permission is still required.
+
 ## Acceptance before promotion
 
 - Verify exact project/account, budget, APIs, IAM identities and public invocation policy.

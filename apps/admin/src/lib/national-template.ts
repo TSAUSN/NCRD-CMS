@@ -1,4 +1,5 @@
 import { isHeroSlides, migrateHeroSlides } from '@cms/schema'
+import { nationalTemplateEligibilitySql } from './site-installation-settings.ts'
 import { renderPage, type RenderManifest, type SectionDefView } from '@cms/renderer'
 import { readSitePreview } from './site-preview.ts'
 import { SCRIPTLESS_RENDER_OPTIONS } from './scriptless-preview.ts'
@@ -36,7 +37,7 @@ export async function nationalTemplateSites(client: Queryable) {
   return (
     await client.query<{ id: string; name: string }>(`SELECT s.id,s.name FROM sites s
  JOIN themes h ON h.site_id=s.id JOIN theme_versions v ON v.id=h.draft_version_id
- WHERE s.archived_at IS NULL AND (s.slug IN ('sawso','echelon-chapters') OR v.tokens#>>'{presentation,template,id}'='national')
+ WHERE s.archived_at IS NULL AND ${nationalTemplateEligibilitySql('v.tokens')}
  AND NOT EXISTS(SELECT 1 FROM site_file_heads f JOIN site_file_versions fv ON fv.id=f.draft_version_id OR fv.id=f.published_version_id WHERE f.site_id=s.id AND fv.bundle ? 'original') ORDER BY s.name,s.id`)
   ).rows
 }

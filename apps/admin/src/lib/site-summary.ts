@@ -1,3 +1,5 @@
+import { SITE_ORDER_SQL } from './site-installation-settings.ts'
+
 /**
  * One RLS-scoped editorial summary per visible site.
  *
@@ -10,7 +12,6 @@ export const ORDINARY_PAGE_SQL = `p.slug NOT LIKE 'stories/%' AND NOT EXISTS (
   WHERE sc.site_id=p.site_id AND sc.reader_key='stories' AND se.archived_at IS NULL
     AND sv.values->>'story_url'=CASE WHEN p.slug='' THEN '/' ELSE '/'||p.slug END
 )`
-const SITE_ORDER_SQL = `CASE s.slug WHEN 'sawso' THEN 0 WHEN 'echelon-chapters' THEN 1 WHEN 'bt2027-r8' THEN 2 ELSE 3 END,s.name`
 
 export const SITE_CHOICE_SQL = `
   SELECT s.id, s.name

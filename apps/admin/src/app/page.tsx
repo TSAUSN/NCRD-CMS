@@ -1,4 +1,5 @@
 import { AdminHome } from '../components/admin-home.tsx'
+import { primaryWorkspaceSlug } from '../lib/site-installation-settings.ts'
 import { EditorHome } from '../components/editor-home.tsx'
 import { editorialStoryHome } from '../lib/editor-home.ts'
 import { GuardedLink as Link } from '../components/guarded-link.tsx'
@@ -63,7 +64,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
     const choices = [...activeSites].sort(
       (a, b) =>
         Number(b.id === query.site) - Number(a.id === query.site) ||
-        Number(b.slug === 'sawso') - Number(a.slug === 'sawso') ||
+        Number(b.slug === primaryWorkspaceSlug) - Number(a.slug === primaryWorkspaceSlug) ||
         a.name.localeCompare(b.name),
     )
     for (const choice of choices) {
@@ -135,7 +136,8 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
     .filter(item => item.changed || item.samples || item.reviews)
     .sort(
       (a, b) =>
-        Number(b.site.slug === 'sawso') - Number(a.site.slug === 'sawso') || a.site.name.localeCompare(b.site.name),
+        Number(b.site.slug === primaryWorkspaceSlug) - Number(a.site.slug === primaryWorkspaceSlug) ||
+        a.site.name.localeCompare(b.site.name),
     )
   return (
     <AppShell email={session.email} role={role} groups={navigationFor(undefined, session.principal)}>
