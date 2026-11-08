@@ -1,6 +1,6 @@
 import { useEffect, type Dispatch, type SetStateAction } from 'react'
 import { setSelection, type EditorState } from '@cms/domain'
-import { isSharedChapterPart } from '../../../lib/chapter-section-locks.ts'
+import { isManagedChapterJumpLinks, isSharedChapterPart } from '../../../lib/chapter-section-locks.ts'
 import type { PageEditorProps } from './editor-types.ts'
 
 /** Limits moves and insertions around the shared part of a chapter page. */
@@ -9,12 +9,7 @@ export function editorSectionRules(props: PageEditorProps) {
     Boolean(
       index !== null &&
       ((props.lockChapterShared && isSharedChapterPart(props.document.sections[index])) ||
-        (props.chapterPage &&
-          props.pinnedSections.some(
-            def =>
-              def.section_def_id === props.document.sections[index]?.section_def_id &&
-              def.slug === 'core-echelon-jump-links',
-          ))),
+        (props.chapterPage && isManagedChapterJumpLinks(props.document.sections[index], props.pinnedSections))),
     )
   const lastShared = props.lockChapterShared
     ? props.document.sections.reduce((last, section, index) => (isSharedChapterPart(section) ? index : last), -1)

@@ -4,6 +4,7 @@
  */
 const DEFAULT_WORKSPACE_ORDER = ['sawso', 'echelon-chapters', 'bt2027-r8']
 const DEFAULT_LEGACY_TEMPLATE_SITES = ['sawso', 'echelon-chapters']
+const DEFAULT_LEGACY_STORY_SITES = ['sawso']
 const SITE_SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 
 function siteSlugs(value: string | undefined, fallback: string[]): string[] {
@@ -18,6 +19,11 @@ function siteSlugs(value: string | undefined, fallback: string[]): string[] {
 
 const workspaceOrder = siteSlugs(process.env.CMS_WORKSPACE_SITE_ORDER, DEFAULT_WORKSPACE_ORDER)
 const legacyTemplateSites = siteSlugs(process.env.CMS_NATIONAL_TEMPLATE_LEGACY_SITES, DEFAULT_LEGACY_TEMPLATE_SITES)
+const legacyStorySites = new Set(siteSlugs(process.env.CMS_STORIES_LEGACY_SOURCE_SITES, DEFAULT_LEGACY_STORY_SITES))
+
+export function hasLegacyStorySource(slug: string): boolean {
+  return legacyStorySites.has(slug)
+}
 
 export const primaryWorkspaceSlug = workspaceOrder[0]
 

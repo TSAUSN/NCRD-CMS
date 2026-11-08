@@ -29,6 +29,11 @@ template review. Older installations may list eligible slugs in
 `CMS_NATIONAL_TEMPLATE_LEGACY_SITES`. Set it to an empty value once those sites
 declare the template themselves. The Super admin permission is still required.
 
+Older Stories lists that do not declare a source may use the legacy catalog.
+Set `CMS_STORIES_LEGACY_SOURCE_SITES` to the comma-separated site slugs that
+need this fallback. An explicit per-list source takes precedence. Lists copied
+with recognizable legacy region fields can still read their existing catalog.
+
 ## Acceptance before promotion
 
 - Verify exact project/account, budget, APIs, IAM identities and public invocation policy.
