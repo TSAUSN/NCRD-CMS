@@ -298,16 +298,7 @@ export function editableReference(input: {
     }
   }
   walk(parsed.nodes, 'root')
-  nameParts(slots, places)
-  const counts = new Map<string, number>()
-  for (const slot of slots) counts.set(slot.label, (counts.get(slot.label) ?? 0) + 1)
-  const occurrences = new Map<string, number>()
-  for (const slot of slots) {
-    if ((counts.get(slot.label) ?? 0) < 2) continue
-    const part = (occurrences.get(slot.label) ?? 0) + 1
-    occurrences.set(slot.label, part)
-    slot.label = `${slot.label} · part ${part}`
-  }
+  nameEditableFields(slots, places)
   const sourceHtml = serializeLegacy(parsed.nodes)
   const compiled = compileSection({
     sourceHtml,
@@ -323,6 +314,19 @@ export function editableReference(input: {
 
 type Within = { path: string[]; role: string | null; element: number }
 type Place = Within & { base: string }
+
+function nameEditableFields(slots: SlotDef[], places: Map<string, Place>) {
+  nameParts(slots, places)
+  const counts = new Map<string, number>()
+  for (const slot of slots) counts.set(slot.label, (counts.get(slot.label) ?? 0) + 1)
+  const occurrences = new Map<string, number>()
+  for (const slot of slots) {
+    if ((counts.get(slot.label) ?? 0) < 2) continue
+    const part = (occurrences.get(slot.label) ?? 0) + 1
+    occurrences.set(slot.label, part)
+    slot.label = `${slot.label} · part ${part}`
+  }
+}
 
 /** What the words of an element are, for naming one field of a split region. */
 const ROLES: Record<string, string> = {

@@ -291,8 +291,27 @@ export async function importReferenceDrafts(
     ])
     createdPages += 1
   }
-  // Replay reports retain unresolved source assets even when every page was
-  // already imported and no image work ran on this invocation.
+  await collectUntransferredSourceAssets(client, bundle, runId, sites, unresolvedAssets)
+  return {
+    runId,
+    createdPages,
+    existingPages,
+    sites: [...new Set(sites.values())],
+    transferredImages: [...mediaBySite.values()].reduce((count, media) => count + media.images, 0),
+    transferredDocuments: [...assetsBySite.values()].reduce((count, assets) => count + assets.documents, 0),
+    transferredFonts: [...assetsBySite.values()].reduce((count, assets) => count + assets.fonts, 0),
+    unresolvedAssets: [...unresolvedAssets].sort(),
+  }
+}
+
+async function collectUntransferredSourceAssets(
+  client: ImportClient,
+  bundle: MigrationBundle,
+  runId: string,
+  sites: ReadonlyMap<string, string>,
+  unresolvedAssets: Set<string>,
+) {
+  // Reports include unresolved source assets even when this run only reuses existing drafts.
   const receipts = (await client.query('SELECT site_id,source_path FROM v1_import_media WHERE run_id=$1', [runId])).rows
   const transferred = new Set(receipts.map(row => `${row.site_id}:${row.source_path}`))
   const assetReceipts = (
@@ -302,7 +321,7 @@ export async function importReferenceDrafts(
     )
   ).rows
   for (const receipt of assetReceipts) transferred.add(`${receipt.site_id}:${receipt.source_path}`)
-  for (const file of bundle.files.filter(file => file.path.startsWith('asset/'))) {
+  for (const file of bundle.files) {
     const match = /^asset\/(tsa-humanneedsindex|tsa-echelonsymposium)\/public\/(.+)$/.exec(file.path)
     if (!match) continue
     const sourceSite = match[1] === 'tsa-humanneedsindex' ? 'humanneedsindex' : 'echelonsymposium'
@@ -313,15 +332,5 @@ export async function importReferenceDrafts(
         `${sourceSite}:${url}${/\.(?:png|jpe?g|webp)$/i.test(url) ? '#missing-authored-alt-intent' : ''}`,
       )
     }
-  }
-  return {
-    runId,
-    createdPages,
-    existingPages,
-    sites: [...new Set(sites.values())],
-    transferredImages: [...mediaBySite.values()].reduce((count, media) => count + media.images, 0),
-    transferredDocuments: [...assetsBySite.values()].reduce((count, assets) => count + assets.documents, 0),
-    transferredFonts: [...assetsBySite.values()].reduce((count, assets) => count + assets.fonts, 0),
-    unresolvedAssets: [...unresolvedAssets].sort(),
   }
 }
