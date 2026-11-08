@@ -2,14 +2,14 @@ import 'server-only'
 import { asUser } from '@cms/platform'
 import { ThemeTokens, DEFAULT_THEME_TOKENS, type ThemeTokens as ThemeTokenValues } from '@cms/schema'
 
-/** Header and Footer need the normalized draft, without page usage counts. */
-export function getDraftTheme(userId: string, siteId: string): Promise<ThemeTokenValues | null> {
+/** Native frame workspaces require site administration and the saved draft theme. */
+export function getManagedDraftTheme(userId: string, siteId: string): Promise<ThemeTokenValues | null> {
   return asUser({ userId }, async client => {
     const { rows } = await client.query<{ draft: unknown }>(
       `SELECT draft.tokens AS draft
          FROM themes t
          JOIN theme_versions draft ON draft.id = t.draft_version_id
-        WHERE t.site_id = $1`,
+        WHERE t.site_id = $1 AND app.can_administer_site($1)`,
       [siteId],
     )
     return rows[0] ? ThemeTokens.parse(rows[0].draft) : null

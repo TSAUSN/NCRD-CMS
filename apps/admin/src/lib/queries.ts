@@ -22,7 +22,7 @@ export {
   canManageNavigation,
 } from '../server/queries/navigation.ts'
 export {
-  getDraftTheme,
+  getManagedDraftTheme,
   type ThemeUsage,
   type ThemeWorkspace,
   getThemeWorkspace,
