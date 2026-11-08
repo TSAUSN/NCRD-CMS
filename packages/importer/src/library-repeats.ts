@@ -120,8 +120,8 @@ function fieldIdFor(label: string, taken: Set<string>, room: number): string {
   let base = slug(label).replace(/--+/g, '-').slice(0, room) || 'field'
   if (!/^[a-z]/.test(base)) base = `f-${base}`.slice(0, room)
   base = base.replace(/-+$/g, '')
-  let id = base,
-    n = 2
+  let id = base
+  let n = 2
   while (taken.has(id)) id = `${base.slice(0, room - String(n).length - 1)}-${n++}`
   taken.add(id)
   return id
@@ -172,9 +172,9 @@ const IRREGULAR: Record<string, string> = {
 }
 /** What a list of units is called: “Cards”, “People”; a unit that is not a noun (“Related”) makes a “… list”. */
 function plural(unit: string): string {
-  const words = unit.split(' '),
-    last = words.at(-1)!,
-    lower = last.toLowerCase()
+  const words = unit.split(' ')
+  const last = words.at(-1)!
+  const lower = last.toLowerCase()
   const keepCase = (word: string) =>
     last[0] === last[0]!.toUpperCase() ? word.replace(/^./, c => c.toUpperCase()) : word
   if (IRREGULAR[lower]) return [...words.slice(0, -1), keepCase(IRREGULAR[lower])].join(' ')
@@ -289,8 +289,8 @@ function attemptLists(
         for (const child of element.children) if (child.kind === 'element') renameFields(child)
       }
       renameFields(chosen.element)
-      const start = run.siblings.indexOf(first.element),
-        end = run.siblings.indexOf(run.units.at(-1)!.element)
+      const start = run.siblings.indexOf(first.element)
+      const end = run.siblings.indexOf(run.units.at(-1)!.element)
       const after = run.siblings[start + 1]
       const separator = after?.kind === 'text' && after.text.trim() === '' ? after.text : ''
       run.siblings.splice(
@@ -327,10 +327,10 @@ function attemptLists(
   const { mapped, meta } = template
   let sourceHtml = mapped.sourceHtml
   const regions = meta.map((_, r) => {
-    const start = `__cms_repeat_${r}_start__`,
-      end = `__cms_repeat_${r}_end__`
-    const from = sourceHtml.indexOf(start),
-      to = sourceHtml.indexOf(end)
+    const start = `__cms_repeat_${r}_start__`
+    const end = `__cms_repeat_${r}_end__`
+    const from = sourceHtml.indexOf(start)
+    const to = sourceHtml.indexOf(end)
     if (from < 0 || to < from || sourceHtml.indexOf(start, from + 1) >= 0 || sourceHtml.indexOf(end, to + 1) >= 0)
       return null
     return { ids: tokensIn(sourceHtml.slice(from, to)), from, to }
@@ -399,8 +399,8 @@ function attemptLists(
   const numberedOrder = tokensIn(input.numbered.sourceHtml)
   const numberedKind = new Map(input.numbered.slots.map(slot => [slot.id, slot.kind]))
   const legacy: Record<string, string>[][] = lists.map(() => [])
-  let pointer = 0,
-    consistent = true
+  let pointer = 0
+  let consistent = true
   const outside = tokensIn(
     sourceHtml.replace(/__cms_repeat_(\d+)_start__[\s\S]*?__cms_repeat_\1_end__/g, (_, r) => `{{__list_${r}__}}`),
   ).filter(token => {
@@ -413,8 +413,8 @@ function attemptLists(
       pointer += 1
       continue
     }
-    const r = Number(list[1]),
-      entry = lists[r]!
+    const r = Number(list[1])
+    const entry = lists[r]!
     const carried = entry.fields.filter(({ field }) => !isDrawingSlot(field))
     for (let k = 0; k < entry.count; k += 1) {
       const ids = numberedOrder.slice(pointer + k * carried.length, pointer + (k + 1) * carried.length)
@@ -427,10 +427,10 @@ function attemptLists(
   if (pointer !== numberedOrder.length) consistent = false
 
   for (const [r, list] of lists.entries()) {
-    const start = `__cms_repeat_${r}_start__`,
-      end = `__cms_repeat_${r}_end__`
-    const from = sourceHtml.indexOf(start),
-      to = sourceHtml.indexOf(end) + end.length
+    const start = `__cms_repeat_${r}_start__`
+    const end = `__cms_repeat_${r}_end__`
+    const from = sourceHtml.indexOf(start)
+    const to = sourceHtml.indexOf(end) + end.length
     let body = sourceHtml.slice(from + start.length, to - end.length)
     for (const { from: slotId, field } of list.fields) body = body.replaceAll(`{{${slotId}}}`, `{{${field.id}}}`)
     // V1's editing hooks named each copy's regions; an item's fields are named by the list.

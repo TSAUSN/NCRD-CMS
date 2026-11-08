@@ -22,8 +22,8 @@ export async function adminReady(page, row) {
   await expect(page.locator('[aria-busy="true"]')).toHaveCount(0, { timeout: 15000 })
   for (const frame of page.frames()) {
     if (frame !== page.mainFrame()) {
-      const element = await frame.frameElement(),
-        box = await element.boundingBox()
+      const element = await frame.frameElement()
+      const box = await element.boundingBox()
       if (!box || box.y >= page.viewportSize().height || box.y + box.height <= 0) continue
     }
     await Promise.race([

@@ -41,23 +41,25 @@ export function convertBetterTogetherLinks(
   paths: Record<string, string>,
   labels: Record<string, string> = {},
 ): OriginalFrameTemplate {
-  const root = parseFragment(input.sourceHtml, { sourceCodeLocationInfo: true }),
-    anchors = [...elements(root)].filter(node => node.tagName === 'a' && node.attrs.some(item => item.name === 'href'))
+  const root = parseFragment(input.sourceHtml, { sourceCodeLocationInfo: true })
+  const anchors = [...elements(root)].filter(
+    node => node.tagName === 'a' && node.attrs.some(item => item.name === 'href'),
+  )
   if (anchors.length > 20 || input.slots.some(slot => /^link-\d+$/.test(slot.id)))
     throw new Error('Review the original links rather than converting an existing conversion.')
-  const values = structuredClone(input.values),
-    groups = new Map<string, SlotDef[]>(),
-    changes: { start: number; end: number; value: string }[] = [],
-    unplaced: SlotDef[] = []
+  const values = structuredClone(input.values)
+  const groups = new Map<string, SlotDef[]>()
+  const changes: { start: number; end: number; value: string }[] = []
+  const unplaced: SlotDef[] = []
   let previous: string | undefined
   anchors.forEach((anchor, index) => {
-    const href = checkedHref(attribute(anchor, 'href'), paths),
-      id = 'link-' + index,
-      location = anchor.sourceCodeLocation?.attrs?.href
+    const href = checkedHref(attribute(anchor, 'href'), paths)
+    const id = 'link-' + index
+    const location = anchor.sourceCodeLocation?.attrs?.href
     if (!location) throw new Error('The original link location is unavailable.')
-    const textToken = token(text(anchor).trim()),
-      image = [...elements(anchor)].find(node => node.tagName === 'img'),
-      pictureToken = image ? token(attribute(image, 'src')) : undefined
+    const textToken = token(text(anchor).trim())
+    const image = [...elements(anchor)].find(node => node.tagName === 'img')
+    const pictureToken = image ? token(attribute(image, 'src')) : undefined
     const icons = [...elements(anchor)]
     const social = icons.some(node => hasClass(node, 'fa-facebook-square') || hasClass(node, 'fa-facebook-f'))
       ? 'Facebook'
@@ -107,15 +109,15 @@ export function convertBetterTogetherMenu(
   paths: Record<string, string>,
   pages: OriginalMarketingPage[],
 ): OriginalFrameTemplate & { menu: NavTree } {
-  const root = parseFragment(input.sourceHtml, { sourceCodeLocationInfo: true }),
-    menus = [...elements(root)].filter(node => node.tagName === 'ul' && hasClass(node, 'navbar-nav'))
-  const menu = menus[0],
-    items = menu?.childNodes.filter((node): node is Element => 'tagName' in node && node.tagName === 'li') ?? []
+  const root = parseFragment(input.sourceHtml, { sourceCodeLocationInfo: true })
+  const menus = [...elements(root)].filter(node => node.tagName === 'ul' && hasClass(node, 'navbar-nav'))
+  const menu = menus[0]
+  const items = menu?.childNodes.filter((node): node is Element => 'tagName' in node && node.tagName === 'li') ?? []
   if (menus.length !== 1 || items.length !== 6 || !menu?.sourceCodeLocation)
     throw new Error('Review the changed original homepage menu before converting it.')
   const target = (anchor: Element): NavTree[number]['target'] => {
-    const href = checkedHref(attribute(anchor, 'href'), paths),
-      page = pages.find(page => page.path === href)
+    const href = checkedHref(attribute(anchor, 'href'), paths)
+    const page = pages.find(page => page.path === href)
     return page ? { type: 'page', page_id: page.id } : { type: 'url', url: href.startsWith('#') ? '/' + href : href }
   }
   const tree = items.map(item => {
@@ -139,13 +141,13 @@ export function convertBetterTogetherMenu(
   })
   if (tree.filter(node => node.children).length !== 1 || tree.at(-1)?.children?.length !== 3)
     throw new Error('Review the changed original More menu.')
-  const parsed = NavTree.parse(tree),
-    location = menu.sourceCodeLocation,
-    sourceHtml =
-      input.sourceHtml.slice(0, location.startOffset) + '{{menu}}' + input.sourceHtml.slice(location.endOffset)
-  const used = new Set([...sourceHtml.matchAll(/\{\{([a-z][a-z0-9_-]*)\}\}/g)].map(match => match[1]!)),
-    slots = input.slots.filter(slot => used.has(slot.id)),
-    values = Object.fromEntries(Object.entries(input.values).filter(([id]) => used.has(id)))
+  const parsed = NavTree.parse(tree)
+  const location = menu.sourceCodeLocation
+  const sourceHtml =
+    input.sourceHtml.slice(0, location.startOffset) + '{{menu}}' + input.sourceHtml.slice(location.endOffset)
+  const used = new Set([...sourceHtml.matchAll(/\{\{([a-z][a-z0-9_-]*)\}\}/g)].map(match => match[1]!))
+  const slots = input.slots.filter(slot => used.has(slot.id))
+  const values = Object.fromEntries(Object.entries(input.values).filter(([id]) => used.has(id)))
   const converted = convertBetterTogetherLinks(
     {
       sourceHtml,

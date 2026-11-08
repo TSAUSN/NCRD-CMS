@@ -30,8 +30,8 @@ export function renderStoryArchive(html: string, value: unknown): string {
 
 /** The optional byline uses plain text and never changes an article without it. */
 export function renderStoryAuthor(html: string, value: unknown): string {
-  const values = resolvedCollection(value)?.entries[0]?.values,
-    author = values && typeof values === 'object' ? (values as Record<string, unknown>).author : undefined
+  const values = resolvedCollection(value)?.entries[0]?.values
+  const author = values && typeof values === 'object' ? (values as Record<string, unknown>).author : undefined
   if (typeof author !== 'string' || !author.trim() || author.length > 120) return html
   const parsed = parseHtml(html, { locations: true })
   if (!parsed.ok) return html
@@ -59,7 +59,8 @@ export function renderStoryDetail(html: string): string {
     nodes.map(node => (node.kind === 'text' ? decodeSourceText(node.text) : words(node.children))).join('')
   const normalized = (nodes: HtmlNode[]) => words(nodes).replace(/\s+/g, ' ').trim()
   const cuts: { start: number; end: number }[] = []
-  let opening: HtmlElement | undefined, article: HtmlElement | undefined
+  let opening: HtmlElement | undefined
+  let article: HtmlElement | undefined
   function walk(nodes: HtmlNode[], inMeta = false) {
     for (const node of nodes)
       if (node.kind === 'element') {
@@ -87,8 +88,8 @@ export function renderStoryDetail(html: string): string {
     return undefined
   }
   const first = article && firstParagraph(article.children)
-  const intro = opening && normalized(opening.children),
-    firstWords = first && normalized(first.children)
+  const intro = opening && normalized(opening.children)
+  const firstWords = first && normalized(first.children)
   if (opening?.source && intro && firstWords && (firstWords === intro || firstWords.startsWith(intro + ' ')))
     cuts.push(opening.source)
   for (const cut of cuts.sort((a, b) => b.start - a.start)) html = html.slice(0, cut.start) + html.slice(cut.end)

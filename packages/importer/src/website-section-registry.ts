@@ -66,9 +66,9 @@ export function createWebsiteSectionRegistry({
       reused: false,
       problems: [],
     }
-    let html: string,
-      fields: SlotDef[] = [],
-      samples: Record<string, unknown> = {}
+    let html: string
+    let fields: SlotDef[] = []
+    let samples: Record<string, unknown> = {}
     const tagged = taggedFields(node)
     for (const el of [...walk({ childNodes: [node] } as unknown as Node)])
       for (const a of [...el.attrs]) if (a.name.startsWith('data-cms-')) setAttr(el, a.name, null)

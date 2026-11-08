@@ -54,8 +54,8 @@ export const collectionTemplateMarker = (field: string) => `<!--cms-bound-list:$
  * inside a table is foster-parented by browsers and changes the real layout. */
 export function markCollectionTemplateParents(html: string, marks: CollectionTemplateMark[]): string {
   if (!marks.length) return html
-  const parsed = parseHtml(html, { locations: true }),
-    insertions = new Map<number, string>()
+  const parsed = parseHtml(html, { locations: true })
+  const insertions = new Map<number, string>()
   if (parsed.ok) {
     const elements: HtmlElement[] = []
     function walk(nodes: HtmlNode[]) {

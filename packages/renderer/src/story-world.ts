@@ -27,10 +27,10 @@ export function storyWidgetQuery(params: URLSearchParams): Record<string, string
 }
 export function storyWidgetHref(index: number, context: StoryWidgetContext, next: Record<string, string>): string {
   const path =
-      context.path?.startsWith('/') && !context.path.startsWith('//') && !/[?#\\\s]/.test(context.path)
-        ? context.path
-        : '/',
-    query = new URLSearchParams(context.fixedQuery)
+    context.path?.startsWith('/') && !context.path.startsWith('//') && !/[?#\\\s]/.test(context.path)
+      ? context.path
+      : '/'
+  const query = new URLSearchParams(context.fixedQuery)
   for (const [key, value] of Object.entries(context.query ?? {}))
     if (value !== undefined && /^story[0-9]{1,3}_(region|sector|view|page)$/.test(key) && value.length <= 80)
       query.set(key, value)
@@ -44,94 +44,94 @@ function record(value: unknown): Record<string, unknown> | null {
   return value && typeof value === 'object' && !Array.isArray(value) ? (value as Record<string, unknown>) : null
 }
 export function storyWorldValues(values: Record<string, unknown>, index: number, context: StoryWidgetContext = {}) {
-  const list = resolvedCollection(values.stories),
-    catalog = list?.readerKey === 'stories' ? list.storyCatalog : undefined,
-    maximum = storyWidgetMaximum(catalog, context.pagePath ?? context.path ?? ''),
-    pool = list?.entries ?? [],
-    regions = catalog?.secondaryTags ?? [],
-    counts = new Map(
-      regions.map(region => [
-        region.id,
-        pool.filter(entry => {
-          const v = record(entry.values)
-          return v && storyTagIds(v, 'secondary').includes(region.id)
-        }).length,
-      ]),
-    ),
-    asked = context.query?.['story' + index + '_region'] ?? String(values.start_region ?? ''),
-    selected = regions.find(region => region.id === asked && (counts.get(region.id) ?? 0) > 0),
-    limit = storyWorldLimit(values.per_region),
-    used = new Set<string>()
-  const areaById = new Map(map.areas.map(area => [area.id, area])),
-    mapped = regions.map(region => {
-      const areas = region.areas.filter(area => areaById.has(area) && !used.has(area))
-      areas.forEach(area => used.add(area))
-      return { ...region, areas, count: counts.get(region.id) ?? 0 }
-    }),
-    active = mapped.filter(region => region.count > 0 && region.areas.length),
-    activeAreas = new Set<string>(active.flatMap(region => region.areas))
-  const href = (id: string) => storyWidgetHref(index, context, { region: id }),
-    links = regions
-      .map(region => {
-        const count = counts.get(region.id) ?? 0,
-          label = region.label + ' (' + count + ')'
-        return count
-          ? '<a data-cms-story-region="' +
-              attr(region.id) +
-              '" href="' +
-              attr(href(region.id)) +
-              '"' +
-              (selected?.id === region.id ? ' aria-current="true"' : '') +
-              '>' +
-              text(label) +
-              '</a>'
-          : '<span aria-disabled="true">' + text(label) + '</span>'
-      })
-      .join(' ')
+  const list = resolvedCollection(values.stories)
+  const catalog = list?.readerKey === 'stories' ? list.storyCatalog : undefined
+  const maximum = storyWidgetMaximum(catalog, context.pagePath ?? context.path ?? '')
+  const pool = list?.entries ?? []
+  const regions = catalog?.secondaryTags ?? []
+  const counts = new Map(
+    regions.map(region => [
+      region.id,
+      pool.filter(entry => {
+        const v = record(entry.values)
+        return v && storyTagIds(v, 'secondary').includes(region.id)
+      }).length,
+    ]),
+  )
+  const asked = context.query?.['story' + index + '_region'] ?? String(values.start_region ?? '')
+  const selected = regions.find(region => region.id === asked && (counts.get(region.id) ?? 0) > 0)
+  const limit = storyWorldLimit(values.per_region)
+  const used = new Set<string>()
+  const areaById = new Map(map.areas.map(area => [area.id, area]))
+  const mapped = regions.map(region => {
+    const areas = region.areas.filter(area => areaById.has(area) && !used.has(area))
+    areas.forEach(area => used.add(area))
+    return { ...region, areas, count: counts.get(region.id) ?? 0 }
+  })
+  const active = mapped.filter(region => region.count > 0 && region.areas.length)
+  const activeAreas = new Set<string>(active.flatMap(region => region.areas))
+  const href = (id: string) => storyWidgetHref(index, context, { region: id })
+  const links = regions
+    .map(region => {
+      const count = counts.get(region.id) ?? 0
+      const label = region.label + ' (' + count + ')'
+      return count
+        ? '<a data-cms-story-region="' +
+            attr(region.id) +
+            '" href="' +
+            attr(href(region.id)) +
+            '"' +
+            (selected?.id === region.id ? ' aria-current="true"' : '') +
+            '>' +
+            text(label) +
+            '</a>'
+        : '<span aria-disabled="true">' + text(label) + '</span>'
+    })
+    .join(' ')
   const land = map.areas
-      .filter(area => !activeAreas.has(area.id))
-      .map(area => '<path class="cms-story-map-land" d="' + attr(area.d) + '"></path>')
-      .join(''),
-    shapes = active
-      .map(region => {
-        const at = areaById.get(region.areas.some(area => area === region.id) ? region.id : region.areas[0]!)!,
-          label = region.label + ': ' + region.count + ' ' + (region.count === 1 ? 'story' : 'stories')
-        return (
-          '<a class="cms-story-map-region" tabindex="0" data-cms-story-region="' +
-          attr(region.id) +
-          '" href="' +
-          attr(href(region.id)) +
-          '" aria-label="' +
-          attr(label) +
-          '"' +
-          (selected?.id === region.id ? ' aria-current="true"' : '') +
-          '><title>' +
-          text(label) +
-          '</title>' +
-          region.areas.map(id => '<path d="' + attr(areaById.get(id)!.d) + '"></path>').join('') +
-          '<g class="cms-story-map-pin" aria-hidden="true"><circle cx="' +
-          at.x +
-          '" cy="' +
-          at.y +
-          '" r="16"></circle><text x="' +
-          at.x +
-          '" y="' +
-          at.y +
-          '">' +
-          region.count +
-          '</text></g></a>'
-        )
-      })
-      .join(''),
-    svg =
-      '<svg class="cms-story-map" viewBox="0 0 ' +
-      map.width +
-      ' ' +
-      map.height +
-      '" role="group" aria-label="World map: choose a region to see its stories">' +
-      land +
-      shapes +
-      '</svg>'
+    .filter(area => !activeAreas.has(area.id))
+    .map(area => '<path class="cms-story-map-land" d="' + attr(area.d) + '"></path>')
+    .join('')
+  const shapes = active
+    .map(region => {
+      const at = areaById.get(region.areas.some(area => area === region.id) ? region.id : region.areas[0]!)!
+      const label = region.label + ': ' + region.count + ' ' + (region.count === 1 ? 'story' : 'stories')
+      return (
+        '<a class="cms-story-map-region" tabindex="0" data-cms-story-region="' +
+        attr(region.id) +
+        '" href="' +
+        attr(href(region.id)) +
+        '" aria-label="' +
+        attr(label) +
+        '"' +
+        (selected?.id === region.id ? ' aria-current="true"' : '') +
+        '><title>' +
+        text(label) +
+        '</title>' +
+        region.areas.map(id => '<path d="' + attr(areaById.get(id)!.d) + '"></path>').join('') +
+        '<g class="cms-story-map-pin" aria-hidden="true"><circle cx="' +
+        at.x +
+        '" cy="' +
+        at.y +
+        '" r="16"></circle><text x="' +
+        at.x +
+        '" y="' +
+        at.y +
+        '">' +
+        region.count +
+        '</text></g></a>'
+      )
+    })
+    .join('')
+  const svg =
+    '<svg class="cms-story-map" viewBox="0 0 ' +
+    map.width +
+    ' ' +
+    map.height +
+    '" role="group" aria-label="World map: choose a region to see its stories">' +
+    land +
+    shapes +
+    '</svg>'
   return {
     catalog,
     active: selected?.id ?? '',
@@ -212,8 +212,8 @@ export function renderStoryWorld(body: string, index: number, model: ReturnType<
   function walk(nodes: HtmlNode[]) {
     for (const node of nodes)
       if (node.kind === 'element') {
-        const classes = node.attributes.find(a => a.name === 'class')?.value.split(/\s+/) ?? [],
-          source = node.source
+        const classes = node.attributes.find(a => a.name === 'class')?.value.split(/\s+/) ?? []
+        const source = node.source
         if (source && (classes.includes('core-story-world') || classes.includes('core-story-split')))
           edits.push({
             start: source.start + 1 + node.tag.length,

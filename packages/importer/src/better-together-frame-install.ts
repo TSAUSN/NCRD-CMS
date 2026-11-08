@@ -108,8 +108,8 @@ export async function installBetterTogetherFrame({
     return result
   })
   for (const [i, next] of plan.definitions.entries()) {
-    const result = compiled[i]!,
-      def = definitions.get(next.id)!
+    const result = compiled[i]!
+    const def = definitions.get(next.id)!
     const saved = (
       await client.query(
         'SELECT section_def_id,version FROM app.upsert_section_def_version($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18)',
@@ -138,8 +138,8 @@ export async function installBetterTogetherFrame({
     if (saved.section_def_id !== next.id || Number(saved.version) !== next.version + 1)
       throw new Error('The original section changed during conversion.')
   }
-  const header = plan.frame.find(head => head.kind === 'header')!,
-    footer = plan.frame.find(head => head.kind === 'footer')!
+  const header = plan.frame.find(head => head.kind === 'header')!
+  const footer = plan.frame.find(head => head.kind === 'footer')!
   await client.query('SELECT * FROM app.save_global_elements_draft($1,$2,$3,$4,$5)', [
     siteId,
     header.revision,

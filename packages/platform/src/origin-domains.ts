@@ -79,7 +79,8 @@ export function createOriginDomainProvisioner(address: string, lookups?: Lookups
           errorCode: 'ownership_required',
           errorDetail: 'Add the CMS ownership TXT record.',
         }
-      let records: string[], proofs: string[][]
+      let records: string[]
+      let proofs: string[][]
       try {
         ;[records, proofs] = await Promise.all([dns.ipv4(host), dns.txt(verification.name)])
       } catch {

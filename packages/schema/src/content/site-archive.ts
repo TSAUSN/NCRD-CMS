@@ -337,8 +337,8 @@ export function validateArchiveReferences(content: SiteArchiveContent): void {
     fail('is missing reviewed file history')
   const files = new Map((content.site_files ?? []).map(row => [row.id, row]))
   const fileVersions = new Map((content.site_file_versions ?? []).map(row => [row.id, row]))
-  const fileNumbers = new Set<number>(),
-    fileHead = content.site_file_heads?.[0]
+  const fileNumbers = new Set<number>()
+  const fileHead = content.site_file_heads?.[0]
   for (const row of fileVersions.values()) {
     if (fileNumbers.has(row.version) || !fileHead || row.version > fileHead.revision)
       fail('has duplicate, orphaned or future reviewed file versions')

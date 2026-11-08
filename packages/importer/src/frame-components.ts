@@ -411,8 +411,8 @@ export async function applyFrameComponents(
         [input.siteId, slug],
       )
     ).rows[0]
-    let id = existing?.id as string | undefined,
-      version = Number(existing?.version ?? 0)
+    let id = existing?.id as string | undefined
+    let version = Number(existing?.version ?? 0)
     if (!id) {
       const saved = (
         await client.query(

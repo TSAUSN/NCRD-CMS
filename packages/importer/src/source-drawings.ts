@@ -98,9 +98,9 @@ export function readIconLibrary(text: string): { label: string; svg: string }[] 
   const start = text.indexOf('[', text.indexOf('iconLibrary'))
   if (start < 0) return []
   // The array's own closing bracket, skipping brackets inside its strings.
-  let depth = 0,
-    inString = false,
-    end = -1
+  let depth = 0
+  let inString = false
+  let end = -1
   for (let at = start; at < text.length && end < 0; at += 1) {
     const char = text[at]!
     if (inString) {

@@ -3,8 +3,8 @@ export const ADOBE_KIT_URL = 'https://use.typekit.net/euh2hvn.css'
 export const ADOBE_STYLE_ORIGINS = ['https://use.typekit.net', 'https://p.typekit.net'] as const
 export function adobeFontsEnabled(theme: unknown, host: unknown): boolean {
   if (!theme || typeof theme !== 'object' || typeof host !== 'string') return false
-  const fonts = (theme as { fonts?: { adobeKit?: unknown } }).fonts,
-    kit = fonts?.adobeKit as { id?: unknown; enabled?: unknown; domains?: unknown } | undefined
+  const fonts = (theme as { fonts?: { adobeKit?: unknown } }).fonts
+  const kit = fonts?.adobeKit as { id?: unknown; enabled?: unknown; domains?: unknown } | undefined
   if (kit?.id !== 'euh2hvn' || kit.enabled !== true || !Array.isArray(kit.domains) || kit.domains.length > 10)
     return false
   const match = /^([a-z0-9.-]+)(?::[0-9]{1,5})?$/.exec(host.toLowerCase())

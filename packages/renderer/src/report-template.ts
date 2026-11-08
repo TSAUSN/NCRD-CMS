@@ -99,8 +99,8 @@ export function reportTemplateMarkup(
 ): string {
   if ((slug === 'core-photo-banner' || slug === 'core-text-image') && !reportPhoto(values.photo))
     body = withoutNativePhoto(body, slug)
-  const part = reportPart(slug, values),
-    index = slug === 'core-text-image' && (values.__cms_report_links === true || part === 'mission')
+  const part = reportPart(slug, values)
+  const index = slug === 'core-text-image' && (values.__cms_report_links === true || part === 'mission')
   if (slug === 'core-photo-banner') {
     if (!part || !hasWords(values.subheading)) body = hideElement(body, 'span', 'national-report-subheading')
     if (!part || !hasWords(values.caption)) body = hideElement(body, 'div', 'national-report-caption')
@@ -202,8 +202,8 @@ export function isReportTemplatePage(sections: readonly ManifestSection[]): bool
 }
 /** Wrappers group normal instances;none of their content is page HTML. */
 export function renderReportBands(sections: readonly ManifestSection[], html: readonly string[]): string {
-  let result = '',
-    active: string | null = null
+  let result = ''
+  let active: string | null = null
   sections.forEach((section, index) => {
     if (!html[index]) return
     const band = reportBand(section.def.slug, section.instance.values ?? {})

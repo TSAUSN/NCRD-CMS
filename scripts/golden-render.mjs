@@ -28,19 +28,19 @@ async function main() {
     throw Error(
       'Usage: golden-render.mjs capture --out PRIVATE_EMPTY_DIRECTORY --media-root REVIEWED_MEDIA_DIRECTORY --canvas-state PRIVATE_TICKET_JSON; or compare --before PRIVATE --after PRIVATE.',
     )
-  const t = target(),
-    out = privateDirectory(option('--out'))
+  const t = target()
+  const out = privateDirectory(option('--out'))
   try {
     readFileSync(join(out, 'render-manifest.json'))
     throw Error('Snapshot already exists. Never overwrite the golden baseline.')
   } catch (error) {
     if (error.code !== 'ENOENT') throw error
   }
-  const data = await fixture(t),
-    stop = await applications(t, out, option('--media-root'))
+  const data = await fixture(t)
+  const stop = await applications(t, out, option('--media-root'))
   try {
-    const manifest = {},
-      functions = await schemaSnapshot(t, out)
+    const manifest = {}
+    const functions = await schemaSnapshot(t, out)
     const assets = await publicPages(t, out, data, manifest)
     const cookie = localCookie(data.owner.email)
     await directPreviews(t, out, data.routes, cookie, manifest)

@@ -39,9 +39,9 @@ export async function transferSiteAssets(
     throw new Error('Asset transfer requires the exact frozen staged source manifest.')
   const repository = sourceSite === 'humanneedsindex' ? 'tsa-humanneedsindex' : 'tsa-echelonsymposium'
   const prefix = `asset/${repository}/public/`
-  const assets = new Map<string, ImportedSiteAsset>(),
-    fontIds: string[] = [],
-    unresolved: string[] = []
+  const assets = new Map<string, ImportedSiteAsset>()
+  const fontIds: string[] = []
+  const unresolved: string[] = []
   const fontByFile = new Map<string, SiteFontKey>(
     Object.entries(SITE_FONT_REGISTRY).map(([key, font]) => [font.filename, key as SiteFontKey]),
   )
@@ -50,8 +50,8 @@ export async function transferSiteAssets(
     if (!files.some(file => file.path === `${prefix}fonts/${font.filename}`))
       unresolved.push(`/fonts/${font.filename}#missing-frozen-source`)
   }
-  let documents = 0,
-    fonts = 0
+  let documents = 0
+  let fonts = 0
   for (const file of files) {
     const localUrl = `/${file.path.slice(prefix.length)}`
     const fontKey = localUrl.startsWith('/fonts/') ? fontByFile.get(localUrl.slice('/fonts/'.length)) : undefined
@@ -86,8 +86,8 @@ export async function transferSiteAssets(
 
 /** Preserve prose/layout: rewrite only URL-bearing markup attributes and CSS URLs. */
 export function remapSiteAssetReferences(html: string, css: string, assets: ReadonlyMap<string, ImportedSiteAsset>) {
-  const ids = new Set<string>(),
-    unresolved = new Set<string>()
+  const ids = new Set<string>()
+  const unresolved = new Set<string>()
   const rewrite = (value: string) => {
     const match = /^(\/[^?#]*)(.*)$/.exec(value)
     if (!match || value.startsWith('//')) return value
@@ -110,9 +110,9 @@ export function remapSiteAssetReferences(html: string, css: string, assets: Read
   // the tree would normalize SVG closing tags and unrelated authored quoting.
   const edits: { start: number; end: number; value: string }[] = []
   for (const match of html.matchAll(/\b(href|src|poster|xlink:href|style)\s*=\s*(["'])([\s\S]*?)\2/gi)) {
-    const value = match[3]!,
-      start = match.index! + match[0].length - value.length - 1,
-      end = start + value.length
+    const value = match[3]!
+    const start = match.index! + match[0].length - value.length - 1
+    const end = start + value.length
     const probe = html.slice(0, start) + '{{cmsAssetProbe}}' + html.slice(end)
     const site = scanSlotSites(probe).find(site => site.index === start)
     const name = match[1]!.toLowerCase()
@@ -138,8 +138,8 @@ export function remapSiteAssetValues(
     if (current && typeof current === 'object')
       return Object.fromEntries(Object.entries(current).map(([key, child]) => [key, walk(child)]))
     if (typeof current !== 'string') return current
-    const match = /^(\/[^?#]*)(.*)$/.exec(current),
-      asset = match ? assets.get(match[1]!) : null
+    const match = /^(\/[^?#]*)(.*)$/.exec(current)
+    const asset = match ? assets.get(match[1]!) : null
     if (asset) {
       ids.add(asset.assetId)
       return asset.url + match![2]

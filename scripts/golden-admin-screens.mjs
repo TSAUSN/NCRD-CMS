@@ -6,17 +6,17 @@ import { adminReady } from './golden/admin-ready.mjs'
 import { adminRoutes } from './golden/admin-routes.mjs'
 import { screenEvidence, compareScreens, differentPixels } from './golden/admin-evidence.mjs'
 const { webkit } = createRequire(join(root, 'e2e/package.json'))('@playwright/test')
-const args = process.argv.slice(2),
-  option = key => args[args.indexOf(key) + 1]
+const args = process.argv.slice(2)
+const option = key => args[args.indexOf(key) + 1]
 async function main() {
   if (!args.includes('--out') || !args.includes('--media-root'))
     throw Error(
       'Supply private --out and reviewed --media-root; optional --reference checks the original route catalog.',
     )
-  const t = target(),
-    out = privateDirectory(option('--out')),
-    data = await fixture(t),
-    catalog = await adminRoutes(t, data)
+  const t = target()
+  const out = privateDirectory(option('--out'))
+  const data = await fixture(t)
+  const catalog = await adminRoutes(t, data)
   if (t.database !== 'cms_e2e_refactor_screens')
     throw Error(
       'Admin captures require the separate cms_e2e_refactor_screens fixture, preserving render-oracle tickets.',
@@ -30,12 +30,12 @@ async function main() {
       JSON.stringify(catalog.cases.map(c => c.pattern))
   )
     throw Error('Admin route catalog differs from baseline.')
-  const at = new Date().toISOString(),
-    stop = await applications(t, out, option('--media-root'))
+  const at = new Date().toISOString()
+  const stop = await applications(t, out, option('--media-root'))
   let browser
   let engine
-  const captures = [],
-    failures = []
+  const captures = []
+  const failures = []
   try {
     browser = await webkit.launch({ headless: true })
     engine = { name: 'webkit', version: browser.version() }

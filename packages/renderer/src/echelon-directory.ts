@@ -11,9 +11,9 @@ function entries(input: unknown): Entry[] {
       const row = value as Record<string, unknown>
       if (typeof row.name !== 'string' || !row.name.trim() || row.name.length > 160) return []
       const external =
-          typeof row.externalUrl === 'string' && row.externalUrl.startsWith('https://') ? safeUrl(row.externalUrl) : '',
-        path = typeof row.path === 'string' && /^\/(?!\/)/.test(row.path) ? safeUrl(row.path) : '',
-        href = external || path
+        typeof row.externalUrl === 'string' && row.externalUrl.startsWith('https://') ? safeUrl(row.externalUrl) : ''
+      const path = typeof row.path === 'string' && /^\/(?!\/)/.test(row.path) ? safeUrl(row.path) : ''
+      const href = external || path
       if (!href) return []
       return [
         {
@@ -32,13 +32,13 @@ function entries(input: unknown): Entry[] {
 }
 /** Source geometry supplies appearance; the redacted publication reader supplies every destination. */
 export function renderEchelonDirectory(context: Context): string {
-  const rows = entries(context.chapters),
-    query = (context.query ?? '').trim().slice(0, 120),
-    lower = query.toLocaleLowerCase('en-US'),
-    shown = rows.filter(row => row.name.toLocaleLowerCase('en-US').includes(lower)),
-    key = 'ech-directory-' + (/^[a-z0-9-]{1,40}$/.test(context.widgetKey ?? '') ? context.widgetKey : 'list'),
-    path = context.pagePath && /^\/(?!\/)/.test(context.pagePath) ? safeUrl(context.pagePath) : '/chapters',
-    listId = key + '-list'
+  const rows = entries(context.chapters)
+  const query = (context.query ?? '').trim().slice(0, 120)
+  const lower = query.toLocaleLowerCase('en-US')
+  const shown = rows.filter(row => row.name.toLocaleLowerCase('en-US').includes(lower))
+  const key = 'ech-directory-' + (/^[a-z0-9-]{1,40}$/.test(context.widgetKey ?? '') ? context.widgetKey : 'list')
+  const path = context.pagePath && /^\/(?!\/)/.test(context.pagePath) ? safeUrl(context.pagePath) : '/chapters'
+  const listId = key + '-list'
   const hidden = (row: Entry) => (lower && !row.name.toLocaleLowerCase('en-US').includes(lower) ? ' hidden' : '')
   const link = (row: Entry) =>
     `href="${attr(row.href)}"${row.external ? ' target="_blank" rel="noopener noreferrer"' : ''}`

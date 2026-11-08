@@ -56,9 +56,9 @@ export function repeatTemplateSpec(slot: Pick<FieldLike, 'id' | 'kind' | 'constr
   for (const candidate of raw['fields'] as unknown[]) {
     if (!candidate || typeof candidate !== 'object') return null
     const field = candidate as Record<string, unknown>
-    const id = field['id'],
-      kind = field['kind'],
-      label = field['label']
+    const id = field['id']
+    const kind = field['kind']
+    const label = field['label']
     if (typeof id !== 'string' || !SLOT_ID.test(id) || id.includes(SEPARATOR) || ids.has(id)) return null
     if (slot.id.length + id.length + KEY_ROOM > 64) return null
     if (typeof kind !== 'string' || !(REPEAT_ITEM_FIELD_KINDS as readonly string[]).includes(kind)) return null

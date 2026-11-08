@@ -4,9 +4,9 @@ import { resolve, dirname } from 'node:path'
 import { Client } from 'pg'
 import { installCoreLibrary } from './core-install.ts'
 import { annualReportTemplate, type ReportSectionInput } from './report-template.ts'
-const input = resolve(process.argv[2] ?? ''),
-  folder = dirname(input),
-  receipt = resolve(folder, 'draft-receipt.json')
+const input = resolve(process.argv[2] ?? '')
+const folder = dirname(input)
+const receipt = resolve(folder, 'draft-receipt.json')
 if (!input.endsWith('/.r8-progress/round3/report-page/source-content.json'))
   throw new Error('Use the private local report input.')
 await access(resolve(folder, 'before.dump'))
@@ -22,8 +22,8 @@ const source = JSON.parse(await readFile(input, 'utf8')) as {
   parentAddress: string
   parts: ReportSectionInput[]
 }
-const owner = new Client({ connectionString: 'postgres://cms:cms@127.0.0.1:54329/cms_demo' }),
-  client = new Client({ connectionString: 'postgres://cms_admin_app:devpassword@127.0.0.1:54329/cms_demo' })
+const owner = new Client({ connectionString: 'postgres://cms:cms@127.0.0.1:54329/cms_demo' })
+const client = new Client({ connectionString: 'postgres://cms_admin_app:devpassword@127.0.0.1:54329/cms_demo' })
 try {
   await owner.connect()
   await client.connect()
@@ -60,12 +60,12 @@ try {
     ).rowCount
   )
     throw new Error('A report already uses this address; no page was overwritten.')
-  const installed = await installCoreLibrary(client),
-    defs = (
-      await client.query(
-        "SELECT d.id,d.slug,d.name,v.version FROM section_defs d JOIN LATERAL(SELECT version FROM section_def_versions WHERE section_def_id=d.id ORDER BY version DESC LIMIT 1)v ON true WHERE d.scope='global'",
-      )
-    ).rows
+  const installed = await installCoreLibrary(client)
+  const defs = (
+    await client.query(
+      "SELECT d.id,d.slug,d.name,v.version FROM section_defs d JOIN LATERAL(SELECT version FROM section_def_versions WHERE section_def_id=d.id ORDER BY version DESC LIMIT 1)v ON true WHERE d.scope='global'",
+    )
+  ).rows
   const content = annualReportTemplate(defs, source.parts)
   const pageId = (await client.query('SELECT app.create_page($1,$2,$3) AS id', [site.id, address, source.title]))
     .rows[0].id

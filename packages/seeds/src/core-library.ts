@@ -1148,8 +1148,8 @@ export function corePreviewValues(entry: CoreSection): Record<string, unknown> {
     }
   const values = structuredClone(entry.samples)
   if (['core-story-detail', 'core-newsroom'].includes(entry.definition.slug)) {
-    const schemaId = '00000000-0000-4000-8000-000000000002',
-      row = sawsoStoryRows()[0]!
+    const schemaId = '00000000-0000-4000-8000-000000000002'
+    const row = sawsoStoryRows()[0]!
     return {
       ...values,
       ...(entry.definition.slug === 'core-story-detail' ? { library_link: link('Newsroom', '/newsroom') } : {}),

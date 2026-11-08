@@ -107,8 +107,8 @@ export function parseSiteVerificationTags(input: string): SiteVerification[] | n
   for (const tag of tags) {
     const match = /^<meta\b([\s\S]*?)\s*\/?>$/i.exec(tag)
     if (!match) return null
-    let remaining = match[1]!,
-      attrs: Record<string, string> = {}
+    let remaining = match[1]!
+    let attrs: Record<string, string> = {}
     while (remaining.trim()) {
       const next = /^\s+([a-z][\w:.-]*)\s*=\s*(['"])(.*?)\2/i.exec(remaining)
       if (!next) return null

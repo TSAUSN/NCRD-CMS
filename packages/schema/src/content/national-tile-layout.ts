@@ -18,8 +18,8 @@ export function preserveNationalTileLayout(
 ): Record<string, unknown> {
   if (slug !== 'core-feature-tiles' || repeatItemKeys(before.cards).length === repeatItemKeys(after.cards).length)
     return after
-  const layout = nationalTileLayout(before),
-    next = { ...after }
+  const layout = nationalTileLayout(before)
+  const next = { ...after }
   if (layout === inferred(next)) delete next[KEY]
   else next[KEY] = layout
   return next

@@ -189,10 +189,10 @@ export function applyChapterSetup(content: SectionInstance[], config: ChapterSet
   })
   const social = next.findIndex(section => section.values.__cms_chapter_part === 'social')
   if (social >= 0) {
-    const item = next.splice(social, 1)[0]!,
-      target = config.sections.socialFirst
-        ? 1
-        : next.findIndex(section => section.values.__cms_chapter_part === 'paragraph') + 1
+    const item = next.splice(social, 1)[0]!
+    const target = config.sections.socialFirst
+      ? 1
+      : next.findIndex(section => section.values.__cms_chapter_part === 'paragraph') + 1
     next.splice(Math.min(Math.max(1, target), next.length), 0, item)
   }
   return next

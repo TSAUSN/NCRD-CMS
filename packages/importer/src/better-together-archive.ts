@@ -59,14 +59,14 @@ export function assembleBetterTogetherArchive({
   versions,
   content,
 }: PageArchive) {
-  const one = () => ({ id: randomUUID(), revision: 1, draft_version_id: randomUUID(), published_version_id: null }),
-    pageVersion = randomUUID(),
-    theme = one(),
-    settings = one(),
-    navigation = one(),
-    head = one(),
-    foot = one(),
-    fileVersion = randomUUID()
+  const one = () => ({ id: randomUUID(), revision: 1, draft_version_id: randomUUID(), published_version_id: null })
+  const pageVersion = randomUUID()
+  const theme = one()
+  const settings = one()
+  const navigation = one()
+  const head = one()
+  const foot = one()
+  const fileVersion = randomUUID()
   const bundle: SiteFileBundle = {
     version: 1,
     files: files.map(file => file.id),

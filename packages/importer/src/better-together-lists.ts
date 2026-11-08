@@ -72,8 +72,8 @@ function repeat(id: string, label: string, unit: string, fields: SlotDef[]): Slo
   return { id, kind: 'repeat', label, constraints: { collection: true, item: { unit, fields } } }
 }
 function replaceItems(parent: Parent, items: Element[]) {
-  const first = parent.childNodes.indexOf(items[0]!),
-    last = parent.childNodes.indexOf(items.at(-1)!)
+  const first = parent.childNodes.indexOf(items[0]!)
+  const last = parent.childNodes.indexOf(items.at(-1)!)
   if (first < 0 || last < first || items.some(item => item.parentNode !== parent))
     throw new Error('The original items no longer share their container.')
   if (parent.childNodes.slice(first, last + 1).some(node => 'tagName' in node && !items.includes(node)))
@@ -95,16 +95,16 @@ export function convertBetterTogetherList(input: {
   slots: SlotDef[]
   values: Record<string, unknown>
 }): BetterTogetherListConversion {
-  const source = parseFragment(input.sourceHtml),
-    rendered = parseFragment(input.renderedHtml),
-    kind = input.kind
-  const entries: BetterTogetherListConversion['entries'] = [],
-    slots: SlotDef[] = [],
-    values: Record<string, unknown> = {}
-  let fields: CollectionField[],
-    presentation: BetterTogetherListConversion['presentation'],
-    sourceHtml: string,
-    name: string
+  const source = parseFragment(input.sourceHtml)
+  const rendered = parseFragment(input.renderedHtml)
+  const kind = input.kind
+  const entries: BetterTogetherListConversion['entries'] = []
+  const slots: SlotDef[] = []
+  const values: Record<string, unknown> = {}
+  let fields: CollectionField[]
+  let presentation: BetterTogetherListConversion['presentation']
+  let sourceHtml: string
+  let name: string
   const commitParent = (parent: Parent, items: Element[], replacement: string) => {
     // Serialize the whole original root, replacing only the item range. Keeping
     // the other authored fields means the heading remains click-to-edit.
@@ -130,8 +130,8 @@ export function convertBetterTogetherList(input: {
       imageField: 'photo',
       groupField: null,
     }
-    const items = [...walk(source)].filter(node => has(node, 'speaker-col')),
-      shown = [...walk(rendered)].filter(node => has(node, 'speaker-col'))
+    const items = [...walk(source)].filter(node => has(node, 'speaker-col'))
+    const shown = [...walk(rendered)].filter(node => has(node, 'speaker-col'))
     if (items.length !== 6 || shown.length !== 6) throw new Error('Expected the six original BT2027 speakers.')
     shown.forEach((node, index) =>
       entries.push({
@@ -151,9 +151,9 @@ export function convertBetterTogetherList(input: {
         },
       }),
     )
-    const prototype = items[0]!,
-      bio = find(prototype, n => has(n, 'speaker-bio')),
-      paragraph = find(bio, n => n.tagName === 'p')
+    const prototype = items[0]!
+    const bio = find(prototype, n => has(n, 'speaker-bio'))
+    const paragraph = find(bio, n => n.tagName === 'p')
     setAttr(prototype, 'id', '{{anchor}}')
     tokenImage(
       find(prototype, n => n.tagName === 'img'),
@@ -189,8 +189,8 @@ export function convertBetterTogetherList(input: {
     )
   } else if (kind === 'sponsors') {
     name = 'Sponsors'
-    const items = [...walk(source)].filter(node => has(node, 'sponsor-card')),
-      shown = [...walk(rendered)].filter(node => has(node, 'sponsor-card'))
+    const items = [...walk(source)].filter(node => has(node, 'sponsor-card'))
+    const shown = [...walk(rendered)].filter(node => has(node, 'sponsor-card'))
     if (items.length !== 8 || shown.length !== 8) throw new Error('Expected the eight original BT2027 sponsors.')
     const tiers = [...new Set(shown.map(node => text(find(node, n => has(n, 'sponsor-card-tag')))))]
     fields = [
@@ -206,8 +206,8 @@ export function convertBetterTogetherList(input: {
       groupField: 'tier',
     }
     shown.forEach((node, index) => {
-      const logo = image(find(node, n => n.tagName === 'img')),
-        tier = text(find(node, n => has(n, 'sponsor-card-tag')))
+      const logo = image(find(node, n => n.tagName === 'img'))
+      const tier = text(find(node, n => has(n, 'sponsor-card-tag')))
       entries.push({
         id: null,
         stableKey: 'sponsor-' + (index + 1),
@@ -216,8 +216,8 @@ export function convertBetterTogetherList(input: {
     })
     const templates = tiers
       .map((tier, index) => {
-        const prototype = items[shown.findIndex(node => text(find(node, n => has(n, 'sponsor-card-tag'))) === tier)]!,
-          id = 'sponsors' + (index + 1)
+        const prototype = items[shown.findIndex(node => text(find(node, n => has(n, 'sponsor-card-tag'))) === tier)]!
+        const id = 'sponsors' + (index + 1)
         tokenImage(
           find(prototype, n => n.tagName === 'img'),
           'logo',
@@ -249,11 +249,11 @@ export function convertBetterTogetherList(input: {
       imageField: null,
       groupField: 'focus',
     }
-    const tbody = find(source, n => n.tagName === 'tbody'),
-      rows = tbody.childNodes.filter((n): n is Element => 'tagName' in n && n.tagName === 'tr'),
-      shown = find(rendered, n => n.tagName === 'tbody').childNodes.filter(
-        (n): n is Element => 'tagName' in n && n.tagName === 'tr',
-      )
+    const tbody = find(source, n => n.tagName === 'tbody')
+    const rows = tbody.childNodes.filter((n): n is Element => 'tagName' in n && n.tagName === 'tr')
+    const shown = find(rendered, n => n.tagName === 'tbody').childNodes.filter(
+      (n): n is Element => 'tagName' in n && n.tagName === 'tr',
+    )
     if (rows.length !== 125 || shown.length !== 125) throw new Error('Expected the125 original BT workshop rows.')
     const keys = ['title', 'presenter', 'focus', 'time']
     shown.forEach((row, index) => {
@@ -266,8 +266,8 @@ export function convertBetterTogetherList(input: {
         values: Object.fromEntries(cells.map((cell, i) => [keys[i]!, text(cell)])),
       })
     })
-    const prototype = rows[0]!,
-      cells = prototype.childNodes.filter((n): n is Element => 'tagName' in n)
+    const prototype = rows[0]!
+    const cells = prototype.childNodes.filter((n): n is Element => 'tagName' in n)
     cells.forEach((cell, i) => setText(cell, '{{' + keys[i] + '}}'))
     slots.push(
       repeat(

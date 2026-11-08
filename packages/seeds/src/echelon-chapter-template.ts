@@ -27,8 +27,8 @@ export function echelonChapterTemplate(
   for (const key of ['logo', 'photo', 'portrait', 'photo_two', 'photo_three'] as const)
     if (!media[key]) throw new Error('Choose the Echelon logo and all chapter photos first.')
   const one = (slug: string): SectionInstance => {
-    const entry = ECHELON_LIBRARY.find(row => row.definition.slug === 'core-echelon-' + slug),
-      definition = definitions.find(row => row.slug === 'core-echelon-' + slug)
+    const entry = ECHELON_LIBRARY.find(row => row.definition.slug === 'core-echelon-' + slug)
+    const definition = definitions.find(row => row.slug === 'core-echelon-' + slug)
     if (!entry || !definition) throw new Error('Install the shared Echelon sections first.')
     return {
       section_def_id: definition.id,
@@ -48,15 +48,15 @@ export function echelonChapterTemplate(
     __cms_anchor: 'ech-demo-title',
     __cms_chapter_part: 'title',
   })
-  const jump = one('jump-links'),
-    links = [
-      ['users', 'Who we are', '#ech-demo-about'],
-      ['heart', 'What we do', '#ech-demo-participate'],
-      ['calendar', 'Events', '#ech-demo-events'],
-      ['users', 'Our board', '#ech-demo-board'],
-      ['info', 'FAQ', '#ech-demo-faq'],
-      ['mail', 'Join us', '#ech-demo-contact'],
-    ]
+  const jump = one('jump-links')
+  const links = [
+    ['users', 'Who we are', '#ech-demo-about'],
+    ['heart', 'What we do', '#ech-demo-participate'],
+    ['calendar', 'Events', '#ech-demo-events'],
+    ['users', 'Our board', '#ech-demo-board'],
+    ['info', 'FAQ', '#ech-demo-faq'],
+    ['mail', 'Join us', '#ech-demo-contact'],
+  ]
   jump.values = {
     links: { items: links.map((_, i) => 'i' + (i + 1)) },
     ...Object.fromEntries(
@@ -67,26 +67,26 @@ export function echelonChapterTemplate(
     ),
     __cms_chapter_part: 'jumps',
   }
-  const [about, who, pillars] = echelonBodyContent('chapter', definitions, media),
-    [faq, contact] = echelonFaqContactContent('chapter', definitions),
-    people = echelonBoardContactsContent(definitions),
-    contacts = people.find(row => row.values.__cms_chapter_part !== 'board')!,
-    board = people.find(row => row.values.__cms_chapter_part === 'board')!,
-    [events, follow] = echelonEngagementContent(definitions)
+  const [about, who, pillars] = echelonBodyContent('chapter', definitions, media)
+  const [faq, contact] = echelonFaqContactContent('chapter', definitions)
+  const people = echelonBoardContactsContent(definitions)
+  const contacts = people.find(row => row.values.__cms_chapter_part !== 'board')!
+  const board = people.find(row => row.values.__cms_chapter_part === 'board')!
+  const [events, follow] = echelonEngagementContent(definitions)
   const content: SectionInstance[] = [
-      hero,
-      jump,
-      about!,
-      who!,
-      pillars!,
-      events!,
-      contacts,
-      follow!,
-      board,
-      faq!,
-      contact!,
-    ].map(section => Object.assign(section, { hidden: false, hidden_at: [] as ('lg' | 'md' | 'sm')[] })),
-    parts = ['title', 'jumps', 'about', 'paragraph', 'what', 'events', 'contact', 'social', 'board', 'faq', 'form']
+    hero,
+    jump,
+    about!,
+    who!,
+    pillars!,
+    events!,
+    contacts,
+    follow!,
+    board,
+    faq!,
+    contact!,
+  ].map(section => Object.assign(section, { hidden: false, hidden_at: [] as ('lg' | 'md' | 'sm')[] }))
+  const parts = ['title', 'jumps', 'about', 'paragraph', 'what', 'events', 'contact', 'social', 'board', 'faq', 'form']
   content.forEach((section, index) => {
     section.values.__cms_echelon_template = 'chapter'
     section.values.__cms_chapter_part = parts[index]!
@@ -104,8 +104,8 @@ export function echelonChapterTemplate(
       if (part === 'board') section.values.__cms_board_display = config.boardDisplay
     }
     if (config.sections.socialFirst) {
-      const at = content.findIndex(row => row.values.__cms_chapter_part === 'social'),
-        item = content.splice(at, 1)[0]!
+      const at = content.findIndex(row => row.values.__cms_chapter_part === 'social')
+      const item = content.splice(at, 1)[0]!
       content.splice(1, 0, item)
     }
   }
@@ -141,9 +141,9 @@ export function applyEchelonChapterTemplateSetup(content: SectionInstance[], con
   }
   const at = next.findIndex(section => section.values.__cms_chapter_part === 'social')
   if (at >= 0) {
-    const social = next.splice(at, 1)[0]!,
-      contacts = next.findIndex(section => section.values.__cms_chapter_part === 'contact'),
-      target = config.sections.socialFirst ? 1 : contacts >= 0 ? contacts + 1 : next.length
+    const social = next.splice(at, 1)[0]!
+    const contacts = next.findIndex(section => section.values.__cms_chapter_part === 'contact')
+    const target = config.sections.socialFirst ? 1 : contacts >= 0 ? contacts + 1 : next.length
     next.splice(target, 0, social)
   }
   for (const section of next)

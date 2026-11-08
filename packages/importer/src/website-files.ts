@@ -33,8 +33,8 @@ export function localWebsiteFile(
   extensions: ReadonlySet<string>,
 ): string | null {
   try {
-    const lexical = resolve(path),
-      inside = (candidate: string) => roots.some(root => candidate.startsWith(root + sep))
+    const lexical = resolve(path)
+    const inside = (candidate: string) => roots.some(root => candidate.startsWith(root + sep))
     if (!inside(lexical) || !extensions.has(extname(lexical).toLowerCase())) return null
     const canonical = realpathSync(lexical)
     if (extname(canonical).toLowerCase() !== extname(lexical).toLowerCase()) return null
@@ -110,8 +110,8 @@ export class SiteFiles {
     const known = this.documents.get(path)
     if (known) return known
     const bytes = readFileSync(path)
-    const id = randomUUID(),
-      hash = sha256(bytes)
+    const id = randomUUID()
+    const hash = sha256(bytes)
     this.assets.push({
       id,
       kind: 'document',

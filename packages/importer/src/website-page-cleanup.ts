@@ -130,8 +130,8 @@ export function adaptImportedMenu(
   const tree: NavTree = []
   for (const link of walk(panel)) {
     if (link.tagName !== 'a') continue
-    const href = attr(link, 'href') ?? '',
-      label = visibleText(link).trim().slice(0, 80)
+    const href = attr(link, 'href') ?? ''
+    const label = visibleText(link).trim().slice(0, 80)
     if (!label || !href || href === '#') continue
     const local = files.resolve(href, page.file)
     const hash = href.includes('#') ? href.slice(href.indexOf('#')) : ''

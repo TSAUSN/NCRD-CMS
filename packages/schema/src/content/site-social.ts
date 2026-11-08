@@ -47,8 +47,8 @@ export function siteSocialSectionValues(
       next = clearSampleField(next, key)
       delete next[key]
     }
-  const rows = (siteSocialAccounts(settings) ?? []).filter(row => row.url),
-    items = rows.map((_, index) => 's' + index)
+  const rows = (siteSocialAccounts(settings) ?? []).filter(row => row.url)
+  const items = rows.map((_, index) => 's' + index)
   next[group] = { items }
   rows.forEach((row, index) => {
     next[repeatItemSlotId(group, items[index]!, 'action')] = {

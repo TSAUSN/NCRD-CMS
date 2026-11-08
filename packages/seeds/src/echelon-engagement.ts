@@ -152,9 +152,9 @@ export function echelonEngagementContent(
   return entries.map(entry => {
     const definition = definitions.find(def => def.slug === entry.definition.slug)
     if (!definition) throw new Error('Install the shared Echelon sections first.')
-    const values = sourceSampleValues(entry.definition.kind === 'legacy' ? entry.definition.slots : []),
-      events = entry.definition.slug === 'core-echelon-events',
-      prefix = events ? 'events' : 'links'
+    const values = sourceSampleValues(entry.definition.kind === 'legacy' ? entry.definition.slots : [])
+    const events = entry.definition.slug === 'core-echelon-events'
+    const prefix = events ? 'events' : 'links'
     Object.assign(
       values,
       markSampleValues(

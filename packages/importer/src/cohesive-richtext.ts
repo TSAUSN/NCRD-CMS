@@ -78,8 +78,8 @@ function sourceBlockAttributes(nodes: HtmlNode[]): RichTextBlockAttributes {
   const take = (node: HtmlElement) => {
     if (node.tag in found) return
     const presentation: { class?: string; style?: string } = {}
-    const className = attribute(node, 'class'),
-      style = attribute(node, 'style')
+    const className = attribute(node, 'class')
+    const style = attribute(node, 'style')
     if (className !== undefined) presentation.class = decodeHTMLAttribute(className)
     if (style !== undefined) presentation.style = decodeHTMLAttribute(style)
     found[node.tag] = presentation
@@ -106,8 +106,8 @@ function sourceInlineAttributes(nodes: HtmlNode[]): RichTextInlineAttributes {
       if (node.kind !== 'element') continue
       if (MARKS.has(node.tag) && !(node.tag in found)) {
         const presentation: { class?: string; style?: string } = {}
-        const className = attribute(node, 'class'),
-          style = attribute(node, 'style')
+        const className = attribute(node, 'class')
+        const style = attribute(node, 'style')
         if (className !== undefined) presentation.class = decodeHTMLAttribute(className)
         if (style !== undefined) presentation.style = decodeHTMLAttribute(style)
         found[node.tag] = presentation

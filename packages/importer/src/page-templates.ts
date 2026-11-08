@@ -21,13 +21,13 @@ export function readV1PageTemplates(text: string): V1PageTemplate[] {
   const start = text.indexOf('[', text.indexOf('export const pageTemplates'))
   if (start < 0) return []
   // The array's own closing bracket, skipping brackets inside strings and comments.
-  let depth = 0,
-    end = -1,
-    quote = '',
-    comment = ''
+  let depth = 0
+  let end = -1
+  let quote = ''
+  let comment = ''
   for (let at = start; at < text.length && end < 0; at += 1) {
-    const char = text[at]!,
-      next = text[at + 1]
+    const char = text[at]!
+    const next = text[at + 1]
     if (comment === 'line') {
       if (char === '\n') comment = ''
       continue
@@ -58,12 +58,12 @@ export function readV1PageTemplates(text: string): V1PageTemplate[] {
   }
   if (end < 0) return []
   // Rewrite the literal to JSON: drop comments, quote keys, double-quote strings, drop trailing commas.
-  let json = '',
-    quoteChar = ''
+  let json = ''
+  let quoteChar = ''
   const literal = text.slice(start, end + 1)
   for (let at = 0; at < literal.length; at += 1) {
-    const char = literal[at]!,
-      next = literal[at + 1]
+    const char = literal[at]!
+    const next = literal[at + 1]
     if (quoteChar) {
       if (char === '\\') {
         json += next === "'" ? "'" : `\\${next}`

@@ -17,8 +17,8 @@ export function annualReportTemplate(
     parts.map(row => {
       const slug = REPORT_PARTS[row.part]
       if (!slug || !REPORT_BANDS.includes(row.band)) throw new Error('Choose a shared report section and band.')
-      const def = definitions.find(item => item.slug === slug),
-        entry = CORE_LIBRARY.find(item => item.definition.slug === slug)
+      const def = definitions.find(item => item.slug === slug)
+      const entry = CORE_LIBRARY.find(item => item.definition.slug === slug)
       if (!def || !entry) throw new Error('Install the shared report sections first.')
       const empty = Object.fromEntries(
         compileCoreSection(entry).slots.map(slot => [

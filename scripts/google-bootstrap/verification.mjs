@@ -4,14 +4,14 @@ import { readFileSync } from 'node:fs'
 import { operatorConnection } from './database.mjs'
 import { assertActiveScope } from './scope.mjs'
 import { origin, receipt, kept } from './common.mjs'
-const require = createRequire(new URL('../../packages/schema/package.json', import.meta.url)),
-  { Client } = require('pg')
-const htmlRequire = createRequire(new URL('../../packages/renderer/package.json', import.meta.url)),
-  { parse } = htmlRequire('parse5')
+const require = createRequire(new URL('../../packages/schema/package.json', import.meta.url))
+const { Client } = require('pg')
+const htmlRequire = createRequire(new URL('../../packages/renderer/package.json', import.meta.url))
+const { parse } = htmlRequire('parse5')
 
 export function localAssets(html, address) {
-  const urls = new Set(),
-    base = new URL(address)
+  const urls = new Set()
+  const base = new URL(address)
   const add = value => {
     if (!value) return
     try {
@@ -52,8 +52,8 @@ export async function verify(c) {
   assertActiveScope(c)
   const checks = []
   for (const role of ['admin', 'site']) {
-    const { bytes } = await get(origin(c, role) + '/health'),
-      data = JSON.parse(bytes.toString())
+    const { bytes } = await get(origin(c, role) + '/health')
+    const data = JSON.parse(bytes.toString())
     if (data.version !== c.revision.slice(0, 7)) throw Error('Health version differs from freeze.')
     checks.push({ role, status: 200, version: data.version })
   }
@@ -65,7 +65,8 @@ export async function verify(c) {
   if (![401, 403].includes(denied.status)) throw Error('Worker must refuse anonymous invocation.')
   const db = new Client(operatorConnection(c))
   await db.connect()
-  let routes, worker
+  let routes
+  let worker
   try {
     await db.query('BEGIN READ ONLY')
     routes = (
@@ -87,8 +88,8 @@ export async function verify(c) {
   if (!Number.isInteger(c.expectedPublicPages) || routes.length !== c.expectedPublicPages)
     throw Error('Published route count differs from the reviewed content inventory.')
   if (!worker.fresh) throw Error('No fresh worker heartbeat for the deployed revision.')
-  const assets = new Set(),
-    pages = []
+  const assets = new Set()
+  const pages = []
   for (const route of routes) {
     if (!route.staging_hostname.startsWith(c.firebaseSitePrefix + '-') || !route.staging_hostname.endsWith('.web.app'))
       throw Error('A kept route still points outside this installation.')

@@ -179,8 +179,8 @@ export function echelonBodyContent(
   return seeds.map(entry => {
     const definition = definitions.find(def => def.slug === entry.definition.slug)
     if (!definition) throw new Error('Install the shared Echelon sections first.')
-    const slots = entry.definition.kind === 'legacy' ? entry.definition.slots : [],
-      values: Record<string, unknown> = {}
+    const slots = entry.definition.kind === 'legacy' ? entry.definition.slots : []
+    const values: Record<string, unknown> = {}
     for (const field of slots) {
       if (field.kind === 'repeat') {
         const item = field.constraints.item as { samples: Record<string, unknown>[] }

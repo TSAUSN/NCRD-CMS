@@ -8,8 +8,8 @@ export async function serveLocalBrandFont(
   file: string,
   options: { local: boolean; publicHosting?: boolean; read: (name: string) => Promise<Uint8Array> },
 ): Promise<Response> {
-  const host = normalizeHost(request.headers.get('host') ?? ''),
-    font = localBrandFont(file)
+  const host = normalizeHost(request.headers.get('host') ?? '')
+  const font = localBrandFont(file)
   const missing = () => new Response('Not found', { status: 404, headers: { 'cache-control': 'no-store' } })
   if (
     !host ||

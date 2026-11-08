@@ -72,9 +72,9 @@ const CUSTOM_PROPERTY = /^--[A-Za-z_][A-Za-z0-9_-]{0,100}$/
 function registeredProperty(at: AtRule): RegisteredProperty | null {
   const name = at.params.trim()
   if (!CUSTOM_PROPERTY.test(name)) return null
-  let initial = '',
-    inherits = true,
-    syntax = ''
+  let initial = ''
+  let inherits = true
+  let syntax = ''
   for (const node of at.nodes ?? []) {
     if (node.type !== 'decl') continue
     const prop = node.prop.toLowerCase()
@@ -114,8 +114,8 @@ function propertyDefaults(properties: readonly RegisteredProperty[], scope: stri
     properties.filter(property => property.initial !== '').map(property => [property.name, property]),
   )
   const declare = (list: RegisteredProperty[]) => list.map(property => `${property.name}:${property.initial}`).join(';')
-  const own = [...byName.values()].filter(property => !property.inherits),
-    inherited = [...byName.values()].filter(property => property.inherits)
+  const own = [...byName.values()].filter(property => !property.inherits)
+  const inherited = [...byName.values()].filter(property => property.inherits)
   return (
     (own.length ? `${scope},${scope} *,${scope} ::before,${scope} ::after{${declare(own)}}` : '') +
     (inherited.length ? `${scope}{${declare(inherited)}}` : '')

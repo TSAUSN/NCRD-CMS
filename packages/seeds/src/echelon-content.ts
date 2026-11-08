@@ -18,8 +18,8 @@ export function echelonSectionContent(
   initial: Record<string, unknown>,
 ): { values: Record<string, unknown>; appearance?: SectionAppearance } {
   if (!['echelon-home', 'chapter-finder'].includes(template)) return { values: initial }
-  let values: Record<string, unknown> = { ...initial },
-    appearance: SectionAppearance | undefined
+  let values: Record<string, unknown> = { ...initial }
+  let appearance: SectionAppearance | undefined
   const owned = (fields: Record<string, unknown>) => {
     Object.assign(values, fields)
     for (const key of Object.keys(fields)) values = clearSampleField(values, key)

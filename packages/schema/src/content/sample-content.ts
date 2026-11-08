@@ -33,8 +33,8 @@ export function boundSampleFieldNames(
 ): string[] {
   const result: string[] = []
   for (const slot of slots) {
-    const flags = slot.constraints?.sampleFlags,
-      bound = values[slot.id] as { kind?: unknown; entries?: { values?: Record<string, unknown> }[] } | undefined
+    const flags = slot.constraints?.sampleFlags
+    const bound = values[slot.id] as { kind?: unknown; entries?: { values?: Record<string, unknown> }[] } | undefined
     if (
       !flags ||
       typeof flags !== 'object' ||
@@ -52,8 +52,8 @@ export function boundSampleFieldNames(
           entry.values?.[flag] !== true
         )
           continue
-        const title = typeof entry.values.title === 'string' ? entry.values.title : 'Story',
-          label = field === 'photo' ? 'Lead photo' : field === 'body' ? 'Story text' : field
+        const title = typeof entry.values.title === 'string' ? entry.values.title : 'Story'
+        const label = field === 'photo' ? 'Lead photo' : field === 'body' ? 'Story text' : field
         result.push(label + ': ' + title)
       }
   }

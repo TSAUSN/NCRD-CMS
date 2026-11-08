@@ -73,29 +73,29 @@ export function echelonLeadershipContent(definitions: readonly CorePageDefinitio
   for (const key of ['photo', 'portrait_one', 'portrait_two', 'portrait_three', 'portrait_four'])
     if (!media[key]) throw new Error('Choose the council group photo and all four portraits first.')
   const entry = echelonLeadershipLibrary((slug, name, purpose, html, slots) => ({
-      definition: {
-        kind: 'legacy',
-        slug: 'core-echelon-' + slug,
-        name,
-        category: 'National sections',
-        changelog: 'Approved national leadership fields.',
-        sourceHtml: html,
-        sourceCss: '',
-        slots,
-      },
-      purpose,
-      capabilities: {
-        background: false,
-        width: false,
-        spacing: false,
-        alignment: false,
-        imagePosition: false,
-        phoneOrder: false,
-        buttonStyle: false,
-      },
-      samples: {},
-    }))[0]!,
-    definition = definitions.find(def => def.slug === entry.definition.slug)
+    definition: {
+      kind: 'legacy',
+      slug: 'core-echelon-' + slug,
+      name,
+      category: 'National sections',
+      changelog: 'Approved national leadership fields.',
+      sourceHtml: html,
+      sourceCss: '',
+      slots,
+    },
+    purpose,
+    capabilities: {
+      background: false,
+      width: false,
+      spacing: false,
+      alignment: false,
+      imagePosition: false,
+      phoneOrder: false,
+      buttonStyle: false,
+    },
+    samples: {},
+  }))[0]!
+  const definition = definitions.find(def => def.slug === entry.definition.slug)
   if (!definition) throw new Error('Install the shared Echelon sections first.')
   const values = sourceSampleValues(entry.definition.kind === 'legacy' ? entry.definition.slots : [])
   values.__cms_anchor = 'ech-demo-leadership'

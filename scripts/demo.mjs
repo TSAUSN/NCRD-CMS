@@ -21,8 +21,8 @@ import { demoNeedsBuild } from './demo-build.mjs'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const flags = new Set(process.argv.slice(2))
-const ADMIN_PORT = 3000,
-  SITE_PORT = 3001
+const ADMIN_PORT = 3000
+const SITE_PORT = 3001
 const postgresPort = process.env['CMS_PG_PORT'] ?? '54329'
 if (!/^\d{1,5}$/.test(postgresPort) || Number(postgresPort) < 1 || Number(postgresPort) > 65535) {
   console.error('CMS_PG_PORT must be a TCP port from 1 to 65535.')

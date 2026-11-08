@@ -102,8 +102,8 @@ export function storyDateInFeed(value: unknown, now = new Date()): boolean {
   if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value) || !Number.isFinite(now.getTime())) return false
   const parsed = new Date(value + 'T00:00:00Z')
   if (!Number.isFinite(parsed.getTime()) || parsed.toISOString().slice(0, 10) !== value) return false
-  const cutoff = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 13, 1)),
-    last = new Date(Date.UTC(cutoff.getUTCFullYear(), cutoff.getUTCMonth() + 1, 0)).getUTCDate()
+  const cutoff = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 13, 1))
+  const last = new Date(Date.UTC(cutoff.getUTCFullYear(), cutoff.getUTCMonth() + 1, 0)).getUTCDate()
   cutoff.setUTCDate(Math.min(now.getUTCDate(), last))
   return value >= cutoff.toISOString().slice(0, 10) && value <= now.toISOString().slice(0, 10)
 }
@@ -183,8 +183,8 @@ export function removeStoryTag(
   replacement: string | null,
   stories: readonly Record<string, unknown>[],
 ): { settings: StoriesSettings; stories: Record<string, unknown>[] } {
-  const key = group === 'main' ? 'mainTags' : 'secondaryTags',
-    tags = settings[key]
+  const key = group === 'main' ? 'mainTags' : 'secondaryTags'
+  const tags = settings[key]
   if (!tags.some(t => t.id === id)) throw new Error('This tag has already been removed. Reload Manage tags.')
   if (replacement !== null && (replacement === id || !tags.some(t => t.id === replacement)))
     throw new Error('Choose another tag in the same group.')
@@ -225,9 +225,9 @@ export function storyMatchesTags(
   )
 }
 
-const group = z.enum(['main', 'secondary']),
-  id = z.string().min(1).max(80),
-  tagName = z.string().trim().min(1).max(80)
+const group = z.enum(['main', 'secondary'])
+const id = z.string().min(1).max(80)
+const tagName = z.string().trim().min(1).max(80)
 const tagDetail = {
   label: tagName,
   keywords: z.array(z.string().trim().min(1).max(120)).max(50),
@@ -273,8 +273,8 @@ export function applyStoryListPatch(
   const tags = patch.group === 'main' ? settings.mainTags : settings.secondaryTags
   if (!tags.some(t => t.id === patch.id))
     throw new Error('This tag is no longer available. Reload Stories and try again.')
-  const ids = storyTagIds(values, patch.group),
-    next = patch.selected ? [...new Set([...ids, patch.id])] : ids.filter(id => id !== patch.id)
+  const ids = storyTagIds(values, patch.group)
+  const next = patch.selected ? [...new Set([...ids, patch.id])] : ids.filter(id => id !== patch.id)
   return { ...withStoryTagIds(values, patch.group, next), reviewed: true }
 }
 

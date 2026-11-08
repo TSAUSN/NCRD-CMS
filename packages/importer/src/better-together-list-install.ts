@@ -41,22 +41,22 @@ export async function installBetterTogetherLists(input: {
   const bundle = SiteFileBundle.parse(fileHead?.bundle)
   if (!bundle.original) throw new Error('The original site layout must be reviewed first.')
   const pages = new Map<
-      string,
-      { revision: string; draft_version_id: string; content: Record<string, unknown>[]; meta: unknown }
-    >(),
-    definitions = new Map<
-      string,
-      {
-        slug: string
-        name: string
-        category: string
-        scope: string
-        site_id: string
-        source_html: string
-        slots: unknown
-        version: number
-      }
-    >()
+    string,
+    { revision: string; draft_version_id: string; content: Record<string, unknown>[]; meta: unknown }
+  >()
+  const definitions = new Map<
+    string,
+    {
+      slug: string
+      name: string
+      category: string
+      scope: string
+      site_id: string
+      source_html: string
+      slots: unknown
+      version: number
+    }
+  >()
   for (const plan of plans) {
     if (!pages.has(plan.pageId)) {
       const page = (
@@ -90,8 +90,8 @@ export async function installBetterTogetherLists(input: {
     const complete =
       existing.length === 3 &&
       plans.every(plan => {
-        const def = definitions.get(plan.definitionId)!,
-          section = pages.get(plan.pageId)!.content[plan.index]
+        const def = definitions.get(plan.definitionId)!
+        const section = pages.get(plan.pageId)!.content[plan.index]
         return (
           def.source_html === plan.sourceHtml &&
           isDeepStrictEqual(def.slots, plan.slots) &&
@@ -103,9 +103,9 @@ export async function installBetterTogetherLists(input: {
     throw new Error('A list with this name already exists. Preserve it and review the conversion again.')
   }
   for (const plan of plans) {
-    const page = pages.get(plan.pageId)!,
-      definition = definitions.get(plan.definitionId)!,
-      section = page.content[plan.index]
+    const page = pages.get(plan.pageId)!
+    const definition = definitions.get(plan.definitionId)!
+    const section = page.content[plan.index]
     if (
       String(page.revision) !== String(plan.pageRevision) ||
       page.draft_version_id !== plan.originalVersion ||
@@ -139,39 +139,39 @@ export async function installBetterTogetherLists(input: {
       list.collection_id,
       JSON.stringify(plan.entries),
     ])
-    const definition = definitions.get(plan.definitionId)!,
-      saved = (
-        await client.query(
-          'SELECT section_def_id,version FROM app.upsert_section_def_version($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18)',
-          [
-            definition.slug,
-            plan.name,
-            'Better Together',
-            plan.sourceHtml,
-            '',
-            compiled.css,
-            JSON.stringify(compiled.ast),
-            JSON.stringify(plan.slots),
-            compiled.renderHash,
-            compiled.ast.policyVersion,
-            compiled.ast.cssPolicyVersion,
-            'Original BT2027 markup with native list fields',
-            false,
-            'legacy',
-            null,
-            null,
-            'site',
-            siteId,
-          ],
-        )
-      ).rows[0]!
+    const definition = definitions.get(plan.definitionId)!
+    const saved = (
+      await client.query(
+        'SELECT section_def_id,version FROM app.upsert_section_def_version($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18)',
+        [
+          definition.slug,
+          plan.name,
+          'Better Together',
+          plan.sourceHtml,
+          '',
+          compiled.css,
+          JSON.stringify(compiled.ast),
+          JSON.stringify(plan.slots),
+          compiled.renderHash,
+          compiled.ast.policyVersion,
+          compiled.ast.cssPolicyVersion,
+          'Original BT2027 markup with native list fields',
+          false,
+          'legacy',
+          null,
+          null,
+          'site',
+          siteId,
+        ],
+      )
+    ).rows[0]!
     if (
       saved.section_def_id !== plan.definitionId ||
       Number(saved.version) !== Number(plan.originalDefinitionVersion) + 1
     )
       throw new Error('The original section changed during conversion.')
-    const page = pages.get(plan.pageId)!,
-      section = page.content[plan.index]!
+    const page = pages.get(plan.pageId)!
+    const section = page.content[plan.index]!
     page.content[plan.index] = {
       ...section,
       section_def_version: Number(saved.version),

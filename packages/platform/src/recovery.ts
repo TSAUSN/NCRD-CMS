@@ -110,8 +110,8 @@ export function validateRecoveryManifest(value: unknown): RecoveryManifest {
     item.objects.length > 100_000
   )
     throw new Error('Unsupported or incomplete recovery manifest.')
-  const files = new Set<string>(),
-    keys = new Set<string>()
+  const files = new Set<string>()
+  const keys = new Set<string>()
   for (const file of [item.database, ...item.objects]) {
     if (
       !file ||
@@ -154,9 +154,9 @@ export function validateRecoveryManifest(value: unknown): RecoveryManifest {
 }
 
 export async function encryptRecoveryStream(input: Readable, destination: string, key: Buffer): Promise<RecoveryFile> {
-  const nonce = randomBytes(12),
-    cipher = createCipheriv('aes-256-gcm', key, nonce),
-    hash = createHash('sha256')
+  const nonce = randomBytes(12)
+  const cipher = createCipheriv('aes-256-gcm', key, nonce)
+  const hash = createHash('sha256')
   const header = Buffer.concat([MAGIC, nonce])
   cipher.setAAD(header)
   let bytes = 0
@@ -191,8 +191,8 @@ export async function decryptRecoveryFile(
   const size = (await stat(source)).size
   if (size < HEADER_BYTES + 16) throw new Error('Backup file is truncated.')
   const handle = await open(source, 'r')
-  const header = Buffer.alloc(HEADER_BYTES),
-    tag = Buffer.alloc(16)
+  const header = Buffer.alloc(HEADER_BYTES)
+  const tag = Buffer.alloc(16)
   try {
     await handle.read(header, 0, header.length, 0)
     await handle.read(tag, 0, 16, size - 16)

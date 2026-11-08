@@ -6,8 +6,8 @@ export { echelonChapterContent, applyChapterSetup } from './echelon-chapter-cont
 export function echelonChapterSetups(): { slug: string; config: ChapterSetup; sample: boolean }[] {
   const rows = ECHELON_CHAPTER_SOURCES.map(source => {
     const editors = ['peoria', 'north-texas', 'boston'].includes(source.slug)
-    const boston = source.slug === 'boston',
-      northTexas = source.slug === 'north-texas'
+    const boston = source.slug === 'boston'
+    const northTexas = source.slug === 'north-texas'
     const destination = boston ? 'page' : source.destination
     return {
       slug: source.slug,

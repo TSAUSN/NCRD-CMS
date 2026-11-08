@@ -131,9 +131,9 @@ export function staleReference(files, directory) {
     )
 }
 async function main() {
-  const files = await referenceFiles(process.env.CURRENT_SQL_DATABASE_URL ?? ''),
-    out = join(root, 'packages/schema/current'),
-    stale = staleReference(files, out)
+  const files = await referenceFiles(process.env.CURRENT_SQL_DATABASE_URL ?? '')
+  const out = join(root, 'packages/schema/current')
+  const stale = staleReference(files, out)
   if (process.argv.includes('--check')) {
     if (stale.length) throw Error('Current SQL reference is stale: ' + stale.slice(0, 8).join(', '))
     console.log('Current SQL reference matches ' + files.size + ' generated files.')

@@ -14,8 +14,8 @@ export function renderHeroSlides(
 ): string {
   if (slot.constraints?.heroEditingParity === true)
     return renderParityHeroSlides(html, index, slot, values, editing, now)
-  const keys = repeatItemKeys(values[slot.id]),
-    shown = editing ? keys : activeHeroSlideKeys(values, slot.id, now)
+  const keys = repeatItemKeys(values[slot.id])
+  const shown = editing ? keys : activeHeroSlideKeys(values, slot.id, now)
   if (!shown.length && editing) return html
   const parsed = parseHtml(html, { locations: true })
   if (!parsed.ok) return ''
@@ -37,8 +37,8 @@ export function renderHeroSlides(
     ) ?? []
   if (!track?.source || slides.length !== keys.length || slides.some(slide => !slide.source)) return ''
   if (!shown.length) return html.slice(0, track.source.start) + html.slice(track.source.end)
-  const id = (key: string) => `cms-hero-s${index}-${key}`,
-    edits: { at: number; end: number; value: string }[] = []
+  const id = (key: string) => `cms-hero-s${index}-${key}`
+  const edits: { at: number; end: number; value: string }[] = []
   edits.push({
     at: track.source.start + 1 + track.tag.length,
     end: track.source.start + 1 + track.tag.length,
@@ -50,9 +50,9 @@ export function renderHeroSlides(
       ' role="region" aria-roledescription="carousel"',
   })
   for (const [at, slide] of slides.entries()) {
-    const key = keys[at]!,
-      source = slide.source!,
-      position = shown.indexOf(key)
+    const key = keys[at]!
+    const source = slide.source!
+    const position = shown.indexOf(key)
     if (position < 0) {
       edits.push({ at: source.start, end: source.end, value: '' })
       continue

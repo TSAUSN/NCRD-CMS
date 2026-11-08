@@ -274,11 +274,11 @@ function adaptEmbedSection(
   const refuse = (reason: string): FaithfulMapping => ({ disposition: 'refused', reason, mapped: null, slots: null })
   const parsed = parseHtml(html)
   if (!parsed.ok) return refuse('its markup could not be read')
-  let frame: HtmlElement | null = null,
-    iframe: HtmlElement | null = null,
-    help = '',
-    placeholderClass = '',
-    source: { parent: HtmlNode[]; link: HtmlElement } | null = null
+  let frame: HtmlElement | null = null
+  let iframe: HtmlElement | null = null
+  let help = ''
+  let placeholderClass = ''
+  let source: { parent: HtmlNode[]; link: HtmlElement } | null = null
   const walk = (nodes: HtmlNode[]) => {
     for (const node of nodes) {
       if (node.kind !== 'element') continue
@@ -331,8 +331,8 @@ function adaptEmbedSection(
   // V1's frame and placeholder keep their own classes, so the embed fills the
   // section's frame and its hint sits where V1's did, in V1's style.
   const className = (value: string) => (/^[A-Za-z_][A-Za-z0-9_-]*$/.test(value.trim()) ? value.trim() : null)
-  const frameName = className(frameClass),
-    placeholderName = className(placeholderClass)
+  const frameName = className(frameClass)
+  const placeholderName = className(placeholderClass)
   const embed: SlotDef = {
     id: EMBED_FIELD,
     kind: 'link',

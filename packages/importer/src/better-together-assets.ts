@@ -50,16 +50,19 @@ export function readBetterTogetherAssets(rootPath: string, cachePath: string, cr
   }
   function resource(value: string, base = sourceBase): string {
     if (!value || /^(?:data:|#)/i.test(value)) return value
-    const url = new URL(value, base),
-      key = url.origin + url.pathname + url.search,
-      existing = loaded.get(key)
+    const url = new URL(value, base)
+    const key = url.origin + url.pathname + url.search
+    const existing = loaded.get(key)
     if (existing) return existing.path + url.hash
-    let bytes: Buffer, name: string, path: string, source: string
+    let bytes: Buffer
+    let name: string
+    let path: string
+    let source: string
     if (url.hostname === new URL(sourceBase).hostname) {
       const relative = decodeURIComponent(url.pathname).replace(/^\//, '')
       if (!extensions.test(relative) || !/^(?:css|images|js|fonts)\//.test(relative)) return value
-      const lexical = resolve(root, relative),
-        real = realpathSync(lexical)
+      const lexical = resolve(root, relative)
+      const real = realpathSync(lexical)
       if (
         !lexical.startsWith(root + sep) ||
         !real.startsWith(root + sep) ||
@@ -92,8 +95,8 @@ export function readBetterTogetherAssets(rootPath: string, cachePath: string, cr
       path = '/fonts/' + name
       source = receipt.source
     }
-    const kind = kindOf(name),
-      reserved = { id: randomUUID(), path }
+    const kind = kindOf(name)
+    const reserved = { id: randomUUID(), path }
     loaded.set(key, reserved)
     if (kind === 'stylesheet') {
       let css = bytes.toString('utf8')

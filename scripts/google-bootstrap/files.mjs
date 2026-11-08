@@ -21,8 +21,8 @@ export async function uploadMedia(config) {
   const files = await mediaFiles(config.mediaDirectory)
   if (files.length !== Object.keys(inventory).length) throw Error('Media file count differs from reviewed inventory.')
   for (const file of files) {
-    const bytes = await readFile(file.path),
-      hash = createHash('sha256').update(bytes).digest('hex')
+    const bytes = await readFile(file.path)
+    const hash = createHash('sha256').update(bytes).digest('hex')
     if (inventory[file.key]?.sha256 !== hash || inventory[file.key]?.bytes !== bytes.length)
       throw Error('Media bytes differ from reviewed inventory: ' + file.key)
   }
@@ -53,8 +53,8 @@ export async function uploadMedia(config) {
     })[key.split('.').pop().toLowerCase()] ?? 'application/octet-stream'
   for (const file of files) {
     assertActiveScope(config)
-    const bytes = await readFile(file.path),
-      md5 = createHash('md5').update(bytes).digest('base64')
+    const bytes = await readFile(file.path)
+    const md5 = createHash('md5').update(bytes).digest('base64')
     const existing = remote.get(file.key)
     if (existing) {
       if (existing.md5Hash !== md5 || Number(existing.size) !== bytes.length)
@@ -90,8 +90,8 @@ export async function validateLocalInputs(config) {
   const fingerprints = JSON.parse(await readFile(config.cleanedFingerprints, 'utf8'))
   if (!fingerprints.app_users || !fingerprints.pages || !fingerprints.cms_migrations)
     throw Error('Missing all-table source fingerprints.')
-  const inventory = JSON.parse(await readFile(config.mediaInventory, 'utf8')),
-    files = await mediaFiles(config.mediaDirectory)
+  const inventory = JSON.parse(await readFile(config.mediaInventory, 'utf8'))
+  const files = await mediaFiles(config.mediaDirectory)
   if (files.length !== Object.keys(inventory).length) throw Error('Local media count differs from reviewed inventory.')
   for (const file of files) {
     const bytes = await readFile(file.path)

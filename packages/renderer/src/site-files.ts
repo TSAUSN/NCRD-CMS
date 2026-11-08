@@ -12,8 +12,8 @@ export function renderSiteFiles(projection: unknown, pageId: string, scriptsEnab
   const parsed = SiteFileProjection.safeParse(projection)
   const empty = { head: '', bodyStart: '', bodyEnd: '', scriptHashes: [] as string[], hasStyles: false }
   if (!parsed.success) return empty
-  const { bundle, files } = parsed.data,
-    byId = new Map(files.map(file => [file.id, file]))
+  const { bundle, files } = parsed.data
+  const byId = new Map(files.map(file => [file.id, file]))
   if (
     bundle.files.some(id => !byId.has(id)) ||
     files.some(file => !bundle.files.includes(file.id)) ||

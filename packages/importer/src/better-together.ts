@@ -35,10 +35,10 @@ export function importBetterTogetherPage(options: {
   page?: BetterTogetherPage
   title?: string
 }) {
-  const page = options.page ?? 'index.php',
-    home = page === 'index.php',
-    prefix = home ? 'home' : page.replace(/\.(?:php|html)$/, '').toLowerCase(),
-    title = options.title ?? 'Better Together 2027'
+  const page = options.page ?? 'index.php'
+  const home = page === 'index.php'
+  const prefix = home ? 'home' : page.replace(/\.(?:php|html)$/, '').toLowerCase()
+  const title = options.title ?? 'Better Together 2027'
   if (
     ![
       'index.php',
@@ -64,11 +64,11 @@ export function importBetterTogetherPage(options: {
   const styles: SiteFileBundle['styles'] = []
   const scripts: SiteFileBundle['scripts'] = []
   const sourceBase = BETTER_TOGETHER_SOURCE_ORIGIN
-  const doc = parse(options.html),
-    elements = [...walk(doc)],
-    html = elements.find(n => n.tagName === 'html')!,
-    body = elements.find(n => n.tagName === 'body')!,
-    pageId = randomUUID()
+  const doc = parse(options.html)
+  const elements = [...walk(doc)]
+  const html = elements.find(n => n.tagName === 'html')!
+  const body = elements.find(n => n.tagName === 'body')!
+  const pageId = randomUUID()
   // Keep stylesheet cascade order, including styles originally inside the body.
   for (const [index, node] of elements.entries()) {
     if (node.tagName === 'link' && /\bstylesheet\b/.test(attr(node, 'rel') ?? '')) {
@@ -89,8 +89,8 @@ export function importBetterTogetherPage(options: {
       )
       styles.push({ fileId: file.id, pages: [pageId] })
     } else if (node.tagName === 'script') {
-      const src = attr(node, 'src'),
-        code = text(node)
+      const src = attr(node, 'src')
+      const code = text(node)
       if (src?.includes('googletagmanager.com') || /\bgtag\(/.test(code)) {
         omitted.add('Analytics is disabled for local comparison.')
         continue
@@ -118,14 +118,14 @@ export function importBetterTogetherPage(options: {
     '/css/home-without-javascript.css',
   )
   styles.push({ fileId: fallback.id, pages: [pageId] })
-  const definitions: SiteArchive['content']['section_defs'] = [],
-    versions: SiteArchive['content']['section_def_versions'] = [],
-    content: SiteArchive['content']['page_versions'][number]['content'] = []
+  const definitions: SiteArchive['content']['section_defs'] = []
+  const versions: SiteArchive['content']['section_def_versions'] = []
+  const content: SiteArchive['content']['page_versions'][number]['content'] = []
   const report: { name: string; text: number; images: number; links: number }[] = []
   function define(node: Element, placement: 'page' | 'header' | 'footer', index: number) {
-    const slots: SlotDef[] = [],
-      values: Record<string, unknown> = {},
-      counts = { text: 0, images: 0, links: 0 }
+    const slots: SlotDef[] = []
+    const values: Record<string, unknown> = {}
+    const counts = { text: 0, images: 0, links: 0 }
     // Remove executable/style elements only after their exact bytes are external.
     function clean(parent: Element) {
       parent.childNodes = parent.childNodes.filter(n => !('tagName' in n && ['script', 'style'].includes(n.tagName)))
@@ -139,8 +139,8 @@ export function importBetterTogetherPage(options: {
         if (['src', 'poster'].includes(a.name)) a.value = resource(a.value)
         if (a.name === 'href' && !a.value.startsWith('#')) {
           try {
-            const url = new URL(a.value, sourceBase),
-              name = url.pathname.slice(1).toLowerCase()
+            const url = new URL(a.value, sourceBase)
+            const name = url.pathname.slice(1).toLowerCase()
             if (
               url.hostname === 'bettertogether2027.org' &&
               [
@@ -162,9 +162,9 @@ export function importBetterTogetherPage(options: {
         }
       }
       if (el.tagName === 'img' && attr(el, 'src')) {
-        const id = 'picture-' + slots.length,
-          src = attr(el, 'src')!,
-          alt = attr(el, 'alt') ?? ''
+        const id = 'picture-' + slots.length
+        const src = attr(el, 'src')!
+        const alt = attr(el, 'alt') ?? ''
         slots.push({ id, kind: 'image', label: alt || 'Picture', constraints: {} })
         values[id] = { src, alt }
         el.attrs.find(a => a.name === 'src')!.value = '{{' + id + '}}'
@@ -179,30 +179,30 @@ export function importBetterTogetherPage(options: {
         text(el).trim() &&
         !/^cd-/.test(attr(el, 'id') ?? '')
       ) {
-        const value = text(el),
-          id = 'text-' + slots.length
+        const value = text(el)
+        const id = 'text-' + slots.length
         slots.push({ id, kind: 'text', label: value.trim().slice(0, 70), constraints: {} })
         values[id] = value
         el.childNodes = [{ nodeName: '#text', value: '{{' + id + '}}', parentNode: el }]
         counts.text++
       }
     }
-    const source = serializeOuter(node),
-      id = randomUUID(),
-      sectionSlug = 'bt-' + prefix + '-' + index,
-      label =
-        placement === 'header'
-          ? 'Site header'
-          : placement === 'footer'
-            ? 'Site footer'
-            : (attr(node, 'id') ??
-                (index === 1
-                  ? 'Conference introduction'
-                  : text(node)
-                      .replace(/\{\{[^}]+\}\}/g, '')
-                      .trim()
-                      .slice(0, 45))) ||
-              'Homepage section ' + index
+    const source = serializeOuter(node)
+    const id = randomUUID()
+    const sectionSlug = 'bt-' + prefix + '-' + index
+    const label =
+      placement === 'header'
+        ? 'Site header'
+        : placement === 'footer'
+          ? 'Site footer'
+          : (attr(node, 'id') ??
+              (index === 1
+                ? 'Conference introduction'
+                : text(node)
+                    .replace(/\{\{[^}]+\}\}/g, '')
+                    .trim()
+                    .slice(0, 45))) ||
+            'Homepage section ' + index
     const compiled = compileSection({
       sourceHtml: source,
       sourceCss: '',
@@ -236,7 +236,8 @@ export function importBetterTogetherPage(options: {
     report.push({ name: label, ...counts })
     return { section_def_id: id, section_def_version: 1, values }
   }
-  let header: ReturnType<typeof define> | undefined, footer: ReturnType<typeof define> | undefined
+  let header: ReturnType<typeof define> | undefined
+  let footer: ReturnType<typeof define> | undefined
   for (const [index, node] of body.childNodes
     .filter((node): node is Element => 'tagName' in node && !['script', 'style'].includes(node.tagName))
     .entries()) {
@@ -245,12 +246,12 @@ export function importBetterTogetherPage(options: {
     else content.push({ ...define(node, 'page', index), hidden: false, hidden_at: [], label: definitions.at(-1)!.name })
   }
   const originalTitle =
-      (elements.find(node => node.tagName === 'title') ? text(elements.find(node => node.tagName === 'title')!) : title)
-        .trim()
-        .slice(0, 200) || title,
-    description =
-      attr(elements.find(node => node.tagName === 'meta' && attr(node, 'name') === 'description') ?? html, 'content') ??
-      ''
+    (elements.find(node => node.tagName === 'title') ? text(elements.find(node => node.tagName === 'title')!) : title)
+      .trim()
+      .slice(0, 200) || title
+  const description =
+    attr(elements.find(node => node.tagName === 'meta' && attr(node, 'name') === 'description') ?? html, 'content') ??
+    ''
 
   const archive = assembleBetterTogetherArchive({
     created,

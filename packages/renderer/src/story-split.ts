@@ -18,14 +18,14 @@ export function storySplitValues(
   context: StoryWidgetContext = {},
   legacy: NewsroomQuery = {},
 ) {
-  const list = resolvedCollection(values.stories),
-    catalog = list?.readerKey === 'stories' ? list.storyCatalog : undefined,
-    search = (legacy.q ?? '').trim().slice(0, 120),
-    query = { ...context.query },
-    prefix = 'story' + index + '_',
-    scoped = Object.keys(query).some(key => key.startsWith(prefix)),
-    legacyMain = catalog?.mainTags.find(tag => tag.id === legacy.sector),
-    legacyRegion = catalog?.secondaryTags.find(tag => tag.id === legacy.region)
+  const list = resolvedCollection(values.stories)
+  const catalog = list?.readerKey === 'stories' ? list.storyCatalog : undefined
+  const search = (legacy.q ?? '').trim().slice(0, 120)
+  const query = { ...context.query }
+  const prefix = 'story' + index + '_'
+  const scoped = Object.keys(query).some(key => key.startsWith(prefix))
+  const legacyMain = catalog?.mainTags.find(tag => tag.id === legacy.sector)
+  const legacyRegion = catalog?.secondaryTags.find(tag => tag.id === legacy.region)
   if (!scoped) {
     if (legacyMain) query[prefix + 'sector'] = legacyMain.id
     if (legacyRegion) query[prefix + 'region'] = legacyRegion.id
@@ -35,88 +35,83 @@ export function storySplitValues(
   }
   context = { ...context, query, ...(search ? { fixedQuery: { ...context.fixedQuery, q: search } } : {}) }
   const pool = orderedStoryWidgetRows(
-      [...(list?.entries ?? [])].filter(entry => {
-        const v = record(entry.values)
-        return (
-          (!search ||
-            [v.title, v.summary].some(
-              value =>
-                typeof value === 'string' &&
-                value.toLocaleLowerCase('en-US').includes(search.toLocaleLowerCase('en-US')),
-            )) &&
-          (!(!scoped && legacyMain && legacyRegion) || storyTagIds(v, 'main').includes(legacyMain!.id))
-        )
-      }),
-    ),
-    source = list ? { ...list, entries: pool } : values.stories
+    [...(list?.entries ?? [])].filter(entry => {
+      const v = record(entry.values)
+      return (
+        (!search ||
+          [v.title, v.summary].some(
+            value =>
+              typeof value === 'string' && value.toLocaleLowerCase('en-US').includes(search.toLocaleLowerCase('en-US')),
+          )) &&
+        (!(!scoped && legacyMain && legacyRegion) || storyTagIds(v, 'main').includes(legacyMain!.id))
+      )
+    }),
+  )
+  const source = list ? { ...list, entries: pool } : values.stories
   const fallback = ['recent', 'sectors', 'map'].includes(String(values.start_view))
-      ? String(values.start_view)
-      : 'recent',
-    asked = context.query?.['story' + index + '_view'] ?? fallback,
-    view = ['recent', 'sectors', 'map'].includes(asked) ? asked : fallback,
-    main = catalog?.mainTags ?? [],
-    sectorId = context.query?.['story' + index + '_sector'] ?? '',
-    sector = main.find(
-      tag => tag.id === sectorId && pool.some(entry => storyTagIds(record(entry.values), 'main').includes(tag.id)),
-    ),
-    size = storySplitPageSize(values.page_size),
-    max = storyWidgetMaximum(catalog, context.pagePath ?? context.path ?? ''),
-    total = Math.min(pool.length, max),
-    rawPage = context.query?.['story' + index + '_page'] ?? '1',
-    page = Math.min(/^[1-9]\d{0,2}$/.test(rawPage) ? Number(rawPage) : 1, Math.max(1, Math.ceil(total / size))),
-    shown = Math.min(total, page * size)
-  const base = storyWorldValues({ ...values, stories: source, start_region: '', per_region: '200' }, index, context),
-    entries =
-      view === 'map'
-        ? (resolvedCollection(base.values.stories)?.entries ?? [])
-        : view === 'sectors'
-          ? sector
-            ? selectedStoryWidgetRows(pool, 'sectors', sector.id, max)
-            : []
-          : selectedStoryWidgetRows(pool, 'recent', '', shown, max !== 6 && catalog?.newsroomOrder !== false),
-    heading =
-      view === 'map'
-        ? base.values.region_heading
-        : view === 'sectors' && sector
-          ? 'Our Stories in ' + sector.label
-          : '',
-    active = view === 'map' ? base.active : view === 'sectors' ? (sector?.id ?? '') : 'recent',
-    hint =
-      !catalog || !pool.length
+    ? String(values.start_view)
+    : 'recent'
+  const asked = context.query?.['story' + index + '_view'] ?? fallback
+  const view = ['recent', 'sectors', 'map'].includes(asked) ? asked : fallback
+  const main = catalog?.mainTags ?? []
+  const sectorId = context.query?.['story' + index + '_sector'] ?? ''
+  const sector = main.find(
+    tag => tag.id === sectorId && pool.some(entry => storyTagIds(record(entry.values), 'main').includes(tag.id)),
+  )
+  const size = storySplitPageSize(values.page_size)
+  const max = storyWidgetMaximum(catalog, context.pagePath ?? context.path ?? '')
+  const total = Math.min(pool.length, max)
+  const rawPage = context.query?.['story' + index + '_page'] ?? '1'
+  const page = Math.min(/^[1-9]\d{0,2}$/.test(rawPage) ? Number(rawPage) : 1, Math.max(1, Math.ceil(total / size)))
+  const shown = Math.min(total, page * size)
+  const base = storyWorldValues({ ...values, stories: source, start_region: '', per_region: '200' }, index, context)
+  const entries =
+    view === 'map'
+      ? (resolvedCollection(base.values.stories)?.entries ?? [])
+      : view === 'sectors'
+        ? sector
+          ? selectedStoryWidgetRows(pool, 'sectors', sector.id, max)
+          : []
+        : selectedStoryWidgetRows(pool, 'recent', '', shown, max !== 6 && catalog?.newsroomOrder !== false)
+  const heading =
+    view === 'map' ? base.values.region_heading : view === 'sectors' && sector ? 'Our Stories in ' + sector.label : ''
+  const active = view === 'map' ? base.active : view === 'sectors' ? (sector?.id ?? '') : 'recent'
+  const hint =
+    !catalog || !pool.length
+      ? base.values.hint
+      : view === 'map'
         ? base.values.hint
-        : view === 'map'
-          ? base.values.hint
-          : view === 'sectors' && !sector
-            ? 'Choose a ' +
-              (catalog.mainLabel === 'Project Sectors' ? 'project sector' : catalog.mainLabel.toLowerCase()) +
-              ' to see its stories.'
-            : ''
-  const href = (next: Record<string, string>) => storyWidgetHref(index, context, next),
-    views = [
-      ['recent', 'Recently Published'],
-      [
-        'sectors',
-        catalog?.mainLabel === 'Project Sectors' ? 'By Project Sector' : 'By ' + (catalog?.mainLabel ?? 'main tag'),
-      ],
-      ['map', 'By Map'],
+        : view === 'sectors' && !sector
+          ? 'Choose a ' +
+            (catalog.mainLabel === 'Project Sectors' ? 'project sector' : catalog.mainLabel.toLowerCase()) +
+            ' to see its stories.'
+          : ''
+  const href = (next: Record<string, string>) => storyWidgetHref(index, context, next)
+  const views = [
+    ['recent', 'Recently Published'],
+    [
+      'sectors',
+      catalog?.mainLabel === 'Project Sectors' ? 'By Project Sector' : 'By ' + (catalog?.mainLabel ?? 'main tag'),
     ],
-    tabs =
-      views
-        .map(
-          ([key, label]) =>
-            '<a id="story' +
-            index +
-            '-view-' +
-            key +
-            '" data-cms-story-nav="view" href="' +
-            attr(href({ view: key!, page: '' })) +
-            '"' +
-            (view === key ? ' aria-current="page"' : '') +
-            '>' +
-            text(label!) +
-            '</a>',
-        )
-        .join('') + '<span class="core-split-ink" aria-hidden="true"></span>'
+    ['map', 'By Map'],
+  ]
+  const tabs =
+    views
+      .map(
+        ([key, label]) =>
+          '<a id="story' +
+          index +
+          '-view-' +
+          key +
+          '" data-cms-story-nav="view" href="' +
+          attr(href({ view: key!, page: '' })) +
+          '"' +
+          (view === key ? ' aria-current="page"' : '') +
+          '>' +
+          text(label!) +
+          '</a>',
+      )
+      .join('') + '<span class="core-split-ink" aria-hidden="true"></span>'
   const sectors = main
     .map(tag => ({
       ...tag,
@@ -139,49 +134,49 @@ export function storySplitValues(
     )
     .join('')
   const tools = [
-      ['themes', catalog?.mainLabel === 'Project Sectors' ? 'Project Sector' : (catalog?.mainLabel ?? 'Main tags')],
-      ['regions', catalog?.secondaryLabel === 'Regions' ? 'Region' : (catalog?.secondaryLabel ?? 'Secondary tags')],
-    ]
-      .map(
-        ([key, label]) =>
-          '<button type="button" role="switch" aria-checked="true" data-cms-story-tag="' +
-          key +
-          '"><span aria-hidden="true" class="core-split-toggle"></span>' +
-          text(label!) +
-          '</button>',
-      )
-      .join(''),
-    more =
-      view === 'recent' && pool.length
-        ? '<p>Showing ' +
-          shown +
-          ' of ' +
-          total +
-          ' stories</p>' +
-          (shown < total
-            ? '<a class="cms-button" data-cms-story-nav="more" href="' +
-              attr(href({ view: 'recent', page: String(page + 1) })) +
-              '">Show more stories</a>'
-            : '')
-        : ''
-  const clean = {
-      ...context,
-      fixedQuery: Object.fromEntries(Object.entries(context.fixedQuery ?? {}).filter(([key]) => key !== 'q')),
-    },
-    combined = !scoped && legacyMain && legacyRegion,
-    notice = [
-      search ? 'Stories matching “' + search + '”' : '',
-      combined ? 'Stories in ' + legacyMain!.label + ' and ' + legacyRegion!.label : '',
-    ]
-      .filter(Boolean)
-      .join(' · '),
-    searchNotice = notice
-      ? '<p class="core-split-search-note">' +
-        text(notice) +
-        '. <a href="' +
-        attr(storyWidgetHref(index, clean, { view: 'recent', sector: '', region: '', page: '' })) +
-        '">Show all stories</a></p>'
+    ['themes', catalog?.mainLabel === 'Project Sectors' ? 'Project Sector' : (catalog?.mainLabel ?? 'Main tags')],
+    ['regions', catalog?.secondaryLabel === 'Regions' ? 'Region' : (catalog?.secondaryLabel ?? 'Secondary tags')],
+  ]
+    .map(
+      ([key, label]) =>
+        '<button type="button" role="switch" aria-checked="true" data-cms-story-tag="' +
+        key +
+        '"><span aria-hidden="true" class="core-split-toggle"></span>' +
+        text(label!) +
+        '</button>',
+    )
+    .join('')
+  const more =
+    view === 'recent' && pool.length
+      ? '<p>Showing ' +
+        shown +
+        ' of ' +
+        total +
+        ' stories</p>' +
+        (shown < total
+          ? '<a class="cms-button" data-cms-story-nav="more" href="' +
+            attr(href({ view: 'recent', page: String(page + 1) })) +
+            '">Show more stories</a>'
+          : '')
       : ''
+  const clean = {
+    ...context,
+    fixedQuery: Object.fromEntries(Object.entries(context.fixedQuery ?? {}).filter(([key]) => key !== 'q')),
+  }
+  const combined = !scoped && legacyMain && legacyRegion
+  const notice = [
+    search ? 'Stories matching “' + search + '”' : '',
+    combined ? 'Stories in ' + legacyMain!.label + ' and ' + legacyRegion!.label : '',
+  ]
+    .filter(Boolean)
+    .join(' · ')
+  const searchNotice = notice
+    ? '<p class="core-split-search-note">' +
+      text(notice) +
+      '. <a href="' +
+      attr(storyWidgetHref(index, clean, { view: 'recent', sector: '', region: '', page: '' })) +
+      '">Show all stories</a></p>'
+    : ''
   return {
     ...base,
     active,
@@ -209,8 +204,8 @@ export function renderStorySplit(body: string, index: number, model: ReturnType<
   function walk(nodes: HtmlNode[]) {
     for (const node of nodes)
       if (node.kind === 'element') {
-        const classes = node.attributes.find(a => a.name === 'class')?.value.split(/\s+/) ?? [],
-          s = node.source
+        const classes = node.attributes.find(a => a.name === 'class')?.value.split(/\s+/) ?? []
+        const s = node.source
         if (!s) continue
         if (classes.includes('core-story-split'))
           edits.push({

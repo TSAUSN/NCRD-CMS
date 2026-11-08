@@ -11,8 +11,8 @@ const MARKS: Readonly<Record<string, string>> = {
 /** Only the reviewed Echelon social navs receive fixed brand SVGs. Other sections stay exact. */
 export function renderEchelonSocialMarks(body: string, slug?: string): string {
   if (slug !== 'core-echelon-follow' && slug !== 'core-echelon-jump-links') return body
-  const national = slug === 'core-echelon-jump-links',
-    className = national ? 'echelon-social' : 'ech-social-placeholders'
+  const national = slug === 'core-echelon-jump-links'
+  const className = national ? 'echelon-social' : 'ech-social-placeholders'
   const nav = new RegExp('(<nav\\b[^>]*class="' + className + '"[^>]*>)([\\s\\S]*?)(</nav>)')
   return body.replace(nav, (_match, open: string, inner: string, close: string) => {
     const links = inner.replace(

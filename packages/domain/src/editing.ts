@@ -1,13 +1,5 @@
-// The editor's state model (SPEC §6.4), kept framework-independent so the
-// behaviours that carry v1's lessons — changed-dots, per-field revert, undo,
-// dirty tracking — are unit-testable without a browser.
-//
-// Two rules run through all of it:
-//
-//   * Changed means a value-diff against the loaded baseline, never a presence
-//     check and never a timer (v1 D15/D16 were both presence checks).
-//   * Undo is a command stack over whole documents, so an operation that moves
-//     or removes a section is as undoable as typing a character (SPEC §6.4).
+// Framework-independent editor state for change tracking, undo and field revert.
+// Compare against the loaded baseline. Undo restores whole documents, including section moves and deletions.
 
 import {
   validSectionAnchor,
@@ -107,7 +99,7 @@ function clone<T>(value: T): T {
   return structuredClone(value)
 }
 
-/** Deep value equality, which is what "changed" has to mean (v1 D2/D15/D16). */
+/** Compare editor values, treating empty and absent fields alike. */
 export function deepEqual(a: unknown, b: unknown): boolean {
   if (a === b) return true
   if (a === null || b === null || typeof a !== 'object' || typeof b !== 'object') {
@@ -319,8 +311,8 @@ export function setMeta<K extends keyof EditorMetadata>(
 
 /** Copied sections keep useful anchors without introducing duplicate page ids. */
 function copyForInsertion(section: EditorSection, existing: readonly EditorSection[]): EditorSection {
-  const next = clone(section),
-    anchor = next.values.__cms_anchor
+  const next = clone(section)
+  const anchor = next.values.__cms_anchor
   delete next.values.__cms_anchor_aliases
   if (!validSectionAnchor(anchor)) return next
   const used = new Set(
@@ -329,8 +321,8 @@ function copyForInsertion(section: EditorSection, existing: readonly EditorSecti
       ...(Array.isArray(section.values.__cms_anchor_aliases) ? section.values.__cms_anchor_aliases : []),
     ]),
   )
-  let candidate = anchor,
-    suffix = 1
+  let candidate = anchor
+  let suffix = 1
   while (used.has(candidate)) {
     suffix += 1
     const ending = '-' + suffix

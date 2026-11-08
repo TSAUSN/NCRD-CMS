@@ -25,8 +25,8 @@ export function supportsMobileStackOrder(document: unknown): boolean {
   const nodes = (document as { nodes?: unknown[] } | null)?.nodes
   if (!Array.isArray(nodes)) return false
   const stack = [...nodes]
-  let containers = 0,
-    visited = 0
+  let containers = 0
+  let visited = 0
   while (stack.length) {
     if (++visited > 2000) return false
     const node = stack.pop() as { type?: string; attributes?: { class?: unknown }; children?: unknown[] }

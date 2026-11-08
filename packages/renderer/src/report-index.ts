@@ -4,9 +4,10 @@ export const isReportIndexRow = (slug: string | undefined, values: Record<string
 export function reportIndexValues(slug: string | undefined, values: Record<string, unknown>): Record<string, unknown> {
   if (!isReportIndexRow(slug, values)) return values
   const link = (field: string, label: string) => {
-    const value = values[field],
-      current = value && typeof value === 'object' && !Array.isArray(value) ? (value as Record<string, unknown>) : {},
-      url = typeof current.url === 'string' ? current.url.trim() : ''
+    const value = values[field]
+    const current =
+      value && typeof value === 'object' && !Array.isArray(value) ? (value as Record<string, unknown>) : {}
+    const url = typeof current.url === 'string' ? current.url.trim() : ''
     return { ...current, url: /^(?:https?:\/\/|\/(?!\/))/i.test(url) ? url : '', label }
   }
   return { ...values, report_page: link('report_page', 'View page'), report_pdf: link('report_pdf', 'View PDF') }

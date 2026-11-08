@@ -95,9 +95,9 @@ export function organizeSource(html: string, css: string, existing: readonly Slo
     result.blocking.push('Use a section with at most 2,000 elements and 40 nesting levels.')
     return result
   }
-  const edits: Edit[] = [],
-    used = new Set([...html.matchAll(TOKENS)].map(match => match[1]!)),
-    fieldIds = new Set(existing.map(field => field.id))
+  const edits: Edit[] = []
+  const used = new Set([...html.matchAll(TOKENS)].map(match => match[1]!))
+  const fieldIds = new Set(existing.map(field => field.id))
   const idElements = new Map<string, HtmlElement[]>()
   const label = (value: string) => value.replace(/[-_]+/g, ' ').replace(/^./, value => value.toUpperCase())
   function propose(base: string, kind: SlotDef['kind'], sample: unknown): string {
@@ -108,8 +108,8 @@ export function organizeSource(html: string, css: string, existing: readonly Slo
         .replace(/^-+|-+$/g, '')
         .slice(0, 52) || 'content'
     if (!/^[a-z]/.test(base)) base = `field-${base}`
-    let id = base,
-      n = 2
+    let id = base
+    let n = 2
     while (used.has(id) || fieldIds.has(id)) id = `${base}-${n++}`
     used.add(id)
     fieldIds.add(id)
@@ -143,8 +143,8 @@ export function organizeSource(html: string, css: string, existing: readonly Slo
       )
         result.blocking.push(`Line ${node.line}: replace the unsupported ${attr.name} address.`)
     }
-    const rawId = attribute(node, 'id'),
-      id = rawId ? decodeSourceText(rawId) : undefined
+    const rawId = attribute(node, 'id')
+    const id = rawId ? decodeSourceText(rawId) : undefined
     if (id) {
       const list = idElements.get(id) ?? []
       list.push(node)
@@ -162,8 +162,8 @@ export function organizeSource(html: string, css: string, existing: readonly Slo
       continue
     }
     nodes.slice(1).forEach((node, index) => {
-      let next = `${id}-${index + 2}`,
-        suffix = index + 2
+      let next = `${id}-${index + 2}`
+      let suffix = index + 2
       while (idElements.has(next)) next = `${id}-${++suffix}`
       idElements.set(next, [node])
       replace(node.attributes.find(attr => attr.name === 'id')?.valueRange, next)
@@ -228,8 +228,8 @@ export function organizeSource(html: string, css: string, existing: readonly Slo
           )
           continue
         }
-        const src = node.attributes.find(attr => attr.name === 'src'),
-          alt = node.attributes.find(attr => attr.name === 'alt')
+        const src = node.attributes.find(attr => attr.name === 'src')
+        const alt = node.attributes.find(attr => attr.name === 'alt')
         if (!src?.valueRange || !alt?.valueRange) {
           result.notes.push(`Line ${node.line}: image needs quoted src and alt before it can become an editable field.`)
           continue
@@ -291,8 +291,8 @@ export function organizeSource(html: string, css: string, existing: readonly Slo
               'text',
               decodeSourceText(child.text.trim()),
             )
-            const leading = child.text.match(/^\s*/)?.[0] ?? '',
-              trailing = child.text.match(/\s*$/)?.[0] ?? ''
+            const leading = child.text.match(/^\s*/)?.[0] ?? ''
+            const trailing = child.text.match(/\s*$/)?.[0] ?? ''
             replace(child.source, `${leading}${token(id)}${trailing}`)
           }
       } else walk(node.children)

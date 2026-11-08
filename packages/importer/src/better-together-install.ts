@@ -7,13 +7,13 @@ import type { Queryable } from '../../platform/src/publication.ts'
 /** Merge page-specific ordered bindings without changing either page's order.
  * Shared files may have different neighbours; a cycle is refused, never guessed. */
 export function mergeBetterTogetherBindings<T extends { fileId: string; pages: string[] }>(left: T[], right: T[]): T[] {
-  const rows = [...left, ...right],
-    key = (row: T) => JSON.stringify({ ...row, pages: [] }),
-    items = new Map<string, T>(),
-    edges = new Map<string, Set<string>>()
+  const rows = [...left, ...right]
+  const key = (row: T) => JSON.stringify({ ...row, pages: [] })
+  const items = new Map<string, T>()
+  const edges = new Map<string, Set<string>>()
   for (const row of rows) {
-    const id = key(row),
-      old = items.get(id)
+    const id = key(row)
+    const old = items.get(id)
     items.set(id, {
       ...row,
       pages: old
@@ -32,8 +32,8 @@ export function mergeBetterTogetherBindings<T extends { fileId: string; pages: s
       for (let i = 1; i < active.length; i++)
         if (active[i - 1] !== active[i]) edges.get(active[i - 1]!)!.add(active[i]!)
     }
-  const result: T[] = [],
-    pending = new Set(items.keys())
+  const result: T[] = []
+  const pending = new Set(items.keys())
   while (pending.size) {
     const next = [...pending].find(id => ![...pending].some(other => edges.get(other)!.has(id)))
     if (!next) throw new Error('The original file loading orders conflict. Keep those files separately named.')
@@ -72,13 +72,13 @@ export async function installBetterTogetherPages(input: {
   ).rows as SiteFileView[]
   const fingerprint = (file: Pick<SiteFileView, 'kind' | 'name' | 'source' | 'sha256'>) =>
     JSON.stringify([file.kind, file.name, file.source, file.sha256])
-  const savedFiles = new Map(receipts.map(file => [fingerprint(file), file.id])),
-    created: { id: string; slug: string; title: string }[] = [],
-    existing: string[] = []
+  const savedFiles = new Map(receipts.map(file => [fingerprint(file), file.id]))
+  const created: { id: string; slug: string; title: string }[] = []
+  const existing: string[] = []
   for (const value of input.archives) {
     const archive = parseSiteArchive(value)
-    const page = archive.content.pages[0]!,
-      pageVersion = archive.content.page_versions[0]!
+    const page = archive.content.pages[0]!
+    const pageVersion = archive.content.page_versions[0]!
     if (
       archive.content.pages.length !== 1 ||
       ![
@@ -98,9 +98,9 @@ export async function installBetterTogetherPages(input: {
       continue
     }
     const id = String(
-        (await client.query('SELECT app.create_page($1,$2,$3) AS id', [siteId, page.slug, page.title])).rows[0]!.id,
-      ),
-      ids = new Map<string, string>([[page.id, id]])
+      (await client.query('SELECT app.create_page($1,$2,$3) AS id', [siteId, page.slug, page.title])).rows[0]!.id,
+    )
+    const ids = new Map<string, string>([[page.id, id]])
     for (const file of archive.content.site_files ?? []) {
       const key = fingerprint(file)
       let saved = savedFiles.get(key)
@@ -125,14 +125,14 @@ export async function installBetterTogetherPages(input: {
       ids.set(file.id, saved)
     }
     for (const definition of archive.content.section_defs) {
-      const version = archive.content.section_def_versions.find(version => version.section_def_id === definition.id)!,
-        slug = definition.slug,
-        compiled = compileSection({
-          sourceHtml: version.source_html,
-          sourceCss: version.source_css,
-          slots: version.slots,
-          scopeSelector: sectionScopeSelector(slug)!,
-        })
+      const version = archive.content.section_def_versions.find(version => version.section_def_id === definition.id)!
+      const slug = definition.slug
+      const compiled = compileSection({
+        sourceHtml: version.source_html,
+        sourceCss: version.source_css,
+        slots: version.slots,
+        scopeSelector: sectionScopeSelector(slug)!,
+      })
       if (compiled.blocking.length || compiled.carriesTrustedCode)
         throw new Error('Revalidate the original section before installing it.')
       const saved = (
@@ -173,16 +173,16 @@ export async function installBetterTogetherPages(input: {
       'checkpoint',
       'Original offline BT2027 marketing page',
     ])
-    const files = archive.content.site_file_versions![0]!.bundle,
-      map = (value: string) => {
-        const result = ids.get(value)
-        if (!result) throw new Error('A reviewed identity is missing.')
-        return result
-      }
+    const files = archive.content.site_file_versions![0]!.bundle
+    const map = (value: string) => {
+      const result = ids.get(value)
+      if (!result) throw new Error('A reviewed identity is missing.')
+      return result
+    }
     const paths = [...(bundle.paths ?? [])]
     for (const path of files.paths ?? []) {
-      const fileId = map(path.fileId),
-        prior = paths.find(row => row.path === path.path)
+      const fileId = map(path.fileId)
+      const prior = paths.find(row => row.path === path.path)
       if (prior && prior.fileId !== fileId) throw new Error('Two different reviewed files use ' + path.path)
       if (!prior) paths.push({ ...path, fileId })
     }

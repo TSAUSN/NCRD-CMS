@@ -8,12 +8,12 @@ function amount(value: unknown): number {
 }
 export function reportFinancialMarkup(body: string, slug: string | undefined, values: Record<string, unknown>): string {
   if (slug !== 'core-report-financial') return body
-  const numbers = repeatItemKeys(values.expenses).map(key => amount(values['expenses__' + key + '__amount'])),
-    max = Math.max(0, ...numbers)
+  const numbers = repeatItemKeys(values.expenses).map(key => amount(values['expenses__' + key + '__amount']))
+  const max = Math.max(0, ...numbers)
   let index = 0
-  const revenue = repeatItemKeys(values.revenue).map(key => amount(values['revenue__' + key + '__amount'])),
-    total = revenue.reduce((sum, n) => sum + n, 0),
-    share = total > 0 ? Math.min(100, Math.max(0, ((revenue[1] ?? revenue[0] ?? 0) / total) * 100)) : 0
+  const revenue = repeatItemKeys(values.revenue).map(key => amount(values['revenue__' + key + '__amount']))
+  const total = revenue.reduce((sum, n) => sum + n, 0)
+  const share = total > 0 ? Math.min(100, Math.max(0, ((revenue[1] ?? revenue[0] ?? 0) / total) * 100)) : 0
   return body
     .replace(
       /<tr class="ar-group"><th scope="row">([\s\S]*?)<\/th><td>[\s\S]*?<\/td><\/tr>/g,

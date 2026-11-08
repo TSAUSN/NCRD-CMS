@@ -16,17 +16,17 @@ export function isHeroSlides(slot: FieldLike): boolean {
 /** Upgrade the former three numbered slides without replacing a single content value. */
 export function migrateHeroSlides(values: Record<string, unknown>): Record<string, unknown> {
   if (values.slides && typeof values.slides === 'object' && 'items' in values.slides) return structuredClone(values)
-  const next = { ...values },
-    marked = sampleFieldNames(values),
-    mapping = new Map<string, string>(),
-    keys: string[] = []
+  const next = { ...values }
+  const marked = sampleFieldNames(values)
+  const mapping = new Map<string, string>()
+  const keys: string[] = []
   for (let n = 1; n <= 3; n++) {
     if (!['title', 'intro', 'photo', 'primary', 'secondary'].some(field => Object.hasOwn(values, field + n))) continue
     const key = 'i' + n
     keys.push(key)
     for (const field of ['title', 'intro', 'photo', 'primary', 'secondary']) {
-      const old = field + n,
-        name = repeatItemSlotId('slides', key, field)
+      const old = field + n
+      const name = repeatItemSlotId('slides', key, field)
       if (Object.hasOwn(values, old)) {
         next[name] = structuredClone(values[old])
         mapping.set(old, name)
@@ -50,11 +50,11 @@ export const heroSlideTime = (value: unknown): number | null => {
     !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2}(?:\.\d{1,3})?)?(?:Z|[+-]\d{2}:\d{2})$/.test(value)
   )
     return NaN
-  const parts = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?/.exec(value)!,
-    year = Number(parts[1]),
-    month = Number(parts[2]),
-    day = Number(parts[3]),
-    calendar = new Date(Date.UTC(year, month - 1, day))
+  const parts = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?/.exec(value)!
+  const year = Number(parts[1])
+  const month = Number(parts[2])
+  const day = Number(parts[3])
+  const calendar = new Date(Date.UTC(year, month - 1, day))
   if (
     calendar.getUTCFullYear() !== year ||
     calendar.getUTCMonth() !== month - 1 ||
@@ -67,8 +67,8 @@ export const heroSlideTime = (value: unknown): number | null => {
   return Date.parse(value)
 }
 export function heroSlideDateProblem(values: Record<string, unknown>, repeat: string, key: string): string | null {
-  const start = heroSlideTime(values[repeatItemSlotId(repeat, key, 'starts_at')]),
-    end = heroSlideTime(values[repeatItemSlotId(repeat, key, 'ends_at')])
+  const start = heroSlideTime(values[repeatItemSlotId(repeat, key, 'starts_at')])
+  const end = heroSlideTime(values[repeatItemSlotId(repeat, key, 'ends_at')])
   if ((start !== null && !Number.isFinite(start)) || (end !== null && !Number.isFinite(end)))
     return 'Choose a valid start and end date, or leave the dates empty.'
   if (start !== null && end !== null && end <= start) return 'The end must be after the start.'
@@ -101,8 +101,8 @@ export function activeHeroSlideKeys(values: Record<string, unknown>, repeat = 's
   return repeatItemKeys(values[repeat]).filter(key => {
     if (values[repeatItemSlotId(repeat, key, 'enabled')] === 'off' || heroSlideDateProblem(values, repeat, key))
       return false
-    const start = heroSlideTime(values[repeatItemSlotId(repeat, key, 'starts_at')]),
-      end = heroSlideTime(values[repeatItemSlotId(repeat, key, 'ends_at')])
+    const start = heroSlideTime(values[repeatItemSlotId(repeat, key, 'starts_at')])
+    const end = heroSlideTime(values[repeatItemSlotId(repeat, key, 'ends_at')])
     return (start === null || start <= now) && (end === null || end > now)
   })
 }

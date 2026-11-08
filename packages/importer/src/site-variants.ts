@@ -64,8 +64,8 @@ export function readSiteVariants(
         if (!ids.has(id)) continue
         if (found.has(id)) throw new Error(`duplicate site template ${site}/${id}`)
         found.add(id)
-        const html = String(value.html),
-          css = String(value.css)
+        const html = String(value.html)
+        const css = String(value.css)
         if (digest(html).slice(0, 16) !== hashes[id])
           throw new Error(`site-variant census hash mismatch for ${site}/${id}`)
         const slots: V1Slot[] = (value.slots as unknown[]).map(slot => {

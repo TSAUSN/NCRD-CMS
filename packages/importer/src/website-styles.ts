@@ -130,10 +130,10 @@ export function siteStylesheet(css: string, file: string, files: SiteFiles, remo
 function salvageCss(css: string): { root: postcss.Root; dropped: number } | null {
   const root = postcss.root()
   const text = css.replace(/<!--|-->/g, '')
-  let depth = 0,
-    start = 0,
-    dropped = 0,
-    kept = 0
+  let depth = 0
+  let start = 0
+  let dropped = 0
+  let kept = 0
   for (let index = 0; index < text.length; index += 1) {
     const char = text[index]
     if (char === '{') depth += 1

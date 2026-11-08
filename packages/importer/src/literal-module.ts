@@ -8,8 +8,8 @@ const identifier = /^[A-Za-z_$][A-Za-z0-9_$]*/
 function tokens(source: string): Token[] {
   if (Buffer.byteLength(source) > 8 * 1024 * 1024) throw new Error('template module exceeds 8 MiB')
   const result: Token[] = []
-  let at = 0,
-    line = 1
+  let at = 0
+  let line = 1
   const fail = () => {
     throw new Error(`unsupported literal module syntax at line ${line}`)
   }
@@ -71,8 +71,8 @@ function tokens(source: string): Token[] {
         else if (escaped === '0' && !/[0-9]/.test(source[at] ?? '')) value += '\0'
         else if (escaped === '\n') line++
         else if (escaped === 'u' || escaped === 'x') {
-          const size = escaped === 'u' ? 4 : 2,
-            hex = source.slice(at, at + size)
+          const size = escaped === 'u' ? 4 : 2
+          const hex = source.slice(at, at + size)
           if (!new RegExp(`^[0-9a-fA-F]{${size}}$`).test(hex)) fail()
           value += String.fromCharCode(Number.parseInt(hex, 16))
           at += size
@@ -239,8 +239,8 @@ export function readLiteralTemplateModule(source: string): LiteralTemplate[] {
       while (peek() !== ']') {
         const spread = peek() === '...'
         if (spread) take()
-        const reference = word(),
-          binding = bindings.get(reference)
+        const reference = word()
+        const binding = bindings.get(reference)
         if (binding) {
           if (spread) throw new Error('unsupported local registry spread')
           add(binding.value, binding.line)
@@ -277,8 +277,8 @@ export function readLiteralTemplateModule(source: string): LiteralTemplate[] {
       bindings.set(name, { value: [], line: 0 })
       continue
     }
-    const line = input[index]?.line ?? 0,
-      value = literal()
+    const line = input[index]?.line ?? 0
+    const value = literal()
     bindings.set(name, { value, line })
     if (isExport) {
       if (name !== 'librarySectionTemplates' || !Array.isArray(value))

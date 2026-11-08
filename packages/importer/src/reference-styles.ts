@@ -45,8 +45,8 @@ export function echelonFlowHeaderStyles(css: string): { css: string; issues: str
 /** Top-level comma-separated layers of a background value. */
 function backgroundLayers(value: string): string[] {
   const layers: string[] = []
-  let depth = 0,
-    start = 0
+  let depth = 0
+  let start = 0
   for (let index = 0; index < value.length; index += 1) {
     const char = value[index]
     if (char === '(') depth += 1

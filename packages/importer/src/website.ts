@@ -139,8 +139,8 @@ export async function importWebsite(options: WebsiteImportOptions): Promise<Webs
           label: section.label,
         })
     }
-    const pageId = randomUUID(),
-      versionId = randomUUID()
+    const pageId = randomUUID()
+    const versionId = randomUUID()
     archivePages.push({
       id: pageId,
       revision: 1,

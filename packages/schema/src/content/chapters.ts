@@ -104,18 +104,18 @@ export function chapterJumpValues(
   content: readonly { hidden?: boolean; values?: Record<string, unknown> }[],
 ): Record<string, unknown> {
   const definitions = [
-      ['paragraph', 'users', 'Who we are'],
-      ['what', 'heart', 'What we do'],
-      ['events', 'calendar', 'Events'],
-      ['board', 'users', 'Our board'],
-      ['faq', 'info', 'FAQ'],
-      ['form', 'mail', 'Join us'],
-    ],
-    values: Record<string, unknown> = {},
-    items: string[] = []
+    ['paragraph', 'users', 'Who we are'],
+    ['what', 'heart', 'What we do'],
+    ['events', 'calendar', 'Events'],
+    ['board', 'users', 'Our board'],
+    ['faq', 'info', 'FAQ'],
+    ['form', 'mail', 'Join us'],
+  ]
+  const values: Record<string, unknown> = {}
+  const items: string[] = []
   definitions.forEach(([part, icon, label], index) => {
-    const target = content.find(section => section.values?.__cms_chapter_part === part && !section.hidden),
-      anchor = target?.values?.__cms_anchor
+    const target = content.find(section => section.values?.__cms_chapter_part === part && !section.hidden)
+    const anchor = target?.values?.__cms_anchor
     if (!validSectionAnchor(anchor)) return
     const key = 'i' + (index + 1)
     items.push(key)

@@ -59,18 +59,18 @@ export function resolveDataValueFields(
   settings: unknown,
   slots: readonly { id: string; kind: string; constraints?: Record<string, unknown> }[],
 ): Record<string, unknown> {
-  const numbers = siteDataValues(settings),
-    bindings = dataValueBindings(values),
-    next = { ...values }
+  const numbers = siteDataValues(settings)
+  const bindings = dataValueBindings(values)
+  const next = { ...values }
   delete next.__cms_data_sources
   for (const [key, binding] of Object.entries(bindings)) {
-    const [group, item, field] = key.split('__'),
-      root = slots.find(slot => slot.id === group),
-      slot =
-        slots.find(slot => slot.id === key) ??
-        (root && item && field && repeatItemKeys(values[group!]).includes(item)
-          ? repeatTemplateSpec(root)?.fields.find(slot => slot.id === field)
-          : undefined)
+    const [group, item, field] = key.split('__')
+    const root = slots.find(slot => slot.id === group)
+    const slot =
+      slots.find(slot => slot.id === key) ??
+      (root && item && field && repeatItemKeys(values[group!]).includes(item)
+        ? repeatTemplateSpec(root)?.fields.find(slot => slot.id === field)
+        : undefined)
     if (!slot || !['text', 'richtext'].includes(slot.kind)) continue
     const text = dataValueText(binding, numbers)
     if (text !== null) {
@@ -104,18 +104,16 @@ export function numberChoiceValues(
   if (binding) bindings[key] = binding
   else delete bindings[key]
   const next: Record<string, unknown> = {
-      ...values,
-      ...(value === undefined ? {} : { [key]: value }),
-      __cms_data_values: bindings,
-    },
-    parts = key.split('__'),
-    labelKey = parts.length === 3 ? parts[0] + '__' + parts[1] + '__label' : 'label',
-    labels =
-      values.__cms_data_labels &&
-      typeof values.__cms_data_labels === 'object' &&
-      !Array.isArray(values.__cms_data_labels)
-        ? (values.__cms_data_labels as Record<string, unknown>)
-        : {}
+    ...values,
+    ...(value === undefined ? {} : { [key]: value }),
+    __cms_data_values: bindings,
+  }
+  const parts = key.split('__')
+  const labelKey = parts.length === 3 ? parts[0] + '__' + parts[1] + '__label' : 'label'
+  const labels =
+    values.__cms_data_labels && typeof values.__cms_data_labels === 'object' && !Array.isArray(values.__cms_data_labels)
+      ? (values.__cms_data_labels as Record<string, unknown>)
+      : {}
   if (
     binding &&
     suggestedLabel &&

@@ -66,8 +66,8 @@ export async function createRecoveryBackup(input: {
   key: Buffer
   appVersion: string
 }): Promise<RecoveryManifest> {
-  const directory = resolve(input.directory),
-    temporary = `${directory}.partial-${randomUUID()}`
+  const directory = resolve(input.directory)
+  const temporary = `${directory}.partial-${randomUUID()}`
   await mkdir(temporary, { recursive: false, mode: 0o700 })
   const client = new Client({ connectionString: input.connection })
   try {

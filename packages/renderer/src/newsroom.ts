@@ -27,34 +27,34 @@ export function newsroomValues(
 ): Record<string, unknown> {
   const list = resolvedCollection(values.stories)
   if (!list) return values
-  const home = values.home === 'home',
-    sectors = choices(options.sectors),
-    regions = choices(options.regions),
-    sector = sectors.some(s => s.id === query.sector) ? query.sector! : '',
-    region = regions.some(r => r.id === query.region) ? query.region! : '',
-    search = (query.q ?? '').trim().slice(0, 120).toLocaleLowerCase('en-US')
+  const home = values.home === 'home'
+  const sectors = choices(options.sectors)
+  const regions = choices(options.regions)
+  const sector = sectors.some(s => s.id === query.sector) ? query.sector! : ''
+  const region = regions.some(r => r.id === query.region) ? query.region! : ''
+  const search = (query.q ?? '').trim().slice(0, 120).toLocaleLowerCase('en-US')
   const selected = (
-      sector || region ? orderedStoryWidgetRows(list.entries) : orderedNewsroomStories(list.entries)
-    ).filter(entry => {
-      if (!entry.values || typeof entry.values !== 'object' || Array.isArray(entry.values)) return false
-      const data = entry.values as Record<string, unknown>
-      return (
-        (!sector ||
-          String(data.tags ?? '')
-            .split(',')
-            .includes(sector)) &&
-        (!region || data.region === region) &&
-        (!search ||
-          [data.title, data.summary].some(v => typeof v === 'string' && v.toLocaleLowerCase('en-US').includes(search)))
-      )
-    }),
-    total = selected.length,
-    pages = Math.max(1, Math.ceil(total / 12)),
-    page = home ? 1 : Math.max(1, Math.min(pages, /^[0-9]{1,4}$/.test(query.page ?? '') ? Number(query.page) : 1))
+    sector || region ? orderedStoryWidgetRows(list.entries) : orderedNewsroomStories(list.entries)
+  ).filter(entry => {
+    if (!entry.values || typeof entry.values !== 'object' || Array.isArray(entry.values)) return false
+    const data = entry.values as Record<string, unknown>
+    return (
+      (!sector ||
+        String(data.tags ?? '')
+          .split(',')
+          .includes(sector)) &&
+      (!region || data.region === region) &&
+      (!search ||
+        [data.title, data.summary].some(v => typeof v === 'string' && v.toLocaleLowerCase('en-US').includes(search)))
+    )
+  })
+  const total = selected.length
+  const pages = Math.max(1, Math.ceil(total / 12))
+  const page = home ? 1 : Math.max(1, Math.min(pages, /^[0-9]{1,4}$/.test(query.page ?? '') ? Number(query.page) : 1))
   function url(next: { sector?: string; region?: string; page?: number }) {
-    const p = new URLSearchParams(),
-      s = next.sector ?? sector,
-      r = next.region ?? region
+    const p = new URLSearchParams()
+    const s = next.sector ?? sector
+    const r = next.region ?? region
     if (s) p.set('sector', s)
     if (r) p.set('region', r)
     if (search) p.set('q', search)
@@ -77,24 +77,24 @@ export function newsroomValues(
     )
   }
   const filters = home
-      ? ''
-      : group('Project sector', sectors, sector, 'sector') + group('Region', regions, region, 'region'),
-    count = Math.min(12, Math.max(0, total - (page - 1) * 12)),
-    paging =
-      '<p>Showing ' +
-      count +
-      ' of ' +
-      total +
-      ' stories</p><p>' +
-      (page > 1 ? '<a href="' + escapeAttribute(url({ page: page - 1 })) + '">Newer stories</a> ' : '') +
-      (page < pages
-        ? '<a href="' +
-          escapeAttribute(home ? '/newsroom' : url({ page: page + 1 })) +
-          '">' +
-          (home ? 'Show more stories' : 'Older stories') +
-          '</a>'
-        : '') +
-      '</p>'
+    ? ''
+    : group('Project sector', sectors, sector, 'sector') + group('Region', regions, region, 'region')
+  const count = Math.min(12, Math.max(0, total - (page - 1) * 12))
+  const paging =
+    '<p>Showing ' +
+    count +
+    ' of ' +
+    total +
+    ' stories</p><p>' +
+    (page > 1 ? '<a href="' + escapeAttribute(url({ page: page - 1 })) + '">Newer stories</a> ' : '') +
+    (page < pages
+      ? '<a href="' +
+        escapeAttribute(home ? '/newsroom' : url({ page: page + 1 })) +
+        '">' +
+        (home ? 'Show more stories' : 'Older stories') +
+        '</a>'
+      : '') +
+    '</p>'
   return {
     ...values,
     stories: { ...list, entries: selected.slice((page - 1) * 12, page * 12) },

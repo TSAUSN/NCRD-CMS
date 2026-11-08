@@ -38,8 +38,8 @@ export function echelonNationalTemplate(
   const photos = echelonChapterPhotos(media)
   if (!photos) throw new Error('Choose the Echelon logo and reference photos first.')
   const one = (slug: string): SectionInstance => {
-    const entry = ECHELON_LIBRARY.find(row => row.definition.slug === 'core-echelon-' + slug),
-      def = definitions.find(row => row.slug === 'core-echelon-' + slug)
+    const entry = ECHELON_LIBRARY.find(row => row.definition.slug === 'core-echelon-' + slug)
+    const def = definitions.find(row => row.slug === 'core-echelon-' + slug)
     if (!entry || !def) throw new Error('Install the shared Echelon sections first.')
     return {
       section_def_id: def.id,
@@ -60,17 +60,17 @@ export function echelonNationalTemplate(
   jump.values.accounts_from = 'site'
   const directory = one('directory')
   directory.values.__cms_anchor = 'ech-demo-chapters'
-  const body = echelonBodyContent('national', definitions, photos),
-    stories = one('stories')
+  const body = echelonBodyContent('national', definitions, photos)
+  const stories = one('stories')
   stories.values.__cms_anchor = 'ech-demo-stories'
   const leadershipMedia = Object.fromEntries(
-      ['council', 'portrait_one', 'portrait_two', 'portrait_three', 'portrait_four'].map(key => [
-        key === 'council' ? 'photo' : key,
-        media[ECHELON_MEDIA_KEYS[key as keyof typeof ECHELON_MEDIA_KEYS]],
-      ]),
-    ),
-    leadership = echelonLeadershipContent(definitions, leadershipMedia),
-    ending = echelonFaqContactContent('national', definitions)
+    ['council', 'portrait_one', 'portrait_two', 'portrait_three', 'portrait_four'].map(key => [
+      key === 'council' ? 'photo' : key,
+      media[ECHELON_MEDIA_KEYS[key as keyof typeof ECHELON_MEDIA_KEYS]],
+    ]),
+  )
+  const leadership = echelonLeadershipContent(definitions, leadershipMedia)
+  const ending = echelonFaqContactContent('national', definitions)
   return [hero, jump, directory, ...body, stories, leadership, ...ending].map(section => ({
     ...section,
     hidden: false,

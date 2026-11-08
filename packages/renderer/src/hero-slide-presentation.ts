@@ -17,9 +17,9 @@ export function renderParityHeroSlides(
   editing: boolean,
   now: number,
 ): string {
-  const keys = repeatItemKeys(values[slot.id]),
-    shown = editing ? keys : activeHeroSlideKeys(values, slot.id, now),
-    parsed = parseHtml(html, { locations: true })
+  const keys = repeatItemKeys(values[slot.id])
+  const shown = editing ? keys : activeHeroSlideKeys(values, slot.id, now)
+  const parsed = parseHtml(html, { locations: true })
   if (!parsed.ok) return ''
   const all: HtmlElement[] = []
   const walk = (nodes: HtmlNode[]) => {
@@ -31,21 +31,20 @@ export function renderParityHeroSlides(
   }
   walk(parsed.nodes)
   const has = (node: HtmlElement, name: string) =>
-      node.attributes.some(attr => attr.name === 'class' && attr.value.split(/\s+/).includes(name)),
-    track = all.find(node => has(node, 'cms-hero-slider')),
-    slides =
-      track?.children.filter((node): node is HtmlElement => node.kind === 'element' && has(node, 'cms-hero-slide')) ??
-      []
+    node.attributes.some(attr => attr.name === 'class' && attr.value.split(/\s+/).includes(name))
+  const track = all.find(node => has(node, 'cms-hero-slider'))
+  const slides =
+    track?.children.filter((node): node is HtmlElement => node.kind === 'element' && has(node, 'cms-hero-slide')) ?? []
   if (!track?.source || slides.length !== keys.length || slides.some(slide => !slide.source)) return ''
   const included = editing ? keys : keys.filter(key => values[repeatItemSlotId(slot.id, key, 'enabled')] !== 'off')
-  const id = (key: string) => `cms-hero-s${index}-${key}`,
-    edits: { at: number; end: number; value: string }[] = [],
-    attribute = (node: HtmlElement, text: string) =>
-      edits.push({
-        at: node.source!.start + 1 + node.tag.length,
-        end: node.source!.start + 1 + node.tag.length,
-        value: text,
-      })
+  const id = (key: string) => `cms-hero-s${index}-${key}`
+  const edits: { at: number; end: number; value: string }[] = []
+  const attribute = (node: HtmlElement, text: string) =>
+    edits.push({
+      at: node.source!.start + 1 + node.tag.length,
+      end: node.source!.start + 1 + node.tag.length,
+      value: text,
+    })
   if (index > 0) {
     const heading = all.find(node => node.tag === 'h1' && has(node, 'national-sr'))
     if (heading?.source) edits.push({ at: heading.source.start, end: heading.source.end, value: '' })
@@ -89,13 +88,13 @@ export function renderParityHeroSlides(
         if (block?.source) edits.push({ at: block.source.start, end: block.source.end, value: '' })
       }
     }
-    const next = shown[(shown.indexOf(key) + 1) % shown.length],
-      dots = included
-        .map(
-          (other, n) =>
-            `<a class="cms-hero-dot" href="#${id(other)}" data-cms-hero-target="${n}" data-cms-hero-control="dot" aria-label="${escapeAttribute('Slide ' + (n + 1) + ': ' + String(values[repeatItemSlotId(slot.id, other, 'title')] ?? 'Untitled slide'))}"${other === key ? ' aria-current="true"' : ''}${!shown.includes(other) ? ' hidden' : ''}><span aria-hidden="true">●</span></a>`,
-        )
-        .join('')
+    const next = shown[(shown.indexOf(key) + 1) % shown.length]
+    const dots = included
+      .map(
+        (other, n) =>
+          `<a class="cms-hero-dot" href="#${id(other)}" data-cms-hero-target="${n}" data-cms-hero-control="dot" aria-label="${escapeAttribute('Slide ' + (n + 1) + ': ' + String(values[repeatItemSlotId(slot.id, other, 'title')] ?? 'Untitled slide'))}"${other === key ? ' aria-current="true"' : ''}${!shown.includes(other) ? ' hidden' : ''}><span aria-hidden="true">●</span></a>`,
+      )
+      .join('')
     const controls = `<nav class="cms-hero-controls" aria-label="Choose a slide"${shown.length < 2 ? ' hidden' : ''}><span class="cms-hero-dots">${dots}</span><a class="cms-hero-arrow" href="#${id(next ?? keys[0]!)}" data-cms-hero-target="${Math.max(0, included.indexOf(next ?? included[0]!))}" data-cms-hero-control="next" aria-label="Next slide">${renderCmsIcon('chevron-right')}</a></nav>`
     edits.push({ at: slide.source!.closeStart, end: slide.source!.closeStart, value: controls })
   }

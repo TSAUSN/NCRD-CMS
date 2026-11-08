@@ -42,8 +42,8 @@ export async function build(c) {
     if (!image?.digest?.match(/^sha256:[a-f0-9]{64}$/)) throw Error('Build returned no expected immutable digest.')
     return imageRoot(c) + suffix + '@' + image.digest
   }
-  const runtime = pin(''),
-    recovery = pin('-recovery')
+  const runtime = pin('')
+  const recovery = pin('-recovery')
   for (const image of [runtime, recovery])
     cloud(c, [
       'artifacts',
@@ -162,8 +162,8 @@ export async function deploy(c, scheduling = false) {
 }
 
 export async function hosting(c) {
-  const require = createRequire(new URL('../../packages/schema/package.json', import.meta.url)),
-    { Client } = require('pg')
+  const require = createRequire(new URL('../../packages/schema/package.json', import.meta.url))
+  const { Client } = require('pg')
   const operator = operatorConnection(c)
   pg(c, operator, 'pg_dump', ['--format=custom', '--file=' + join(c.privateDirectory, 'before-host-binding.dump')])
   const db = new Client(operator)

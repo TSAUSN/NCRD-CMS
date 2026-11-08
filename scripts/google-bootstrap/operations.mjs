@@ -87,8 +87,8 @@ export async function operations(c) {
   }
   cloud(c, ['scheduler', 'jobs', 'run', name(c, 'worker-pass'), '--location=' + c.region])
   cloud(c, ['run', 'jobs', 'execute', name(c, 'backup'), '--region=' + c.region, '--wait'])
-  const require = createRequire(new URL('../../packages/schema/package.json', import.meta.url)),
-    { Client } = require('pg')
+  const require = createRequire(new URL('../../packages/schema/package.json', import.meta.url))
+  const { Client } = require('pg')
   const db = new Client(operatorConnection(c))
   await db.connect()
   try {

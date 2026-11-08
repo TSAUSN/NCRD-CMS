@@ -8,8 +8,8 @@ import { postgresConnectionUrl, runtimeConnection } from '../postgres-connection
 import { local, identity, receipt } from './common.mjs'
 export async function database(c) {
   await restoreDatabase(c)
-  const require = createRequire(new URL('../../packages/schema/package.json', import.meta.url)),
-    { Client } = require('pg')
+  const require = createRequire(new URL('../../packages/schema/package.json', import.meta.url))
+  const { Client } = require('pg')
   const check = new Client(operatorConnection(c))
   await check.connect()
   try {

@@ -233,8 +233,8 @@ function richTextHosts(nodes: readonly AstNode[]): Map<number, string> {
   const hosts = new Map<number, string>()
   for (const [index, node] of nodes.entries()) {
     if (node.kind !== 'slot' || node.slotKind !== 'richtext' || node.context !== 'element-text') continue
-    const before = nodes[index - 1],
-      after = nodes[index + 1]
+    const before = nodes[index - 1]
+    const after = nodes[index + 1]
     if (before?.kind !== 'html' || after?.kind !== 'html') continue
     const opening = /<([a-zA-Z][a-zA-Z0-9-]*)((?:\s[^<>]*)?)>$/.exec(before.value)
     const tag = opening?.[1]?.toLowerCase()

@@ -26,19 +26,19 @@ export function reportSourceStoryLayout(
   if (!article?.source) return body
   const grid = find(article.children, 'ar-country-grid')
   if (!grid) return body
-  const get = (name: string) => find(grid.children, name),
-    heading = get('ar-feature-heading'),
-    copy = get('ar-copy'),
-    photo = get('ar-story-figure')
+  const get = (name: string) => find(grid.children, name)
+  const heading = get('ar-feature-heading')
+  const copy = get('ar-copy')
+  const photo = get('ar-story-figure')
   if (!heading?.source || !copy?.source || !photo?.source) return body
   const raw = (node: HtmlElement | undefined) => (node?.source ? body.slice(node.source.start, node.source.end) : '')
   const inner = (node: HtmlElement) => (node.source ? body.slice(node.source.openEnd, node.source.closeStart) : '')
   const open = (node: HtmlElement, add: string[], remove: string[]) => {
-    const range = node.source!,
-      before = body.slice(range.start, range.openEnd),
-      attribute = node.attributes.find(a => a.name === 'class'),
-      names = (attribute?.value ?? '').split(/\s+/).filter(name => name && !remove.includes(name)),
-      next = [...new Set([...names, ...add])].join(' ')
+    const range = node.source!
+    const before = body.slice(range.start, range.openEnd)
+    const attribute = node.attributes.find(a => a.name === 'class')
+    const names = (attribute?.value ?? '').split(/\s+/).filter(name => name && !remove.includes(name))
+    const next = [...new Set([...names, ...add])].join(' ')
     if (attribute?.valueRange)
       return (
         before.slice(0, attribute.valueRange.start - range.start) +
@@ -47,9 +47,9 @@ export function reportSourceStoryLayout(
       )
     return before.replace(/^<([a-z0-9-]+)/i, '<$1 class="' + next + '"')
   }
-  const note = find(photo.children, 'ar-photo-note'),
-    photoInner = inner(photo),
-    noteMarkup = raw(note)
+  const note = find(photo.children, 'ar-photo-note')
+  const photoInner = inner(photo)
+  const noteMarkup = raw(note)
   const figure =
     open(photo, [], ['ar-story-figure']) +
     (layout === 'reading' ? photoInner.replace(noteMarkup, '') : photoInner) +
@@ -61,8 +61,8 @@ export function reportSourceStoryLayout(
     after?.source && hasHeading(after.children)
       ? open(after, ['ar-fact'], []) + inner(after) + body.slice(after.source.closeStart, after.source.end)
       : raw(after)
-  const statGrid = get('ar-stat-grid'),
-    statCount = statGrid?.children.filter(node => node.kind === 'element' && has(node, 'ar-stat')).length ?? 0
+  const statGrid = get('ar-stat-grid')
+  const statCount = statGrid?.children.filter(node => node.kind === 'element' && has(node, 'ar-stat')).length ?? 0
   const facts =
     layout === 'reading' &&
     statCount > 0 &&
@@ -81,14 +81,14 @@ export function reportSourceStoryLayout(
         body.slice(statGrid.source.closeStart, statGrid.source.end)
       : raw(statGrid)
   const stats = raw(get('ar-stats-heading')) + statMarkup + (facts ? '' : afterMarkup)
-  const continuation = find(article.children, 'ar-story-body'),
-    impact = find(article.children, 'ar-program-impact'),
-    action = find(article.children, 'ar-discover')
-  let content = '',
-    classes: string[] = []
+  const continuation = find(article.children, 'ar-story-body')
+  const impact = find(article.children, 'ar-program-impact')
+  const action = find(article.children, 'ar-discover')
+  let content = ''
+  let classes: string[] = []
   if (layout === 'reading') {
-    const eyebrow = find(heading.children, 'ar-eyebrow'),
-      photoLead = hasPhoto && (!eyebrow || eyebrow.attributes.some(attribute => attribute.name === 'hidden'))
+    const eyebrow = find(heading.children, 'ar-eyebrow')
+    const photoLead = hasPhoto && (!eyebrow || eyebrow.attributes.some(attribute => attribute.name === 'hidden'))
     classes = [
       'ar-reading-story',
       ...(wideReading ? ['ar-secondary-story'] : []),
@@ -151,16 +151,16 @@ export function reportSourceClosingLayout(body: string, hasPhoto: boolean): stri
     }
     return undefined
   }
-  const root = find(parsed.nodes, node => has(node, 'core')),
-    heading = root && find(root.children, node => node.tag === 'h2'),
-    photo = root && find(root.children, node => has(node, 'core-report-closing-photo'))
+  const root = find(parsed.nodes, node => has(node, 'core'))
+  const heading = root && find(root.children, node => node.tag === 'h2')
+  const photo = root && find(root.children, node => has(node, 'core-report-closing-photo'))
   if (!root?.source || !heading?.source || !photo?.source) return body
-  const quote = body.slice(heading.source.start, heading.source.end),
-    picture = hasPhoto
-      ? '<div class="core-report-closing-photo ar-photo">' +
-        body.slice(photo.source.openEnd, photo.source.closeStart) +
-        '</div>'
-      : ''
+  const quote = body.slice(heading.source.start, heading.source.end)
+  const picture = hasPhoto
+    ? '<div class="core-report-closing-photo ar-photo">' +
+      body.slice(photo.source.openEnd, photo.source.closeStart) +
+      '</div>'
+    : ''
   return (
     body.slice(0, root.source.start) +
     '<section class="ar-closing ar-band">' +

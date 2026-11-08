@@ -4,8 +4,8 @@ export function reportPageLinkValues(
   content: readonly { hidden?: boolean; values?: Record<string, unknown> }[],
 ): Record<string, unknown> {
   const candidates = content.filter(part => !part.hidden && validSectionAnchor(part.values?.__cms_anchor))
-  const values: Record<string, unknown> = {},
-    items: string[] = []
+  const values: Record<string, unknown> = {}
+  const items: string[] = []
   for (const part of candidates) {
     const anchor = part.values!.__cms_anchor as string
     if (candidates.filter(other => other.values!.__cms_anchor === anchor).length !== 1) continue

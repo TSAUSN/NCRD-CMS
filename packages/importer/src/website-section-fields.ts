@@ -27,15 +27,15 @@ export function taggedFields(node: Element): { fields: SlotDef[]; samples: Recor
     FIELD_KINDS.has(attr(el, 'data-cms-editable') ?? ''),
   )
   if (!tagged.length) return null
-  const fields: SlotDef[] = [],
-    samples: Record<string, unknown> = {},
-    used = new Set<string>()
+  const fields: SlotDef[] = []
+  const samples: Record<string, unknown> = {}
+  const used = new Set<string>()
   const idFor = (el: Element, kind: string) => {
     const base =
       slugPart(attr(el, 'data-cms-id') ?? attr(el, 'id') ?? `${kind}-${fields.length + 1}`) ||
       `${kind}-${fields.length + 1}`
-    let id = /^[a-z]/.test(base) ? base : `field-${base}`,
-      n = 2
+    let id = /^[a-z]/.test(base) ? base : `field-${base}`
+    let n = 2
     while (used.has(id)) id = `${base}-${n++}`
     used.add(id)
     return id

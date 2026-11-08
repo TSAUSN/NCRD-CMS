@@ -23,8 +23,8 @@ function omitEmptyStoryTags(html: string): string {
         if (owned && hasClass(node, 'core-story-tags')) {
           const children = node.children.filter((n): n is HtmlElement => n.kind === 'element')
           for (let i = 0; i < children.length - 1; i++) {
-            const label = children[i]!,
-              value = children[i + 1]!
+            const label = children[i]!
+            const value = children[i + 1]!
             if (
               label.tag === 'b' &&
               label.source &&
@@ -59,8 +59,8 @@ export function renderStoryGrid(html: string): string {
   walk(parsed.nodes)
   for (const grid of grids.reverse()) {
     if (!grid.source || grid.attributes.some(a => a.name === 'data-cms-story-grid')) continue
-    const count = grid.children.filter(node => node.kind === 'element' && hasClass(node, 'core-story-card')).length,
-      at = grid.source.start + 1 + grid.tag.length
+    const count = grid.children.filter(node => node.kind === 'element' && hasClass(node, 'core-story-card')).length
+    const at = grid.source.start + 1 + grid.tag.length
     html = html.slice(0, at) + ` data-cms-story-grid="${storyGridColumns(count)}"` + html.slice(at)
   }
   return html

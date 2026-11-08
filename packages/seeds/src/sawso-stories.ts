@@ -56,9 +56,9 @@ export const STORIES_MODEL = withStoriesCatalog(LEGACY_STORIES_MODEL, sawsoStori
 
 export function sawsoStoryRows() {
   return SAWSO_APPROVED.feed.stories.map(story => {
-    const tags = parseStoryTags(story.themes),
-      regions = parseStoryTags(story.regions),
-      sample = SAMPLE_STORY_TITLES.has(story.title)
+    const tags = parseStoryTags(story.themes)
+    const regions = parseStoryTags(story.regions)
+    const sample = SAMPLE_STORY_TITLES.has(story.title)
     if (
       tags.some(tag => !STORY_SECTORS.some(sector => sector.id === tag)) ||
       regions.length !== 1 ||

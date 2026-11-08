@@ -169,10 +169,10 @@ export function renderSlot(
       if (isGovernedEmbedKind(embed)) {
         const text = (key: string) =>
           typeof slot?.constraints?.[key] === 'string' ? (slot.constraints[key] as string) : undefined
-        const title = text('embedTitle'),
-          empty = text('embedHelp'),
-          frameClass = text('embedFrameClass'),
-          placeholderClass = text('embedPlaceholderClass')
+        const title = text('embedTitle')
+        const empty = text('embedHelp')
+        const frameClass = text('embedFrameClass')
+        const placeholderClass = text('embedPlaceholderClass')
         return renderGovernedEmbed(embed, value['url'], title ?? String(value['label'] ?? ''), {
           ...(options.preview ? { preview: true } : {}),
           ...(options.providerEmbeds === false ? { providerEmbeds: false } : {}),
