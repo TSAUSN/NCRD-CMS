@@ -66,6 +66,8 @@ vi.mock('../../sites/[siteId]/media/replacement-actions.ts', () => ({
 }))
 import { MediaPicker } from './media-picker.tsx'
 import { MediaWorkspace } from '../../sites/[siteId]/media/media-workspace.tsx'
+import { MediaWorkspaceScreen } from '../../sites/[siteId]/media/media-workspace-screen.tsx'
+import { MediaWorkspaceDetails } from '../../sites/[siteId]/media/media-workspace-details.tsx'
 import { MediaLibraryBrowser } from '../../sites/[siteId]/media/media-library-browser.tsx'
 import { MediaBulkSelection } from '../../sites/[siteId]/media/media-bulk-selection.tsx'
 import { MediaLifecycleDialogs } from '../../sites/[siteId]/media/media-lifecycle-dialogs.tsx'
@@ -133,6 +135,8 @@ function renderWorkspace() {
   })
 }
 const mediaRegions = new Set<ReactElement['type']>([
+  MediaWorkspaceScreen,
+  MediaWorkspaceDetails,
   MediaLibraryBrowser,
   MediaBulkSelection,
   MediaLifecycleDialogs,
