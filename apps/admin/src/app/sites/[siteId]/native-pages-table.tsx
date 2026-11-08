@@ -5,6 +5,7 @@ import reorderStyles from '../../../components/ui/reorderable-list.module.css'
 import { useReorderableList } from '../../../components/ui/use-reorderable-list.ts'
 import { useMemo, useState } from 'react'
 import { GuardedLink as Link } from '../../../components/guarded-link.tsx'
+import { DocumentLink } from '../../../components/document-link.tsx'
 import { Button, ButtonLink, SearchField, Note, EmptyState, SegmentedControl } from '../../../components/ui/index.ts'
 import { IconDrag, IconChevronRight } from '../../../components/icons.tsx'
 import { StatusChip, pageStatus } from '../../../components/status.tsx'
@@ -257,21 +258,24 @@ export function NativePagesTable({
                   </tr>
                 )
               })}
-              {stories.map(story => (
-                <tr key={'story-' + story.id}>
-                  <td>
-                    <div className={recordTableStyles.rowCopy}>
-                      <Link href={'/sites/' + siteId + '/stories/' + story.id}>{story.title}</Link>
-                      <span className={recordTableStyles.meta}>Story · {story.path}</span>
-                    </div>
-                  </td>
-                  <td colSpan={canAdmin ? 5 : 3}>
-                    <Link className="btn secondary small" href={'/sites/' + siteId + '/stories/' + story.id}>
-                      Edit story
-                    </Link>
-                  </td>
-                </tr>
-              ))}
+              {stories.map(story => {
+                const href = `/sites/${siteId}/stories/${story.id}`
+                return (
+                  <tr key={'story-' + story.id}>
+                    <td>
+                      <div className={recordTableStyles.rowCopy}>
+                        <DocumentLink href={href}>{story.title}</DocumentLink>
+                        <span className={recordTableStyles.meta}>Story · {story.path}</span>
+                      </div>
+                    </td>
+                    <td colSpan={canAdmin ? 5 : 3}>
+                      <DocumentLink className="btn secondary small" href={href}>
+                        Edit story
+                      </DocumentLink>
+                    </td>
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
         </div>
