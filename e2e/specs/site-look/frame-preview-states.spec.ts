@@ -1,8 +1,25 @@
-import { test, expect } from '@playwright/test'
+import { test, expect, type Page } from '@playwright/test'
 import { mkdir } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { sawsoFixture } from '../fixtures/sawso.ts'
 import { signIn } from '../helpers.ts'
+
+async function observeHeaderPreviewFrames(page: Page) {
+  await page.addInitScript(() => {
+    if (window !== window.top) return
+    const opened = new WeakSet<Element>()
+    let count = 0
+    new MutationObserver(changes => {
+      for (const change of changes)
+        for (const node of change.addedNodes)
+          if (node instanceof HTMLIFrameElement && node.title.endsWith('Header preview') && !opened.has(node)) {
+            opened.add(node)
+            document.documentElement.dataset.testHeaderPreviewFrames = String(++count)
+          }
+    }).observe(document, { subtree: true, childList: true })
+  })
+  return page.locator('html')
+}
 
 test('header and footer reserve error wording and retry for a failed preview, then recover to a settled frame', async ({
   page,
@@ -61,12 +78,14 @@ test('a stalled inline preview offers a standalone view and can be retried', asy
   const f = await sawsoFixture(true, true)
   try {
     await signIn(page, 'root@example.test')
-    let failed = false
+    const frames = await observeHeaderPreviewFrames(page)
+    let failInlinePreview = true
     await page.route(
       url => url.pathname.startsWith('/__cms/canvas/') && url.searchParams.get('visit') === '1',
       async route => {
-        if (failed) return route.continue()
-        failed = true
+        // Keep both inline attempts unavailable. The standalone fallback and
+        // the later manual retry still go through the real preview endpoint.
+        if (!failInlinePreview) return route.continue()
         await route.fulfill({ status: 503, body: 'Temporary preview error' })
       },
     )
@@ -76,6 +95,8 @@ test('a stalled inline preview offers a standalone view and can be retried', asy
     await expect(
       page.getByText('The inline preview hasn’t opened. Your changes are still here.', { exact: true }),
     ).toBeVisible({ timeout: 20000 })
+    await expect(frames).toHaveAttribute('data-test-header-preview-frames', '2')
+    failInlinePreview = false
     const fallback = page.getByRole('link', { name: 'Open preview in a new tab', exact: true })
     await expect(fallback).toBeVisible()
     const opened = page.waitForEvent('popup')
@@ -124,6 +145,46 @@ test('Header & menu can ask a loaded preview to repeat its size after missing th
     await page.goto('/sites/' + f.siteId + '/header')
     await expect(page.frameLocator('iframe[title="Header preview"]').locator('header')).toBeVisible()
     await expect(page.getByText('Opening preview…', { exact: true })).toHaveCount(0)
+  } finally {
+    await f.pool.query('UPDATE sites SET archived_at=now() WHERE id=$1', [f.siteId])
+    f.client.release()
+    await f.pool.end()
+  }
+})
+
+test('Header & menu reopens an unresponsive frame once without asking for another ticket', async ({ page }) => {
+  const f = await sawsoFixture(true, true)
+  try {
+    await signIn(page, 'root@example.test')
+    const frames = await observeHeaderPreviewFrames(page)
+    let blockedFirst = false,
+      tickets = 0
+    const ticketUrls = new Set<string>()
+    await page.route('**/api/sites/*/global-elements/preview', async route => {
+      tickets++
+      await route.continue()
+    })
+    await page.route(
+      url => url.pathname.startsWith('/__cms/canvas/') && url.searchParams.get('visit') === '1',
+      async route => {
+        ticketUrls.add(route.request().url())
+        if (blockedFirst) return route.continue()
+        blockedFirst = true
+        await route.fulfill({
+          status: 200,
+          contentType: 'text/html',
+          body: '<html><body>Unverified preview</body></html>',
+        })
+      },
+    )
+    await page.goto('/sites/' + f.siteId + '/header')
+    await expect(page.frameLocator('iframe[title="Header preview"]').locator('header')).toBeVisible({ timeout: 14000 })
+    await expect(page.getByText('Opening preview…', { exact: true })).toHaveCount(0)
+    await expect(page.locator('iframe[title="Loading Header preview"]')).toHaveCount(0)
+    await expect(frames).toHaveAttribute('data-test-header-preview-frames', '2')
+    expect(blockedFirst).toBe(true)
+    expect(ticketUrls.size).toBe(1)
+    expect(tickets).toBe(1)
   } finally {
     await f.pool.query('UPDATE sites SET archived_at=now() WHERE id=$1', [f.siteId])
     f.client.release()

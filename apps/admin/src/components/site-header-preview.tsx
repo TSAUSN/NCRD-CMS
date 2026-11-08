@@ -9,7 +9,9 @@ import ownedStyles from './site-header-preview-styles.module.css'
 import frameStyles from './site-header-preview.module.css'
 
 export type FramePreviewTicket = { href: string; channel?: string }
-type Preview = FramePreviewTicket
+type Preview = FramePreviewTicket & { key: string }
+const RETRY_AFTER_UNVERIFIED_LOAD_MS = 4000
+const PREVIEW_DEADLINE_MS = 15000
 
 /** Load a new authorized preview alongside the current one. Keep the loaded
  * frame mounted until the newest document is ready to replace it. */
@@ -36,10 +38,13 @@ export function SiteHeaderPreview({
   const [frameHeight, setFrameHeight] = useState(part === 'footer' ? 260 : 120)
   const [width, setWidth] = useState(0)
   const [failedHref, setFailedHref] = useState<string | null>(null)
+  const [unverifiedLoad, setUnverifiedLoad] = useState<string | null>(null)
+  const [reopenedHref, setReopenedHref] = useState<string | null>(null)
+  const nextKey = href ? href + (reopenedHref === href ? ':reopened' : '') : null
   useLayoutEffect(() => {
-    latest.current = href ? { href, channel } : null
+    latest.current = href && nextKey ? { href, channel, key: nextKey } : null
     displayed.current = shown
-  }, [href, channel, shown])
+  }, [href, channel, nextKey, shown])
   useEffect(() => {
     const node = host.current
     if (!node) return
@@ -53,13 +58,13 @@ export function SiteHeaderPreview({
     const size = (event: MessageEvent) => {
       for (const candidate of [latest.current, displayed.current]) {
         if (!candidate?.channel) continue
-        const frame = frames.current.get(candidate.href)
+        const frame = frames.current.get(candidate.key)
         if (!frame || event.source !== frame.contentWindow) continue
         if (event.origin !== new URL(candidate.href, window.location.href).origin) continue
         const height = framePreviewHeight(event.data, candidate.channel, part)
         if (height === null) continue
         setFrameHeight(height)
-        if (candidate.href === latest.current?.href && candidate.href !== displayed.current?.href) setShown(candidate)
+        if (candidate.key === latest.current?.key && candidate.key !== displayed.current?.key) setShown(candidate)
         return
       }
     }
@@ -71,12 +76,22 @@ export function SiteHeaderPreview({
   const failed = Boolean(href && updating && failedHref === href)
   useEffect(() => {
     if (!href || !updating) return
-    const timer = window.setTimeout(() => setFailedHref(href), 15000)
+    const timer = window.setTimeout(() => setFailedHref(href), PREVIEW_DEADLINE_MS)
     return () => window.clearTimeout(timer)
   }, [href, updating])
+  useEffect(() => {
+    if (!href || !nextKey || !updating || failed || reopenedHref === href || unverifiedLoad !== nextKey) return
+    // A browser load event can represent an error document or a frame that
+    // never answers the size request. Reopen it once within the same deadline.
+    const timer = window.setTimeout(() => setReopenedHref(href), RETRY_AFTER_UNVERIFIED_LOAD_MS)
+    return () => window.clearTimeout(timer)
+  }, [href, nextKey, updating, failed, reopenedHref, unverifiedLoad])
   const previewUrl = (url: string) =>
     url + '?visit=1' + (part === 'footer' ? '#cms-preview-footer' : '#cms-preview-header')
-  const previews = [...(shown ? [shown] : []), ...(href && updating ? [{ href, channel }] : [])]
+  const previews = [
+    ...(shown ? [shown] : []),
+    ...(href && nextKey && updating ? [{ href, channel, key: nextKey }] : []),
+  ]
   const scale = Math.min(1, width / 1280)
   const height = expanded ? Math.max(768, frameHeight) : frameHeight
   const title = expanded
@@ -112,17 +127,23 @@ export function SiteHeaderPreview({
           </span>
         )}
         {previews.map(preview => {
-          const active = preview.href === shown?.href
+          const active = preview.key === shown?.key
           return (
             <iframe
-              key={preview.href}
+              key={preview.key}
               ref={frame => {
-                if (frame) frames.current.set(preview.href, frame)
-                else frames.current.delete(preview.href)
+                if (frame) frames.current.set(preview.key, frame)
+                else frames.current.delete(preview.key)
               }}
               onLoad={event => {
-                if (latest.current?.href !== preview.href || displayed.current?.href === preview.href) return
+                if (
+                  latest.current?.key !== preview.key ||
+                  displayed.current?.key === preview.key ||
+                  frames.current.get(preview.key) !== event.currentTarget
+                )
+                  return
                 if (preview.channel) {
+                  setUnverifiedLoad(preview.key)
                   // The child may have sent its initial size before the editor attached its listener.
                   // Ask again; load itself also fires for an error page and doesn't make a ticket ready.
                   const origin = new URL(preview.href, window.location.href).origin
