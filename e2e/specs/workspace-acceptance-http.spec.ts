@@ -23,14 +23,15 @@ async function as(request: APIRequestContext, path: string, email: string) {
   expect(response.status(), path).toBe(200)
   return documentMarkup(await response.text())
 }
-test('SSR role journeys expose content editing and reserve publishing/technical controls', async ({ request }) => {
+async function roleFixture() {
   const db = await connect()
   try {
-    const site = (await db.query("SELECT id FROM sites WHERE slug='demo'")).rows[0]!
+    const site = (await db.query<{ id: string }>("SELECT id FROM sites WHERE slug='demo'")).rows[0]!
     const page = (
-      await db.query('SELECT id FROM pages WHERE site_id=$1 AND archived_at IS NULL ORDER BY created_at LIMIT 1', [
-        site.id,
-      ])
+      await db.query<{ id: string }>(
+        'SELECT id FROM pages WHERE site_id=$1 AND archived_at IS NULL ORDER BY created_at LIMIT 1',
+        [site.id],
+      )
     ).rows[0]!
     const root = (await db.query("SELECT id FROM app_users WHERE email='root@example.test'")).rows[0]!.id
     await db.query('BEGIN')
@@ -44,58 +45,79 @@ test('SSR role journeys expose content editing and reserve publishing/technical 
     await db.query('SELECT app.set_site_membership($1,$2,$3)', [siteAdmin, site.id, 'site_admin'])
     await db.query('UPDATE app_users SET auth_subject=$1 WHERE id=$2', ['local|siteadmin@example.test', siteAdmin])
     await db.query('COMMIT')
-    for (const email of [
-      'contributor@example.test',
-      'editor@example.test',
-      'siteadmin@example.test',
-      'root@example.test',
-    ]) {
-      const editor = await as(request, `/pages/${page.id}?site=draft`, email)
+    return { siteId: site.id, pageId: page.id }
+  } finally {
+    await db.end()
+  }
+}
+
+const roles = [
+  { kind: 'contributor', email: 'contributor@example.test', label: 'Contributor' },
+  { kind: 'editor', email: 'editor@example.test', label: 'Editor' },
+  { kind: 'site_admin', email: 'siteadmin@example.test', label: 'Site admin' },
+  { kind: 'super_admin', email: 'root@example.test', label: 'Super admin' },
+] as const
+
+test.describe('SSR role journeys', () => {
+  let fixture: Awaited<ReturnType<typeof roleFixture>>
+  test.beforeAll(async () => {
+    fixture = await roleFixture()
+  })
+
+  for (const { kind, email, label } of roles) {
+    test(`${label} sees permitted editorial and technical controls`, async ({ request }) => {
+      const { siteId, pageId } = fixture
+      const isContributor = kind === 'contributor'
+      const isRoot = kind === 'super_admin'
+      const canCreateSections = isRoot || kind === 'site_admin'
+      const canPreviewSiteLook = isRoot || kind === 'site_admin'
+      const editor = await as(request, `/pages/${pageId}?site=draft`, email)
       expect(editor).toContain('Save draft')
-      if (email.startsWith('root') || email.startsWith('siteadmin')) {
+      if (canPreviewSiteLook) {
         expect(editor).toContain('Preview with saved site-look changes')
         expect(editor.match(/<label[^>]*><input[^>]*\/>Preview with saved site-look changes<\/label>/)?.[0]).toContain(
           'checked',
         )
       } else expect(editor).not.toContain('Preview with saved site-look changes')
-      if (email.startsWith('contributor')) {
+      if (isContributor) {
         expect(editor).toContain('Submit for review')
         expect(editor).not.toMatch(/<button[^>]*>\s*Publish\s*<\/button>/)
       } else expect(editor).toMatch(/<button[^>]*>[\s\S]*?Publish/)
-      const frame = await as(request, `/sites/${site.id}/global-elements`, email)
+      const frame = await as(request, `/sites/${siteId}/global-elements`, email)
       expect(frame).toContain('Header &amp; footer')
-      if (email.startsWith('contributor')) {
+      if (isContributor) {
         expect(frame).toContain('You can inspect the site frame')
         // Server HTML writes the ampersand as an entity.
         expect(frame).not.toMatch(/Publish header &(?:amp;)? footer/)
       } else expect(frame).toMatch(/Publish header &(?:amp;)? footer/)
-      const library = await as(request, `/sites/${site.id}/sections`, email)
+      const library = await as(request, `/sites/${siteId}/sections`, email)
       expect(library).toContain('Find a section')
-      if (!email.startsWith('root') && !email.startsWith('siteadmin')) expect(library).not.toContain('Create a section')
+      if (!canCreateSections) expect(library).not.toContain('Create a section')
       else expect(library).toContain('Create a section')
-      const authoring = await as(request, `/sites/${site.id}/sections/new`, email)
-      if (email.startsWith('contributor') || email.startsWith('editor'))
-        expect(authoring).toContain('You cannot create sections on this site')
+      const authoring = await as(request, `/sites/${siteId}/sections/new`, email)
+      if (!canCreateSections) expect(authoring).toContain('You cannot create sections on this site')
       else expect(authoring).not.toContain('You cannot create sections on this site')
       for (const suffix of ['content', 'media', 'navigation', 'design']) {
-        const response = await request.get(`/sites/${site.id}/${suffix}`, { headers: { cookie: cookie(email) } })
+        const response = await request.get(`/sites/${siteId}/${suffix}`, { headers: { cookie: cookie(email) } })
         expect(response.status(), `${email}: ${suffix}`).toBe(200)
       }
-      const frames = await request.get(`/sites/${site.id}/sections/frames`, { headers: { cookie: cookie(email) } })
-      expect(frames.status()).toBe(email.startsWith('root') ? 200 : 404)
-    }
+      const frames = await request.get(`/sites/${siteId}/sections/frames`, { headers: { cookie: cookie(email) } })
+      expect(frames.status()).toBe(isRoot ? 200 : 404)
+    })
+  }
+
+  test('anonymous and unrelated users cannot open protected editorial routes', async ({ request }) => {
+    const { siteId, pageId } = fixture
     for (const path of [
-      `/pages/${page.id}`,
-      `/sites/${site.id}/content`,
-      `/sites/${site.id}/global-elements`,
-      `/sites/${site.id}/sections`,
+      `/pages/${pageId}`,
+      `/sites/${siteId}/content`,
+      `/sites/${siteId}/global-elements`,
+      `/sites/${siteId}/sections`,
     ]) {
       expect((await request.get(path)).status()).toBe(404)
       expect((await request.get(path, { headers: { cookie: cookie('stranger@example.test') } })).status()).toBe(404)
     }
-  } finally {
-    await db.end()
-  }
+  })
 })
 
 test('unsaved frame HTTP preview validates input and never changes draft or live pointers', async ({ request }) => {
