@@ -50,7 +50,7 @@ test('Home matches the Main card hierarchy and shared navigation keeps visible i
       await expect(cards).toHaveCount(active.length)
       expect(
         await cards
-          .locator('.site-card-name')
+          .getByRole('link', { name: /^Open / })
           .evaluateAll(links => links.map(link => link.getAttribute('href')).sort()),
       ).toEqual(active)
       const boxes = await cards.evaluateAll(nodes =>
