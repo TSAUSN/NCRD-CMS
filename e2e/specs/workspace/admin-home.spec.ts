@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test'
 import { randomUUID, createHash } from 'node:crypto'
 import { readFile } from 'node:fs/promises'
 import { compileSection, sectionScopeSelector } from '@cms/renderer'
+import { DEFAULT_THEME_TOKENS } from '@cms/schema'
 import { createFilesystemMediaStore, defaultMediaRoot } from '../../../packages/platform/src/local/index.ts'
 import { mkdir } from 'node:fs/promises'
 import { resolve } from 'node:path'
@@ -18,7 +19,8 @@ test('Admin Home shows saved attention, immediate authenticated pictures and rec
     siteName = '! 000 Home preview ' + suffix,
     folder = resolve('../.r8-progress/round3/admin-home/' + info.project.name)
   let sourceReads = 0,
-    user: string | undefined
+    user: string | undefined,
+    attentionSite: string | undefined
   try {
     await mkdir(folder, { recursive: true })
     const c = await f.pool.connect()
@@ -96,6 +98,17 @@ test('Admin Home shows saved attention, immediate authenticated pictures and rec
       user = (await c.query('SELECT app.provision_user($1,$2) AS id', [email, '[Admin account]'])).rows[0]!.id
       await c.query("SELECT app.set_site_membership($1,$2,'site_admin')", [user, f.site])
       await c.query('UPDATE app_users SET auth_subject=$1 WHERE id=$2', ['local|' + email, user])
+      // Give Super admin an attention row even when this test runs by itself.
+      // This site is outside the site admin’s membership.
+      attentionSite = (
+        await c.query("SELECT app.create_site($1,$2,'resource',NULL,$3,'[]') AS id", [
+          'home-attention-' + suffix,
+          'Pending Home work ' + suffix,
+          JSON.stringify(DEFAULT_THEME_TOKENS),
+        ])
+      ).rows[0]!.id
+      await c.query("SELECT app.create_page($1,'visit','Unpublished attention fixture')", [attentionSite])
+
       await c.query('COMMIT')
     } catch (error) {
       await c.query('ROLLBACK')
@@ -155,6 +168,7 @@ test('Admin Home shows saved attention, immediate authenticated pictures and rec
           await page.evaluate(() => document.fonts.ready)
           expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
           if (account.role === 'superadmin') {
+            await expect(main.locator('[data-attention-site="' + attentionSite + '"]')).toHaveCount(1)
             const rows = await main.locator('[data-attention-site]').evaluateAll(elements =>
               elements.map(row => {
                 const copy = row.querySelector('strong')!.parentElement!.getBoundingClientRect()
@@ -216,7 +230,9 @@ test('Admin Home shows saved attention, immediate authenticated pictures and rec
     expect(sourceReads).toBe(0)
   } finally {
     if (user) await f.pool.query('DELETE FROM site_memberships WHERE site_id=$1 AND user_id=$2', [f.site, user])
-    await f.pool.query('UPDATE sites SET archived_at=now() WHERE id=$1', [f.site])
+    await f.pool.query("UPDATE sites SET status='archived',archived_at=now() WHERE id=ANY($1::uuid[])", [
+      attentionSite ? [f.site, attentionSite] : [f.site],
+    ])
     await f.pool.end()
   }
 })
