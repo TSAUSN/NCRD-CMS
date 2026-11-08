@@ -101,7 +101,9 @@ test('selecting any native card section preserves the real page geometry and kee
       await capture(page, 'before-select-' + width, info.project.name)
       for (const index of indices) {
         const root = frame.locator('[data-cms-section="' + index + '"]')
-        await root.click({ position: { x: 2, y: 2 } })
+        await root.evaluate(node => node.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'instant' }))
+        await expect(root).toBeInViewport({ ratio: 0.25 })
+        await root.click({ position: { x: 12, y: 12 } })
         await expect
           .poll(() =>
             root.evaluate(
