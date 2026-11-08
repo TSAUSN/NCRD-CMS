@@ -6,8 +6,8 @@ name: CI
 # running to completion once they start.
 #
 # The quick checks (types, styles, formatting, unit, database, build) run on
-# every pull request. The browser suite takes much longer, so it runs on pushes
-# to staging and main, on manual runs, and on pull requests labelled run-e2e.
+# every pull request. Chromium runs on release branches, manual runs and pull
+# requests labelled run-e2e. Release branches and manual runs also use WebKit.
 # The reference images build on branch pushes and manual runs.
 on:
   push:
@@ -33,7 +33,7 @@ jobs:
       github.ref == format('refs/heads/{0}', vars.CMS_STAGING_BRANCH || 'staging')
     runs-on: ubuntu-latest
     # A hung run would otherwise use GitHub's 6-hour default.
-    timeout-minutes: 180
+    timeout-minutes: 350
 
     services:
       postgres:
@@ -58,6 +58,7 @@ jobs:
       TEST_DATABASE_URL: postgres://cms:cms@127.0.0.1:54329/postgres
       AUTH_SECRET: ci-secret-value-not-used-in-production
       RUN_E2E: ${{ github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'run-e2e') }}
+      RUN_WEBKIT: ${{ github.event_name != 'pull_request' }}
 
     steps:
       - uses: actions/checkout@v4
@@ -105,9 +106,7 @@ jobs:
         run: pnpm -r build
         timeout-minutes: 20
 
-      # The browser suite: Chromium, on staging/main, on manual runs, or when a pull
-      # request carries the run-e2e label. Firefox and WebKit stay in the
-      # release gate (SPEC §9).
+      # Run each engine separately so its global setup starts with a fresh database.
       - name: Cache Playwright browsers
         if: env.RUN_E2E == 'true'
         uses: actions/cache@v4
@@ -119,9 +118,20 @@ jobs:
         if: env.RUN_E2E == 'true'
         run: pnpm --filter e2e exec playwright install --with-deps chromium
 
-      - name: Browser and public-contract specs
+      - name: Chromium browser and public-contract specs
         if: env.RUN_E2E == 'true'
         run: pnpm --filter e2e test:e2e
+        timeout-minutes: 150
+
+      - name: Install WebKit
+        if: env.RUN_WEBKIT == 'true'
+        run: pnpm --filter e2e exec playwright install --with-deps webkit
+
+      - name: WebKit browser and public-contract specs
+        if: env.RUN_WEBKIT == 'true'
+        env:
+          RELEASE_BROWSERS: '1'
+        run: pnpm --filter e2e exec playwright test --project=webkit --output=test-results/webkit
         timeout-minutes: 150
 
       - name: No-mail browser specs

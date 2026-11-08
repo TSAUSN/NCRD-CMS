@@ -108,7 +108,8 @@ release artifact and check the full commit on Admin and Site `/health`.
 
 ## What a release does
 
-1. CI tests and builds the exact commit. The release job checks that
+1. CI tests the exact commit in Chromium and WebKit with a fresh database for
+   each engine, and builds it. The release job checks that
    the target branch and GitHub environment match. Deployments to the
    same environment do not interrupt an active rollout.
 2. Cloud Build builds the committed Git archive. The deployment uses the

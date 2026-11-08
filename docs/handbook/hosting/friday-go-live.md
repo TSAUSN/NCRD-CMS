@@ -35,8 +35,8 @@ pnpm check:node
 TASK_REVISION=$(git rev-parse "$TASK_TAG^{commit}")
 ```
 
- CI is not an automatic deployment;
-bootstrap builds the selected committed source through Cloud Build.
+This initial install builds the selected release tag through Cloud Build. After
+setup, use [automatic releases](../upgrades/automatic-releases.md) for tested branch deploys.
 
 Collect the [private release handoff packet](private-release-handoff.md) before
 restoring content or configuring sign-in.
