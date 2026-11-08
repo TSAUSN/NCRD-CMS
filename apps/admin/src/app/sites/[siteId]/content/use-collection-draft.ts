@@ -20,9 +20,12 @@ export function useCollectionDraft(selected: CollectionWorkspace['selected'], in
   const [expanded, setExpanded] = useState<string | null>(null)
   const originalEntry = useRef<EntryState | null>(null)
   const [checked, setChecked] = useState<string[]>([])
+  const previousList = useRef(selected)
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [notice, setNotice] = useState<ActionResult | null>(null)
   useEffect(() => {
+    const previous = previousList.current
+    previousList.current = selected
     setEntries(clone(selected?.entries ?? []))
     setSavedEntries(clone(selected?.entries ?? []))
     setModel(clone(selected?.draft ?? null))
@@ -33,7 +36,17 @@ export function useCollectionDraft(selected: CollectionWorkspace['selected'], in
     setDraftSchemaId(selected?.draftSchemaVersionId ?? null)
     setPublishedSchemaId(selected?.publishedSchemaVersionId ?? null)
     setExpanded(null)
-    setChecked([])
+    setChecked(current => {
+      if (!current.length) return current
+      if (!selected || previous?.id !== selected.id) return []
+      const before = new Map(previous.entries.map(entry => [entryIdentity(entry), entry.archived]))
+      const after = new Map(selected.entries.map(entry => [entryIdentity(entry), entry.archived]))
+      // A save or publish can refresh after a person checks a row.
+      const remaining = current.filter(
+        key => after.has(key) && (!before.has(key) || before.get(key) === after.get(key)),
+      )
+      return remaining.length === current.length ? current : remaining
+    })
   }, [
     selected?.id,
     selected?.revision,

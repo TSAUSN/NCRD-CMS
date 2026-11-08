@@ -237,6 +237,23 @@ beforeEach(() => {
   flushEffects()
 })
 
+it('keeps checked rows through a saved refresh and clears them when their scope changes', () => {
+  const list = () => elements(render()).find(element => element.type === CollectionRecordList)!.props
+  list().select('item-0', true)
+  list().select('item-1', true)
+  expect(list().checked).toEqual(['item-0', 'item-1'])
+  initial = workspace()
+  initial.selected!.publishedEntryRevision = 2
+  initial.selected!.entries[1]!.archived = true
+  render()
+  flushEffects()
+  expect(list().checked).toEqual(['item-0'])
+  initial = workspace('collection-two')
+  render()
+  flushEffects()
+  expect(list().checked).toEqual([])
+})
+
 describe('collection workspace pending mutation boundary', () => {
   it('reviews publication before invoking the command and keeps cancellation private', () => {
     let tree = render()
