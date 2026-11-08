@@ -319,7 +319,7 @@ test('revision 8 workspaces: media grid, conditional attention filter, details d
       if (asset.status === 'ready') {
         await pool.query(
           `INSERT INTO media_variants(media_id,kind,object_key,content_hash,width,height,bytes,mime_type)
-           VALUES ($1,'thumbnail',$2,$3,$4,$5,$6,$7)`,
+           VALUES ($1,'thumbnail',$2,$3,$4,$5,$6,'image/webp')`,
           [
             asset.id,
             'e2e-workspace/thumb-' + asset.id,
@@ -327,7 +327,6 @@ test('revision 8 workspaces: media grid, conditional attention filter, details d
             asset.width,
             asset.height,
             asset.bytes,
-            asset.mimeType,
           ],
         )
         await page.route('**/media/' + asset.id + '/thumbnail', route =>
