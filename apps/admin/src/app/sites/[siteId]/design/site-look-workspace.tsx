@@ -1,13 +1,7 @@
 'use client'
-import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react'
+import { useCallback, useEffect, useState, type CSSProperties } from 'react'
 import { useRouter } from 'next/navigation'
-import {
-  ThemeTokens as ThemeValue,
-  type HeaderConfig,
-  type FooterConfig,
-  type NavTree,
-  type ThemeTokens,
-} from '@cms/schema'
+import { ThemeTokens as ThemeValue, type NavTree, type ThemeTokens } from '@cms/schema'
 import { CORE_THEME_PRESETS } from '@cms/seeds/core-themes'
 import type { ThemeWorkspace, GlobalElementsWorkspace } from '../../../../lib/queries.ts'
 import type { MediaAsset } from '../../../../lib/media-library.ts'
@@ -24,13 +18,11 @@ import {
   EmptyState,
   Card,
 } from '../../../../components/ui/index.ts'
-import { queueFramePreview, requestFramePreview } from '../../../../lib/frame-preview-request.ts'
-import { useSiteLookCanvas } from './use-site-look-canvas.ts'
+import { useSiteLookPreviewStage, type SharedDraft } from './use-site-look-preview-stage.ts'
 import styles from './site-look.module.css'
 import workspaceFormsStyles from '../../../../components/workspace-styles/workspace-forms.module.css'
 import recordTableStyles from '../../../../components/workspace-styles/record-table.module.css'
 
-type SharedDraft = { header: HeaderConfig; footer: FooterConfig; menu: NavTree }
 type ChangedParts = { header: boolean; footer: boolean; menu: boolean }
 export function SiteLookWorkspace({
   siteId,
@@ -53,31 +45,24 @@ export function SiteLookWorkspace({
   canFrame: boolean
   media: MediaAsset[]
 }) {
-  const original = frame.originalDesign === true,
-    router = useRouter()
+  const original = frame.originalDesign === true
+  const router = useRouter()
   const [tab, setTab] = useState(original ? 'header' : 'theme')
   const [page, setPage] = useState(
     (original ? frame.pages.find(page => page.usesHeader !== false) : frame.pages[0])?.versionId ?? '',
   )
-  const [device, setDevice] = useState('desktop'),
-    [tokens, setTokens] = useState(theme.draft),
-    [draft, setDraft] = useState<SharedDraft | null>(() =>
-      original ? null : { header: frame.header.draft, footer: frame.footer.draft, menu },
-    )
-  const [themeStatus, setThemeStatus] = useState({ dirty: false, pending: false, ready: false }),
-    [frameStatus, setFrameStatus] = useState({ dirty: false, pending: false, ready: !original })
+  const [device, setDevice] = useState('desktop')
+  const [tokens, setTokens] = useState(theme.draft)
+  const [draft, setDraft] = useState<SharedDraft | null>(() =>
+    original ? null : { header: frame.header.draft, footer: frame.footer.draft, menu },
+  )
+  const [themeStatus, setThemeStatus] = useState({ dirty: false, pending: false, ready: false })
+  const [frameStatus, setFrameStatus] = useState({ dirty: false, pending: false, ready: !original })
   const [parts, setParts] = useState<ChangedParts>({ header: false, footer: false, menu: false })
-  const [html, setHtml] = useState(''),
-    [error, setError] = useState(''),
-    [loading, setLoading] = useState(false),
-    [retry, setRetry] = useState(0),
-    [publishOpen, setPublishOpen] = useState(false),
-    [preset, setPreset] = useState('')
+  const [retry, setRetry] = useState(0)
+  const [publishOpen, setPublishOpen] = useState(false)
+  const [preset, setPreset] = useState('')
   const [presetTokens, setPresetTokens] = useState<ThemeTokens | undefined>(undefined)
-  const frameRef = useRef<HTMLIFrameElement | null>(null),
-    viewport = useRef<HTMLDivElement | null>(null),
-    [available, setAvailable] = useState(0),
-    [canvasTop, setCanvasTop] = useState(280)
   const choices = frame.pages.filter(
     page => tab === 'theme' || (tab === 'footer' ? page.usesFooter !== false : page.usesHeader !== false),
   )
@@ -85,14 +70,6 @@ export function SiteLookWorkspace({
   useEffect(() => {
     if (!choices.some(choice => choice.versionId === page)) setPage(choices[0]?.versionId ?? '')
   }, [choiceIds, page])
-  const isolated = useSiteLookCanvas({
-    origin: isolatedOrigin,
-    siteId,
-    pageId: frame.pages.find(item => item.versionId === page)?.id ?? '',
-    versionId: page,
-    look: draft ? { tokens, ...draft } : null,
-    retry,
-  })
   const changedTheme = useCallback((value: ThemeTokens, dirty: boolean, pending: boolean, ready: boolean) => {
     if (ThemeValue.safeParse(value).success) setTokens(value)
     setThemeStatus({ dirty, pending, ready })
@@ -105,70 +82,23 @@ export function SiteLookWorkspace({
     },
     [],
   )
-  const refresh = useCallback(() => setRetry(value => value + 1), []),
-    noop = useCallback(() => {}, [])
-  useEffect(() => {
-    const node = viewport.current
-    if (!node) return
-    const measure = () => {
-      setAvailable(
-        node.clientWidth -
-          Number.parseFloat(getComputedStyle(node).paddingLeft) -
-          Number.parseFloat(getComputedStyle(node).paddingRight),
-      )
-      // Ancestor scrollIntoView movement must not increase the panel's height.
-      let top = 0,
-        current: HTMLElement | null = node
-      while (current) {
-        top += current.offsetTop
-        current = current.offsetParent as HTMLElement | null
-      }
-      setCanvasTop(top)
-    }
-    measure()
-    const observer = new ResizeObserver(measure)
-    observer.observe(node)
-    window.addEventListener('resize', measure)
-    return () => {
-      observer.disconnect()
-      window.removeEventListener('resize', measure)
-    }
-  }, [])
-  function showArea(frame: HTMLIFrameElement | null) {
-    if (!frame || isolatedOrigin) return
-    const view = frame.contentWindow,
-      footer = frame.contentDocument?.querySelector('footer,[data-cms-frame="footer"],.footer')
-    if (tab === 'footer' && view && footer)
-      view.scrollTo({ top: Math.max(0, footer.getBoundingClientRect().top + view.scrollY) })
-    else view?.scrollTo({ top: 0 })
-  }
-  useEffect(() => showArea(frameRef.current), [tab])
-  const serial = JSON.stringify([page, tokens, draft])
-  useEffect(() => {
-    if (isolatedOrigin || !page || !draft) return
-    setLoading(true)
-    setError('')
-    return queueFramePreview(async signal => {
-      const result = await requestFramePreview(
-        '/api/sites/' + siteId + '/global-elements/preview',
-        { versionId: page, tokens, ...draft, previewContext: 'draft' },
-        signal,
-      )
-      if (result.kind === 'aborted' || signal.aborted) return
-      if (result.kind === 'ready') setHtml(result.html)
-      else {
-        setError(result.message)
-        setHtml('')
-      }
-      setLoading(false)
+  const refresh = useCallback(() => setRetry(value => value + 1), [])
+  const noop = useCallback(() => {}, [])
+  const { html, frameRef, viewport, available, canvasTop, showArea, isolated, previewError, previewLoading } =
+    useSiteLookPreviewStage({
+      isolatedOrigin,
+      siteId,
+      pageId: frame.pages.find(item => item.versionId === page)?.id ?? '',
+      page,
+      tokens,
+      draft,
+      retry,
+      tab,
     })
-  }, [serial, siteId, retry, isolatedOrigin])
-  const previewError = isolatedOrigin ? isolated.error : error,
-    previewLoading = isolatedOrigin ? isolated.loading : loading
-  const width = device === 'phone' ? 390 : device === 'tablet' ? 768 : 1280,
-    scale = Math.min(1, available / width || 1)
-  const unsaved = themeStatus.dirty || frameStatus.dirty,
-    pending = themeStatus.pending || frameStatus.pending
+  const width = device === 'phone' ? 390 : device === 'tablet' ? 768 : 1280
+  const scale = Math.min(1, available / width || 1)
+  const unsaved = themeStatus.dirty || frameStatus.dirty
+  const pending = themeStatus.pending || frameStatus.pending
   const affected = original
     ? frame.pages.filter(
         page =>
