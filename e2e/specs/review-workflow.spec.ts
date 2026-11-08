@@ -65,7 +65,7 @@ async function seedSubmittedPage(label: string, trusted = false, samples = false
       [pageId, saved.rows[0]!.revision, `${label} is ready for review.`],
     )
     await client.query('COMMIT')
-    return { submissionId: submitted.rows[0]!.submission_id, title: `Review ${label}`, path: `/${slug}` }
+    return { pageId, submissionId: submitted.rows[0]!.submission_id, title: `Review ${label}`, path: `/${slug}` }
   } catch (error) {
     await client.query('ROLLBACK')
     throw error
@@ -86,6 +86,7 @@ test.describe('page review journey', () => {
     const author = await authorContext.newPage()
     const reviewer = await reviewerContext.newPage()
     const heading = `Reviewed in the inbox ${Date.now()}`
+    let nextRequest: Awaited<ReturnType<typeof seedSubmittedPage>> | undefined
 
     try {
       await signIn(author, 'contributor@example.test')
@@ -128,6 +129,7 @@ test.describe('page review journey', () => {
       await expect(author.getByText('Please make the heading more specific before it goes live.')).toBeVisible()
       await expect(author.getByRole('button', { name: 'Submit for review' })).toBeEnabled()
 
+      nextRequest = await seedSubmittedPage('Waiting')
       await author.getByRole('button', { name: 'Submit for review' }).click()
       const resubmission = author.getByRole('dialog', { name: 'Submit this page for review?' })
       await resubmission.getByLabel('Note for the reviewer').fill('Updated and ready for the final decision.')
@@ -144,6 +146,8 @@ test.describe('page review journey', () => {
       // notice, which names the page the action just published.
       await expect(reviewer.getByText(/Approved and published “/)).toBeVisible()
       expect((await fetchPublic()).body).toContain(heading)
+      await expect(reviewer.getByRole('heading', { name: nextRequest.title, exact: true })).toBeVisible()
+      expect((await fetchPublic(nextRequest.path)).status).toBe(404)
 
       // This suite shares one seeded page. Leave both its draft and public
       // projection in the documented state for the later renderer specs.
@@ -161,6 +165,15 @@ test.describe('page review journey', () => {
       await expect(canvas(reviewer).locator('h1')).toHaveText(ORIGINAL_HEADING)
       expect((await fetchPublic()).body).toContain(ORIGINAL_HEADING)
     } finally {
+      if (nextRequest) {
+        const client = new Client({ connectionString: DATABASE_URL })
+        await client.connect()
+        try {
+          await client.query('UPDATE pages SET archived_at=now() WHERE id=$1', [nextRequest.pageId])
+        } finally {
+          await client.end()
+        }
+      }
       await authorContext.close()
       await reviewerContext.close()
     }

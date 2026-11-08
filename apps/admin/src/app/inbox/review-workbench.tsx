@@ -113,7 +113,15 @@ export function ReviewChecks({ model }: { model: ReviewModel }) {
   )
 }
 
-export function ReviewWorkbench({ model, dialogs }: { model: ReviewModel; dialogs: ReactNode }) {
+export function ReviewWorkbench({
+  model,
+  dialogs,
+  receipt,
+}: {
+  model: ReviewModel
+  dialogs: ReactNode
+  receipt: string | null
+}) {
   const router = useRouter()
   const {
     unavailable,
@@ -140,6 +148,11 @@ export function ReviewWorkbench({ model, dialogs }: { model: ReviewModel; dialog
         storageKey="cms.reviews.queue-width"
         queue={<FullReviewQueue model={model} />}
       >
+        {receipt && (
+          <div role="status" className="notice notice-ok">
+            {receipt}
+          </div>
+        )}
         {!selected ? (
           <EmptyState
             title={

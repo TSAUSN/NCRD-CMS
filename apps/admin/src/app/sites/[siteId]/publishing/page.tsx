@@ -215,7 +215,6 @@ export default async function PublishingWorkspace({
                 </EmptyState>
               ) : (
                 <ReviewWorkspace
-                  key={selected?.id ?? 'none'}
                   actorId={session.principal.userId}
                   reviews={reviews}
                   selected={selected}

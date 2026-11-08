@@ -108,7 +108,6 @@ export default async function ReviewInbox({
         {area === 'pages' ? (
           <section aria-label="Page reviews">
             <ReviewWorkspace
-              key={selected?.id ?? 'none'}
               fullScreen
               actorId={session.principal.userId}
               queueHeader={queueHeader}

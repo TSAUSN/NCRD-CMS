@@ -30,21 +30,24 @@ export type ReviewWorkspaceProps = {
   basePath: string
 }
 
-export function useReviewModel({
-  fullScreen = false,
-  actorId = '',
-  queueHeader,
-  unavailable = false,
-  comparison,
-  initialQuery = '',
-  initialFilter,
-  reviews,
-  selected,
-  comments,
-  people,
-  readiness,
-  basePath,
-}: ReviewWorkspaceProps) {
+export function useReviewModel(
+  {
+    fullScreen = false,
+    actorId = '',
+    queueHeader,
+    unavailable = false,
+    comparison,
+    initialQuery = '',
+    initialFilter,
+    reviews,
+    selected,
+    comments,
+    people,
+    readiness,
+    basePath,
+  }: ReviewWorkspaceProps,
+  setDecisionReceipt?: (message: string | null) => void,
+) {
   const [filter, setFilter] = useState<Filter>(
     ['waiting', 'returned', 'decided', 'all'].includes(initialFilter ?? '')
       ? (initialFilter as Filter)
@@ -114,6 +117,7 @@ export function useReviewModel({
 
   function approve(override?: string, sampleConsent = samplesConfirmed) {
     if (!selected) return
+    setDecisionReceipt?.(null)
     setPhase('approve')
     startTransition(async () => {
       try {
@@ -122,16 +126,14 @@ export function useReviewModel({
         if (override) data.set('overrideReason', override)
         if (sampleConsent) data.set('sampleContentConfirmed', 'true')
         const outcome = await approveReviewSubmission(data)
-        setResult(outcome)
+        if (outcome.ok && setDecisionReceipt) setDecisionReceipt(outcome.message)
+        else setResult(outcome)
         if (!outcome.ok && outcome.kind === 'blocked') {
           if (outcome.report.blocking.some(finding => finding.rule === 'sample_content') && !sampleConsent)
             setSampleOpen(true)
           else setOverrideOpen(true)
         }
-        if (outcome.ok) {
-          window.dispatchEvent(new Event('cms:inbox-changed'))
-          // The action revalidates this route; a second refresh can overtake its result.
-        }
+        if (outcome.ok) window.dispatchEvent(new Event('cms:inbox-changed'))
       } catch {
         setResult({
           ok: false,
@@ -144,6 +146,7 @@ export function useReviewModel({
 
   function reject(reason: string) {
     if (!selected) return
+    setDecisionReceipt?.(null)
     setPhase('return')
     startTransition(async () => {
       try {
@@ -151,11 +154,9 @@ export function useReviewModel({
         data.set('submissionId', selected.id)
         data.set('reason', reason)
         const outcome = await rejectReviewSubmission(data)
-        setResult(outcome)
-        if (outcome.ok) {
-          window.dispatchEvent(new Event('cms:inbox-changed'))
-          // The action revalidates this route; a second refresh can overtake its result.
-        }
+        if (outcome.ok && setDecisionReceipt) setDecisionReceipt(outcome.message)
+        else setResult(outcome)
+        if (outcome.ok) window.dispatchEvent(new Event('cms:inbox-changed'))
       } catch {
         setResult({
           ok: false,
