@@ -60,19 +60,12 @@ export function readConfig(env: NodeJS.ProcessEnv = process.env): WorkerConfig {
   }
 }
 
-/**
- * M0/M1 ships the recording invalidator: it is a real implementation with real
- * failure behaviour, and a CDN adapter drops in behind the same port at M5
- * without the worker changing (SPEC §12, V2-SETUP-10).
- */
+/** Record invalidation requests. This implementation does not call a CDN. */
 export function createCacheInvalidator(): CacheInvalidator {
   return createRecordingCacheInvalidator()
 }
 
-/**
- * The store thumbnails are written to, behind the same port an object store will
- * sit behind at M5 (SPEC §6.11, §12).
- */
+/** Use the configured media store for thumbnails. */
 export function createMediaStore(config: WorkerConfig): MediaStore {
   return configuredMediaStore({
     ...process.env,

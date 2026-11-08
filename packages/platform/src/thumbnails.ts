@@ -13,9 +13,7 @@
 //
 // It renders through @cms/renderer and through nothing else. A thumbnail
 // generator with its own idea of how a section becomes markup is a second
-// renderer, and a second renderer is a picture of a page that does not exist —
-// which is the exact failure D3 is an upgrade over, not a repeat of. So the
-// markup comes from `renderSection`, the stylesheet from `themeCss` and
+// renderer. The markup comes from `renderSection`, the stylesheet from `themeCss` and
 // `collectCss`, and the refusals from `compiledCssProblems` and
 // `structuredSectionProblems`. Nothing here decides what a section looks like.
 //
@@ -420,8 +418,7 @@ export function buildThumbnailDocument(input: {
   // and returns a wrapper with nothing in it when the section is fine and its
   // body rendered to nothing — a structured document with no nodes, every field
   // region declining its value. A page shows the second as an empty region and
-  // carries on; a library card showing it would be a blank rectangle with a name
-  // under it, which is the thing D3 is meant to stop.
+  // carries on, but the library should not offer a blank thumbnail.
   if (EMPTY_SECTION.test(body)) {
     return refuse(
       'thumbnail-renders-nothing',

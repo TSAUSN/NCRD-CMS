@@ -1,33 +1,10 @@
-// One versioned readiness policy, consulted by every publish path (SPEC §6.8).
-//
-// The rules are pure functions over a rendered page, so the editor, the review
-// queue, a bulk release, and the scheduler all get the same verdict — v1's D17
-// defect was two surfaces disagreeing about whether a page was publishable.
-//
-// Blocking rules that must never be bypassable live in the database as well
-// (unapproved raw markup, an unresolvable section version). Everything here is
-// the product-level half.
+// A shared readiness policy for the editor, reviews, bulk releases and schedules.
+// The database also enforces rules that must never be bypassed, such as approved markup and resolvable sections.
 
 /**
- * The version of this policy. It is stamped into every report, recorded in the
- * publication audit, and pinned into `scheduled_actions` when a schedule is
- * created (SPEC §6.8).
- *
- * 2 adds `refused_canonical`, the last of SPEC §6.8's blocking rules that
- * `runReadinessChecks` did not implement. It could not be implemented before:
- * the check needs the value the author typed, and the rendered page no longer
- * has it, because the renderer has already put the page's own address in its
- * place. `PageDocument.canonical.refusal` is where it comes from instead.
- *
- * Bumping this number is not free, and the cost is deliberate. A schedule pins
- * the version it will be judged by, and `app.execute_scheduled_action` raises
- * when the version the worker checked against is not the version the schedule
- * pinned — so every schedule already pinned to 1 would fail closed on its run
- * date. The migration that lands with this carries those pins forward and
- * writes one audit row per schedule it moves. Carrying them forward is only
- * honest because version 2 adds a rule and relaxes none: a schedule that would
- * have published under version 1 still publishes, unless its canonical was
- * refused, which is the feedback this version exists to give.
+ * Reports and publication audits record this version. Schedules pin it at creation.
+ * The worker refuses a schedule whose pinned policy differs. Plan an audited migration
+ * for compatible scheduled actions before changing the version.
  */
 export const READINESS_POLICY_VERSION = 3
 
@@ -160,13 +137,8 @@ export function runReadinessChecks(input: ReadinessInput): ReadinessReport {
     })
   }
 
-  // Blocking rather than advisory, because the renderer's fallback is silent.
-  // The page publishes, looks entirely correct, and quietly does not carry the
-  // link the author asked for — so an advisory here would be D17 a second
-  // time: a check that reports something next to a publish that proceeds
-  // anyway. The refusal's own sentence is reused rather than rewritten; it is
-  // already the editor-facing explanation, and it is the one that knows when
-  // repeating the authored value would republish a password.
+  // An invalid canonical is blocking because the rendered page would silently use a different address.
+  // Reuse the renderer’s explanation so a rejected URL cannot expose its credentials.
   if (input.canonicalRefusal) {
     findings.push({
       rule: 'refused_canonical',

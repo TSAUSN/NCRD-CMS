@@ -1,7 +1,5 @@
-// Provider seams (SPEC §3.4). Everything provider-specific lives behind one of
-// these; the portable core is Postgres plus these contracts. Local
-// implementations come first so M0/M1 can run and be tested with no account
-// anywhere — SPEC §12 only introduces a provider once code needs it.
+// The portable core uses Postgres and these contracts for provider services.
+// Local implementations support a complete run without a provider account.
 
 export type Clock = { now(): Date }
 

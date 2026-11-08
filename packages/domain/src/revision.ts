@@ -1,7 +1,4 @@
-// Revision compare-and-set, stated once (SPEC §5). v1 proved the scheme; v2
-// generalizes it to every head. The database performs the actual comparison
-// inside the command transaction — these are the types and the conflict shape
-// the editor renders, so no surface invents its own conflict handling.
+// The database compares revisions in the command transaction. All editor surfaces share this conflict shape.
 import { DomainError } from './errors.ts'
 
 export type Revision = number

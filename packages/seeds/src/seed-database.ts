@@ -126,11 +126,7 @@ try {
       'Seeded home page',
     ])
 
-    // The seed publishes through the same gate as everything else, which means
-    // running the same evaluator (SPEC §6.8). It used to call the two-argument
-    // form and inherit a default "nothing found" report — the seed asserting on
-    // the product's behalf that it had checked, having checked nothing. If the
-    // demo content is ever not publishable, this is the right place to find out.
+    // Use the same readiness evaluator as editor publication so invalid seed content fails here.
     const readiness = await evaluateVersionReadiness(client, draft.version_id, 'member')
     if (!readiness.ok) {
       throw new Error(`the seeded home page is not publishable: ${readiness.blocking.map(f => f.rule).join(', ')}`)
