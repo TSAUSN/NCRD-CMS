@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { CHECKED_CLEAN, TestDatabase } from '@cms/schema/testing'
 import { heroContent, seedScenario, type Scenario } from '@cms/schema/fixtures'
-import { SITE_CHOICE_SQL, SITE_SUMMARY_SQL } from '../src/lib/site-summary.ts'
+import { SITE_CHOICE_SQL, SITE_DIRECTORY_SQL, SITE_SUMMARY_SQL } from '../src/lib/site-summary.ts'
 
 type Summary = {
   id: string
@@ -163,7 +163,11 @@ it('keeps the picker scoped, orders identical names consistently, and excludes a
   expect(await choices(s.editorA)).toEqual([siteA])
   expect(await choices(s.editorB)).toEqual([siteB])
   expect(await choices(s.disabled)).toEqual([])
-  await db.as('owner', c => c.query("UPDATE sites SET status='archived',archived_at=now() WHERE id=$1", [s.siteB]))
+  await db.as('owner', c => c.query('UPDATE sites SET archived_at=now() WHERE id=$1', [s.siteB]))
+  for (const query of [SITE_SUMMARY_SQL, SITE_DIRECTORY_SQL]) {
+    const rows = (await db.asUser(s.superAdmin, client => client.query<{ id: string; status: string }>(query))).rows
+    expect(rows.find(row => row.id === s.siteB)?.status).toBe('archived')
+  }
   expect(await choices(s.superAdmin)).toEqual([siteA])
   expect(await choices(s.editorB)).toEqual([])
 })

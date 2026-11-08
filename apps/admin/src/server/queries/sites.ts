@@ -1,7 +1,7 @@
 import 'server-only'
 import { nationalTemplateEligibilitySql } from '../../lib/site-installation-settings.ts'
 import { asUser } from '@cms/platform'
-import { SITE_DIRECTORY_SQL, SITE_SUMMARY_SQL } from '../../lib/site-summary.ts'
+import { SITE_DIRECTORY_SQL, SITE_STATUS_SQL, SITE_SUMMARY_SQL } from '../../lib/site-summary.ts'
 import { REVIEWED_PAGE_CANVAS_SQL } from '../../lib/reviewed-page-canvas.ts'
 import { UUID_SHAPE } from './record-id.ts'
 
@@ -60,7 +60,7 @@ export function getSite(userId: string, siteId: string): Promise<SiteRow | null>
     async client =>
       (
         await client.query<SiteRow>(
-          `SELECT s.id, s.slug, s.name, s.status, s.staging_hostname, s.initial_release_required, s.chapters_enabled, ${nationalTemplateEligibilitySql()} AS national_template, EXISTS(SELECT 1 FROM collections c WHERE c.site_id=s.id AND c.reader_key='stories') AS has_stories, EXISTS(SELECT 1 FROM collections c WHERE c.site_id=s.id AND c.reader_key IS DISTINCT FROM 'stories') AS has_content_lists, CASE WHEN app.has_site_access(s.id) THEN app.site_hosting_status(s.id) ELSE 'ready' END AS hosting_status,
+          `SELECT s.id, s.slug, s.name, ${SITE_STATUS_SQL} AS status, s.staging_hostname, s.initial_release_required, s.chapters_enabled, ${nationalTemplateEligibilitySql()} AS national_template, EXISTS(SELECT 1 FROM collections c WHERE c.site_id=s.id AND c.reader_key='stories') AS has_stories, EXISTS(SELECT 1 FROM collections c WHERE c.site_id=s.id AND c.reader_key IS DISTINCT FROM 'stories') AS has_content_lists, CASE WHEN app.has_site_access(s.id) THEN app.site_hosting_status(s.id) ELSE 'ready' END AS hosting_status,
         (SELECT d.hostname_normalized FROM domains d WHERE d.site_id=s.id AND d.kind='primary'
           AND d.status='live' AND d.removed_at IS NULL LIMIT 1) AS primary_hostname,
         EXISTS(SELECT 1 FROM pages p WHERE p.site_id=s.id AND p.published_version_id IS NOT NULL

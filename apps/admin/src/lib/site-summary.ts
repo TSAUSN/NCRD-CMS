@@ -13,10 +13,14 @@ export const ORDINARY_PAGE_SQL = `p.slug NOT LIKE 'stories/%' AND NOT EXISTS (
     AND sv.values->>'story_url'=CASE WHEN p.slug='' THEN '/' ELSE '/'||p.slug END
 )`
 
+/** Older restored records can have the archive time without the matching status. */
+export const ACTIVE_SITE_SQL = "s.status <> 'archived' AND s.archived_at IS NULL"
+export const SITE_STATUS_SQL = "CASE WHEN s.archived_at IS NOT NULL THEN 'archived' ELSE s.status END"
+
 export const SITE_CHOICE_SQL = `
   SELECT s.id, s.name
     FROM sites s
-   WHERE s.status <> 'archived'
+   WHERE ${ACTIVE_SITE_SQL}
    ORDER BY ${SITE_ORDER_SQL}, s.slug, s.id`
 
 const HOME_PREVIEW_COLUMN = `(SELECT COALESCE(
@@ -43,7 +47,7 @@ const HOME_PREVIEW_COLUMN = `(SELECT COALESCE(
 
 function siteSummarySql(includeHomePreview: boolean) {
   return `
-  SELECT s.id, s.slug, s.name, s.status, s.staging_hostname, s.kind, EXISTS(SELECT 1 FROM collections c WHERE c.site_id=s.id AND c.reader_key='stories') AS has_stories, CASE WHEN app.has_site_access(s.id) THEN app.site_hosting_status(s.id) ELSE 'ready' END AS hosting_status,
+  SELECT s.id, s.slug, s.name, ${SITE_STATUS_SQL} AS status, s.staging_hostname, s.kind, EXISTS(SELECT 1 FROM collections c WHERE c.site_id=s.id AND c.reader_key='stories') AS has_stories, CASE WHEN app.has_site_access(s.id) THEN app.site_hosting_status(s.id) ELSE 'ready' END AS hosting_status,
          (SELECT d.hostname_normalized FROM domains d WHERE d.site_id=s.id AND d.kind='primary'
            AND d.status='live' AND d.removed_at IS NULL LIMIT 1) AS primary_hostname,
          count(p.id) FILTER (WHERE ${ORDINARY_PAGE_SQL}) AS page_count,

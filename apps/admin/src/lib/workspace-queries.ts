@@ -4,6 +4,7 @@ import { asUser } from '@cms/platform'
 import { NavTree } from '@cms/schema'
 import { pageInMenu } from './page-details.ts'
 import type { PageRow } from './queries.ts'
+import { ACTIVE_SITE_SQL } from './site-summary.ts'
 export type WorkspacePage = PageRow & {
   site_id: string
   site_name: string
@@ -24,7 +25,7 @@ const WORKSPACE_PAGES_SQL = `SELECT p.id,p.site_id,s.name AS site_name,p.slug,p.
    COALESCE((SELECT nv.tree FROM navigations n JOIN navigation_versions nv ON nv.id=n.draft_version_id WHERE n.site_id=p.site_id),'[]'::jsonb) END AS menu_tree
  FROM pages p JOIN sites s ON s.id=p.site_id LEFT JOIN page_versions v ON v.id=p.draft_version_id
  LEFT JOIN page_versions live ON live.id=p.published_version_id
- WHERE p.archived_at IS NULL AND s.status<>'archived' AND ($1::uuid IS NULL OR p.site_id=$1)
+ WHERE p.archived_at IS NULL AND ${ACTIVE_SITE_SQL} AND ($1::uuid IS NULL OR p.site_id=$1)
  ORDER BY p.sort_index,p.slug<>'',p.title`
 export async function listWorkspacePages(userId: string, siteId: string | null = null): Promise<WorkspacePage[]> {
   const pages = await asUser({ userId }, async client => {
