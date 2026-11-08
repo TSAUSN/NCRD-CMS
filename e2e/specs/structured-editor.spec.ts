@@ -9,7 +9,8 @@
 // nothing in this file re-does that. Everything below goes through a running
 // admin, a real click, and, where it matters at the end, a raw socket with no
 // browser involved in it at all.
-import { expect, test, type Page } from '@playwright/test'
+import { expect, type Page } from '@playwright/test'
+import { test } from './fixtures/shared-demo-home.ts'
 import { SEED_SECTION_DEFS } from '@cms/seeds'
 import {
   addSectionButton,
@@ -310,7 +311,6 @@ test.describe('a structured rich-text field', () => {
     await signIn(page, 'root@example.test')
     await page.goto(editorUrl)
     let editor = await openRichText(page)
-    const seeded = await (await richTextSource(page)).inputValue()
     await page.getByRole('button', { name: 'Visual' }).click()
 
     const exactText = 'Family & Services < >\u00a0 entity-like &amp;'
@@ -338,15 +338,12 @@ test.describe('a structured rich-text field', () => {
     await live.goto(STAGING_ORIGIN)
     await expect(live.locator('.cms-section--prose strong')).toHaveText(exactText)
     await live.close()
-
-    // Restore the shared fixture through the same public path this test proves.
-    await page.reload()
-    await openRichText(page)
-    await (await richTextSource(page)).fill(seeded)
-    await publish(page)
   })
 
-  test('goes through the same loop, and reaches the live page as the sanitizer leaves it', async ({ page }) => {
+  test('goes through the same loop, and reaches the live page as the sanitizer leaves it', async ({
+    page,
+    sharedDemoHome,
+  }) => {
     const editorUrl = page.url()
     await openRichText(page)
     await expect(page.getByRole('button', { name: 'HTML source', exact: true })).toHaveCount(0)
@@ -355,7 +352,6 @@ test.describe('a structured rich-text field', () => {
     await page.goto(editorUrl)
     await openRichText(page)
     const source = await richTextSource(page)
-    const seeded = await source.inputValue()
 
     const stamp = Date.now()
     // `em` is on the rich-text allowlist and carries no attributes, so an
@@ -389,20 +385,9 @@ test.describe('a structured rich-text field', () => {
     expect(live.body).toContain('<em>some more</em>')
     expect(live.body).not.toContain('onclick')
     expect(live.body).not.toContain('data-cms-slot')
-
-    // Put the shared fixture back the way the seed left it. The specs that run
-    // after this one read the seeded body off the live page, and a fixture this
-    // file quietly rewrote would fail them for a reason that has nothing to do
-    // with what they are testing.
-    //
-    // Reloaded first so the second publish is confirmed by a notice this test
-    // has not already seen — the success notice stays on screen, so waiting for
-    // it twice in one page would be waiting for the first one again.
-    await page.reload()
-    await openRichText(page)
-    await (await richTextSource(page)).fill(seeded)
-    await publish(page)
-    expect((await fetchPublic()).body).toContain('<strong>immutable definition version</strong>')
+    sharedDemoHome.afterRestore(async () => {
+      expect((await fetchPublic()).body).toContain('<strong>immutable definition version</strong>')
+    })
   })
 
   test('is rendered again where the author is looking, without taking the selection away', async ({ page }) => {
@@ -443,7 +428,7 @@ test.describe('a structured rich-text field', () => {
 test.describe('a structured link and image', () => {
   // The seeded page does not use this definition, so the section arrives the
   // way a person's does: out of the library, with marked sample values.
-  test('are filled in through the inspector’s own controls and reach the page as markup', async ({ page }) => {
+  test('are filled in through the inspector’s own controls and reach the page as markup', async ({ page, browser }) => {
     expect(STRUCTURED.has('feature')).toBe(true)
     // Appended after whatever the shared page holds, rather than assuming an
     // earlier spec left exactly the seeded three behind.
@@ -453,72 +438,72 @@ test.describe('a structured link and image', () => {
     // Adding structure belongs to an admin; the Editor still fills the fields.
     await expect(addSectionButton(page)).toHaveCount(0)
     const editorUrl = page.url()
-    await page.context().clearCookies()
-    await signIn(page, 'root@example.test')
-    await page.goto(editorUrl)
-    await addSectionButton(page).click()
-    const dialog = page.getByRole('dialog', { name: 'Add a section' })
-    await dialog
-      .getByTestId('library-card-feature')
-      .getByRole('button', { name: /^Add .+ (?:after|before|between|as the first)/ })
-      .click()
-    await dialog.getByRole('button', { name: 'Add this section', exact: true }).click()
-    await saveDraft(page)
-    await page.context().clearCookies()
-    await signIn(page, 'editor@example.test')
-    await page.goto(editorUrl)
-    await tree(page).locator('.tree-label').nth(FEATURE).click()
-    await expect(
-      page.getByRole('complementary', { name: 'Inspector' }).getByRole('heading', { name: 'Feature card' }),
-    ).toBeVisible()
+    const adminContext = await browser.newContext({ baseURL: new URL(editorUrl).origin })
+    try {
+      const admin = await adminContext.newPage()
+      await signIn(admin, 'root@example.test')
+      await admin.goto(editorUrl, { waitUntil: 'domcontentloaded' })
+      await addSectionButton(admin).click()
+      const dialog = admin.getByRole('dialog', { name: 'Add a section' })
+      await dialog
+        .getByTestId('library-card-feature')
+        .getByRole('button', { name: /^Add .+ (?:after|before|between|as the first)/ })
+        .click()
+      await dialog.getByRole('button', { name: 'Add this section', exact: true }).click()
+      await saveDraft(admin)
+      await page.reload({ waitUntil: 'domcontentloaded' })
+      await tree(page).locator('.tree-label').nth(FEATURE).click()
+      await expect(
+        page.getByRole('complementary', { name: 'Inspector' }).getByRole('heading', { name: 'Feature card' }),
+      ).toBeVisible()
 
-    // A link is a label and a destination and an image is a source and a
-    // description, so neither is a string the canvas could be handed: both are
-    // two boxes in the inspector and the renderer's own policy on the page.
-    const stamp = Date.now()
-    // A picture from another address is behind its own disclosure; the media
-    // library is the ordinary way to choose one.
-    await page.locator(`#slot-${FEATURE}-picture-src`).locator('xpath=ancestor::details[1]/summary').click()
-    await page.locator(`#slot-${FEATURE}-picture-src`).fill('/pictures/harbour.png')
-    await page.locator(`#slot-${FEATURE}-picture-alt`).fill(`Boats in a harbour ${stamp}`)
-    await page.locator(`[data-inspector-slot="more"]`).getByRole('button', { name: 'Change', exact: true }).click()
-    await page.locator(`#slot-${FEATURE}-more-label`).fill(`Read more ${stamp}`)
-    await page
-      .getByRole('dialog', { name: 'Change link', exact: true })
-      .getByRole('button', { name: 'Website', exact: true })
-      .click()
-    await page.locator(`#slot-${FEATURE}-more-url`).fill('/about')
-    await page
-      .getByRole('dialog', { name: 'Change link', exact: true })
-      .getByRole('button', { name: 'Done', exact: true })
-      .click()
-    await expect(savedState(page)).toHaveText('All changes saved', { timeout: 10_000 })
+      // A link is a label and a destination and an image is a source and a
+      // description, so neither is a string the canvas could be handed: both are
+      // two boxes in the inspector and the renderer's own policy on the page.
+      const stamp = Date.now()
+      // A picture from another address is behind its own disclosure; the media
+      // library is the ordinary way to choose one.
+      await page.locator(`#slot-${FEATURE}-picture-src`).locator('xpath=ancestor::details[1]/summary').click()
+      await page.locator(`#slot-${FEATURE}-picture-src`).fill('/pictures/harbour.png')
+      await page.locator(`#slot-${FEATURE}-picture-alt`).fill(`Boats in a harbour ${stamp}`)
+      await page.locator(`[data-inspector-slot="more"]`).getByRole('button', { name: 'Change', exact: true }).click()
+      await page.locator(`#slot-${FEATURE}-more-label`).fill(`Read more ${stamp}`)
+      await page
+        .getByRole('dialog', { name: 'Change link', exact: true })
+        .getByRole('button', { name: 'Website', exact: true })
+        .click()
+      await page.locator(`#slot-${FEATURE}-more-url`).fill('/about')
+      await page
+        .getByRole('dialog', { name: 'Change link', exact: true })
+        .getByRole('button', { name: 'Done', exact: true })
+        .click()
+      await expect(savedState(page)).toHaveText('All changes saved', { timeout: 10_000 })
 
-    // What the renderer made of them, on the page, with no reload. The image
-    // address names nothing this app serves on purpose: what is being checked
-    // is the markup the author's two boxes produced, not a picture.
-    const feature = canvas(page).locator(`[data-cms-section="${FEATURE}"]`)
-    await expect(feature.locator('img')).toHaveAttribute('src', '/pictures/harbour.png')
-    await expect(feature.locator('img')).toHaveAttribute('alt', `Boats in a harbour ${stamp}`)
-    await expect(feature.locator('a')).toHaveText(`Read more ${stamp}`)
-    await expect(feature.locator('a')).toHaveAttribute('href', '/about')
+      // What the renderer made of them, on the page, with no reload. The image
+      // address names nothing this app serves on purpose: what is being checked
+      // is the markup the author's two boxes produced, not a picture.
+      const feature = canvas(page).locator(`[data-cms-section="${FEATURE}"]`)
+      await expect(feature.locator('img')).toHaveAttribute('src', '/pictures/harbour.png')
+      await expect(feature.locator('img')).toHaveAttribute('alt', `Boats in a harbour ${stamp}`)
+      await expect(feature.locator('a')).toHaveText(`Read more ${stamp}`)
+      await expect(feature.locator('a')).toHaveAttribute('href', '/about')
 
-    // Both fields are marked with the type they were declared as, which is what
-    // every editor surface reads to decide what to offer for them.
-    await expect(feature.locator('[data-cms-slot="picture"]')).toHaveAttribute('data-cms-kind', 'image')
-    await expect(feature.locator('[data-cms-slot="more"]')).toHaveAttribute('data-cms-kind', 'link')
-    await expect(tree(page).locator('.tree-slot', { hasText: 'Picture' })).toHaveCount(1)
+      // Both fields are marked with the type they were declared as, which is what
+      // every editor surface reads to decide what to offer for them.
+      await expect(feature.locator('[data-cms-slot="picture"]')).toHaveAttribute('data-cms-kind', 'image')
+      await expect(feature.locator('[data-cms-slot="more"]')).toHaveAttribute('data-cms-kind', 'link')
+      await expect(tree(page).locator('.tree-slot', { hasText: 'Picture' })).toHaveCount(1)
 
-    // Take it away again: the page this file shares is the seeded three, and
-    // this section was never published, so the live site never saw it.
-    await page.context().clearCookies()
-    await signIn(page, 'root@example.test')
-    await page.goto(editorUrl)
-    await tree(page).locator('.tree-label').nth(FEATURE).click()
-    await deleteSelectedSection(page)
-    await expect(tree(page).locator('.tree-label')).toHaveCount(FEATURE)
-    await expect(savedState(page)).toHaveText('All changes saved', { timeout: 10_000 })
-    await expect(canvas(page).locator('[data-cms-section]')).toHaveCount(FEATURE)
-    expect((await fetchPublic()).body).not.toContain('/pictures/harbour.png')
+      // Verify the admin can remove the unpublished section after the Editor’s save.
+      await admin.reload({ waitUntil: 'domcontentloaded' })
+      await tree(admin).locator('.tree-label').nth(FEATURE).click()
+      await deleteSelectedSection(admin)
+      await expect(tree(admin).locator('.tree-label')).toHaveCount(FEATURE)
+      await expect(savedState(admin)).toHaveText('All changes saved', { timeout: 10_000 })
+      await expect(canvas(admin).locator('[data-cms-section]')).toHaveCount(FEATURE)
+      expect((await fetchPublic()).body).not.toContain('/pictures/harbour.png')
+    } finally {
+      await adminContext.close()
+    }
   })
 })

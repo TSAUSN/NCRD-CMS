@@ -155,16 +155,17 @@ test('Admin Home shows saved attention, immediate authenticated pictures and rec
           await page.evaluate(() => document.fonts.ready)
           expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
           if (account.role === 'superadmin') {
-            const rows = main.locator('[data-attention-site]')
-            expect(await rows.count()).toBeGreaterThan(0)
-            for (const row of await rows.all()) {
-              const copy = await row.locator('strong').evaluate(node => {
-                  const box = node.parentElement!.getBoundingClientRect()
-                  return { width: box.width, bottom: box.bottom }
-                }),
-                action = await row.getByRole('link').boundingBox()
-              expect(copy.width).toBeGreaterThanOrEqual(160)
-              if (width === 390) expect(action!.y).toBeGreaterThanOrEqual(copy.bottom)
+            const rows = await main.locator('[data-attention-site]').evaluateAll(elements =>
+              elements.map(row => {
+                const copy = row.querySelector('strong')!.parentElement!.getBoundingClientRect()
+                const action = row.querySelector('a[href]')!.getBoundingClientRect()
+                return { copyWidth: copy.width, copyBottom: copy.bottom, actionTop: action.top }
+              }),
+            )
+            expect(rows.length).toBeGreaterThan(0)
+            for (const [index, row] of rows.entries()) {
+              expect(row.copyWidth, 'attention row ' + index).toBeGreaterThanOrEqual(160)
+              if (width === 390) expect(row.actionTop, 'attention row ' + index).toBeGreaterThanOrEqual(row.copyBottom)
             }
           }
           await page.screenshot({ path: resolve(folder, account.role + '-' + width + '.png'), animations: 'disabled' })

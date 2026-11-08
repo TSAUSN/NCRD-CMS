@@ -26,7 +26,7 @@ for (const width of [1440, 1024]) {
       await f.client.query('COMMIT')
       await page.setViewportSize({ width, height: 1000 })
       await signIn(page, 'root@example.test')
-      await page.goto('/sites/' + f.site + '/chapters')
+      await page.goto('/sites/' + f.site + '/chapters', { waitUntil: 'domcontentloaded' })
       await page.getByRole('button', { name: 'Detroit Chapter', exact: true }).click()
       const detail = page.getByRole('dialog', { name: 'Detroit Chapter', exact: true })
       await expect(detail.getByText('No chapter editors are assigned.', { exact: true })).toBeVisible()
@@ -57,7 +57,11 @@ for (const width of [1440, 1024]) {
     } finally {
       await f.client.query('ROLLBACK')
       f.client.release()
-      await f.pool.end()
+      try {
+        await f.archive()
+      } finally {
+        await f.pool.end()
+      }
     }
   })
 }
@@ -68,7 +72,7 @@ for (const width of [1440, 1024]) {
     try {
       await page.setViewportSize({ width, height: 1000 })
       await signIn(page, 'root@example.test')
-      await page.goto('/sites/' + f.site + '/chapters')
+      await page.goto('/sites/' + f.site + '/chapters', { waitUntil: 'domcontentloaded' })
       await page.getByRole('button', { name: 'Atlanta Chapter', exact: true }).click()
       await page
         .getByRole('dialog', { name: 'Atlanta Chapter', exact: true })
@@ -104,7 +108,11 @@ for (const width of [1440, 1024]) {
       expect(saved.externalUrl).toBeNull()
     } finally {
       f.client.release()
-      await f.pool.end()
+      try {
+        await f.archive()
+      } finally {
+        await f.pool.end()
+      }
     }
   })
 }
