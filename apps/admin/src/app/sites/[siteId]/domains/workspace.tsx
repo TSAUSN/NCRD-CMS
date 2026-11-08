@@ -3,6 +3,7 @@ import { useEffect, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { ConfirmDialog } from '../../../../components/confirm.tsx'
 import { domainStatusLabel, recordsText, type DomainRow } from '../../../../lib/domains.ts'
+import { reviewTime } from '../../../../lib/review-time.ts'
 import workspace from '../../../../components/workspace.module.css'
 import workspaceFormsStyles from '../../../../components/workspace-styles/workspace-forms.module.css'
 import recordTableStyles from '../../../../components/workspace-styles/record-table.module.css'
@@ -124,9 +125,7 @@ export function DomainWorkspace({
                 ? 'Staging address'
                 : `Redirects to ${row.redirect_hostname}`}
           </p>
-          {row.last_checked_at && (
-            <p className="hint">Last checked: {new Date(row.last_checked_at).toLocaleString()}</p>
-          )}
+          {row.last_checked_at && <p className="hint">Last checked: {reviewTime(row.last_checked_at)}</p>}
           {row.error_detail && !row.removed_at && <p className="notice">{row.error_detail}</p>}
           {!!row.dns_records?.length && !row.removed_at && (
             <>
@@ -224,7 +223,7 @@ export function DomainWorkspace({
               <ol>
                 {row.events.map((event, i) => (
                   <li key={i}>
-                    {domainStatusLabel(event.status)} · {new Date(event.at).toLocaleString()}
+                    {domainStatusLabel(event.status)} · {reviewTime(event.at)}
                     {event.detail ? ` — ${event.detail}` : ''}
                   </li>
                 ))}

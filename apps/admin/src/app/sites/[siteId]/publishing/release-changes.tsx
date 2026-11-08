@@ -1,4 +1,5 @@
 import { releaseGroup, releaseLabel } from '../../../../lib/release-copy.ts'
+import { reviewTime } from '../../../../lib/review-time.ts'
 import { Button, EmptyState, Card, TextLink as Link } from '../../../../components/ui/index.ts'
 import { requestLocalDraftNavigation } from '../../../../components/navigation-guard.ts'
 import styles from './publish.module.css'
@@ -253,7 +254,7 @@ function ReleaseChangeTime({ stamp }: { stamp: ReleaseStamp | undefined }) {
   if (!stamp) return 'Not recorded'
   const date = new Date(stamp.when)
   return (
-    <time dateTime={stamp.when} title={date.toLocaleString()}>
+    <time dateTime={stamp.when} title={reviewTime(stamp.when)}>
       {releaseDay.format(date)}
       <small>{releaseHour.format(date)}</small>
     </time>

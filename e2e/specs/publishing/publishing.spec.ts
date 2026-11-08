@@ -147,6 +147,7 @@ async function fixture() {
 }
 test('revision 8 Publish: grouped choices, visual comparisons, real scheduled release and history', async ({
   page,
+  browser,
 }) => {
   test.setTimeout(120000)
   page.setDefaultTimeout(10000)
@@ -309,6 +310,25 @@ test('revision 8 Publish: a leased worker publishes the reviewed release through
         )
       ).rows[0].count,
     ).toBe(1)
+    const reader = await browser.newContext({ timezoneId: 'Asia/Tokyo' })
+    try {
+      const reopened = await reader.newPage()
+      await signIn(reopened, 'root@example.test')
+      const hydrationErrors: string[] = []
+      reopened.on('pageerror', error => hydrationErrors.push(error.message))
+      await reopened.goto(`/sites/${f.siteId}/publishing?tab=history`)
+      const liveRelease = reopened
+        .getByRole('tabpanel')
+        .getByRole('listitem')
+        .filter({ has: reopened.getByText('Went live', { exact: true }) })
+        .first()
+      await liveRelease.getByRole('button', { name: 'View details', exact: true }).click()
+      await expect(reopened.getByLabel('Selected changes review', { exact: true })).toBeVisible()
+      expect(hydrationErrors).toEqual([])
+      await expect(liveRelease).toContainText('Eastern time')
+    } finally {
+      await reader.close()
+    }
     await page.goto(`/sites/${f.siteId}/publishing?tab=history`)
     await page
       .getByRole('tabpanel')

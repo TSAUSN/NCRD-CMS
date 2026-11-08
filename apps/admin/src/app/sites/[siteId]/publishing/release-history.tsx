@@ -1,4 +1,5 @@
 import { releaseLabel } from '../../../../lib/release-copy.ts'
+import { reviewTime } from '../../../../lib/review-time.ts'
 import { Button, EmptyState, Badge } from '../../../../components/ui/index.ts'
 import { requestLocalDraftNavigation } from '../../../../components/navigation-guard.ts'
 import recordTableStyles from '../../../../components/workspace-styles/record-table.module.css'
@@ -37,8 +38,7 @@ export function ReleaseHistory({ model }: { model: ReleaseWorkspaceModel }) {
                       </p>
                     </div>
                     <small>
-                      {new Date(release.finished_at ?? release.created_at).toLocaleString()} ·{' '}
-                      {release.actorLabel ?? 'Another editor'}
+                      {reviewTime(release.finished_at ?? release.created_at)} · {release.actorLabel ?? 'Another editor'}
                     </small>
                   </div>
                   <Button

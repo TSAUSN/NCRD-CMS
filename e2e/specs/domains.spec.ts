@@ -58,6 +58,7 @@ async function runConnection(hostname: string) {
 }
 test('connects a pair, shows exact DNS records, verifies public routing and revokes it before cleanup', async ({
   page,
+  browser,
 }) => {
   await signIn(page, 'root@example.test')
   const sitePath = await page
@@ -81,6 +82,25 @@ test('connects a pair, shows exact DNS records, verifies public routing and revo
   await runConnection(host)
   await page.getByRole('button', { name: 'Refresh domain status' }).click()
   await expect(domain.getByText('Live', { exact: true })).toBeVisible()
+  const reader = await browser.newContext({ timezoneId: 'Asia/Tokyo' })
+  try {
+    const reopened = await reader.newPage()
+    await signIn(reopened, 'root@example.test')
+    const errors: string[] = []
+    reopened.on('pageerror', error => errors.push(error.message))
+    await reopened.goto(sitePath + '/domains')
+    const connected = reopened.getByRole('region', { name: `Domain ${host}`, exact: true })
+    await connected.getByRole('button', { name: 'Remove domain', exact: true }).click()
+    const confirm = reopened.getByRole('alertdialog')
+    await expect(confirm).toBeVisible()
+    await confirm.getByRole('button', { name: 'Cancel', exact: true }).click()
+    expect(errors).toEqual([])
+    await expect(connected).toContainText(/Last checked: .+ Eastern time/)
+    await connected.getByText('Status history', { exact: true }).click()
+    await expect(connected.locator('details ol').first()).toContainText('Eastern time')
+  } finally {
+    await reader.close()
+  }
   await expect(domain.getByRole('table')).toContainText(`_cms-verify.${host}`)
   const folder = resolve('../.r8-progress/admin-domains')
   await mkdir(folder, { recursive: true })
