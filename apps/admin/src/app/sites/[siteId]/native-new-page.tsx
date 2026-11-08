@@ -1,11 +1,9 @@
 'use client'
-import { useEffect, useRef, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 import { CORE_PAGE_TEMPLATES } from '@cms/seeds/core-templates'
 import { Button, Dialog, Field } from '../../../components/ui/index.ts'
 import { IconPlus } from '../../../components/icons.tsx'
-import { useNavigationGuard, requestClientNavigation } from '../../../components/navigation-guard.ts'
-import { createNativePage } from './page-list-actions.ts'
+import { useNativeNewPageDraft, type NewPageSource } from './use-native-new-page-draft.ts'
 import workspaceFormsStyles from '../../../components/workspace-styles/workspace-forms.module.css'
 import recordTableStyles from '../../../components/workspace-styles/record-table.module.css'
 import siteSummaryStyles from '../../../components/workspace-styles/site-summary.module.css'
@@ -13,7 +11,6 @@ import selectionControlsStyles from '../../../components/workspace-styles/select
 import listInspectorStyles from '../../../components/workspace-styles/list-inspector.module.css'
 import ownedStyles from './native-new-page-styles.module.css'
 import styles from './native-new-page.module.css'
-type PageChoice = { id: string; title: string; revision: string }
 export function NativeNewPage({
   siteId,
   canAdmin,
@@ -22,11 +19,11 @@ export function NativeNewPage({
 }: {
   siteId: string
   canAdmin: boolean
-  pages: PageChoice[]
+  pages: NewPageSource[]
   asTask?: boolean
 }) {
-  const [open, setOpen] = useState(false),
-    [notice, setNotice] = useState('')
+  const [open, setOpen] = useState(false)
+  const [notice, setNotice] = useState('')
   const openDialog = () => {
     setNotice('')
     setOpen(true)
@@ -68,118 +65,40 @@ function NewPageDialog({
 }: {
   siteId: string
   canAdmin: boolean
-  pages: PageChoice[]
+  pages: NewPageSource[]
   onClose: () => void
   onCreated: (message: string) => void
 }) {
-  const router = useRouter(),
-    [title, setTitle] = useState(''),
-    [description, setDescription] = useState(''),
-    [address, setAddress] = useState<string | null>(null),
-    [changeAddress, setChangeAddress] = useState(false),
-    [start, setStart] = useState<'blank' | 'design' | 'copy' | 'website'>('blank'),
-    [template, setTemplate] = useState('landing'),
-    [sourceId, setSourceId] = useState(pages[0]?.id ?? ''),
-    [url, setUrl] = useState(''),
-    [inMenu, setInMenu] = useState(false),
-    [parentId, setParentId] = useState(''),
-    [pending, setPending] = useState(false),
-    [error, setError] = useState(''),
-    [unknown, setUnknown] = useState(false),
-    busy = useRef(false),
-    created = useRef<{ pageId: string | null } | null>(null),
-    titleInput = useRef<HTMLInputElement>(null)
-  const slug =
-      address ??
-      title
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-|-$/g, ''),
-    dirty = Boolean(title || description || address || url || parentId || inMenu || start !== 'blank'),
-    valid = Boolean(
-      title.trim() &&
-      title.length <= 90 &&
-      description.length <= 155 &&
-      (start === 'website' ? /^https:\/\//.test(url) : slug && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) &&
-      (start !== 'copy' || sourceId),
-    )
-  async function save() {
-    if (created.current) return { ok: true }
-    if (busy.current) return { ok: false, message: 'Wait for the draft to finish saving.' }
-    if (unknown)
-      return { ok: false, message: 'Check Pages before trying again. The previous result could not be confirmed.' }
-    if (!valid) {
-      const message = 'Complete the title and destination before saving.'
-      setError(message)
-      return { ok: false, message }
-    }
-    busy.current = true
-    setPending(true)
-    setError('')
-    try {
-      const source = pages.find(page => page.id === sourceId),
-        result = await createNativePage({
-          siteId,
-          title,
-          address: slug,
-          description,
-          start,
-          template,
-          sourceId,
-          sourceRevision: source?.revision,
-          url,
-          inMenu,
-          parentId: parentId || null,
-        })
-      if (!result.ok) {
-        setError(result.message)
-        if (result.message.includes('could not be confirmed')) setUnknown(true)
-        return { ok: false, message: result.message }
-      }
-      created.current = { pageId: result.pageId }
-      return { ok: true }
-    } catch {
-      const message = 'The draft could not be confirmed. Check Pages before trying again.'
-      setUnknown(true)
-      setError(message)
-      return { ok: false, message }
-    } finally {
-      busy.current = false
-      setPending(false)
-    }
-  }
-  useNavigationGuard(() => ({
-    dirty: dirty && !created.current,
-    pending: pending || busy.current,
-    draft: {
-      label: start === 'website' ? 'New menu link' : 'New page',
-      saved: false,
-      saveDraft: save,
-      discard: () => {
-        created.current = { pageId: null }
-      },
-    },
-  }))
-  useEffect(() => {
-    const warn = (event: BeforeUnloadEvent) => {
-      if ((dirty && !created.current) || busy.current) event.preventDefault()
-    }
-    window.addEventListener('beforeunload', warn)
-    return () => window.removeEventListener('beforeunload', warn)
-  }, [dirty])
-  const close = () => {
-    if (requestClientNavigation(onClose)) onClose()
-  }
-  async function submit() {
-    const saved = await save()
-    if (saved.ok) {
-      const id = created.current?.pageId
-      if (!id) onCreated('Website link added to the menu draft. There is no page to edit. Review it in Publish.')
-      onClose()
-      if (id) router.push('/pages/' + id)
-      else router.refresh()
-    }
-  }
+  const [changeAddress, setChangeAddress] = useState(false)
+  const {
+    title,
+    setTitle,
+    description,
+    setDescription,
+    address,
+    setAddress,
+    start,
+    setStart,
+    template,
+    setTemplate,
+    sourceId,
+    setSourceId,
+    url,
+    setUrl,
+    inMenu,
+    setInMenu,
+    parentId,
+    setParentId,
+    pending,
+    error,
+    unknown,
+    titleInput,
+    slug,
+    valid,
+    close,
+    submit,
+    checkPages,
+  } = useNativeNewPageDraft({ siteId, pages, onClose, onCreated })
   return (
     <Dialog
       title="New page"
@@ -392,14 +311,7 @@ function NewPageDialog({
         )}
         {error && <p role="alert">{error}</p>}
         {unknown && (
-          <Button
-            variant="secondary"
-            onClick={() => {
-              created.current = { pageId: null }
-              onClose()
-              router.refresh()
-            }}
-          >
+          <Button variant="secondary" onClick={checkPages}>
             Check Pages
           </Button>
         )}
