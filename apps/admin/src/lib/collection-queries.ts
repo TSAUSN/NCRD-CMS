@@ -302,15 +302,15 @@ export function getCollectionContent(
 }
 
 /** Release comparisons use one rail and one entry batch for all requested lists. */
-export function getCollectionSelections(userId: string, siteId: string, requestedIds: readonly string[]) {
+export function getReleaseCollectionSelections(userId: string, siteId: string, requestedIds: readonly string[]) {
   if (!requestedIds.length) return Promise.resolve(new Map<string, SelectedCollection>())
   return asUser({ userId }, async client => {
     const { rows, collections } = await readCollectionRail(client, siteId)
     const byId = new Map(rows.map(row => [row.id, row]))
     const selected = new Map(
       requestedIds.flatMap(id => {
-        // A missing requested list uses the same first visible list as the workspace.
-        const row = byId.get(id) ?? rows[0]
+        // A release names an exact list; the workspace’s first-list fallback does not apply.
+        const row = byId.get(id)
         return row?.draft_schema_version_id ? [[id, row] as const] : []
       }),
     )

@@ -1,7 +1,7 @@
 import 'server-only'
 import { STORY_SECTORS, STORY_REGIONS } from '@cms/seeds/sawso-stories'
 import { asUser } from '@cms/platform'
-import { getCollectionSelections } from './collection-queries.ts'
+import { getReleaseCollectionSelections } from './collection-queries.ts'
 import { changedCells, readableReleaseValue, storyEntryPresentation, type ReleasePresentation } from './release-copy.ts'
 import type { ReleaseItem } from './releases.ts'
 
@@ -20,7 +20,7 @@ export async function addReleaseListPresentations(
   }
   if (!itemsByCollection.size) return
   const collectionIds = [...itemsByCollection.keys()]
-  const collections = await getCollectionSelections(userId, siteId, collectionIds)
+  const collections = await getReleaseCollectionSelections(userId, siteId, collectionIds)
   for (const [id, selected] of itemsByCollection) {
     const list = collections.get(id)
     if (!list) continue

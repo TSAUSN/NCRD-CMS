@@ -13,7 +13,7 @@ vi.mock('@cms/platform', async original => ({
   asUser: (identity: { userId: string }, run: Parameters<TestDatabase['asUser']>[1]) =>
     mapErrors(() => db.asUser(identity.userId, run)),
 }))
-import { getCollectionWorkspace } from '../src/lib/collection-queries.ts'
+import { getCollectionWorkspace, getReleaseCollectionSelections } from '../src/lib/collection-queries.ts'
 import { createSiteFromSetupInTransaction } from '../src/lib/site-creation.ts'
 import { publishStarterFixture } from './site-fixture.ts'
 
@@ -55,6 +55,11 @@ it('counts actual record changes rather than new version IDs from saving the who
     ])
     await client.query('SELECT app.publish_collection_entries($1,1)', [collectionId])
   })
+  const missingId = randomUUID()
+  const exact = await getReleaseCollectionSelections(scenario.editorA, siteId, [missingId, collectionId])
+  expect([...exact.keys()]).toEqual([collectionId])
+  expect(exact.get(collectionId)?.id).toBe(collectionId)
+  expect(await getReleaseCollectionSelections(scenario.editorB, siteId, [collectionId])).toEqual(new Map())
   const read = () => getCollectionWorkspace(scenario.editorA, siteId, collectionId)
   let state = await read()
   expect(state.selected!.changedEntries).toBe(0)
