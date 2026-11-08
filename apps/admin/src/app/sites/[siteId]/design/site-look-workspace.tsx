@@ -299,35 +299,59 @@ export function SiteLookWorkspace({
         </div>
       </div>
       {publishOpen && (
-        <Dialog
-          title={publishLabel}
+        <SiteLookPublishDialog
+          original={original}
+          label={publishLabel}
+          affected={affected}
           onClose={() => setPublishOpen(false)}
-          footer={
-            <>
-              <Button variant="secondary" onClick={() => setPublishOpen(false)}>
-                Cancel
-              </Button>
-              <Button variant="publish" onClick={() => router.push('/sites/' + siteId + '/publishing?area=site-look')}>
-                {original ? 'Review menu & footer changes' : 'Review site look changes'}
-              </Button>
-            </>
-          }
-        >
-          <p>
-            {original
-              ? 'The saved menu and footer changes affect these pages. Review the checks and publish them together.'
-              : 'The saved colours, fonts and buttons affect these pages. Review the checks before publishing.'}
-          </p>
-          <ul>
-            {affected.map(page => (
-              <li key={page.id}>
-                {page.title}
-                {!page.published ? ' · draft' : ''}
-              </li>
-            ))}
-          </ul>
-        </Dialog>
+          onReview={() => router.push('/sites/' + siteId + '/publishing?area=site-look')}
+        />
       )}
     </div>
+  )
+}
+
+function SiteLookPublishDialog({
+  original,
+  label,
+  affected,
+  onClose,
+  onReview,
+}: {
+  original: boolean
+  label: string
+  affected: GlobalElementsWorkspace['pages']
+  onClose: () => void
+  onReview: () => void
+}) {
+  return (
+    <Dialog
+      title={label}
+      onClose={onClose}
+      footer={
+        <>
+          <Button variant="secondary" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button variant="publish" onClick={onReview}>
+            {original ? 'Review menu & footer changes' : 'Review site look changes'}
+          </Button>
+        </>
+      }
+    >
+      <p>
+        {original
+          ? 'The saved menu and footer changes affect these pages. Review the checks and publish them together.'
+          : 'The saved colours, fonts and buttons affect these pages. Review the checks before publishing.'}
+      </p>
+      <ul>
+        {affected.map(page => (
+          <li key={page.id}>
+            {page.title}
+            {!page.published ? ' · draft' : ''}
+          </li>
+        ))}
+      </ul>
+    </Dialog>
   )
 }
