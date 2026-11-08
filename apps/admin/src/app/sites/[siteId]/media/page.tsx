@@ -5,6 +5,7 @@ import { AppShell } from '../../../../components/app-shell.tsx'
 import { navigationFor } from '../../../../components/nav.ts'
 import { PageHeader, siteAreaTabs } from '../../../../components/shell.tsx'
 import { authoringRights, getSite, roleLabel } from '../../../../lib/queries.ts'
+import { DEFAULT_MEDIA_LIBRARY_QUERY } from '../../../../lib/media-library-defaults.ts'
 import { listMediaLibrary } from '../../../../lib/media-organization-repository.ts'
 import { currentSession } from '../../../../lib/session.ts'
 import { MediaWorkspace } from './media-workspace.tsx'
@@ -18,18 +19,8 @@ export default async function MediaLibraryPage({ params }: { params: Promise<{ s
   const site = await getSite(session.principal.userId, siteId)
   if (!site) notFound()
 
-  const initialQuery = {
-    search: '',
-    status: 'all' as const,
-    scope: 'all' as const,
-    folder: '',
-    tag: '',
-    sort: 'newest' as const,
-    page: 1,
-    pageSize: 24,
-  }
   const [library, role, rights] = await Promise.all([
-    listMediaLibrary(session.principal.userId, site.id, initialQuery),
+    listMediaLibrary(session.principal.userId, site.id, DEFAULT_MEDIA_LIBRARY_QUERY),
     roleLabel(session.principal.userId),
     authoringRights(session.principal.userId, site.id),
   ])
@@ -57,6 +48,7 @@ export default async function MediaLibraryPage({ params }: { params: Promise<{ s
           />
         )}
         <MediaWorkspace
+          key={site.id}
           native={!site.original_design}
           siteId={site.id}
           initialResult={library}

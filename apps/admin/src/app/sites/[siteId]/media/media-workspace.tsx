@@ -16,7 +16,6 @@ import {
   bulkDeleteMedia,
   bulkOrganizeMedia,
   deleteMedia,
-  fetchMediaLibrary,
   mediaUploadStatus,
   MediaRequestError,
   restoreMedia,
@@ -35,17 +34,8 @@ import { MediaNotices } from './media-notices.tsx'
 import { MediaLifecycleDialogs, type MediaLifecycleAction } from './media-lifecycle-dialogs.tsx'
 import { MediaLibraryBrowser, type MediaLibraryView } from './media-library-browser.tsx'
 import { normalizedTags } from './media-tags.ts'
-
-const INITIAL_QUERY: MediaLibraryQuery = {
-  search: '',
-  status: 'all',
-  scope: 'all',
-  folder: '',
-  tag: '',
-  sort: 'newest',
-  page: 1,
-  pageSize: 24,
-}
+import { useMediaLibraryResults } from './use-media-library-results.ts'
+import { DEFAULT_MEDIA_LIBRARY_QUERY } from '../../../../lib/media-library-defaults.ts'
 
 export function MediaWorkspace({
   siteId,
@@ -60,14 +50,12 @@ export function MediaWorkspace({
   canManage: boolean
   canManageShared: boolean
 }) {
-  const [result, setResult] = useState(initialResult)
   const [metadataBusy, setMetadataBusy] = useState(false),
     [metadataChanged, setMetadataChanged] = useState(false),
     [detailTab, setDetailTab] = useState<'details' | 'usage'>('details')
   const metadataLock = useRef(false),
     metadataDirty = useRef(false)
   const [droppedFile, setDroppedFile] = useState<File | null>(null)
-  const [query, setQuery] = useState<MediaLibraryQuery>(INITIAL_QUERY)
   const [searchInput, setSearchInput] = useState('')
   const [view, setView] = useState<MediaLibraryView>('grid')
   const [foldersExpanded, setFoldersExpanded] = useState(true)
@@ -90,8 +78,6 @@ export function MediaWorkspace({
   const [working, setWorking] = useState(false)
   const mutationInFlight = useRef(false)
   const [refreshNeeded, setRefreshNeeded] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
   const [trackedUpload, setTrackedUpload] = useState<MediaUploadReceipt | null>(null)
   const [uploadState, setUploadState] = useState<MediaUploadIntentStatus | null>(null)
   const [pollCycle, setPollCycle] = useState(0)
@@ -99,8 +85,8 @@ export function MediaWorkspace({
   const [bulkFolder, setBulkFolder] = useState('')
   const [bulkTags, setBulkTags] = useState('')
   const [bulkBaseline, setBulkBaseline] = useState({ folder: '', tags: '' })
-  const requestSequence = useRef(0)
-  const activeQuery = useRef(query)
+  const { result, query, setQuery, loading, setLoading, error, setError, refresh, rememberAssets } =
+    useMediaLibraryResults(siteId, initialResult, setSelectedId)
 
   const selected = result.assets.find(asset => asset.id === selectedId) ?? null
   const checked = result.assets.filter(asset => checkedIds.has(asset.id))
@@ -161,25 +147,6 @@ export function MediaWorkspace({
     }, 300)
     return () => clearTimeout(timer)
   }, [searchInput, query.search, bulkDirty, bulkFolder, bulkTags, checkedIds])
-
-  useEffect(() => {
-    activeQuery.current = query
-    const sequence = ++requestSequence.current
-    setLoading(true)
-    fetchMediaLibrary(siteId, query)
-      .then(next => {
-        if (sequence !== requestSequence.current) return
-        setResult(next)
-        setSelectedId(current => (next.assets.some(asset => asset.id === current) ? current : null))
-      })
-      .catch(reason => {
-        if (sequence === requestSequence.current)
-          setError(reason instanceof MediaRequestError ? reason.message : 'The media library could not be refreshed.')
-      })
-      .finally(() => {
-        if (sequence === requestSequence.current) setLoading(false)
-      })
-  }, [query, siteId])
 
   useEffect(() => {
     if (!trackedUpload) return
@@ -274,17 +241,6 @@ export function MediaWorkspace({
     else apply()
   }
 
-  async function refresh() {
-    const sequence = ++requestSequence.current
-    try {
-      const next = await fetchMediaLibrary(siteId, activeQuery.current)
-      if (sequence === requestSequence.current) setResult(next)
-      return next
-    } finally {
-      if (sequence === requestSequence.current) setLoading(false)
-    }
-  }
-
   function canEdit(asset: MediaAsset) {
     return asset.status === 'ready' && (asset.scope === 'site' || canManageShared)
   }
@@ -308,13 +264,6 @@ export function MediaWorkspace({
         return next
       }),
     )
-  }
-
-  function rememberAssets(assets: MediaAsset[]) {
-    setResult(current => ({
-      ...current,
-      assets: current.assets.map(asset => assets.find(changed => changed.id === asset.id) ?? asset),
-    }))
   }
 
   async function refreshLibraryOnly() {
@@ -562,7 +511,7 @@ export function MediaWorkspace({
     const clear = () => {
       setCheckedIds(new Set())
       setSearchInput('')
-      setQuery(INITIAL_QUERY)
+      setQuery(DEFAULT_MEDIA_LIBRARY_QUERY)
     }
     if (native || bulkDirty) leaveDetails(clear)
     else clear()
