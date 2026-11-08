@@ -1,27 +1,25 @@
 import { test, expect } from '@playwright/test'
 import { randomUUID } from 'node:crypto'
-import { Pool } from 'pg'
 import { mkdir } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { signIn } from '../helpers.ts'
+import { siteLookFixture } from '../fixtures/r8-site-look.ts'
 test('page editor saves before Schedule, reviews only that page, and keeps publication private until the timer', async ({
   page,
   browser,
 }, info) => {
   test.setTimeout(120000)
-  const pool = new Pool({
-      connectionString: `postgres://cms:cms@127.0.0.1:${process.env['E2E_PG_PORT'] ?? '54329'}/${process.env['E2E_DATABASE'] ?? 'cms_e2e'}`,
-    }),
+  // Publication readiness covers the site's existing visitor state. Use this
+  // test's own clean site so another spec's live samples cannot require consent.
+  const { pool, site: siteId } = await siteLookFixture(),
     c = await pool.connect(),
     worker = 'page-schedule-' + randomUUID(),
     folder = resolve('../.r8-progress/round3/page-schedule/' + info.project.name)
   await mkdir(folder, { recursive: true })
-  let pageId = '',
-    siteId = ''
+  let pageId = ''
   try {
     await c.query('BEGIN')
     const actor = (await c.query("SELECT id FROM app_users WHERE email='editor@example.test'")).rows[0]!.id
-    siteId = (await c.query("SELECT id FROM sites WHERE slug='demo'")).rows[0]!.id
     await c.query('SET LOCAL ROLE cms_authenticated_user')
     await c.query("SELECT set_config('app.user_id',$1,true)", [actor])
     const def = (
@@ -130,6 +128,7 @@ test('page editor saves before Schedule, reviews only that page, and keeps publi
     await c.query('ROLLBACK').catch(() => {})
     await pool.query('DELETE FROM job_heartbeats WHERE worker_id=$1', [worker])
     if (pageId) await pool.query('UPDATE pages SET archived_at=now() WHERE id=$1', [pageId])
+    await pool.query("UPDATE sites SET status='archived',archived_at=now() WHERE id=$1", [siteId])
     c.release()
     await pool.end()
   }
