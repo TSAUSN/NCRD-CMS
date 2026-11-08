@@ -45,6 +45,8 @@ export async function importReferenceMedia(input: {
   readSource: (file: string) => Promise<Uint8Array>
   previous?: readonly ImportedReferenceImage[]
   onItem?: (rows: ImportedReferenceImage[]) => Promise<void>
+  /** Default to the real operator machine; deterministic callers can supply a sampler. */
+  machineLoad?: () => number
 }) {
   const site = await getSite(input.userId, input.siteId)
   if (!site || site.original_design) throw new Error('Choose an available native site for these reference photos.')
@@ -76,7 +78,8 @@ export async function importReferenceMedia(input: {
     origin = process.env['ADMIN_ORIGIN'] ?? 'http://localhost:3000',
     rows: ImportedReferenceImage[] = []
   for (const image of input.images) {
-    if (loadavg()[0]! > 12) throw new Error('Machine load is above12. Import paused before the next image.')
+    if ((input.machineLoad?.() ?? loadavg()[0]!) > 12)
+      throw new Error('Machine load is above 12. Import paused before the next image.')
     const existing = await asUser(
       { userId: input.userId },
       async client =>

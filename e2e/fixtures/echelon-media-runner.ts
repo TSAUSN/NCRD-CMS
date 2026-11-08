@@ -32,11 +32,14 @@ try {
       ).rows[0]!.n,
     before = await count(),
     checkpoints: EchelonImportedImage[][] = []
+  const transfer = { userId: actor, siteId: site, images: [image], readSource: async () => bytes }
+  // The operator guard remains active. Exercise its refusal and use a fixed idle
+  // machine for the upload behavior, so unrelated processes cannot break the fixture.
+  await assert.rejects(importEchelonReferenceMedia({ ...transfer, machineLoad: () => 13 }), /Machine load is above 12/)
+  assert.equal(await count(), before)
   const imported = await importEchelonReferenceMedia({
-    userId: actor,
-    siteId: site,
-    images: [image],
-    readSource: async () => bytes,
+    ...transfer,
+    machineLoad: () => 1,
     onItem: async rows => {
       checkpoints.push(rows)
     },
@@ -45,10 +48,8 @@ try {
   assert.equal(await count(), before + 1)
   assert.equal(checkpoints.length, 1)
   const repeated = await importEchelonReferenceMedia({
-    userId: actor,
-    siteId: site,
-    images: [image],
-    readSource: async () => bytes,
+    ...transfer,
+    machineLoad: () => 1,
     previous: imported,
   })
   assert.deepEqual(repeated, imported)
