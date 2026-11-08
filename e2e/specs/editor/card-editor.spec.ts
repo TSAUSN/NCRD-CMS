@@ -117,12 +117,19 @@ test('selecting any native card section preserves the real page geometry and kee
                 const hit = node.ownerDocument.elementFromPoint(box.left + position.x + dx!, box.top + position.y + dy!)
                 return hit?.closest('[data-cms-section]') === node && !hit.closest(blocked)
               })
-              if (safe) return position
+              if (safe) return { position, width: box.width, height: box.height }
             }
           }
           throw new Error('No visible section background to select')
         })
-        await root.click({ position: sectionPoint })
+        const renderedBox = await root.boundingBox()
+        expect(renderedBox).not.toBeNull()
+        await root.click({
+          position: {
+            x: sectionPoint.position.x * (renderedBox!.width / sectionPoint.width),
+            y: sectionPoint.position.y * (renderedBox!.height / sectionPoint.height),
+          },
+        })
         await expect
           .poll(() =>
             root.evaluate(
