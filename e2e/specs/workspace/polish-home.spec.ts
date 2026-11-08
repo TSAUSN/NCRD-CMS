@@ -1,9 +1,33 @@
-import { test, expect } from '@playwright/test'
+import { test, expect, type Locator } from '@playwright/test'
 import { mkdir } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { siteLookFixture } from '../fixtures/r8-site-look.ts'
 import { echelonFixture } from '../fixtures/echelon.ts'
 import { signIn } from '../helpers.ts'
+
+async function expectVisibleIcons(nav: Locator) {
+  await expect
+    .poll(() =>
+      nav.getByRole('link').evaluateAll(links =>
+        links.flatMap(link => {
+          const icons = link.querySelectorAll('svg')
+          const icon = icons[0]
+          const box = icon?.getBoundingClientRect()
+          if (
+            icons.length === 1 &&
+            icon &&
+            box &&
+            box.width > 0 &&
+            box.height > 0 &&
+            getComputedStyle(icon).visibility === 'visible'
+          )
+            return []
+          return [link.getAttribute('aria-label') ?? link.textContent ?? 'Unlabelled navigation link']
+        }),
+      ),
+    )
+    .toEqual([])
+}
 
 test.use({ actionTimeout: 15000 })
 test('Home matches the Main card hierarchy and shared navigation keeps visible icons across site screens', async ({
@@ -63,11 +87,7 @@ test('Home matches the Main card hierarchy and shared navigation keeps visible i
       expect(boxes[0]!.height).toBe(boxes[1]!.height)
       if (width === 1440) expect(boxes[2]!.y).toBe(boxes[0]!.y)
       else expect(boxes[2]!.y).toBeGreaterThan(boxes[0]!.y)
-      for (const link of await sidebar
-        .getByRole('navigation', { name: 'Sections of the CMS', exact: true })
-        .getByRole('link')
-        .all())
-        await expect(link.locator('svg')).toBeVisible()
+      await expectVisibleIcons(sidebar.getByRole('navigation', { name: 'Sections of the CMS', exact: true }))
     }
     const tools = main
       .locator('details')
@@ -106,7 +126,7 @@ test('Home matches the Main card hierarchy and shared navigation keeps visible i
       if (labels) expect(current).toEqual(labels)
       else labels = current
       expect(current.filter(label => common.includes(label))).toEqual(common)
-      for (const link of await nav.getByRole('link').all()) await expect(link.locator('svg')).toBeVisible()
+      await expectVisibleIcons(nav)
       await capture('shared-' + route)
     }
     expect(
