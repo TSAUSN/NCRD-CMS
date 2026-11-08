@@ -4,6 +4,7 @@ import { Button, Disclosure, Drawer, Field } from '../../../../components/ui/ind
 import recordTableStyles from '../../../../components/workspace-styles/record-table.module.css'
 import listInspectorStyles from '../../../../components/workspace-styles/list-inspector.module.css'
 import type { MediaAsset } from '../../../../lib/media-library.ts'
+import { reviewTime } from '../../../../lib/review-time.ts'
 import type { EntryState } from './collection-entries.ts'
 import { entryIdentity } from './collection-record-display.ts'
 import styles from './lists.module.css'
@@ -64,7 +65,7 @@ export function CollectionEntryDrawer({
       <p className={recordTableStyles.meta}>Save keeps this item private until you publish the list.</p>
       {opened.editedAt && (
         <p className={recordTableStyles.meta}>
-          Updated {new Date(opened.editedAt).toLocaleString('en-US')} ·{' '}
+          Updated {reviewTime(opened.editedAt)} ·{' '}
           <span title={opened.editedBy ?? undefined}>{opened.editedBy ?? 'Not saved yet'}</span>
         </p>
       )}

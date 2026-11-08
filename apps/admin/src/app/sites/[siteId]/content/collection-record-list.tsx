@@ -11,6 +11,7 @@ import type { useReorderableList } from '../../../../components/ui/use-reorderab
 import reorderStyles from '../../../../components/ui/reorderable-list.module.css'
 import selectionControlsStyles from '../../../../components/workspace-styles/selection-controls.module.css'
 import type { MediaAsset } from '../../../../lib/media-library.ts'
+import { reviewDate, reviewTime } from '../../../../lib/review-time.ts'
 import type { EntryState } from './collection-entries.ts'
 import { entryChanged, entryIdentity, recordImage, recordSubtitle, recordTitle } from './collection-record-display.ts'
 import styles from './lists.module.css'
@@ -169,17 +170,11 @@ export function CollectionRecordList({
                     data-secondary
                     className={ownedStyles.recordValue}
                     title={
-                      (entry.editedBy ?? 'Not saved yet') +
-                      (entry.editedAt ? ' · ' + new Date(entry.editedAt).toLocaleString('en-US') : '')
+                      (entry.editedBy ?? 'Not saved yet') + (entry.editedAt ? ' · ' + reviewTime(entry.editedAt) : '')
                     }
                   >
                     {entry.editedBy ?? 'Not saved yet'}
-                    {entry.editedAt &&
-                      ' · ' +
-                        new Date(entry.editedAt).toLocaleDateString('en-US', {
-                          month: 'short',
-                          day: 'numeric',
-                        })}
+                    {entry.editedAt && ' · ' + reviewDate(entry.editedAt)}
                   </small>
                 </button>
                 {canEdit && (
