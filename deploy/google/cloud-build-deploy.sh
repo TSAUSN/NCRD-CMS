@@ -13,7 +13,12 @@ state=/workspace/release
 mkdir -p "$state"
 cloud=(gcloud --quiet --project="$PROJECT_ID")
 
-json_field() { python3 -c "import json,sys; d=json.load(sys.stdin); print(eval(sys.argv[1], {}, {'d': d}))" "$1"; }
+# The slim Cloud SDK image has no system python3; gcloud always bundles one.
+python() {
+  [[ -n "${PYTHON:-}" ]] || PYTHON="$(command -v python3 || gcloud info --format='value(basic.python_location)')"
+  "$PYTHON" "$@"
+}
+json_field() { python -c "import json,sys; d=json.load(sys.stdin); print(eval(sys.argv[1], {}, {'d': d}))" "$1"; }
 
 serving_revision() {
   "${cloud[@]}" run services describe "$1" --region="$REGION" --format=json | json_field \
@@ -32,8 +37,19 @@ healthy() {
     "$ADMIN") role=admin ;;
     *) return 0 ;; # Worker health stays private; Ready is checked by the update.
   esac
-  curl --fail --silent --show-error --max-time 45 --retry 3 --retry-all-errors "$(service_url "$service")/health" |
-    json_field "d.get('status')=='ok' and d.get('role')=='$role' and d.get('version')=='$version' or exit(1)" >/dev/null
+  # Python, not curl: the step image guarantees only gcloud and its bundled Python.
+  python - "$(service_url "$service")/health" "$role" "$version" <<'PY'
+import json, sys, time, urllib.request
+url, role, version = sys.argv[1:]
+for attempt in range(4):
+    try:
+        with urllib.request.urlopen(url, timeout=45) as response:
+            d = json.load(response)
+        sys.exit(0 if d.get('status') == 'ok' and d.get('role') == role and d.get('version') == version else 1)
+    except (OSError, ValueError):
+        time.sleep(5)
+sys.exit(1)
+PY
 }
 route() {
   "${cloud[@]}" run services update-traffic "$1" --region="$REGION" --to-revisions="$2=100" --format=none
