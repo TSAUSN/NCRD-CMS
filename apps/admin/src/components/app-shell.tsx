@@ -4,6 +4,7 @@ import type { ReactNode } from 'react'
 import { IconMenu } from './icons.tsx'
 import type { NavGroup } from './nav.ts'
 import { AppSidebar } from './app-sidebar.tsx'
+import { BrandMark } from './brand-mark.tsx'
 import { useSidebarLayout } from './use-sidebar-layout.ts'
 import styles from './app-shell.module.css'
 
@@ -64,9 +65,7 @@ export function AppShell({
             <IconMenu size={20} />
           </button>
           <span className="app-topbar-title">
-            <span className={styles.wordmark} aria-hidden="true">
-              C
-            </span>
+            <BrandMark className={styles.wordmark} />
             NCRD CMS
           </span>
         </div>

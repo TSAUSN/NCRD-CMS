@@ -178,15 +178,9 @@
 }
 .wordmark {
   flex: none;
-  display: grid;
-  place-items: center;
-  width: var(--admin-mark-size);
+  display: block;
+  width: auto;
   height: var(--admin-mark-size);
-  border-radius: var(--radius-control);
-  background: var(--primary);
-  color: var(--text-on-dark);
-  font-weight: var(--weight-semibold);
-  font-size: var(--text-help);
 }
 .brand {
   padding-block: var(--space-3);

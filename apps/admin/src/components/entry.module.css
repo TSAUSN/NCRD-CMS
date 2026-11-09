@@ -24,16 +24,11 @@
   align-items: center;
   gap: var(--space-3);
 }
-.brand > span {
-  display: grid;
-  place-items: center;
-  width: var(--target-small);
-  height: var(--target-small);
-  border-radius: var(--radius-control);
-  background: var(--primary);
-  color: var(--text-on-dark);
-  font-size: var(--text-body);
-  font-weight: var(--weight-semibold);
+.mark {
+  flex: none;
+  display: block;
+  width: auto;
+  height: var(--entry-control);
 }
 .brand strong {
   font-size: var(--text-emphasis);

@@ -26,6 +26,7 @@ import { COMMAND_SEARCH_EVENT } from '../lib/command-search-model.ts'
 import { siteInitials } from '../lib/site-initials.ts'
 import { Button, IconButton } from './ui/button.tsx'
 import { Menu } from './ui/menu.tsx'
+import { BrandMark } from './brand-mark.tsx'
 import { navItemIsCurrent, type NavGroup, type NavIconName } from './nav.ts'
 import { useSidebarData } from './sidebar-data.tsx'
 import type { SidebarLayout } from './use-sidebar-layout.ts'
@@ -167,9 +168,7 @@ export function AppSidebar({
       inert={compact && !open ? true : undefined}
     >
       <div className={`sidebar-brand ${styles.brand}`}>
-        <span className={styles.wordmark} aria-hidden="true">
-          C
-        </span>
+        <BrandMark className={styles.wordmark} />
         <span className="sidebar-brandtext">
           <strong>NCRD CMS</strong>
           <span>Content manager</span>

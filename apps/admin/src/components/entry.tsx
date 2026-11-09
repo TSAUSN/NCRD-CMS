@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { BrandMark } from './brand-mark.tsx'
 import styles from './entry.module.css'
 
 export function EntryPanel({
@@ -16,7 +17,7 @@ export function EntryPanel({
     <main id="main" className={styles.entry}>
       <section className={styles.card}>
         <div className={styles.brand}>
-          <span aria-hidden="true">C</span>
+          <BrandMark className={styles.mark} />
           <strong>NCRD CMS</strong>
         </div>
         {beforeHeading}
