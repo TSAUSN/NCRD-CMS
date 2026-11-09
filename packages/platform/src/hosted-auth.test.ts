@@ -254,3 +254,36 @@ describe('hosted email verification', () => {
     await expect(down.verify('token')).rejects.toEqual(new AuthServiceError('unavailable'))
   })
 })
+
+describe('Microsoft sign-in through the Supabase Azure provider', () => {
+  it('is off unless explicitly enabled', () => {
+    expect(createSupabaseAuthProvider(config).microsoftSignInUrl).toBeUndefined()
+    const env = {
+      NODE_ENV: 'production',
+      SUPABASE_URL: config.url,
+      SUPABASE_PUBLISHABLE_KEY: config.publishableKey,
+      ADMIN_ORIGIN: config.adminOrigin,
+    }
+    expect(configuredAuthProvider(env).microsoftSignInUrl).toBeUndefined()
+    expect(configuredAuthProvider({ ...env, AUTH_MICROSOFT_ENABLED: 'true' }).microsoftSignInUrl).toBeTypeOf('function')
+  })
+  it('sends only the challenge and returns to the admin confirmation page', () => {
+    const proof = createSignInProof()
+    const url = new URL(
+      createSupabaseAuthProvider({ ...config, microsoftSignIn: true }).microsoftSignInUrl!(proof.challenge),
+    )
+    expect(url.origin + url.pathname).toBe('https://project.supabase.co/auth/v1/authorize')
+    expect(Object.fromEntries(url.searchParams)).toEqual({
+      provider: 'azure',
+      scopes: 'email',
+      redirect_to: 'https://cms.example.test/auth/confirm',
+      code_challenge: proof.challenge,
+      code_challenge_method: 's256',
+    })
+    expect(url.toString()).not.toContain(proof.verifier)
+  })
+  it('refuses a malformed challenge', () => {
+    const provider = createSupabaseAuthProvider({ ...config, microsoftSignIn: true })
+    expect(() => provider.microsoftSignInUrl!('not a challenge')).toThrow(AuthServiceError)
+  })
+})

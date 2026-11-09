@@ -23,7 +23,10 @@ export default async function ConfirmSignIn({
     ? browserProof
     : !code && tokenHash && /^[a-zA-Z0-9_-]{20,512}$/.test(tokenHash) && type === 'email'
   return (
-    <EntryPanel heading="Confirm sign-in" lede="Continue to sign in using the link from your email.">
+    <EntryPanel
+      heading="Confirm sign-in"
+      lede={code ? 'Continue to finish signing in.' : 'Continue to sign in using the link from your email.'}
+    >
       {valid ? (
         <form action={completeSignIn}>
           {codeValid ? (

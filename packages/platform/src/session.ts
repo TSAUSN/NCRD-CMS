@@ -28,6 +28,8 @@ export type AuthProvider = {
   requestSignIn?(email: string, options?: { invited: boolean; codeChallenge?: string }): Promise<void>
   completeSignIn?(tokenHash: string): Promise<VerifiedAuthSession | null>
   completeCodeSignIn?(code: string, verifier: string): Promise<VerifiedAuthSession | null>
+  /** Where to send the browser to sign in with the organization's Microsoft account, when enabled. */
+  microsoftSignInUrl?(codeChallenge: string): string
   refresh?(refreshToken: string): Promise<VerifiedAuthSession | null>
   revoke?(token: string): Promise<void>
 }

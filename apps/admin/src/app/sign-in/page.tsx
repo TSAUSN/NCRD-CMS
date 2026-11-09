@@ -1,4 +1,4 @@
-import { signIn } from '../actions/auth.ts'
+import { signIn, signInWithMicrosoft } from '../actions/auth.ts'
 import { authProvider, currentSession } from '../../lib/session.ts'
 import { redirect } from 'next/navigation'
 import { EntryPanel } from '../../components/entry.tsx'
@@ -20,8 +20,11 @@ export default async function SignInPage({
   if (reauth !== '1' && !error && !sent && (await currentSession())) redirect('/')
   let local = false
   let configured = true
+  let microsoft = false
   try {
-    local = authProvider().name === 'local'
+    const provider = authProvider()
+    local = provider.name === 'local'
+    microsoft = typeof provider.microsoftSignInUrl === 'function'
   } catch {
     configured = false
   }
@@ -95,6 +98,14 @@ export default async function SignInPage({
         <p className="notice notice-error" role="alert">
           Sign-in has not been set up for this installation yet. Contact the person who manages this CMS.
         </p>
+      )}
+      {microsoft && (
+        <>
+          <form action={signInWithMicrosoft}>
+            <SignInButton label="Sign in with Microsoft" />
+          </form>
+          <p className={styles.help}>Or get a sign-in link by email:</p>
+        </>
       )}
       <form action={signIn}>
         <div className="field">

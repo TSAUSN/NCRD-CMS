@@ -75,6 +75,28 @@ export async function signIn(formData: FormData): Promise<void> {
   redirect(destination)
 }
 
+/** Starts Microsoft sign-in. The browser proof cookie ties the returned code to this browser. */
+export async function signInWithMicrosoft(): Promise<void> {
+  let destination = '/sign-in?error=unavailable'
+  try {
+    const provider = authProvider()
+    if (provider.microsoftSignInUrl) {
+      const proof = createSignInProof()
+      ;(await cookies()).set(SIGN_IN_PROOF_COOKIE, proof.verifier, {
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: true,
+        path: '/',
+        maxAge: 600,
+      })
+      destination = provider.microsoftSignInUrl(proof.challenge)
+    }
+  } catch {
+    destination = '/sign-in?error=unavailable'
+  }
+  redirect(destination)
+}
+
 export async function completeSignIn(formData: FormData): Promise<void> {
   const tokenHash = String(formData.get('tokenHash') ?? '')
   const code = String(formData.get('authCode') ?? '')

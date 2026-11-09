@@ -13,6 +13,32 @@ change (Chromium/WebKit plus database tests), so it remains under the maintainer
 explicit exception. It grants product access, not sign-in. Do not use it to invite
 people during Friday's Super-admin-only test.
 
+## Turn on "Sign in with Microsoft" (through Supabase)
+
+The admin can offer Microsoft sign-in through the Supabase project's Azure
+provider. It is off unless `AUTH_MICROSOFT_ENABLED=true` is set on the Admin
+service. Email links keep working alongside it.
+
+1. **Microsoft (IT):** in Microsoft Entra ID, register an app for the
+   organization's accounts only (single tenant). Add the Supabase callback
+   `https://<project>.supabase.co/auth/v1/callback` as a Web redirect URI.
+   Create a client secret. Under Token configuration, add the optional claims
+   `email` and `xms_edov` to the ID token, so Supabase treats the email as
+   verified; the CMS rejects unverified emails.
+2. **Supabase:** Authentication → Providers → Azure. Turn it on and enter the
+   application (client) ID, the secret and the tenant URL
+   `https://login.microsoftonline.com/<tenant-id>`. Keep
+   `<admin origin>/auth/confirm` in the allowed redirect URLs.
+3. **Admin service:** set `AUTH_MICROSOFT_ENABLED=true` and deploy.
+4. **Check:** sign in with Microsoft as an existing CMS user. Someone with a
+   Microsoft account but no CMS access sees the no-access message; access still
+   comes only from a Super admin adding them.
+
+A person's CMS account is matched by verified email the first time they sign
+in. If Supabase already has an email-link account for the same address, check
+that Supabase links the Microsoft sign-in to it rather than creating a second
+user.
+
 ## Compare the choices
 
 Estimates below are engineering judgments for one maintainer, including focused

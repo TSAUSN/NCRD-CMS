@@ -36,6 +36,7 @@ export function configuredAuthProvider(env: Environment = process.env): AuthProv
     url: env['SUPABASE_URL'] ?? '',
     publishableKey: env['SUPABASE_PUBLISHABLE_KEY'] ?? '',
     adminOrigin: env['ADMIN_ORIGIN'] ?? '',
+    microsoftSignIn: env['AUTH_MICROSOFT_ENABLED'] === 'true',
   })
 }
 
@@ -93,6 +94,8 @@ export function createSupabaseAuthProvider(
     url: string
     publishableKey: string
     adminOrigin: string
+    /** Offer "Sign in with Microsoft" through the project's Azure provider. */
+    microsoftSignIn?: boolean
   },
   fetcher: typeof fetch = fetch,
 ): AuthProvider {
@@ -249,6 +252,23 @@ export function createSupabaseAuthProvider(
         return null
       return verifiedSession(await request('/token?grant_type=pkce', { auth_code: code, code_verifier: verifier }))
     },
+    // Microsoft returns the browser to the same confirmation page as an email
+    // link, with a one-time code that completeCodeSignIn exchanges.
+    ...(config.microsoftSignIn
+      ? {
+          microsoftSignInUrl(codeChallenge: string) {
+            if (!/^[a-zA-Z0-9_-]{43}$/.test(codeChallenge)) throw new AuthServiceError('unavailable')
+            const params = new URLSearchParams({
+              provider: 'azure',
+              scopes: 'email',
+              redirect_to: `${adminOrigin}/auth/confirm`,
+              code_challenge: codeChallenge,
+              code_challenge_method: 's256',
+            })
+            return `${origin}/auth/v1/authorize?${params}`
+          },
+        }
+      : {}),
     async refresh(refreshToken) {
       if (!refreshToken || refreshToken.length > 3800 || /\s/.test(refreshToken)) return null
       return verifiedSession(await request('/token?grant_type=refresh_token', { refresh_token: refreshToken }))
