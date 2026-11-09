@@ -1,77 +1,114 @@
+import { randomUUID } from 'node:crypto'
 import { readFile } from 'node:fs/promises'
-import { expect, test } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
+import { Client } from 'pg'
 import { signIn, canvas } from './helpers.ts'
 import { rawRequest } from './http.ts'
 import { DEFAULT_THEME_TOKENS } from '@cms/schema'
+import { e2eTarget } from '../test-target.ts'
 
-test('exports an authored site and imports a private draft copy with its content', async ({ page }) => {
-  test.setTimeout(120_000)
-  page.setDefaultTimeout(10_000)
-  const failures: string[] = []
-  page.on('pageerror', error => failures.push(error.message))
-  await signIn(page, 'root@example.test')
-  await page.goto('/sites/new')
-  const slug = `portable-${Date.now()}`,
-    name = 'Portable content example'
-  await page.getByLabel('Site name', { exact: true }).fill(name)
-  await page.getByLabel('Short address', { exact: true }).fill(slug)
-  for (let step = 0; step < 4; step++) await page.getByRole('button', { name: 'Continue', exact: true }).click()
-  await page.getByRole('button', { name: 'Create site', exact: true }).click()
-  await expect(page.getByText('Your new site is private until you publish it.', { exact: false })).toBeVisible()
-  const sourceId = page.url().match(/\/sites\/([^/?]+)/)![1]!
-  await page.getByRole('link', { name: 'Settings', exact: true }).click()
-  await page.getByRole('link', { name: 'Advanced', exact: true }).click()
-  const downloadPromise = page.waitForEvent('download', { timeout: 10_000 })
-  await page.getByRole('button', { name: 'Download content archive', exact: true }).click()
-  const download = await downloadPromise,
-    file = await download.path()
-  expect(file).not.toBeNull()
-  const bytes = await readFile(file!),
-    archive = JSON.parse(bytes.toString('utf8'))
-  expect(archive.format).toBe('cms-site-content')
-  expect(archive.version).toBe(1)
-  expect(archive.content.pages.length).toBeGreaterThan(0)
-  expect(
-    archive.content.page_versions.some((version: { content: { values: Record<string, string> }[] }) =>
-      version.content.some(section => section.values['heading'] === name),
-    ),
-  ).toBe(true)
-  await page.goto('/sites/import')
-  await page
-    .getByLabel('Content archive (.json, up to 64 MB)')
-    .setInputFiles({ name: 'content.json', mimeType: 'application/json', buffer: bytes })
-  await expect(page.getByRole('heading', { name: 'Review this import', exact: true })).toBeVisible()
-  await page.getByLabel('New site name', { exact: true }).fill('Imported content example')
-  await page.getByLabel('New short address', { exact: true }).fill(`${slug}-copy`)
-  await page.getByRole('button', { name: 'Create private draft copy', exact: true }).click()
-  await expect(page.getByText('Your site content was imported as private drafts.', { exact: true })).toBeVisible()
-  await page.getByRole('link', { name: 'Open imported site', exact: true }).click()
-  await expect(page).toHaveURL(/\/sites\/[0-9a-f-]+$/)
-  const targetId = page.url().match(/\/sites\/([^/?]+)/)![1]!
-  expect(targetId).not.toBe(sourceId)
-  await expect(page.getByRole('heading', { level: 1, name: /^Imported content example/ })).toBeVisible()
-  expect((await rawRequest({ host: `${slug}-copy.staging.localhost`, path: '/' })).status).toBe(404)
-  await page.getByRole('link', { name: 'Settings', exact: true }).click()
-  await page.getByRole('link', { name: 'Advanced', exact: true }).click()
-  const redownloadPromise = page.waitForEvent('download', { timeout: 10_000 })
-  await page.getByRole('button', { name: 'Download content archive', exact: true }).click()
-  const redownload = await redownloadPromise
-  const copy = JSON.parse(await readFile((await redownload.path())!, 'utf8'))
-  expect(
-    copy.content.pages.every((row: { published_version_id: string | null }) => row.published_version_id === null),
-  ).toBe(true)
-  expect(copy.content.page_versions.length).toBe(archive.content.page_versions.length)
-  for (const workspace of ['design', 'navigation', 'global-elements']) {
-    expect((await page.goto(`/sites/${targetId}/${workspace}`))?.status()).toBe(200)
-    await expect(page.getByText('Not published yet', { exact: true })).toBeVisible()
-    if (workspace !== 'navigation')
-      await expect(page.getByRole('button', { name: 'Revert to live', exact: true })).toBeDisabled()
-  }
-  await page.goto(`/sites/${targetId}`)
-  await page.locator('table[aria-label="Pages"] tbody tr td:first-child a').first().click()
-  await expect(canvas(page).locator('h1')).toContainText(name)
-  expect(failures).toEqual([])
+const portabilityTest = test.extend<{ sourceSlug: string }>({
+  sourceSlug: [
+    async ({}, use) => {
+      const slug = 'portable-' + randomUUID().slice(0, 12)
+      try {
+        await use(slug)
+      } finally {
+        const { host, port, database } = e2eTarget()
+        const client = new Client({ connectionString: `postgres://cms:cms@${host}:${port}/${database}` })
+        await client.connect()
+        try {
+          await client.query(
+            "UPDATE sites SET status='archived',archived_at=now() WHERE slug=ANY($1::text[]) AND archived_at IS NULL",
+            [[slug, slug + '-copy']],
+          )
+        } finally {
+          await client.end()
+        }
+      }
+    },
+    { auto: true },
+  ],
 })
+
+async function readyArchiveInput(page: Page) {
+  const input = page.getByLabel('Content archive (.json, up to 64 MB)', { exact: true })
+  // The field stays disabled while the browser reads a saved import setup.
+  // setInputFiles can assign a file even before an ordinary user can choose it.
+  await expect(input).toBeEnabled()
+  return input
+}
+
+portabilityTest(
+  'exports an authored site and imports a private draft copy with its content',
+  async ({ page, sourceSlug: slug }) => {
+    test.setTimeout(120_000)
+    page.setDefaultTimeout(10_000)
+    const failures: string[] = []
+    page.on('pageerror', error => failures.push(error.message))
+    await signIn(page, 'root@example.test')
+    await page.goto('/sites/new')
+    const name = 'Portable content example'
+    await page.getByLabel('Site name', { exact: true }).fill(name)
+    await page.getByLabel('Short address', { exact: true }).fill(slug)
+    for (let step = 0; step < 4; step++) await page.getByRole('button', { name: 'Continue', exact: true }).click()
+    await page.getByRole('button', { name: 'Create site', exact: true }).click()
+    await expect(page.getByText('Your new site is private until you publish it.', { exact: false })).toBeVisible()
+    const sourceId = page.url().match(/\/sites\/([^/?]+)/)![1]!
+    await page.getByRole('link', { name: 'Settings', exact: true }).click()
+    await page.getByRole('link', { name: 'Advanced', exact: true }).click()
+    const downloadPromise = page.waitForEvent('download', { timeout: 10_000 })
+    await page.getByRole('button', { name: 'Download content archive', exact: true }).click()
+    const download = await downloadPromise,
+      file = await download.path()
+    expect(file).not.toBeNull()
+    const bytes = await readFile(file!),
+      archive = JSON.parse(bytes.toString('utf8'))
+    expect(archive.format).toBe('cms-site-content')
+    expect(archive.version).toBe(1)
+    expect(archive.content.pages.length).toBeGreaterThan(0)
+    expect(
+      archive.content.page_versions.some((version: { content: { values: Record<string, string> }[] }) =>
+        version.content.some(section => section.values['heading'] === name),
+      ),
+    ).toBe(true)
+    await page.goto('/sites/import')
+    await (
+      await readyArchiveInput(page)
+    ).setInputFiles({ name: 'content.json', mimeType: 'application/json', buffer: bytes })
+    await expect(page.getByRole('heading', { name: 'Review this import', exact: true })).toBeVisible()
+    await page.getByLabel('New site name', { exact: true }).fill('Imported content example')
+    await page.getByLabel('New short address', { exact: true }).fill(`${slug}-copy`)
+    await page.getByRole('button', { name: 'Create private draft copy', exact: true }).click()
+    await expect(page.getByText('Your site content was imported as private drafts.', { exact: true })).toBeVisible()
+    await page.getByRole('link', { name: 'Open imported site', exact: true }).click()
+    await expect(page).toHaveURL(/\/sites\/[0-9a-f-]+$/)
+    const targetId = page.url().match(/\/sites\/([^/?]+)/)![1]!
+    expect(targetId).not.toBe(sourceId)
+    await expect(page.getByRole('heading', { level: 1, name: /^Imported content example/ })).toBeVisible()
+    expect((await rawRequest({ host: `${slug}-copy.staging.localhost`, path: '/' })).status).toBe(404)
+    await page.getByRole('link', { name: 'Settings', exact: true }).click()
+    await page.getByRole('link', { name: 'Advanced', exact: true }).click()
+    const redownloadPromise = page.waitForEvent('download', { timeout: 10_000 })
+    await page.getByRole('button', { name: 'Download content archive', exact: true }).click()
+    const redownload = await redownloadPromise
+    const copy = JSON.parse(await readFile((await redownload.path())!, 'utf8'))
+    expect(
+      copy.content.pages.every((row: { published_version_id: string | null }) => row.published_version_id === null),
+    ).toBe(true)
+    expect(copy.content.page_versions.length).toBe(archive.content.page_versions.length)
+    for (const workspace of ['design', 'navigation', 'global-elements']) {
+      expect((await page.goto(`/sites/${targetId}/${workspace}`))?.status()).toBe(200)
+      await expect(page.getByText('Not published yet', { exact: true })).toBeVisible()
+      if (workspace !== 'navigation')
+        await expect(page.getByRole('button', { name: 'Revert to live', exact: true })).toBeDisabled()
+    }
+    await page.goto(`/sites/${targetId}`)
+    await page.locator('table[aria-label="Pages"] tbody tr td:first-child a').first().click()
+    await expect(canvas(page).locator('h1')).toContainText(name)
+    expect(failures).toEqual([])
+  },
+)
 
 test('keeps content import unavailable to ordinary editors and rejects setup files clearly', async ({ page }) => {
   await signIn(page, 'editor@example.test')
@@ -79,7 +116,9 @@ test('keeps content import unavailable to ordinary editors and rejects setup fil
   await page.context().clearCookies()
   await signIn(page, 'root@example.test')
   await page.goto('/sites/import')
-  await page.getByLabel('Content archive (.json, up to 64 MB)').setInputFiles({
+  await (
+    await readyArchiveInput(page)
+  ).setInputFiles({
     name: 'setup.json',
     mimeType: 'application/json',
     buffer: Buffer.from(JSON.stringify({ name: 'A wizard setup', version: 1 })),
@@ -91,8 +130,6 @@ test('keeps content import unavailable to ordinary editors and rejects setup fil
 test('keeps failed exports in Settings and downloads successfully after media recovery', async ({ page }) => {
   test.setTimeout(45_000)
   page.setDefaultTimeout(10_000)
-  const { Client } = await import('pg')
-  const { randomUUID } = await import('node:crypto')
   const client = new Client({
     connectionString: `postgres://cms:cms@${process.env['E2E_PG_HOST'] ?? '127.0.0.1'}:${process.env['E2E_PG_PORT'] ?? '54329'}/${process.env['E2E_DATABASE'] ?? 'cms_e2e'}`,
   })
