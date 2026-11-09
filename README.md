@@ -31,6 +31,7 @@ the product and its acceptance checks.
 
 ## Start here
 
+- **Read the handbook:** open [docs/handbook.html](docs/handbook.html) in a browser. It is one readable page covering what the CMS is, how it works, where the code lives, how to run and deploy it, known issues and its history.
 - **Run it:** `pnpm install`, then `pnpm demo` (details below).
 - **How do I…?** The [handbook index](docs/handbook/INDEX.md) maps everyday tasks to step-by-step guides.
 - **How it is built:** [docs/architecture.md](docs/architecture.md).

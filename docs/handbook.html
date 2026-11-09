@@ -1,0 +1,717 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NCRD CMS Handbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+/* Layout: a technical manual. Sticky chapter rail on the left, one chapter visible at a time, reading column ~68ch. */
+:root {
+  --paper: #f5f6f4;
+  --sheet: #ffffff;
+  --ink: #1b2228;
+  --ink-soft: #4a5560;
+  --rule: #d9dedb;
+  --rule-strong: #b9c2bd;
+  --accent: #19606e;
+  --accent-soft: #e2efef;
+  --code-bg: #eef1ef;
+  --warn: #8a5a00;
+  --warn-soft: #fbf1dc;
+  --bad: #9b2c2c;
+  --bad-soft: #f8e5e3;
+  --good: #2c6e3f;
+  --good-soft: #e3f1e6;
+  --font-display: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --step--1: 0.84rem;
+  --step-0: 1rem;
+  --step-1: 1.2rem;
+  --step-2: 1.5rem;
+  --step-3: 2.1rem;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #12171a; --sheet: #192024; --ink: #e4e9e6; --ink-soft: #a7b2ad;
+    --rule: #2b3439; --rule-strong: #3c474d; --accent: #6cc3cf; --accent-soft: #173238;
+    --code-bg: #20292d; --warn: #e3b558; --warn-soft: #33290f; --bad: #ec8f86; --bad-soft: #3a1d1b;
+    --good: #82cc95; --good-soft: #17301e; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #12171a; --sheet: #192024; --ink: #e4e9e6; --ink-soft: #a7b2ad;
+  --rule: #2b3439; --rule-strong: #3c474d; --accent: #6cc3cf; --accent-soft: #173238;
+  --code-bg: #20292d; --warn: #e3b558; --warn-soft: #33290f; --bad: #ec8f86; --bad-soft: #3a1d1b;
+  --good: #82cc95; --good-soft: #17301e; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-padding-top: 16px; }
+body {
+  background: var(--paper); color: var(--ink);
+  font-family: var(--font-body); font-size: 16px; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.shell { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 48px; max-width: 1180px; margin: 0 auto; padding-block: 32px 80px; }
+.rail { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 24px); align-self: start; }
+.brand { font-family: var(--font-display); font-weight: 700; font-size: 1.35rem; line-height: 1.15; letter-spacing: 0.01em; }
+.brand small { display: block; font-family: var(--font-mono); font-weight: 400; font-size: 0.72rem; color: var(--ink-soft); letter-spacing: 0.04em; margin-top: 6px; }
+.toc { list-style: none; padding: 0; margin: 28px 0 0; display: flex; flex-direction: column; gap: 2px; border-left: 1px solid var(--rule-strong); }
+.toc a { display: grid; grid-template-columns: 2.2em 1fr; padding: 7px 12px; color: var(--ink-soft); text-decoration: none; font-size: 0.95rem; border-left: 3px solid transparent; margin-left: -2px; }
+.toc a span { font-family: var(--font-mono); font-size: 0.78rem; padding-top: 2px; }
+.toc a:hover { color: var(--ink); }
+.toc a[aria-current="page"] { color: var(--ink); font-weight: 600; border-left-color: var(--accent); background: var(--accent-soft); }
+.rail .meta { margin-top: 28px; font-size: var(--step--1); color: var(--ink-soft); }
+.rail .meta code { font-size: 0.78rem; }
+main { min-width: 0; }
+.chapter { background: var(--sheet); border: 1px solid var(--rule); padding: 44px 52px 52px; min-width: 0; }
+.chapter > * { max-width: 70ch; }
+.chapter > .wide, .chapter > .table-wrap, .chapter > .diagram, .chapter > .stats, .chapter > .cards { max-width: none; }
+.eyebrow { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin: 0 0 10px; }
+h1 { font-family: var(--font-display); font-weight: 700; font-size: var(--step-3); line-height: 1.1; margin: 0 0 14px; text-wrap: balance; }
+h2 { font-family: var(--font-display); font-weight: 600; font-size: var(--step-2); line-height: 1.2; margin: 48px 0 12px; padding-top: 22px; border-top: 1px solid var(--rule); text-wrap: balance; }
+h3 { font-family: var(--font-body); font-weight: 600; font-size: var(--step-1); margin: 30px 0 8px; text-wrap: balance; }
+p { margin: 0 0 14px; }
+.lede { font-size: 1.12rem; color: var(--ink-soft); margin-bottom: 26px; }
+ul, ol { margin: 0 0 16px; padding-left: 1.3em; }
+li { margin-bottom: 6px; }
+a { color: var(--accent); text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+code { font-family: var(--font-mono); font-size: 0.86em; background: var(--code-bg); padding: 1px 5px; border-radius: 3px; overflow-wrap: anywhere; }
+pre { font-family: var(--font-mono); font-size: 0.86rem; line-height: 1.55; background: var(--code-bg); padding: 14px 16px; margin: 0 0 18px; overflow-x: auto; border-left: 3px solid var(--rule-strong); }
+pre code { background: none; padding: 0; overflow-wrap: normal; }
+.table-wrap { overflow-x: auto; margin: 0 0 22px; border: 1px solid var(--rule); }
+table { border-collapse: collapse; width: 100%; font-size: 0.93rem; }
+th, td { text-align: left; vertical-align: top; padding: 9px 12px; border-bottom: 1px solid var(--rule); }
+th { font-family: var(--font-display); font-weight: 600; font-size: 0.86rem; letter-spacing: 0.03em; text-transform: uppercase; color: var(--ink-soft); background: var(--code-bg); }
+tr:last-child td { border-bottom: 0; }
+td:first-child { font-weight: 500; }
+td.mono, .mono { font-family: var(--font-mono); font-size: 0.84rem; }
+.yes { color: var(--good); font-weight: 600; }
+.no { color: var(--ink-soft); }
+.part { color: var(--warn); font-weight: 600; }
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: var(--rule); border: 1px solid var(--rule); margin: 8px 0 28px; }
+.stat { background: var(--sheet); padding: 14px 16px; }
+.stat b { display: block; font-family: var(--font-display); font-size: 1.7rem; font-weight: 600; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.stat span { font-size: var(--step--1); color: var(--ink-soft); }
+.note { border-left: 3px solid var(--accent); background: var(--accent-soft); padding: 12px 16px; margin: 0 0 18px; }
+.note.warn { border-left-color: var(--warn); background: var(--warn-soft); }
+.note p:last-child, .note ul:last-child { margin-bottom: 0; }
+.note strong:first-child { display: block; margin-bottom: 4px; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; margin: 0 0 24px; }
+.card { border: 1px solid var(--rule); padding: 16px 18px; min-width: 0; }
+.card h3 { margin: 0 0 6px; font-size: 1.02rem; }
+.card p { margin: 0; font-size: 0.93rem; color: var(--ink-soft); }
+.card a.go { display: inline-block; margin-top: 10px; font-size: 0.9rem; font-weight: 500; }
+.steps { counter-reset: s; list-style: none; padding: 0; }
+.steps > li { counter-increment: s; position: relative; padding-left: 44px; margin-bottom: 14px; }
+.steps > li::before { content: counter(s); position: absolute; left: 0; top: 0; width: 28px; height: 28px; border: 1.5px solid var(--accent); color: var(--accent); font-family: var(--font-mono); font-size: 0.82rem; display: grid; place-items: center; border-radius: 50%; }
+.diagram { border: 1px solid var(--rule); background: var(--paper); padding: 22px; margin: 6px 0 26px; overflow-x: auto; }
+.flow { display: grid; grid-template-columns: repeat(3, minmax(170px, 1fr)); gap: 18px 34px; min-width: 620px; position: relative; }
+.node { background: var(--sheet); border: 1.5px solid var(--rule-strong); padding: 12px 14px; position: relative; }
+.node b { display: block; font-family: var(--font-display); font-weight: 600; font-size: 1.02rem; }
+.node small { display: block; color: var(--ink-soft); font-size: 0.83rem; line-height: 1.4; margin-top: 3px; }
+.node .tag { font-family: var(--font-mono); font-size: 0.7rem; color: var(--accent); letter-spacing: 0.05em; }
+.node.core { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.node.person { border-style: dashed; }
+.arrow-r::after, .arrow-l::after { position: absolute; top: 50%; transform: translateY(-50%); font-family: var(--font-mono); color: var(--accent); font-size: 1rem; }
+.arrow-r::after { content: "→"; right: -26px; }
+.arrow-l::after { content: "←"; left: -26px; }
+.span-col { grid-column: 1 / -1; }
+.legend { font-size: var(--step--1); color: var(--ink-soft); margin-top: 14px; }
+.journey { list-style: none; padding: 0; margin: 0 0 24px; border-left: 2px solid var(--accent); }
+.journey li { padding: 0 0 14px 22px; position: relative; margin: 0; }
+.journey li::before { content: ""; position: absolute; left: -7px; top: 7px; width: 12px; height: 12px; background: var(--sheet); border: 2px solid var(--accent); border-radius: 50%; }
+.journey li b { display: block; }
+.journey li span { color: var(--ink-soft); font-size: 0.94rem; }
+.timeline { display: grid; gap: 0; border-left: 2px solid var(--rule-strong); margin: 0 0 26px; }
+.era { padding: 0 0 26px 26px; position: relative; }
+.era::before { content: ""; position: absolute; left: -8px; top: 6px; width: 14px; height: 14px; background: var(--accent); border-radius: 50%; }
+.era .when { font-family: var(--font-mono); font-size: 0.78rem; color: var(--ink-soft); letter-spacing: 0.04em; }
+.era h3 { margin: 2px 0 8px; }
+.pill { display: inline-block; font-family: var(--font-mono); font-size: 0.72rem; padding: 2px 8px; border-radius: 999px; letter-spacing: 0.03em; white-space: nowrap; }
+.pill.open { background: var(--warn-soft); color: var(--warn); }
+.pill.limit { background: var(--code-bg); color: var(--ink-soft); }
+.pill.fixed { background: var(--good-soft); color: var(--good); }
+.pill.rule { background: var(--accent-soft); color: var(--accent); }
+.never { list-style: none; padding: 0; }
+.never li { padding: 10px 14px 10px 40px; border: 1px solid var(--rule); margin-bottom: 8px; position: relative; }
+.never li::before { content: "✕"; position: absolute; left: 14px; top: 10px; color: var(--bad); font-weight: 600; }
+.pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 44px; padding-top: 20px; border-top: 1px solid var(--rule); flex-wrap: wrap; }
+.pager a { text-decoration: none; font-weight: 500; }
+.pager a small { display: block; font-family: var(--font-mono); font-size: 0.72rem; color: var(--ink-soft); font-weight: 400; letter-spacing: 0.05em; }
+.pager .next { text-align: right; margin-left: auto; }
+.chips { display: none; }
+@media (max-width: 900px) {
+  .shell { grid-template-columns: minmax(0, 1fr); gap: 18px; padding-block: 20px 60px; }
+  .rail { position: static; }
+  .toc, .rail .meta { display: none; }
+  .chips { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; margin-top: 14px; }
+  .chips a { flex: none; font-size: 0.88rem; padding: 6px 12px; border: 1px solid var(--rule-strong); text-decoration: none; color: var(--ink-soft); background: var(--sheet); }
+  .chips a[aria-current="page"] { border-color: var(--accent); color: var(--ink); font-weight: 600; background: var(--accent-soft); }
+  .chapter { padding: 26px 18px 34px; }
+  h1 { font-size: 1.75rem; }
+}
+@media (max-width: 560px) { .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (prefers-reduced-motion: no-preference) { .chapter { animation: rise .25s ease-out; } @keyframes rise { from { transform: translateY(4px); } to { transform: none; } } }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <aside class="rail">
+    <div class="brand">NCRD CMS Handbook<small>CMS V2 · FOR MAINTAINERS AND EDITORS</small></div>
+    <nav aria-label="Chapters">
+      <ol class="toc" id="toc"></ol>
+      <div class="chips" id="chips"></div>
+    </nav>
+    <div class="meta">Describes commit <code>181fe954</code><br>Checked November 9, 2026</div>
+  </aside>
+
+  <main id="main">
+
+<!-- ============ START ============ -->
+<section class="chapter" id="start" data-title="Start here">
+  <p class="eyebrow">Chapter 1 · Start here</p>
+  <h1>What this CMS is</h1>
+  <p class="lede">A content management system for a family of small websites. Editors click the real page to change it, add designed sections from a shared library, and publish when they are ready. Each site keeps its own look.</p>
+
+  <p>It runs SAWSO and the Echelon sites today, with Better Together 2027 and Human Needs Index kept as reference imports. One installation serves every site: one admin app, one public website app, one background worker and one Postgres database.</p>
+
+  <div class="stats">
+    <div class="stat"><b>3</b><span>apps: admin, public site, worker</span></div>
+    <div class="stat"><b>6</b><span>shared packages</span></div>
+    <div class="stat"><b>~80</b><span>database tables</span></div>
+    <div class="stat"><b>548</b><span>database functions</span></div>
+    <div class="stat"><b>6,389</b><span>unit and database tests</span></div>
+    <div class="stat"><b>657</b><span>browser tests per browser</span></div>
+  </div>
+
+  <h2>Five ideas that explain everything else</h2>
+  <ol class="steps">
+    <li><b>A page is a list of sections.</b> A section is a designed block, such as a hero, cards or an FAQ, plus the words and pictures poured into it. Sections come from a library each site shares.</li>
+    <li><b>Nothing goes live until it is published.</b> Every save is a private draft. Visitors only ever see published versions.</li>
+    <li><b>Nothing is ever overwritten.</b> Every save adds a new version and keeps the old ones. History and restore work because of this.</li>
+    <li><b>The database is the security guard.</b> Who can see or change what is enforced inside Postgres, not just hidden on screen. A bug in a screen cannot leak one site's content to another.</li>
+    <li><b>One renderer draws both the preview and the live page.</b> What an editor sees in the editor is built by the same code that builds the public page, so they cannot drift apart.</li>
+  </ol>
+
+  <h2>Find what you need</h2>
+  <div class="cards">
+    <div class="card"><h3>I edit a website</h3><p>Roles, everyday tasks and what each button does.</p><a class="go" href="#using">Using the CMS →</a></div>
+    <div class="card"><h3>I need to understand how it works</h3><p>The pieces, how a change reaches the public page, and how security is enforced.</p><a class="go" href="#how-it-works">How it works →</a></div>
+    <div class="card"><h3>I'm changing the code</h3><p>What each folder does, where a feature lives, and the rules never to break.</p><a class="go" href="#code-map">Code map →</a></div>
+    <div class="card"><h3>I run or deploy it</h3><p>Local setup, tests, deploying to Google Cloud, backups and rollback.</p><a class="go" href="#running">Running it →</a></div>
+    <div class="card"><h3>Something looks wrong</h3><p>Known glitches and limits, with workarounds.</p><a class="go" href="#known-issues">Known issues →</a></div>
+    <div class="card"><h3>Why is it built this way?</h3><p>How it grew from V1 to today, and what each rebuild fixed.</p><a class="go" href="#history">History →</a></div>
+  </div>
+
+  <h2>Where the full detail lives</h2>
+  <p>This handbook is the readable overview. The repository holds the step-by-step detail and stays the source of truth:</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>In the repository</th><th>What it holds</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">README.md</td><td>What it is, how to run the demo, where to go next.</td></tr>
+      <tr><td class="mono">AGENTS.md</td><td>The first file an AI coding agent reads: conventions, checks and rules.</td></tr>
+      <tr><td class="mono">docs/handbook/INDEX.md</td><td>"How do I…" table that maps every everyday task to a step-by-step guide.</td></tr>
+      <tr><td class="mono">docs/architecture.md</td><td>The technical design in depth.</td></tr>
+      <tr><td class="mono">docs/handbook/maintainers/where-things-live.md</td><td>For each feature: screen, server action, database command, renderer and tests.</td></tr>
+      <tr><td class="mono">docs/operations.md</td><td>Running, testing, hosting, backups.</td></tr>
+      <tr><td class="mono">deploy/google/README.md</td><td>Deploying on Google Cloud.</td></tr>
+      <tr><td class="mono">packages/schema/current/README.md</td><td>Every database function as it exists today, one file each.</td></tr>
+      <tr><td class="mono">SPEC.md</td><td>What the product should do and how it is accepted.</td></tr>
+      <tr><td class="mono">docs/decisions.md, docs/adr/</td><td>Why particular choices were made.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ============ HOW IT WORKS ============ -->
+<section class="chapter" id="how-it-works" data-title="How it works" hidden>
+  <p class="eyebrow">Chapter 2 · How it works</p>
+  <h1>The pieces and how they connect</h1>
+  <p class="lede">Editors work in the admin app. Visitors read the public site app. Both talk to one Postgres database, which enforces every permission. A worker handles everything that happens in the background.</p>
+
+  <div class="diagram" role="img" aria-label="Editors use the admin app; visitors use the public site app; both connect to Postgres; the worker processes background jobs; media is stored in a file store.">
+    <div class="flow">
+      <div class="node person arrow-r"><span class="tag">PEOPLE</span><b>Editors and admins</b><small>Sign in by email link</small></div>
+      <div class="node core arrow-r"><span class="tag">apps/admin</span><b>Admin app</b><small>Next.js. Every screen, editor and workspace. Calls database commands that re-check permission.</small></div>
+      <div class="node core"><span class="tag">POSTGRES</span><b>One database</b><small>Every site's content, versions, permissions (row-level security), audit log and job queue.</small></div>
+      <div class="node person arrow-r"><span class="tag">PEOPLE</span><b>Visitors</b><small>No sign-in; no JavaScript needed</small></div>
+      <div class="node core arrow-r"><span class="tag">apps/site</span><b>Public site app</b><small>Next.js. Serves every site by web address. Reads only published content.</small></div>
+      <div class="node"><span class="tag">apps/worker</span><b>Worker</b><small>Background jobs: publish-time cache refresh, schedules, thumbnails, media, mail, domains.</small></div>
+      <div class="node span-col"><span class="tag">packages/renderer</span><b>Shared renderer</b><small>Imported by both apps. Turns sections into safe HTML, so the editor's preview and the public page are built by the same code. Media files live in a separate file store (Google Cloud Storage when hosted).</small></div>
+    </div>
+    <p class="legend">Solid outline: part of this system. Dashed: people. Arrows show who calls whom.</p>
+  </div>
+
+  <h2>How a change reaches the public page</h2>
+  <ul class="journey">
+    <li><b>An editor opens a page.</b><span>The editor shows the real page, drawn by the shared renderer inside the admin, with a structure tree on the left and settings on the right.</span></li>
+    <li><b>They type on the page.</b><span>About one second after they stop, the change saves as a new private version. If two people edit at once, the second save gets a conflict warning instead of overwriting.</span></li>
+    <li><b>They press Publish.</b><span>The database re-checks that this person may publish this page on this site.</span></li>
+    <li><b>Publishing checks run.</b><span>For example: no main heading, an image without a description, a broken internal link, leftover sample text. Blocking problems need a recorded reason from someone allowed to override.</span></li>
+    <li><b>Everything moves in one step.</b><span>In one database transaction, the page's published pointer moves, the public copy is written, the audit log records it and a background job is queued. Either all of it happens or none of it does.</span></li>
+    <li><b>The worker refreshes the cache.</b><span>The public site serves the new version on the next request, as complete HTML.</span></li>
+  </ul>
+
+  <h2>Drafts, versions and history</h2>
+  <p>Everything an editor can change works the same way: pages, the site look, the menu, the header and footer, site settings, lists and their entries, and section designs. Each has a current record that points to two versions: the draft and the published one.</p>
+  <ul>
+    <li><b>Saving</b> adds a new version and moves the draft pointer.</li>
+    <li><b>Publishing</b> moves the published pointer.</li>
+    <li><b>History</b> is just reading older versions. <b>Restore as new draft</b> copies an old version into a new draft; the live page does not change until that draft is published.</li>
+  </ul>
+
+  <h2>Sections and the library</h2>
+  <p>A page version is an ordered list of section instances. Each one pins an exact version of its section design, so changing a design in the library never silently changes pages that already use it. Updating a page to a newer design is a deliberate, previewed step.</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Kind of section</th><th>Used for</th><th>How it is built</th></tr></thead>
+    <tbody>
+      <tr><td>Structured</td><td>The core library and native sites such as SAWSO and Echelon</td><td>A typed tree of headings, text, images, links, buttons, groups and lists. Every field is declared, so every control is typed.</td></tr>
+      <tr><td>HTML template</td><td>Imported and migrated sites that must keep their exact original markup</td><td>Authored HTML and CSS with placeholders. Checked by the sanitizer: scripts, event handlers and unsafe links are refused.</td></tr>
+    </tbody>
+  </table></div>
+  <p>Section styles are scoped to that section, fonts come only from a list of licensed files, and appearance options (spacing, width, alignment, colours from the site look) are a fixed set of choices.</p>
+
+  <h2>Releases and scheduling</h2>
+  <p>Some changes need to go live together, such as a new page and the unpublished pages it links to, or a site's very first publish with its design, header, footer and menu. A <b>release</b> groups them. The CMS rehearses the whole release first, checks every page it would produce, then publishes all of it or none of it.</p>
+  <p><b>Publish later</b> pins the exact reviewed versions to a time. Edits made after review are not included unless they are reviewed too. The worker runs scheduled releases with the same engine as Publish, as the person who scheduled it, and re-checks their permission at that moment.</p>
+
+  <h2>Security: who can do what</h2>
+  <p>The apps never connect as an all-powerful user. Each one has its own database login with only the access it needs:</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Database login</th><th>Used by</th><th>Can</th><th>Cannot</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">cms_authenticated_user</td><td>Admin app</td><td>Read rows for its signed-in person's sites; change data only through named commands</td><td>See another site's data, move a published pointer directly, edit the audit log</td></tr>
+      <tr><td class="mono">cms_public_renderer</td><td>Public site</td><td>Call a few read-only functions over published content</td><td>Read any draft or editing table</td></tr>
+      <tr><td class="mono">cms_worker</td><td>Worker</td><td>Claim and deliver queued jobs</td><td>Change memberships or content outside its commands</td></tr>
+      <tr><td class="mono">cms_migration_owner</td><td>Migrations and backups only</td><td>Everything</td><td>Be used by a running app</td></tr>
+    </tbody>
+  </table></div>
+  <p>People get roles per site, described in <a href="#using">Using the CMS</a>. Sign-in is an email link through Supabase when hosted, and a local-only login for development. Public pages contain their content before any script runs, and only reviewed, application-owned scripts are allowed.</p>
+
+  <h2>Background work</h2>
+  <p>The worker reads two job tables in Postgres: an <b>outbox</b> of events written during publishing, and <b>scheduled actions</b>. Jobs are claimed with leases, retried with backoff and set aside if they keep failing. On Google Cloud the worker runs as a private web service that a scheduler calls every minute; it finishes its current job before replying.</p>
+
+  <h2>Why it is built this way</h2>
+  <p>Each choice answers a problem the first version had. See <a href="#history">History</a> for the full story.</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Choice</th><th>The problem it solves</th></tr></thead>
+    <tbody>
+      <tr><td>Pages built on the server</td><td>Search engines and link previews see real content, not an empty page waiting for JavaScript.</td></tr>
+      <tr><td>Postgres with row-level security</td><td>Real transactions and constraints, and site-to-site isolation enforced in one place instead of a separate rules language.</td></tr>
+      <tr><td>One renderer package imported by both apps</td><td>No copies of rendering code to keep in sync by hand.</td></tr>
+      <tr><td>Editor canvas in the same app</td><td>No fragile messaging between two websites, and the editor can be tested automatically.</td></tr>
+      <tr><td>Sections stored as versioned data</td><td>Section designs can be edited in the CMS without a developer rebuild.</td></tr>
+      <tr><td>Job queue inside Postgres</td><td>Scheduling and background work run without a separate paid queue service.</td></tr>
+      <tr><td>One standard container</td><td>The whole system can move to another host without a rewrite.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ============ CODE MAP ============ -->
+<section class="chapter" id="code-map" data-title="Code map" hidden>
+  <p class="eyebrow">Chapter 3 · Code map</p>
+  <h1>What each part of the code does</h1>
+  <p class="lede">A pnpm monorepo in TypeScript. Three apps that run, six packages they share, and a browser test suite. Start here before opening a folder.</p>
+
+  <h2>Top level</h2>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Folder</th><th>What it is</th><th>Size</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">apps/admin</td><td>The CMS that editors use. Every screen, the visual editor and all the workspaces.</td><td>~100k lines</td></tr>
+      <tr><td class="mono">apps/site</td><td>The public website server. One deployment serves every site, chosen by the web address.</td><td>~1.5k lines</td></tr>
+      <tr><td class="mono">apps/worker</td><td>Background jobs and schedules.</td><td>~2.5k lines</td></tr>
+      <tr><td class="mono">packages/schema</td><td>The database: SQL migrations, permissions, commands, plus the content data shapes (Zod).</td><td>210 migrations</td></tr>
+      <tr><td class="mono">packages/renderer</td><td>Turns sections into safe HTML and CSS. Used by both admin and site.</td><td>~13k lines</td></tr>
+      <tr><td class="mono">packages/domain</td><td>Plain business rules with no framework: publishing checks, revision checks, colour contrast, save queue.</td><td>~1.4k lines</td></tr>
+      <tr><td class="mono">packages/platform</td><td>Connections to the outside world: database clients per role, file storage, mail, Google, Firebase Hosting, sign-in, backups.</td><td>~5k lines</td></tr>
+      <tr><td class="mono">packages/importer</td><td>Brings existing websites and V1 content into the CMS.</td><td>~15k lines</td></tr>
+      <tr><td class="mono">packages/seeds</td><td>The core section library, site starters, SAWSO and Echelon content, and demo data.</td><td>~7.6k lines</td></tr>
+      <tr><td class="mono">e2e</td><td>Playwright browser tests that click through real journeys against a throwaway database.</td><td>265 test files</td></tr>
+      <tr><td class="mono">scripts</td><td>The demo launcher, Google deploy and bootstrap, performance checks, visual comparisons.</td><td>66 files</td></tr>
+      <tr><td class="mono">deploy</td><td>Hosting guides and example configuration for Google Cloud.</td><td></td></tr>
+      <tr><td class="mono">docs</td><td>Architecture, handbook, decisions, security model, design references.</td><td></td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>Inside the admin app</h2>
+  <p>Paths are under <code>apps/admin/src/</code>. It follows the Next.js App Router: folders under <code>app/</code> are URLs.</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Folder</th><th>What lives there</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">app/page.tsx</td><td>Home: the signed-in person's sites and work waiting for them.</td></tr>
+      <tr><td class="mono">app/sites/[siteId]/</td><td>The site workspace, one folder per screen (listed below).</td></tr>
+      <tr><td class="mono">app/pages/[pageId]/</td><td>The visual page editor: canvas, structure tree, inspector panels, hero slides, history and publish dialogs. <code>editor.tsx</code> is the entry point.</td></tr>
+      <tr><td class="mono">app/actions/</td><td>Server actions shared by several screens: saving and publishing pages, reviews, site look.</td></tr>
+      <tr><td class="mono">app/people/</td><td>People and access.</td></tr>
+      <tr><td class="mono">app/inbox/</td><td>Reviews waiting for a decision.</td></tr>
+      <tr><td class="mono">app/api/</td><td>Endpoints for uploads, previews and the worker's scheduled-release call.</td></tr>
+      <tr><td class="mono">app/sign-in/, app/auth/</td><td>Email-link sign-in and its callback.</td></tr>
+      <tr><td class="mono">app/health/</td><td>Health check that reports the running commit.</td></tr>
+      <tr><td class="mono">lib/</td><td>The logic behind the screens, one file per job: stories, releases, media, chapters, people, page history and so on. Tests sit next to each file.</td></tr>
+      <tr><td class="mono">server/queries/</td><td>Read-only database queries, one file per kind of data: pages, sites, media, navigation, theme, sections.</td></tr>
+      <tr><td class="mono">server/commands/</td><td>Shared write commands.</td></tr>
+      <tr><td class="mono">components/ui/</td><td>Shared building blocks: buttons, fields, dialogs, menus, cards, drop indicators.</td></tr>
+      <tr><td class="mono">components/</td><td>Larger shared pieces: the app shell and sidebar, media pickers, site look panel, header and footer previews.</td></tr>
+      <tr><td class="mono">styles/</td><td>Design tokens and base styles. Each component has its own CSS module next to it.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>The site workspace screens</h3>
+  <p>Under <code>app/sites/[siteId]/</code>. Each folder is one screen in the site's sidebar.</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Folder</th><th>Screen</th><th>Folder</th><th>Screen</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">pages</td><td>Page list</td><td class="mono">stories</td><td>Stories, tags, Newsroom</td></tr>
+      <tr><td class="mono">page-creation</td><td>New page from a template</td><td class="mono">media</td><td>Photo and file library</td></tr>
+      <tr><td class="mono">header</td><td>Header and menu</td><td class="mono">documents</td><td>Downloadable documents</td></tr>
+      <tr><td class="mono">footer</td><td>Footer</td><td class="mono">content</td><td>Lists and their entries</td></tr>
+      <tr><td class="mono">design</td><td>Site look and fonts</td><td class="mono">data</td><td>Data values shared across pages</td></tr>
+      <tr><td class="mono">sections</td><td>Section library</td><td class="mono">recipes</td><td>Page templates</td></tr>
+      <tr><td class="mono">publishing</td><td>Releases, schedules, history</td><td class="mono">chapters</td><td>Echelon chapters and divisions</td></tr>
+      <tr><td class="mono">settings</td><td>Site settings, contact messages</td><td class="mono">domains</td><td>Web addresses</td></tr>
+      <tr><td class="mono">redirects</td><td>Old address forwarding</td><td class="mono">scripts</td><td>Reviewed site-owned scripts</td></tr>
+      <tr><td class="mono">template</td><td>Shared national template</td><td class="mono">outbox</td><td>Queued background work</td></tr>
+      <tr><td class="mono">navigation, global-elements</td><td>Older menu and header screens kept for imported sites</td><td></td><td></td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>Inside the other apps and packages</h2>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Where</th><th>Key files and what they do</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">apps/site/src/lib</td><td><code>routing.ts</code> picks the site from the web address. <code>public-page.ts</code> and <code>canvas-page-handler.ts</code> render pages. <code>http-cache.ts</code> handles caching. <code>contact-handler.ts</code> saves contact forms. <code>public-security.ts</code> sets the content security policy.</td></tr>
+      <tr><td class="mono">apps/worker/src</td><td><code>handlers.ts</code> lists every job type. <code>release-schedules.ts</code> runs scheduled publishing. <code>thumbnails.ts</code>, <code>media.ts</code>, <code>invitations.ts</code>, <code>domains.ts</code> do one job each. <code>request-server.ts</code> is the Google Cloud mode; <code>drain.ts</code> empties the queue once.</td></tr>
+      <tr><td class="mono">packages/renderer/src</td><td><code>document/</code> renders a whole page and its frame. <code>section/</code> renders one section. <code>theme/</code> turns the site look into CSS. <code>behaviors/</code> holds interactive widgets such as story feeds, the story map and split view. <code>structured.ts</code> renders structured sections.</td></tr>
+      <tr><td class="mono">packages/schema</td><td><code>migrations/</code> is the executable database history and must never be edited. <code>current/</code> is a generated, readable copy of every function today. <code>src/content/</code> defines the shape of content: sections, hero slides, chapters, site settings. <code>src/db/</code> has database helpers.</td></tr>
+      <tr><td class="mono">packages/platform/src</td><td><code>storage.ts</code> and <code>google-storage.ts</code> for files. <code>hosted-auth.ts</code> and <code>session.ts</code> for sign-in. <code>google-backup.ts</code> and <code>recovery.ts</code> for backups. <code>firebase-hosting.ts</code> for site addresses. <code>mail.ts</code> for email.</td></tr>
+      <tr><td class="mono">packages/domain/src</td><td><code>readiness.ts</code> (publishing checks), <code>revision.ts</code> (conflict checks), <code>contrast.ts</code>, <code>save-queue.ts</code> (autosave), <code>authorization.ts</code>.</td></tr>
+      <tr><td class="mono">packages/importer/src</td><td><code>website*.ts</code> imports a folder of built pages. Other files handle V1 content, styles and source cleanup.</td></tr>
+      <tr><td class="mono">packages/seeds/src</td><td><code>core-library.ts</code> is the shared section library. <code>sawso-*</code> and <code>echelon-*</code> files are each site's starting content.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>Where a feature lives</h2>
+  <p>Most features follow the same path: a screen in <code>app/</code> calls a server action, which calls logic in <code>lib/</code>, which calls a database command that re-checks permission. The public side reads the result through the renderer. The full table with exact files and test names is in <code>docs/handbook/maintainers/where-things-live.md</code>.</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Feature</th><th>Screen</th><th>Logic</th><th>Database command</th></tr></thead>
+    <tbody>
+      <tr><td>Editing a page</td><td class="mono">app/pages/[pageId]/editor.tsx</td><td class="mono">app/actions/page-draft.ts</td><td class="mono">app.save_page_draft</td></tr>
+      <tr><td>Publishing</td><td class="mono">app/actions/page-publish.ts</td><td class="mono">lib/releases.ts</td><td class="mono">app.publish_page</td></tr>
+      <tr><td>Stories</td><td class="mono">sites/[siteId]/stories/</td><td class="mono">lib/stories-edit.ts</td><td>collection entry commands</td></tr>
+      <tr><td>Header, menu, footer</td><td class="mono">sites/[siteId]/header/, footer/</td><td>actions in those folders</td><td class="mono">app.save_navigation_draft</td></tr>
+      <tr><td>Site look</td><td class="mono">sites/[siteId]/design/</td><td>site look actions</td><td class="mono">app.save_theme_draft</td></tr>
+      <tr><td>Media</td><td class="mono">sites/[siteId]/media/</td><td class="mono">lib/media-*-repository.ts</td><td>upload and media commands</td></tr>
+      <tr><td>Chapters</td><td class="mono">sites/[siteId]/chapters/</td><td class="mono">lib/chapters.ts</td><td class="mono">app.create_division_chapter</td></tr>
+      <tr><td>People</td><td class="mono">app/people/</td><td class="mono">lib/people.ts</td><td class="mono">app.add_person</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>The database</h2>
+  <p>About 80 tables and 548 functions, grouped into <code>app</code> (commands the admin calls: access, editing, publishing, media, sites, jobs) and <code>public_api</code> (the few read-only functions the public site may call). Many commands were redefined by later migrations, so to see what a command does today, open its file under <code>packages/schema/current/</code>. Database tests (<code>*.db.test.ts</code>) run against real Postgres as the real logins and are the specification of the rules.</p>
+</section>
+
+<!-- ============ USING ============ -->
+<section class="chapter" id="using" data-title="Using the CMS" hidden>
+  <p class="eyebrow">Chapter 4 · Using the CMS</p>
+  <h1>Roles and everyday tasks</h1>
+  <p class="lede">Everything an editor does stays a private draft until it is published. Each person sees only the controls for their work, and the database enforces it.</p>
+
+  <h2>Who can do what</h2>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Work</th><th>Super admin</th><th>Admin</th><th>Site editor</th><th>Content creator</th><th>Page editor</th></tr></thead>
+    <tbody>
+      <tr><td>Edit words, photos and links</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="part">Assigned pages</td></tr>
+      <tr><td>Add and tag stories</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="no">No</td></tr>
+      <tr><td>Publish or schedule</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="no">No, sends for review</td><td class="no">No</td></tr>
+      <tr><td>Create pages</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="no">No</td><td class="no">No</td></tr>
+      <tr><td>Add and move sections</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="no">No</td><td class="no">No</td><td class="no">No</td></tr>
+      <tr><td>Header, menu and footer</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="no">No</td><td class="no">No</td><td class="no">No</td></tr>
+      <tr><td>Site look, tags and section appearance</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="no">No</td><td class="no">No</td><td class="no">No</td></tr>
+      <tr><td>Template, fonts, hosting and code</td><td class="yes">Yes</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td></tr>
+    </tbody>
+  </table></div>
+  <p>In the database these are <code>super_admin</code>, <code>site_admin</code>, <code>editor</code> and <code>contributor</code>. "Page editor" is a contributor limited to assigned pages. On Echelon, chapter volunteers are content creators for their chapter, and division accounts are site editors who approve chapter changes.</p>
+  <div class="note warn"><strong>Still open</strong><p>This table is the agreed target and the screens follow it, but it should be reviewed before real editors are added. Site admins cannot manage people yet; only Super admins can.</p></div>
+
+  <h2>Everyday tasks</h2>
+  <p>Short versions below. Each links to the full guide in <code>docs/handbook/</code>.</p>
+
+  <h3>Edit a page</h3>
+  <ol class="steps">
+    <li>Open the site, then <b>Pages</b>, and choose the page.</li>
+    <li>Click the words or picture you want to change on the page itself, or pick it in the structure tree. Settings for the selected item appear on the right.</li>
+    <li>Type. Changes save automatically as a private draft. Undo and redo cover every change.</li>
+    <li>When ready, choose <b>Publish</b>, or send it for review if your role can't publish.</li>
+  </ol>
+  <p class="mono">Guide: editing/pages.md, editing/titles-and-links.md, editing/cards.md, editing/hero-slides.md</p>
+
+  <h3>Add a section</h3>
+  <p>Open the library from the editor and insert a section at a chosen position, by button, keyboard or dragging it onto the page. Site editors and below don't see this; it is for Admins and Super admins. <span class="mono">Guide: editing/adding-sections.md</span></p>
+
+  <h3>Publish, schedule and restore</h3>
+  <ul>
+    <li><b>Publish</b> shows exactly what will change and any publishing checks. Some checks can be overridden with a recorded reason.</li>
+    <li><b>Publish later</b> schedules the exact reviewed version for a time. Later edits need their own review.</li>
+    <li><b>History</b> lists every saved version. <b>Restore as new draft</b> brings one back without touching the live page until you publish.</li>
+  </ul>
+  <p class="mono">Guide: publishing/publish-a-page.md, publishing/schedule-a-page.md, publishing/review-changes.md, publishing/checks.md</p>
+
+  <h3>Stories</h3>
+  <p>Write a story, give it main and secondary tags, and publish or schedule it. The Newsroom order, the story map and Split View are set from the Stories screen. <b>Check for new stories</b> looks for new items from the connected story source. <span class="mono">Guide: editing/stories.md, story-tags.md, story-publishing.md, newsroom-order.md, story-world.md, story-split.md</span></p>
+
+  <h3>Media</h3>
+  <p>Upload photos and files to the site's library, describe them for screen readers, organize them, and set where a picture focuses when it's cropped. <span class="mono">Guide: editing/media.md</span></p>
+
+  <h3>Header, menu and footer</h3>
+  <p>Admins change the logo, header buttons, menu items and their order, and the footer. Changes are drafts until published. <span class="mono">Guide: site-setup/header-menu-footer.md</span></p>
+
+  <h3>Site look and fonts</h3>
+  <p>Admins change colours, buttons and fonts with a live preview. A contrast check warns when text would be hard to read. <span class="mono">Guide: site-setup/site-look.md, site-setup/fonts.md</span></p>
+
+  <h3>Echelon chapters</h3>
+  <p>Each chapter has its own page with shared parts protected. Volunteers edit their chapter and send changes to their division, which approves and publishes. <span class="mono">Guide: site-setup/echelon-templates.md, site-setup/chapter-destinations.md</span></p>
+
+  <h3>Contact messages</h3>
+  <p>Contact form submissions are saved in <b>Settings → Contact messages</b> for site admins. The CMS does not email them, so someone needs to check the inbox.</p>
+
+  <h3>Add a person</h3>
+  <p>Super admins open <b>People</b>. Because email isn't set up, <b>Add person</b> creates their access without sending an invitation; the person then signs in with their own email link once email delivery works. <span class="mono">Guide: people/adding-a-person.md</span></p>
+
+  <div class="note"><strong>Coming from Symphony?</strong><p><code>docs/handbook/start-here/coming-from-symphony.md</code> maps Symphony terms to their CMS names, and <code>start-here/glossary.md</code> explains every word the screens use.</p></div>
+</section>
+
+<!-- ============ RUNNING ============ -->
+<section class="chapter" id="running" data-title="Running it" hidden>
+  <p class="eyebrow">Chapter 5 · Running it</p>
+  <h1>Setup, tests, deploying and recovery</h1>
+  <p class="lede">For whoever runs the CMS: on a laptop, in testing and on Google Cloud.</p>
+
+  <h2>Run it on your computer</h2>
+  <p>You need Node 24 (the version in <code>.nvmrc</code>), pnpm 11.22.0 and Postgres 16, through Docker or <code>brew install postgresql@16</code>.</p>
+<pre><code>pnpm install
+pnpm demo</code></pre>
+  <p>The admin opens at <code>http://localhost:3000</code>. Sign in as <code>admin@example.test</code>. The demo loads SAWSO, the Echelon sites, Better Together 2027 and Human Needs Index from local files. Nothing connects to a live website.</p>
+
+  <h2>Run the checks</h2>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Command</th><th>What it checks</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">pnpm typecheck</td><td>Style lint and TypeScript across every package</td></tr>
+      <tr><td class="mono">pnpm test</td><td>Unit tests</td></tr>
+      <tr><td class="mono">pnpm test:db</td><td>Database rules against a real, disposable Postgres</td></tr>
+      <tr><td class="mono">pnpm build</td><td>Builds every app; browser tests refuse a stale build</td></tr>
+      <tr><td class="mono">pnpm test:e2e</td><td>Browser journeys in Chromium and WebKit</td></tr>
+      <tr><td class="mono">pnpm verify</td><td>All of the above in order</td></tr>
+      <tr><td class="mono">pnpm format:check</td><td>Code formatting</td></tr>
+    </tbody>
+  </table></div>
+  <p>Run one browser suite at a time, with at most two workers. Never point tests at a database you want to keep.</p>
+
+  <h2>Deploy to Google Cloud</h2>
+  <p>Source comes from the organization's GitHub repository at a reviewed commit. The first installation follows <code>docs/handbook/hosting/bootstrap.md</code>; the project administrator runs the organization commands. In order:</p>
+  <ol class="steps">
+    <li><b>Administrative setup.</b> Project, region, billing and budget alerts, permissions, and an IT-approved way to make the sites public.</li>
+    <li><b>Infrastructure.</b> Enable the Google services (Cloud Run, Cloud SQL, Storage, Artifact Registry, Cloud Build, Secret Manager, Firebase Hosting, Scheduler, Monitoring). Create a separate identity for each part; no exported keys.</li>
+    <li><b>Database.</b> Postgres 16 on Cloud SQL. Restore the verified content export into an empty database, apply the migrations, compare fingerprints, create the restricted logins.</li>
+    <li><b>Media and source.</b> Upload the media and check it against the inventory. Cloud Build builds the image from the committed source.</li>
+    <li><b>Runtime.</b> Deploy the Site, Admin and a private Worker on Cloud Run, plus the backup job. Keep scheduling off until operations are accepted.</li>
+    <li><b>Routing and sign-in.</b> Firebase Hosting gives each site a review address that forwards to the public site. Add the new Admin <code>/auth/confirm</code> address to Supabase's allowed sign-in callbacks, or sign-in fails.</li>
+    <li><b>Operations.</b> Set the minute trigger for the Worker, the backup trigger and health alerts. Check a backup reads back and an alert arrives before turning on scheduling.</li>
+  </ol>
+  <p>Full steps: <code>deploy/google/README.md</code>. The list of private inputs is in <code>deploy/google/bootstrap.example.json</code>; copy it outside the repository before filling it in.</p>
+
+  <h2>What gets handed over privately</h2>
+  <p>None of this goes in GitHub. The checklist is <code>docs/handbook/hosting/private-release-handoff.md</code>.</p>
+  <ul>
+    <li>The cleaned database export and its SHA-256 checksum</li>
+    <li>The database fingerprints file</li>
+    <li>The media folder and its inventory</li>
+    <li>The public asset check file, and the expected page count</li>
+    <li>The Supabase project address and publishable key</li>
+    <li>The Super admin's email</li>
+  </ul>
+
+  <h2>Ship an update</h2>
+  <ol class="steps">
+    <li>In a clean checkout: <code>pnpm install --frozen-lockfile</code>, then typecheck, tests and build.</li>
+    <li>Run the database and browser tests that cover the change.</li>
+    <li>Review the staged changes, commit and push to the branch for the target environment.</li>
+    <li>Deploy to staging first, check health and the main routes, then production.</li>
+  </ol>
+  <p>Separate staging and production with automatic releases are described in <code>docs/handbook/upgrades/automatic-releases.md</code>. Automatic deploys stay off until the deploy identities exist.</p>
+
+  <h2>Back up, recover and roll back</h2>
+  <ul>
+    <li><b>Wrong content published:</b> use History, or Publish → History → the release → Review recovery. That restores versions as drafts; nothing is lost.</li>
+    <li><b>Bad code deploy:</b> send traffic back to the previous Cloud Run revision. Keep the previous image digest for this.</li>
+    <li><b>Lost database:</b> restore the backup into a new, empty database and check it before switching services to it. Never downgrade a migration or restore over live content.</li>
+    <li>Never start a general worker against a restored copy; queued schedules and emails in it are real jobs.</li>
+  </ul>
+  <p>Detail: <code>docs/handbook/upgrades/backup-recovery.md</code> and <code>docs/operations.md</code>.</p>
+
+  <h2>Sign-in and email</h2>
+  <p>Sign-in uses Supabase email links. The Supabase project should be owned by the organization, not an individual account; Supabase can transfer a project between organizations. Email delivery is not set up: Supabase's built-in sender only reaches members of the Supabase project team, so real editors need a custom email sender (SMTP) configured in Supabase before they can sign in. Options are compared in <code>docs/handbook/hosting/sign-in-options.md</code>.</p>
+</section>
+
+<!-- ============ CHANGING ============ -->
+<section class="chapter" id="changing" data-title="Changing the code" hidden>
+  <p class="eyebrow">Chapter 6 · Changing the code</p>
+  <h1>Rules for developers and AI agents</h1>
+  <p class="lede">The same rules apply to people and to AI coding agents. Agents should read <code>AGENTS.md</code> in the repository first; this chapter is the plain-language version.</p>
+
+  <h2>Never do these</h2>
+  <ul class="never">
+    <li><b>Edit an existing migration</b> in <code>packages/schema/migrations/</code>, even a comment. Applied migrations are checksummed. Add a new migration instead.</li>
+    <li><b>Write around the database commands.</b> Every change goes through the normal draft, review and release commands so permissions, versions and the audit log stay correct.</li>
+    <li><b>Weaken site isolation</b> or row-level security, or give an app's database login more access to make something work.</li>
+    <li><b>Bypass the shared renderer</b> or its sanitizer. Section fields cannot add scripts.</li>
+    <li><b>Commit secrets</b>, database exports, credentials or private manifests.</li>
+    <li><b>Point tests at a database you want to keep.</b></li>
+    <li><b>Weaken a test</b> or raise a timeout to get a pass.</li>
+  </ul>
+
+  <h2>Conventions</h2>
+  <ul>
+    <li>Use design tokens and the shared UI components. No raw colours or spacing, and no new rules in <code>globals.css</code>.</li>
+    <li>Keep files under about 800 lines and functions under 300. Split by responsibility, not to make a number smaller.</li>
+    <li>Site-specific behaviour goes behind site settings or capabilities, not checks on a site's name.</li>
+    <li>Comments explain why, only where the code isn't obvious.</li>
+    <li>Check admin screens at 1440 and 1024 pixels wide and public pages at 390.</li>
+    <li>Update the matching handbook guide in the same commit as the feature.</li>
+  </ul>
+
+  <h2>Before you commit</h2>
+  <ol class="steps">
+    <li>Run the checks that cover your change: typecheck, unit, database, and the related browser tests.</li>
+    <li>Format only the files you changed (<code>pnpm format</code>), never the migrations.</li>
+    <li>Read the staged diff. Make sure nothing private is in it.</li>
+  </ol>
+
+  <h2>How to approach a change</h2>
+  <ol class="steps">
+    <li>Find the feature in <code>docs/handbook/maintainers/where-things-live.md</code>.</li>
+    <li>Read the screen, its server action, the logic in <code>lib/</code> and the current database command in <code>packages/schema/current/</code>.</li>
+    <li>Read the existing tests for that feature; they describe the intended behaviour.</li>
+    <li>Make the change, add or update tests, and update the guide.</li>
+  </ol>
+</section>
+
+<!-- ============ KNOWN ISSUES ============ -->
+<section class="chapter" id="known-issues" data-title="Known issues" hidden>
+  <p class="eyebrow">Chapter 7 · Known issues</p>
+  <h1>Known glitches and limits</h1>
+  <p class="lede">Checked November 9, 2026, on commit <code>181fe954</code>. Unit, database and full Chromium tests pass. Full WebKit passed 652 of 653; the one failure was in a test and is fixed.</p>
+
+  <div class="table-wrap"><table>
+    <thead><tr><th>What you see</th><th>Why</th><th>What to do</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td>A Header or Footer preview stays blank</td><td>Seen only in a background Chrome tab with debugging tools attached. Cause not found.</td><td>Use <b>Try preview again</b> once, or open the preview in a new tab. Your draft is safe.</td><td><span class="pill open">Open</span></td></tr>
+      <tr><td>No invitation or notification emails</td><td>Email delivery is not configured.</td><td>Add people with <b>Add person</b>. Check <b>Settings → Contact messages</b> for form submissions.</td><td><span class="pill open">Needs setup</span></td></tr>
+      <tr><td>New editors can't sign in</td><td>Supabase's built-in sender only emails its own project team.</td><td>Configure a custom email sender in Supabase.</td><td><span class="pill open">Needs setup</span></td></tr>
+      <tr><td>First load after a quiet period takes about 11 seconds</td><td>Servers scale to zero when idle to save cost, then start up again.</td><td>Wait for it. Keeping one instance always on removes this but costs more.</td><td><span class="pill limit">Hosting choice</span></td></tr>
+      <tr><td>Public sites go down if Cloud Run or the database does</td><td>Pages are built on request from the live database. Static publishing is planned separately.</td><td>Watch health alerts.</td><td><span class="pill limit">Accepted for testing</span></td></tr>
+      <tr><td>Some screens are slow on the review copy</td><td>The test database is the smallest Cloud SQL tier.</td><td>A larger tier is described in <code>hosting/speed-and-size.md</code>.</td><td><span class="pill limit">Hosting choice</span></td></tr>
+      <tr><td>Site editors can't add or move sections</td><td>Deliberate: content roles change content, not layout.</td><td>Ask an Admin.</td><td><span class="pill rule">By design</span></td></tr>
+      <tr><td>Site admins can't manage people</td><td>People management is Super admin only for now.</td><td>Ask a Super admin.</td><td><span class="pill open">Open</span></td></tr>
+      <tr><td>Better Together 2027 and Human Needs Index screens differ, and not everything is editable</td><td>They are imported reference sites kept with their original designs.</td><td>Use them as references; edit SAWSO and Echelon normally.</td><td><span class="pill limit">By design</span></td></tr>
+      <tr><td>Editing on a phone is awkward</td><td>The editor targets laptops and desktops. Public pages work on phones.</td><td>Edit on a computer.</td><td><span class="pill limit">By design</span></td></tr>
+      <tr><td>Custom domains aren't connected</td><td>Sites use their Firebase review addresses. Domain and DNS work is a separate step.</td><td>See <code>hosting/domains.md</code>.</td><td><span class="pill open">Next step</span></td></tr>
+      <tr><td>A few older browser tests share test data</td><td>The Navigation and Header/Footer test suites haven't been isolated like the others.</td><td>If one fails, run it alone before investigating.</td><td><span class="pill open">Test cleanup</span></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ============ HISTORY ============ -->
+<section class="chapter" id="history" data-title="History" hidden>
+  <p class="eyebrow">Chapter 8 · History</p>
+  <h1>How it got here</h1>
+  <p class="lede">The CMS was rebuilt once and refactored twice. Each step kept what worked and fixed what the previous design couldn't.</p>
+
+  <div class="timeline">
+    <div class="era">
+      <span class="when">JUNE – JULY 2026</span>
+      <h3>V1: Vue and Firebase</h3>
+      <p>A Vue admin running in the browser, content in Firestore, and public sites as static files that fetched their content in the visitor's browser. The editor loaded the live site inside a frame and talked to it across two separate websites.</p>
+      <p>It got the hard parts right: drafts kept apart from live pages, conflict warnings, database-enforced permissions, review and history, and one renderer for preview and live.</p>
+    </div>
+    <div class="era">
+      <span class="when">AUGUST 13 – 17, 2026</span>
+      <h3>V1.5: the V1 cleanup</h3>
+      <p>An audit and refactor moved logic out of screens into 16 services and fixed a batch of bugs. The code got much better, but the platform's limits stayed.</p>
+    </div>
+    <div class="era">
+      <span class="when">AUGUST 21 – NOVEMBER 6, 2026</span>
+      <h3>V2: Next.js and Postgres</h3>
+      <p>A rebuild to remove V1's platform limits. Foundation and security work came first, then on October 25 the editing experience was redone. Released as <code>v2026.11.06</code>.</p>
+    </div>
+    <div class="era">
+      <span class="when">NOVEMBER 7 – 8, 2026</span>
+      <h3>The refactor</h3>
+      <p>Same architecture, much cleaner code. Large files split by responsibility, the main stylesheet went from 11,796 lines to 39, dead code removed, slow database reads rewritten, and a batch of real bugs fixed. Commit <code>181fe954</code>.</p>
+    </div>
+  </div>
+
+  <h2>Why V1 was rebuilt</h2>
+  <div class="table-wrap"><table>
+    <thead><tr><th>V1 limit</th><th>How V2 answers it</th></tr></thead>
+    <tbody>
+      <tr><td>Pages were assembled in the visitor's browser, so search engines and link previews often saw nothing</td><td>Complete HTML built on the server</td></tr>
+      <tr><td>The editor and the site were two websites messaging each other, with timing races, and the editor couldn't be tested automatically</td><td>The editor canvas lives in the same app and is tested in two browsers</td></tr>
+      <tr><td>Firestore had no joins, small batch and document limits, and permissions in a second rules language where bugs hid</td><td>Postgres with transactions, constraints and row-level security</td></tr>
+      <tr><td>Scheduling, media storage and server rendering all needed a paid Firebase plan</td><td>A job queue inside Postgres and a standard container</td></tr>
+      <tr><td>Most sections were code, so editing a section meant a developer rebuild</td><td>Sections are versioned data, editable in the CMS</td></tr>
+      <tr><td>Built for one organization, with the brand hard-coded in many files</td><td>Multi-site by design, with site behaviour in settings</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>Can it grow?</h2>
+  <p>Yes. One database isolates every site, one public app serves every site and the container can run on any host, so adding a site is setup, not new code. Today's limits are hosting settings: one small server instance, a small database tier and two database connections. Raising them needs no code change. Two longer-term limits: all sites share one database, so a very busy site could slow others, and moving a large site to its own database isn't built yet.</p>
+</section>
+
+  </main>
+</div>
+
+<script>
+(function () {
+  var chapters = Array.prototype.slice.call(document.querySelectorAll('.chapter'));
+  var toc = document.getElementById('toc');
+  var chips = document.getElementById('chips');
+  chapters.forEach(function (c, i) {
+    var label = c.getAttribute('data-title');
+    var li = document.createElement('li');
+    var a = document.createElement('a');
+    a.href = '#' + c.id;
+    a.innerHTML = '<span>' + String(i + 1).padStart(2, '0') + '</span>' + label;
+    li.appendChild(a); toc.appendChild(li);
+    var chip = document.createElement('a');
+    chip.href = '#' + c.id; chip.textContent = label; chips.appendChild(chip);
+    var pager = document.createElement('nav');
+    pager.className = 'pager'; pager.setAttribute('aria-label', 'Chapter navigation');
+    var prev = chapters[i - 1], next = chapters[i + 1];
+    if (prev) pager.innerHTML += '<a href="#' + prev.id + '"><small>PREVIOUS</small>← ' + prev.getAttribute('data-title') + '</a>';
+    if (next) pager.innerHTML += '<a class="next" href="#' + next.id + '"><small>NEXT</small>' + next.getAttribute('data-title') + ' →</a>';
+    c.appendChild(pager);
+  });
+  function show() {
+    var id = (location.hash || '').slice(1);
+    var target = chapters.find(function (c) { return c.id === id; }) || chapters[0];
+    chapters.forEach(function (c) { c.hidden = c !== target; });
+    document.querySelectorAll('.toc a, .chips a').forEach(function (a) {
+      if (a.getAttribute('href') === '#' + target.id) a.setAttribute('aria-current', 'page');
+      else a.removeAttribute('aria-current');
+    });
+    document.title = target.id === chapters[0].id ? 'NCRD CMS Handbook' : target.getAttribute('data-title') + ' · NCRD CMS Handbook';
+    if (id) window.scrollTo(0, 0);
+  }
+  window.addEventListener('hashchange', show);
+  show();
+})();
+</script>
+</body>
+</html>
