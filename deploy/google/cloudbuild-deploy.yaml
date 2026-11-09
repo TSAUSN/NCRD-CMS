@@ -1,0 +1,47 @@
+# Push-to-main production deploy for the Cloud Build trigger `ncrd-cms-deploy`.
+# Stops before building when the migration set differs from the live image.
+# Steps live in cloud-build-deploy.sh; see docs/handbook/upgrades/automatic-releases.md.
+steps:
+  - id: live-image
+    name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+    entrypoint: bash
+    args: [deploy/google/cloud-build-deploy.sh, live-image]
+  - id: migration-guard
+    name: gcr.io/cloud-builders/docker
+    entrypoint: bash
+    args: [deploy/google/cloud-build-deploy.sh, migration-guard]
+  - id: build
+    name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - --target=runtime
+      - --build-arg=APP_VERSION=$COMMIT_SHA
+      - --tag=${_IMAGE}:$COMMIT_SHA
+      - .
+  - id: push
+    name: gcr.io/cloud-builders/docker
+    entrypoint: bash
+    args: [deploy/google/cloud-build-deploy.sh, push]
+  - id: deploy
+    name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+    entrypoint: bash
+    args: [deploy/google/cloud-build-deploy.sh, deploy]
+substitutions:
+  _IMAGE: us-central1-docker.pkg.dev/${PROJECT_ID}/cms-v2/app
+  _REGION: us-central1
+  _SITE: ncrd-cms-site
+  _WORKER: ncrd-cms-worker
+  _ADMIN: ncrd-cms-admin
+timeout: 3600s
+options:
+  dynamicSubstitutions: true
+  logging: CLOUD_LOGGING_ONLY
+  machineType: E2_STANDARD_2
+  env:
+    - COMMIT_SHA=$COMMIT_SHA
+    - PROJECT_ID=$PROJECT_ID
+    - REGION=${_REGION}
+    - IMAGE=${_IMAGE}
+    - SITE=${_SITE}
+    - WORKER=${_WORKER}
+    - ADMIN=${_ADMIN}

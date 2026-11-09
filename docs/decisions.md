@@ -15,6 +15,7 @@ The dated entries below explain the choices; they do not override a later platfo
 
 | Subject | Decision |
 | --- | --- |
+| Pushes to `main` deploy through Cloud Build | [Production deploys through a Cloud Build trigger — November 9, 2026](#production-deploys-through-a-cloud-build-trigger--november-9-2026) |
 | Friday sign-in is Super-admin-only on personal Supabase | [Friday stays on personal Supabase, Super admin only — November 5, 2026](#friday-stays-on-personal-supabase-super-admin-only--november-5-2026) |
 | Friday SQL starts on the agreed micro budget | [Friday database budget: micro first — November 5, 2026](#friday-database-budget-micro-first--november-5-2026) |
 | Product access and email delivery are separate | [Add product access independently of invitation mail — November 5, 2026](#add-product-access-independently-of-invitation-mail--november-5-2026) |
@@ -35,6 +36,19 @@ The dated entries below explain the choices; they do not override a later platfo
 | Queue Story metadata and enforce feed policy | [2026-10-31 — Queue story metadata saves and enforce published feed policy](#2026-10-31--queue-story-metadata-saves-and-enforce-published-feed-policy) |
 | World View is server-rendered | [2026-10-31 — Use one server-rendered World View section](#2026-10-31--use-one-server-rendered-world-view-section) |
 | Chapter creation uses site-owned photos | [2026-11-01 — Use site-owned Echelon photos at creation and publication](#2026-11-01--use-site-owned-echelon-photos-at-creation-and-publication) |
+
+## Production deploys through a Cloud Build trigger — November 9, 2026
+
+The `ncrd-cms-deploy` trigger in `aohub-migration` runs
+`deploy/google/cloudbuild-deploy.yaml` on each push to `main`, as the
+organization's other Cloud Run apps do. It runs as `cms-builder` with
+`run.developer` on the three CMS services and `serviceAccountUser` on their
+runtime accounts. GitHub Actions minutes are exhausted, so the Actions release
+path stays unconfigured. The trigger does not run the browser suites; run the
+relevant checks before pushing. It stops before building when the migration set
+differs from the live image, because migrations run separately. A commit message
+containing `[skip ci]` skips the deploy as well as Actions. Reverse by disabling
+or deleting the trigger and removing the two grants.
 
 ## 2026-10-31 — Connect Story actions to the existing scoped review
 

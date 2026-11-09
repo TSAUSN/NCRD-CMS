@@ -12,6 +12,15 @@ exact name in the repository variable `CMS_STAGING_BRANCH`. Use that same
 name in the staging environment's branch rule and federation condition.
 
 
+## Current production path
+
+Production currently deploys through the Cloud Build trigger `ncrd-cms-deploy`,
+not GitHub Actions. See [the decision](../../decisions.md#production-deploys-through-a-cloud-build-trigger--november-9-2026)
+and `deploy/google/cloudbuild-deploy.yaml`. A push to `main` without `[skip ci]`
+deploys after its migration guard passes. When migrations change, apply them
+with the operator runbook, then re-run the failed build. The GitHub setup below
+remains available when Actions minutes return.
+
 ## Enable the two environments
 
 1. Set up each environment separately using [the Google bootstrap](../hosting/bootstrap.md).
