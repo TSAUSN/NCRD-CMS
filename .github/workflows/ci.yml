@@ -69,7 +69,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           # SPEC §2: development, CI, and the container share one Node major.
-          node-version: 24
+          # Playwright's workspace TypeScript loader is verified on this Node 24 release.
+          # Node 24.22.2 fails discovery before any spec runs; keep the known working toolchain.
+          node-version: 24.15.0
           cache: pnpm
       - run: pnpm install --frozen-lockfile
 
