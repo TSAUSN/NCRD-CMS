@@ -267,7 +267,7 @@ export function AdminHome({ email, role, access, sites, pages, reviewCounts, ope
             </div>
           </Disclosure>
         )}
-        {operations && <Disclosure title="Test tools (this computer only)">{operations}</Disclosure>}
+        {operations && <Disclosure title="System status">{operations}</Disclosure>}
       </main>
     </AppShell>
   )

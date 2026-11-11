@@ -19,6 +19,8 @@ export default async function ConfirmSignIn({
   const { token_hash: tokenHash, type, code, error, error_code: errorCode } = await searchParams
   // The provider sends people back with an error instead of a code when the
   // emailed link was already opened once, for example by a mail security scan.
+  // Supabase can also put errors in a URL fragment, which the server cannot
+  // read. The incomplete-link fallback must offer the same safe recovery.
   const spent = !code && !tokenHash && Boolean(error || errorCode)
   const codeValid = code && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(code)
   const browserProof = (await cookies()).has(SIGN_IN_PROOF_COOKIE)
@@ -29,11 +31,11 @@ export default async function ConfirmSignIn({
     <EntryPanel
       heading="Confirm sign-in"
       lede={
-        code
-          ? 'Continue to finish signing in.'
-          : spent
-            ? 'This link can no longer sign you in.'
+        valid
+          ? code
+            ? 'Continue to finish signing in.'
             : 'Continue to sign in using the link from your email.'
+          : 'Use your password or request a new sign-in link.'
       }
     >
       {valid ? (
@@ -51,7 +53,7 @@ export default async function ConfirmSignIn({
             ? 'Open this link in the browser where you requested it, or start sign-in again here.'
             : spent
               ? 'This sign-in link was already used or has expired. Some email systems open links to check them before you do, which uses the link up. Sign in with your password, or request another link.'
-              : 'This link is incomplete. Request another sign-in link.'}
+              : 'This sign-in link is incomplete, expired or already used. Sign in with your password, or request a new link.'}
         </p>
       )}
       <p className="entry-note">

@@ -3798,3 +3798,16 @@ admin still holds only the publishable key, and a password is set with the
 person's own session. The confirmation page now says when a link was already
 used. Reverse by removing the two provider methods, their actions, the
 `/account/password` page and the second sign-in button; no data changes.
+
+## Sign-in recovery and operator labels — November 11, 2026
+
+Supabase may return failed email-link details in a URL fragment, which server
+search parameters cannot read. An invalid confirmation therefore always offers
+password sign-in or a new link, including when no query error is visible. This
+changes the explanation only; invalid links still cannot issue a session.
+
+The Super admin Home diagnostics are called System status because their worker
+and queue evidence also describes hosted installations. Actual local chapter
+test tools keep their existing labels and access restrictions. The editor sign-in
+guide now covers password setup, same-browser email links and the gated Microsoft
+provider rather than describing email-only login as the only available option.
