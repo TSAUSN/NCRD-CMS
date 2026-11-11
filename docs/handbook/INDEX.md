@@ -15,7 +15,7 @@ Permissions are enforced by the database, not only by the screens.
 | Learn how the CMS works and do ten common tasks | [start-here/README.md](start-here/README.md) | Whole guide |
 | Ship a code update to the Google review | [upgrades/ship-an-update.md](upgrades/ship-an-update.md) | Tested commands and rollback |
 | Understand a word the CMS uses | [start-here/glossary.md](start-here/glossary.md) | The table |
-| Search steps by work area inside the CMS | Open **Help** in the sidebar (`/help`) | Search or choose a work area; this does not change account permissions |
+| Find role-based steps inside the CMS | Open **Help** in the sidebar (`/help`) | Choose Guidance for, search a task, or open a common-task guide; permissions stay unchanged |
 | Sign in | [start-here/sign-in.md](start-here/sign-in.md) | Whole guide |
 | Find my work after signing in | [start-here/content-home.md](start-here/content-home.md) | Whole guide |
 | Find the CMS name for something I did in Symphony | [start-here/coming-from-symphony.md](start-here/coming-from-symphony.md) | The table |
@@ -43,8 +43,8 @@ Permissions are enforced by the database, not only by the screens.
 | Spread stories out on a calendar | [editing/coming-up.md](editing/coming-up.md) | Whole guide |
 | Set up a new site | [site-setup/create-a-site.md](site-setup/create-a-site.md) | Whole guide |
 | Set up Echelon chapters and their pages | [site-setup/echelon-templates.md](site-setup/echelon-templates.md), [site-setup/chapter-destinations.md](site-setup/chapter-destinations.md) | Whole guides |
-| Add an editor without invitation email | [people/adding-a-person.md](people/adding-a-person.md) | Access creation, sign-in prerequisite and restricted view |
-| Decide who can do what | [people/roles.md](people/roles.md) | Whole guide (still a draft for review) |
+| Add a person or change their site access | [people/adding-a-person.md](people/adding-a-person.md) | Access creation, sign-in prerequisite and restricted view |
+| Decide who can do what | [people/roles.md](people/roles.md) | Role/scope boundaries and common tasks; hosted role acceptance is separate |
 | Recover from a problem | [fixing-things/common-problems.md](fixing-things/common-problems.md) | Whole guide |
 
 ## For maintainers

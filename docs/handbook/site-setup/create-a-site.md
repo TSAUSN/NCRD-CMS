@@ -2,20 +2,36 @@
 
 Keep setup choices private until you explicitly create the site.
 
-For: Super admins. Last checked: 2026-11-04.
+For: Super admins. Last checked: November 11, 2026 against the live Name step
+and current creation/publishing commands. No production site was created during
+this documentation check.
 
 ## Steps
 
-1. On **Home** or **All sites**, choose **Create a site**. Only Super admins see
-   this button.
-2. Work through the steps: **Name**, **Look**, **Pages**, **Header & footer** and
-   **Review**. The sample shows your current choices, and **Continue** checks the
-   fields each step needs.
-3. On **Review**, choose **Create site**. This creates the site and its pages as
-   private drafts. Nothing is public yet.
-4. Edit the pages, then review and publish the site from **Publish**. A new site
-   asks you to review its complete design first (**Review first site
-   publication**).
+1. On **Home** or **All sites**, choose **New site** / **Create a site**. Only
+   Super admins can create websites; an Admin manages an existing assigned site.
+2. **Name:** enter **Site name**, **Short name** (or **Short address**) and
+   **One line about the site**. Choose **Resource site** or **Event site**.
+   The short name identifies the site; it is not a custom DNS hostname.
+3. Complete **Look**, **Pages** and **Header & footer**. Review the planned page
+   titles, addresses, shared name and links. The preview follows these choices.
+4. On **Review**, inspect the setup and choose **Create site** once. If asked,
+   confirm sign-in in the offered new tab, then return to retry the retained
+   setup. A hosted creation request requires recent sign-in. An uncertain result
+   should be checked in **All sites** before starting another request.
+5. The site and pages are private drafts. Open each page and replace example
+   text/photos with approved content. Add its team through **People & access**;
+   see [Adding a person](../people/adding-a-person.md).
+6. Review the first complete site publication in **Publish**, including site
+   look, header/footer, menu and required pages. The first-site review asks for
+   the complete design. Resolve the checks and publish only the intended work.
+7. Inspect the public test address, including a nested page, menu, images and
+   Phone layout. A private site-creation receipt does not prove Hosting works.
+   If the test address says **Needs attention**, or Domains has no records,
+   ask the hosting operator to check the provisioning failure.
+8. Connect a custom domain through the separate [domain runbook](../hosting/domains.md)
+   after the hosting path works. Exact records, DNS ownership and a valid HTTPS
+   certificate are separate checks. Never guess DNS from the site's short name.
 
 To start from the national design instead, open the national template and
 choose **Start a site from this**.
