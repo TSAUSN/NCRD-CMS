@@ -20,9 +20,14 @@ export default async function HelpPage({ searchParams }: { searchParams: Promise
         <PageHeader
           title="Help"
           crumbs={[{ label: 'Home', href: '/' }, { label: 'Help' }]}
-          lede="Find the steps for your work. Your account permissions still determine which controls you can use."
+          lede="Choose your role, find a task and follow the steps. Start here for people, site access and new websites."
         />
-        <HelpTopics role={role} initialTopic={topic} />
+        <HelpTopics
+          key={topic ?? 'start'}
+          role={role}
+          initialTopic={topic}
+          isSuperAdmin={session.principal.isSuperAdmin}
+        />
       </main>
     </AppShell>
   )

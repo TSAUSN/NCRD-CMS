@@ -1,85 +1,76 @@
-# Roles — draft for review
+# Roles and site assignments
 
-Use the shortest view that supports a person's content responsibilities.
+For all CMS users. Last checked: November 11, 2026 against the current role,
+navigation and account-management code. This guide explains supported work;
+full hosted acceptance with each real role remains a release check.
 
-For: Admins and Super admins. Last checked: 2026-11-03.
+## Start with your role
 
-This is the approved RoleViews draft, with the hard-rule clarification below.
-It is a target for review, not a claim that every screen already follows it.
+Open **Help** in the CMS sidebar. **Guidance for** starts from your account's
+role and offers the common tasks for that role. Search includes guide titles,
+steps and common names such as “add users.” Choose **Everyone** to find another
+role's instructions. Guidance choices never change permissions. A person's role
+can differ between websites; **People & access** shows actual assignments.
 
-| Work | Super admin | Admin | Site editor | Content creator | Page editor |
-| --- | --- | --- | --- | --- | --- |
-| Words, photos and links | Yes | Yes | Yes | Yes | Assigned page |
-| Add and tag stories | Yes | Yes | Yes | Yes | No |
-| Add and move sections | Yes | Yes | No* | No | No |
-| Publish or schedule | Yes | Yes | Yes | No | No |
-| Create pages | Yes | Yes | Yes | No | No |
-| Header, menu and footer | Yes | Yes | No | No | No |
-| Manage tags | Yes | Yes | No | No | No |
-| Site look and people | Yes | Yes | No | No | No |
-| Section spacing and appearance | Yes | Yes | No | No | No |
-| Template, fonts, hosting and code | Yes | No | No | No | No |
+| Role or scope | Usual work | Ask someone else for |
+| --- | --- | --- |
+| Super admin | People, whole-site assignments, new websites and work across sites | Google/Supabase infrastructure changes unless separately authorized |
+| Admin | Assigned site's shared building blocks, appearance, settings and publication | Global account management, creating a website, domains/infrastructure |
+| Site editor | Content and publication within assigned sites/pages | Native section/layout management, site-wide appearance and People management |
+| Content creator | Drafts and submission for approval | Publication and account/site administration |
+| Chapter contributor | Assigned chapter content; submit for approval | Shared national parts, other chapters and publication |
+| Division team member | Assigned division's chapters and existing approval workflow | Other divisions and global account management |
+| Comment-only reviewer | Existing comment-only review access | Content changes and publication |
 
-*RoleViews shows Yes for Site editor section add/move. The Round3 hard UX rule
-says content fields only, without section management. Native page editing
-follows the hard rule. Admin and Super admin move controls remain.
+Display names map to the existing permission identifiers: Super admin to
+`super_admin`, Admin to `site_admin`, Site editor to `editor`, Content creator
+to `contributor`. Assigned pages and divisions describe scope, not a new
+whole-site role. Native content editors use the offered field controls; the
+older RoleViews proposal in [roles-draft.md](roles-draft.md) is not an authority
+to expose additional controls. Imported-site interfaces retain their existing
+controls. Database commands and publication checks remain authoritative.
 
-Verified locally: native content-role page editing keeps the page list, fields
-and card/slide flows while hiding section management, spacing and visibility.
-Content-only native panels open directly on fields without a redundant Content
-tab. Admins and Super admins retain grouped controls. Imported-site editor
-interfaces keep their existing controls while those sites are frozen.
+## How the CMS fits together
 
-Database permissions and normal save/release checks remain enforced. The
-remaining full-screen comparisons and fresh-account role acceptance are open;
-do not use this draft as proof of those behaviors. Chapter page memberships
-resolve to Content creator and submit for approval; division assignments resolve
-to Site editor and retain their existing chapter approval capability. People and role badges use Super admin, Admin, Site editor and Content creator.
-These map to the existing super_admin, site_admin, editor and contributor IDs;
-permissions do not change. “Assigned pages” or “division” describes the scope,
-not whole-site access. Comment-only reviewers keep their existing access and name.
+1. A **person** signs in through the configured provider and receives explicit
+   CMS site/page/division assignments.
+2. A **site** contains its own pages, media, stories/lists, menu, appearance and
+   settings. One CMS can manage several websites.
+3. **Save draft** stores private content. Preview can show saved changes that
+   visitors cannot see yet. A contributor submits a review request.
+4. An authorized publisher reviews the selected changes and shared dependencies
+   in **Publish**, then confirms. Visitors see published projections through a
+   working website address. Code deployment does not publish content drafts.
 
-An assigned-page editor can load the photos referenced by that page and its
-history. This does not open the site-wide Media library or unrelated photos.
-Removing the page assignment removes this photo access too.
+Google Cloud and Supabase project membership are infrastructure access, separate
+from a CMS role. Microsoft sign-in likewise proves identity without granting a
+site assignment. Neither selecting a Help role nor knowing a site's address
+changes the account's permissions.
 
-For chapter work, refresh the chapter list after someone else changes its page
-before sending an invitation. The invitation checks the current saved version
-and refuses an outdated screen. Invitations remain in the local outbox for
-this demo; no real email is sent. Scoped volunteers send content for approval.
+## Common tasks by role
 
-The local demo's three example accounts display role placeholders. Catalogue
-people/speakers are numbered samples. These labels do not change their access;
-use the role and assigned-scope notes to see what an account can do.
+- **Super admin:** [add a person or change their site access](adding-a-person.md),
+  [create a website](../site-setup/create-a-site.md), review first publication.
+- **Admin:** [shared site look](../site-setup/site-look.md),
+  [header/menu/footer](../site-setup/header-menu-footer.md),
+  [tags](../editing/story-tags.md), [publishing](../publishing/review-changes.md).
+- **Site editor / Content creator:** [find and edit a page](../editing/pages.md),
+  [stories](../editing/stories.md), [publish or submit](../publishing/publish-a-page.md).
+- **Chapter/division team:** [chapter setup and destinations](../site-setup/chapter-destinations.md).
+- **Hosting operator:** [domain checks](../hosting/domains.md),
+  [deployment](../upgrades/ship-an-update.md), [backup/recovery](../upgrades/backup-recovery.md).
 
-People & access opens People for Super admins. Invite someone keeps the same
-invitation flow. When invitation delivery is off, Add person creates the chosen
-site access without sending an email; see [Adding a person](adding-a-person.md). Other
-accounts open Your access and see their authorized sites and scopes. This pass
-does not grant account management to Site admins.
+## Narrow access and missing access
 
-Choose Edit access to open the bounded panel beside the list. Save account
-access and Cancel stay at the bottom while fields scroll. Saving access takes
-effect immediately; it is separate from page drafts and publication. Existing
-chapter/division assignments stay visible and unchanged when saving whole-site
-account fields. Manage chapter access and Manage division team open their
-existing setup screens. Deactivation still requires its normal confirmation.
+Whole-site membership covers every page. Chapter/division assignments remain
+separate and survive saving whole-site account fields. An assigned-page editor
+can load photos referenced by the page and its history; this does not open the
+site-wide Media library or unrelated photos. Removing the assignment removes
+that photo access. Deactivation stops all CMS access on the next request while
+keeping content and history. An existing Super admin stays global until the
+responsible platform administrator changes that role.
 
-Closing or choosing another account with unfinished changes offers Keep editing,
-Discard changes and Save draft and leave. Saving on leave keeps only private
-choices in this browser, scoped to your account and the selected person (or the
-invitation form). It changes no permissions, creates no account and sends no
-invitation. Reopening restores those choices; Clear saved access choices removes
-the browser copy and returns to the form's opening values. A storage failure
-keeps the form open. Another browser has its own choices.
-
-Review restored name, status and whole-site access before using Save account
-access or Create account & send invitation. An old restored revision cannot
-replace newer account access; clear the choices and reopen the account after a
-stale refusal. Missing saved sites require clearing and reopening. Deactivation
-still requires its explicit confirmation. Discard returns to the opening or
-last browser-saved choices; it does not delete an earlier saved browser copy.
- A pending save disables switching and
-closing; an uncertain result keeps its error with the fields. Search/filter and
-empty states use saved account facts. Status is shown instead of an invented
-last-active time; January/July reminders stay in chapter-site Settings.
+If a site is missing, check the signed-in email and **People & access → Your
+access**. Ask a Super admin to inspect the exact assignment and account status.
+For paused chapter access, also check update mode and archived page/site state.
+Do not create a duplicate account or grant every website to fix one missing scope.

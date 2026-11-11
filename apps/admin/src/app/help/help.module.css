@@ -12,3 +12,18 @@
 .filters > :first-child {
   flex: 1;
 }
+
+.roleGuide {
+  display: grid;
+  gap: var(--space-3);
+}
+.shortcuts,
+.steps {
+  display: grid;
+  gap: var(--space-3);
+  padding-inline-start: var(--space-5);
+}
+.audience {
+  color: var(--text-muted);
+  font-size: var(--text-meta);
+}

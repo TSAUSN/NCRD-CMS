@@ -3849,3 +3849,20 @@ The reference check passes on a new disposable PostgreSQL 16 cluster with
 version 16 tools. Pin the checks job to Ubuntu 24.04 and assert the dump and
 restore major before migrating. Preserve the exact catalog comparison and
 all policy tests; no generated SQL or immutable migration is changed.
+
+
+## 2026-11-11 — Role-first task help
+
+Expand authenticated Help into role-first onboarding with searchable task guides
+for adding people, changing site access, creating websites and the draft/review/
+publication flow. Reuse the actual People labels and site-creation steps. Explain
+CMS membership, provider sign-in and infrastructure access separately. Global
+People and site creation remain Super-admin-only; selecting Help guidance grants
+no permissions. Document browser-only saved account/setup choices, recent sign-in,
+scoped chapter/division access and independent email/Hosting prerequisites.
+
+Keep existing contextual topic IDs and shareable guide links. Search includes
+steps and common user terms, with an explicit route to other roles' matching
+help. Match the handbook to current workflows; retain the historical RoleViews
+proposal as a proposal. No account/site action, migration, role change, invitation,
+content publication or domain operation is performed by this documentation work.
