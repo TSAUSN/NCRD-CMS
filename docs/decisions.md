@@ -3811,3 +3811,19 @@ and queue evidence also describes hosted installations. Actual local chapter
 test tools keep their existing labels and access restrictions. The editor sign-in
 guide now covers password setup, same-browser email links and the gated Microsoft
 provider rather than describing email-only login as the only available option.
+
+
+## 2026-11-11 — Monday CMS follow-up guidance (DOC-1 / WS-8)
+
+Add authenticated, searchable Help with work-area filters and contextual links from
+saved-number publishing errors, story tags and domains. Explain unassigned tags
+and tags without suggestion keywords without changing editorial assignments. A
+reserved domain with no provider records says Preparing DNS instructions, rather
+than implying that the DNS administrator already has actionable records.
+
+Sign-in and both password-setting fields have explicit Show/Hide controls; the
+password is hidden initially and revealing it never submits the form.
+
+These changes do not grant permissions, publish content, retry failed hosting
+work, configure Analytics, enable Azure or change DNS. Those operational steps
+still require the owning administrator, approved identifiers and normal review.

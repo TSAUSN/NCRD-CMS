@@ -1,4 +1,5 @@
 'use client'
+import { GuardedLink as Link } from '../../../../../components/guarded-link.tsx'
 import { ReorderAnnouncement } from '../../../../../components/ui/drop-indicator.tsx'
 import { Badge, Button, ButtonLink, Note, PageHeader } from '../../../../../components/ui/index.ts'
 import workspaceFormsStyles from '../../../../../components/workspace-styles/workspace-forms.module.css'
@@ -10,6 +11,15 @@ export function TagManager(props: TagManagerProps) {
   const { siteId } = props
   const model = useTagManager(props)
   const { pending, hasDraft, dirty, setConfirmSuggestions, message, error, reorder } = model
+  const tagChecks = (['main', 'secondary'] as const).flatMap(group =>
+    model.tags(group).map(tag => ({
+      label: tag.label,
+      noKeywords: tag.keywords.length === 0,
+      unused: model.count(group, tag.id) === 0,
+    })),
+  )
+  const withoutKeywords = tagChecks.filter(tag => tag.noKeywords)
+  const unassigned = tagChecks.filter(tag => tag.unused)
   return (
     <>
       <PageHeader
@@ -48,6 +58,22 @@ export function TagManager(props: TagManagerProps) {
         </Note>
       )}
 
+      <Note>
+        Keywords suggest tags; editors review the assignments before publishing. Re-suggest only changes unreviewed
+        stories. <Link href="/help?topic=stories">How story tagging works</Link>
+      </Note>
+      {withoutKeywords.length > 0 && (
+        <Note tone="warning">
+          No suggestion keywords: {withoutKeywords.map(tag => tag.label).join(', ')}. These tags can still be assigned
+          manually.
+        </Note>
+      )}
+      {unassigned.length > 0 && (
+        <Note>
+          No stories assigned: {unassigned.map(tag => tag.label).join(', ')}. Review relevant stories and their tags
+          before publishing.
+        </Note>
+      )}
       <StoryTagLevel model={model} group="main" />
       <StoryTagLevel model={model} group="secondary" />
       <div className={workspaceFormsStyles.actions}>

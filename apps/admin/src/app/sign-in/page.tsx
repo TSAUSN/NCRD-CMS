@@ -1,6 +1,7 @@
 import { signIn, signInWithMicrosoft, signInWithPassword } from '../actions/auth.ts'
 import { authProvider, currentSession } from '../../lib/session.ts'
 import { redirect } from 'next/navigation'
+import { PasswordInput } from '../../components/password-input.tsx'
 import { EntryPanel } from '../../components/entry.tsx'
 import { IconAlert, IconMail, IconClock } from '../../components/icons.tsx'
 import { SignInButton } from './submit-button.tsx'
@@ -132,7 +133,7 @@ export default async function SignInPage({
             </div>
             <div className="field">
               <label htmlFor="password">Password</label>
-              <input id="password" name="password" type="password" required autoComplete="current-password" />
+              <PasswordInput id="password" name="password" required autoComplete="current-password" />
             </div>
             <SignInButton label="Sign in" />
             <SignInButton label="Email me a sign-in link" formAction={signIn} />

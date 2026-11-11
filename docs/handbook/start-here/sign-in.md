@@ -14,6 +14,8 @@ fresh one-time link supplied privately by your Supabase project owner. Open
 **Password** in the sidebar, type your own password of at least 12 characters
 twice, and choose **Save password**. Use that password on later visits. The same
 screen replaces a forgotten password after you sign in again with a fresh link.
+Each password field has a **Show** button; choose **Hide** to mask it again.
+The buttons do not save or submit the form.
 Do not send your password to the administrator or put it in a chat.
 
 ## Email links and recovery

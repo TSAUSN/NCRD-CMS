@@ -44,6 +44,13 @@ export function EditorNotices({
           {result.ok ? <IconCheck size={16} /> : <IconAlert size={16} />}
           <div className="notice-body">
             {result.message}
+            {!result.ok && result.message.includes('Publish the saved numbers with this page') && (
+              <p>
+                This page uses shared Data values that are still a draft. Ask an administrator to review and publish
+                those values with the intended page changes. Your page draft is kept.{' '}
+                <Link href="/help?topic=saved-numbers">How to publish saved numbers</Link>
+              </p>
+            )}
             {scheduleFirstReview && (
               <div>
                 <Link className="btn small" href={'/sites/' + siteId + '/publishing'}>

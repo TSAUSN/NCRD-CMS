@@ -15,6 +15,7 @@ Permissions are enforced by the database, not only by the screens.
 | Learn how the CMS works and do ten common tasks | [start-here/README.md](start-here/README.md) | Whole guide |
 | Ship a code update to the Google review | [upgrades/ship-an-update.md](upgrades/ship-an-update.md) | Tested commands and rollback |
 | Understand a word the CMS uses | [start-here/glossary.md](start-here/glossary.md) | The table |
+| Search steps by work area inside the CMS | Open **Help** in the sidebar (`/help`) | Search or choose a work area; this does not change account permissions |
 | Sign in | [start-here/sign-in.md](start-here/sign-in.md) | Whole guide |
 | Find my work after signing in | [start-here/content-home.md](start-here/content-home.md) | Whole guide |
 | Find the CMS name for something I did in Symphony | [start-here/coming-from-symphony.md](start-here/coming-from-symphony.md) | The table |

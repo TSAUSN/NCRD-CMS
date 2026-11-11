@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import { PASSWORD_MAX_BYTES, PASSWORD_MIN_LENGTH } from '@cms/platform'
+import { PasswordInput } from '../../../components/password-input.tsx'
 import { AppShell } from '../../../components/app-shell.tsx'
 import { IconAlert, IconCheck } from '../../../components/icons.tsx'
 import { navigationFor } from '../../../components/nav.ts'
@@ -59,10 +60,9 @@ export default async function PasswordPage({
           <input type="email" name="email" value={session.email} autoComplete="username" readOnly hidden />
           <div className="field">
             <label htmlFor="password">New password</label>
-            <input
+            <PasswordInput
               id="password"
               name="password"
-              type="password"
               required
               minLength={PASSWORD_MIN_LENGTH}
               maxLength={PASSWORD_MAX_BYTES}
@@ -75,10 +75,9 @@ export default async function PasswordPage({
           </div>
           <div className="field">
             <label htmlFor="password-again">Type it again</label>
-            <input
+            <PasswordInput
               id="password-again"
               name="passwordAgain"
-              type="password"
               required
               minLength={PASSWORD_MIN_LENGTH}
               maxLength={PASSWORD_MAX_BYTES}

@@ -2,7 +2,7 @@
 
 Organize stories with this site's own tags, keywords and map regions, then publish the draft changes.
 
-For: Site admins and Super admins. Last checked: 2026-11-02.
+For: Site admins and Super admins. Last checked: 2026-11-11.
 
 Open Stories, then Manage tags. SAWSO calls its two groups Project Sectors and
 Regions. Another site can use its own names through Rename level. Editors and
@@ -30,9 +30,15 @@ queue; opening it does not publish. If another person changed Stories, reload
 Manage tags before saving again. Done returns to Stories. There is no automatic
 public-feed refresh, embed code or external sign-in on this screen.
 
-The new workspace's click-to-tag list, refresh, map, Split View and calendar are
-still in progress. Their required real-app acceptance remains open; this guide
-does not certify all Stories requirements or the final numbered checklist.
+The story list, tag chips, refresh controls, World View, Split View and calendar
+are implemented. A controlled check with a real newly added or removed source
+story remains open; these controls alone do not certify that acceptance gate.
+
+Manage tags now summarizes tags without keywords and tags with no assigned
+stories. No keywords means no keyword-based suggestions, but manual assignment
+still works. Zero assigned stories is a review prompt, not an automatic error.
+The summaries do not change assignments or publish anything. For searchable
+steps, open Help in the CMS sidebar and search for story tags.
 
 The current TagManager comparison at 1440/1024 uses shared navigation, buttons,
 row menus and region checkboxes. Normal saves still preserve identities and

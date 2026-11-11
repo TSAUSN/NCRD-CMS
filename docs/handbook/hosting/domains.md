@@ -25,6 +25,9 @@ unrehearsed, so this is a runbook, not a completed live-domain claim.
    Firebase ownership/certificate records. Follow each explicit **Add/Remove**
    action; do not invent an IP or copy the personal project's targets. Have IT
    approve the complete record diff before applying it. Preserve unrelated records.
+   When the provider has not returned any records, the CMS shows **Preparing DNS
+   instructions**. Check failed background work with the hosting administrator;
+   do not interpret the reservation as actionable DNS instructions.
 5. The authorized DNS administrator applies that exact diff and checks authoritative
    DNS plus an independent resolver. Use **Verify now** and **Refresh domain
    status**; the CMS also checks in the background. Pending DNS, ownership verified,

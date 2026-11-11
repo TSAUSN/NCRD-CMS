@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
+import { GuardedLink as Link } from '../../../../components/guarded-link.tsx'
 import { ConfirmDialog } from '../../../../components/confirm.tsx'
 import { domainStatusLabel, recordsText, type DomainRow } from '../../../../lib/domains.ts'
 import { reviewTime } from '../../../../lib/review-time.ts'
@@ -118,13 +119,25 @@ export function DomainWorkspace({
         >
           <h2>{row.hostname_normalized}</h2>
           <p>
-            <strong>{domainStatusLabel(row.removed_at ? 'removed' : row.status)}</strong> ·{' '}
+            <strong>
+              {!row.removed_at && row.status === 'pending_dns' && !row.dns_records?.length
+                ? 'Preparing DNS instructions'
+                : domainStatusLabel(row.removed_at ? 'removed' : row.status)}
+            </strong>{' '}
+            ·{' '}
             {row.kind === 'primary'
               ? 'Primary address'
               : row.kind === 'staging'
                 ? 'Staging address'
                 : `Redirects to ${row.redirect_hostname}`}
           </p>
+          {!row.removed_at && row.status === 'pending_dns' && !row.dns_records?.length && (
+            <p className="notice" role="note">
+              The hosting service has not returned DNS records yet. A hosting administrator should check failed
+              background work before you change DNS. Refreshing this page does not retry a failed task.{' '}
+              <Link href="/help?topic=domains">Domain setup help</Link>
+            </p>
+          )}
           {row.last_checked_at && <p className="hint">Last checked: {reviewTime(row.last_checked_at)}</p>}
           {row.error_detail && !row.removed_at && <p className="notice">{row.error_detail}</p>}
           {!!row.dns_records?.length && !row.removed_at && (

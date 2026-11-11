@@ -1,0 +1,14 @@
+.topics {
+  display: grid;
+  gap: var(--space-4);
+  max-inline-size: var(--form-content-max);
+}
+.filters {
+  display: flex;
+  align-items: end;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+.filters > :first-child {
+  flex: 1;
+}

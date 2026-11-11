@@ -2,6 +2,7 @@ import { GuardedLink as Link } from './guarded-link.tsx'
 import { signOut } from '../app/actions/auth.ts'
 import {
   IconHome,
+  IconInfo,
   IconLocation,
   IconBrush,
   IconChevronDown,
@@ -295,6 +296,18 @@ export function AppSidebar({
             Signed in as {email}, {role}
           </span>
         </div>
+        <Link
+          href="/help"
+          className="navlink"
+          aria-label="Help"
+          aria-current={pathname === '/help' ? 'page' : undefined}
+          title={rail ? 'Help' : undefined}
+        >
+          <span className="navlink-icon">
+            <IconInfo size={18} />
+          </span>
+          <span className="navlink-label">Help</span>
+        </Link>
         {passwordSignIn && (
           <Link
             href="/account/password"
