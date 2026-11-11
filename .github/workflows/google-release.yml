@@ -24,8 +24,6 @@ jobs:
     concurrency:
       group: cms-release-${{ inputs.target }}
       cancel-in-progress: false
-    env:
-      RELEASE_DIR: ${{ runner.temp }}/cms-release
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
@@ -70,6 +68,7 @@ jobs:
 
       - name: Check scope and build the tested commit
         env:
+          RELEASE_DIR: ${{ runner.temp }}/cms-release
           CLOUDSDK_AUTH_ACCESS_TOKEN: ${{ steps.build-auth.outputs.access_token }}
         run: |
           bash scripts/deploy-google-release.sh plan "$GITHUB_SHA" "$RELEASE_DIR"
@@ -88,6 +87,7 @@ jobs:
 
       - name: Deploy only if this is still the branch head
         env:
+          RELEASE_DIR: ${{ runner.temp }}/cms-release
           GH_TOKEN: ${{ github.token }}
           CLOUDSDK_AUTH_ACCESS_TOKEN: ${{ steps.deploy-auth.outputs.access_token }}
         run: |

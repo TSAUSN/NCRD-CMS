@@ -3827,3 +3827,14 @@ password is hidden initially and revealing it never submits the form.
 These changes do not grant permissions, publish content, retry failed hosting
 work, configure Analytics, enable Azure or change DNS. Those operational steps
 still require the owning administrator, approved identifiers and normal review.
+
+
+## 2026-11-11 — Release workflow runner context
+
+GitHub rejected the reusable release workflow before any job ran because
+`runner.temp` was used in job-level `env`. Move `RELEASE_DIR` into the two
+run steps that consume it, where the runner context is available. Keep
+release target checks, environment approvals and deployment flags intact.
+Cloud Build remains the current production deployment path. Validate the
+workflow expressions with actionlint; a successful Google deployment alone
+does not prove GitHub Actions parsed its separate configuration.
