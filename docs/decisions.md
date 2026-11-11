@@ -3838,3 +3838,14 @@ release target checks, environment approvals and deployment flags intact.
 Cloud Build remains the current production deployment path. Validate the
 workflow expressions with actionlint; a successful Google deployment alone
 does not prove GitHub Actions parsed its separate configuration.
+
+
+## 2026-11-11 — Pin database-reference CI tools
+
+The restored CI run reached the database suite: 958 tests passed and the
+generated catalog comparison failed. Its `ubuntu-latest` runner selected
+Ubuntu 26.04, which supplies PostgreSQL 18 tools for a PostgreSQL 16 fixture.
+The reference check passes on a new disposable PostgreSQL 16 cluster with
+version 16 tools. Pin the checks job to Ubuntu 24.04 and assert the dump and
+restore major before migrating. Preserve the exact catalog comparison and
+all policy tests; no generated SQL or immutable migration is changed.

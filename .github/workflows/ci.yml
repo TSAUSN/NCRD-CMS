@@ -31,7 +31,9 @@ jobs:
       github.event_name != 'push' ||
       github.ref == 'refs/heads/main' ||
       github.ref == format('refs/heads/{0}', vars.CMS_STAGING_BRANCH || 'staging')
-    runs-on: ubuntu-latest
+    # Keep pg_dump/pg_restore aligned with the Postgres 16 fixture and SQL reference.
+    # ubuntu-latest now selects Ubuntu 26.04 with Postgres 18 client tools.
+    runs-on: ubuntu-24.04
     # A hung run would otherwise use GitHub's 6-hour default.
     timeout-minutes: 350
 
@@ -87,6 +89,11 @@ jobs:
 
       - name: Script tests
         run: node --test scripts/*.test.mjs scripts/golden/*.test.mjs
+
+      - name: Verify PostgreSQL reference tools
+        run: |
+          pg_dump --version | grep -E '^pg_dump \(PostgreSQL\) 16\.'
+          pg_restore --version | grep -E '^pg_restore \(PostgreSQL\) 16\.'
 
       # Applies every migration to an empty database, exactly as a deploy does.
       - name: Migrate a clean database
