@@ -1,3 +1,4 @@
+import { googleAnalyticsScriptHash } from '@cms/renderer'
 import { it, expect } from 'vitest'
 import { publicSecurityHeaders } from './public-security.ts'
 it('retains the exact existing default-deny policy for sites without approved files', () => {
@@ -79,4 +80,19 @@ it('permits only the fixed national menu-fit file on pages with that header', as
   expect(header).toContain("script-src '" + nationalNavigationScriptHash() + "'")
   expect(header).not.toContain("script-src 'self'")
   expect(header).not.toContain('unsafe-eval')
+})
+
+it('permits only the governed GA4 runtime for an opted-in site without weakening inline script rules', () => {
+  const id = 'G-ABCD123456'
+  const plain = publicSecurityHeaders()['content-security-policy']!
+  const tracking = publicSecurityHeaders({ analyticsMeasurementId: id })['content-security-policy']!
+  expect(plain).not.toContain('googletagmanager')
+  expect(tracking).toContain("'" + googleAnalyticsScriptHash(id) + "'")
+  expect(tracking).toContain('https://www.googletagmanager.com/gtag/js')
+  expect(tracking).toContain('https://*.google-analytics.com')
+  expect(tracking).not.toContain('doubleclick')
+  expect(tracking).not.toMatch(/script-src[^;]*unsafe-(?:inline|eval)/)
+  expect(
+    publicSecurityHeaders({ analyticsMeasurementId: 'https://attacker.test/tag.js' })['content-security-policy'],
+  ).toBe(plain)
 })

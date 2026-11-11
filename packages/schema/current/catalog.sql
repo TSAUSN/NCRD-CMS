@@ -10534,6 +10534,13 @@ REVOKE ALL ON FUNCTION app.site_public_settings_defect(p jsonb) FROM PUBLIC;
 
 
 --
+-- Name: FUNCTION site_public_settings_defect_before_analytics(p jsonb); Type: ACL; Schema: app; Owner: cms_migration_owner
+--
+
+REVOKE ALL ON FUNCTION app.site_public_settings_defect_before_analytics(p jsonb) FROM PUBLIC;
+
+
+--
 -- Name: FUNCTION site_public_settings_defect_before_data_values(p jsonb); Type: ACL; Schema: app; Owner: cms_migration_owner
 --
 

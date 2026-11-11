@@ -236,8 +236,8 @@ export const helpTopics: HelpTopic[] = [
     title: 'Google Analytics for each site',
     audience: 'admin',
     text: [
-      'Each site needs its approved GA4 Measurement ID and a decision about which test and public hosts should send events. A story tag is unrelated to an analytics tag.',
-      'This build does not include a per-site Google Analytics setting. Ask the maintainer to complete the validated setting, publishing and site-specific security policy integration. Do not paste tracking scripts into ordinary page fields.',
+      'Each site needs its own approved GA4 Measurement ID. Create the property and web data stream in Google Analytics, then copy the G-… ID. Reports inside the CMS need a separate reporting connection; view collected traffic in Google Analytics for now.',
+      'Open the site’s Settings → Analytics. Enter its GA4 Measurement ID, choose whether to enable tracking and whether to include test addresses, then save and publish the reviewed settings. Previews and CMS screens are excluded. Do not paste tracking scripts into ordinary page fields.',
     ],
   },
   {

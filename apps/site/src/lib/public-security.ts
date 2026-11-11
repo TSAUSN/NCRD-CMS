@@ -1,4 +1,6 @@
+import { GA4_MEASUREMENT_ID } from '@cms/schema'
 import {
+  googleAnalyticsScriptHash,
   nationalNavigationScriptHash,
   echelonDirectoryScriptHash,
   faqFilterScriptHash,
@@ -26,6 +28,8 @@ export type PageSecurityNeeds = {
   siteStyles?: boolean
   /** The page loads the site's approved Adobe Fonts kit. */
   adobeFonts?: boolean
+  /** GA4 is enabled only by this site’s reviewed published settings. */
+  analyticsMeasurementId?: string
 }
 
 /**
@@ -44,7 +48,12 @@ export function publicSecurityHeaders({
   siteScriptHashes = [],
   siteStyles: hasSiteStyles = false,
   adobeFonts = false,
+  analyticsMeasurementId,
 }: PageSecurityNeeds = {}): Record<string, string> {
+  const analytics =
+    typeof analyticsMeasurementId === 'string' && GA4_MEASUREMENT_ID.test(analyticsMeasurementId)
+      ? analyticsMeasurementId
+      : undefined
   const approvedSiteHashes = siteScriptHashes.filter(hash => /^sha256-[A-Za-z0-9+/]{43}=$/.test(hash))
   const scripts = [
     ...(hasNavigation ? [nationalNavigationScriptHash()] : []),
@@ -54,15 +63,28 @@ export function publicSecurityHeaders({
     ...(hasProviderEmbed ? [providerEmbedScriptHash()] : []),
     ...(hasFilter ? [faqFilterScriptHash()] : []),
     ...(hasSchedule ? [scheduleFilterScriptHash()] : []),
+    ...(analytics ? [googleAnalyticsScriptHash(analytics)] : []),
     ...approvedSiteHashes,
   ]
   return {
     'content-security-policy': [
       "default-src 'none'",
-      ...(scripts.length ? [`script-src ${scripts.map(hash => `'${hash}'`).join(' ')}`] : []),
-      `img-src 'self' data:${adobeFonts ? ' https://p.typekit.net' : ''}`,
+      ...(scripts.length
+        ? [
+            `script-src ${scripts.map(hash => `'${hash}'`).join(' ')}${analytics ? ' https://www.googletagmanager.com/gtag/js' : ''}`,
+          ]
+        : []),
+      `img-src 'self' data:${adobeFonts ? ' https://p.typekit.net' : ''}${analytics ? ' https://www.googletagmanager.com https://*.google-analytics.com' : ''}`,
       `style-src 'unsafe-inline'${hasSiteStyles ? " 'self'" : ''}${adobeFonts ? ' https://use.typekit.net https://p.typekit.net' : ''}`,
-      ...(approvedSiteHashes.length || hasStories ? ["connect-src 'self'", "script-src-attr 'none'"] : []),
+      ...(approvedSiteHashes.length || hasStories || analytics
+        ? [
+            "connect-src 'self'" +
+              (analytics
+                ? ' https://www.googletagmanager.com https://*.google-analytics.com https://*.google.com'
+                : ''),
+            "script-src-attr 'none'",
+          ]
+        : []),
       `font-src 'self'${adobeFonts ? ' https://use.typekit.net' : ''}`,
       `frame-src 'self' https://public.tableau.com${embedSources.map(source => ` ${source}`).join('')}`,
       "form-action 'self'",

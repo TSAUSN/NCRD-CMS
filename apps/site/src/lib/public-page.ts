@@ -26,7 +26,7 @@ export async function publicPageResponse(
   const paths = Object.fromEntries(
     (await siteRoutes(resolveRequestHost(request.headers) ?? '')).map(entry => [entry.pageId, entry.path]),
   )
-  const { html, noindex } = measurePerfRender(() =>
+  const { html, noindex, analyticsMeasurementId } = measurePerfRender(() =>
     renderPage({
       manifest: route.manifest,
       shell: route.shell,
@@ -48,6 +48,7 @@ export async function publicPageResponse(
     'cache-control': noindex || privateResponse ? 'private, no-store' : REVALIDATE_PUBLIC,
     'x-robots-tag': noindex ? 'noindex, nofollow' : 'index, follow',
     ...publicSecurityHeaders({
+      analyticsMeasurementId,
       providerFullscreen: features.providerFullscreen,
       embedSources: governedEmbedFrameSources(html),
       faqFilter: features.faqFilter,

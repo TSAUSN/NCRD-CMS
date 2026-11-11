@@ -8,6 +8,7 @@ export function SettingsNavigation({ siteId, current }: { siteId: string; curren
     ['Review reminders', base + '?tab=reviews'],
     ['Search & sharing', base + '/search'],
     ['Social accounts', base + '/social'],
+    ['Analytics', base + '/analytics'],
     ['Redirects', '/sites/' + siteId + '/redirects'],
     ['Advanced', base + '?tab=advanced'],
   ]

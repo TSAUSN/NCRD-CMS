@@ -3601,3 +3601,16 @@ Record the reference and any remaining difference/reason for each screen. Run th
 4. Complete the SPEC acceptance walk, including required browser coverage and admin comparisons against the approved mockups. Resolve failures or record reviewed deferred work before release acceptance.
 
 5. Release only reviewed, verified commits. Preserve the retained demo and record remaining work and administrator decisions.
+
+
+### November 11 scope addition — GA4 fields and tracking
+
+Cagatay's current request adds per-site GA4 Measurement ID fields and governed,
+opt-in public tracking as the first phase of Jon's Analytics request. This
+supersedes earlier Analytics-settings exclusions for that narrow feature.
+The existing administrator-only draft/publication flow and tenant isolation
+remain required. Tracking defaults off, test addresses require a separate
+choice, and private previews/CMS screens are excluded. In-CMS reporting remains
+a later Data API integration; the initial Measurement ID setting does not
+provide report access. Migration 0210 requires operator review/application
+before the matching application is deployed.

@@ -263,6 +263,11 @@ export async function releasePresentations(
             phone: 'Contact phone',
             address: 'Mailing address',
           }),
+          ...changedCells(row.live?.analytics ?? {}, row.draft.analytics ?? {}, {
+            measurementId: 'GA4 Measurement ID',
+            enabled: 'Google Analytics tracking',
+            includeStaging: 'Analytics on test addresses',
+          }),
           ...changedCells(row.live?.search ?? {}, row.draft.search ?? {}, {
             verification: 'Site verification tags',
             hints: 'Search keywords',

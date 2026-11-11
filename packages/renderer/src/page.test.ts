@@ -283,3 +283,45 @@ describe('self-hosted reading fonts', () => {
     expect(device).not.toContain('open-sans')
   })
 })
+
+describe('published per-site Analytics', () => {
+  const settings = {
+    schemaVersion: 1,
+    name: 'Site A',
+    analytics: { measurementId: 'G-ABCD123456', enabled: true, includeStaging: false },
+  }
+  it('adds the configured ID only to opted-in published pages', () => {
+    const publicPage = renderPage({ manifest: manifest(), shell: shell({ settings }), isStaging: false })
+    expect(publicPage.html).toContain('https://www.googletagmanager.com/gtag/js?id=G-ABCD123456')
+    expect(publicPage.analyticsMeasurementId).toBe('G-ABCD123456')
+    expect(renderPage({ manifest: manifest(), shell: shell(), isStaging: false }).html).not.toContain(
+      'googletagmanager',
+    )
+    for (const options of [
+      { preview: true },
+      { visitorPreview: true },
+      { sectionOnly: true },
+      { providerEmbeds: false },
+    ]) {
+      const privatePage = renderPage({ manifest: manifest(), shell: shell({ settings }), isStaging: false, options })
+      expect(privatePage.html).not.toContain('googletagmanager')
+      expect(privatePage.analyticsMeasurementId).toBeUndefined()
+    }
+  })
+  it('keeps test addresses excluded until separately enabled and keeps each site ID separate', () => {
+    expect(renderPage({ manifest: manifest(), shell: shell({ settings }), isStaging: true }).html).not.toContain(
+      'googletagmanager',
+    )
+    const other = { ...settings, analytics: { measurementId: 'G-OTHER12345', enabled: true, includeStaging: true } }
+    const page = renderPage({ manifest: manifest(), shell: shell({ settings: other }), isStaging: true })
+    expect(page.html).toContain('id=G-OTHER12345')
+    expect(page.html).not.toContain('G-ABCD123456')
+    expect(
+      renderPage({
+        manifest: manifest(),
+        shell: shell({ settings: { ...settings, analytics: { ...settings.analytics, enabled: false } } }),
+        isStaging: false,
+      }).analyticsMeasurementId,
+    ).toBeUndefined()
+  })
+})

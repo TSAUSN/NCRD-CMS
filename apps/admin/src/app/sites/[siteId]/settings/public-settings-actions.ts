@@ -10,13 +10,13 @@ import { releaseCandidates, planSiteRelease } from '../../../../lib/releases.ts'
 export async function savePublicSiteSettings(
   siteId: string,
   revision: string,
-  block: 'social' | 'general' | 'search' | 'dataValues',
+  block: 'social' | 'general' | 'search' | 'dataValues' | 'analytics',
   value: unknown,
 ) {
   const session = await currentSession()
   if (!session) return { ok: false as const, message: 'Sign in again before saving site settings.' }
   try {
-    if (!['social', 'general', 'search', 'dataValues'].includes(block))
+    if (!['social', 'general', 'search', 'dataValues', 'analytics'].includes(block))
       throw new DomainError('invalid_state', 'Choose a supported Settings tab.')
     const result = await asUser({ userId: session.principal.userId, requestId: randomUUID() }, async client => {
       const current = await siteSettingsWorkspace(client, siteId)

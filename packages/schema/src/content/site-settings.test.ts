@@ -63,3 +63,26 @@ it('bounds General and Search fields without accepting extra code or analytics p
     false,
   )
 })
+
+it('accepts only typed, opt-in GA4 settings and normalizes the Measurement ID', () => {
+  const base = {
+    schemaVersion: 1,
+    name: 'Site',
+    analytics: { measurementId: ' g-abcd123456 ', enabled: true, includeStaging: false },
+  }
+  expect(SitePublicSettings.parse(base).analytics?.measurementId).toBe('G-ABCD123456')
+  expect(
+    SitePublicSettings.safeParse({ ...base, analytics: { measurementId: '', enabled: false, includeStaging: false } })
+      .success,
+  ).toBe(true)
+  for (const analytics of [
+    { ...base.analytics, measurementId: '', enabled: true },
+    { ...base.analytics, measurementId: 'GTM-ABCD1234' },
+    { ...base.analytics, measurementId: 'UA-123456-1' },
+    { ...base.analytics, measurementId: 'https://example.test/tag.js' },
+    { ...base.analytics, measurementId: 'G-ABCD1234\"><script>' },
+    { ...base.analytics, extraScript: '<script>bad()</script>' },
+    { ...base.analytics, includeStaging: 'true' },
+  ])
+    expect(SitePublicSettings.safeParse({ ...base, analytics }).success).toBe(false)
+})
