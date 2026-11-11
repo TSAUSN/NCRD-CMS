@@ -39,6 +39,39 @@ in. If Supabase already has an email-link account for the same address, check
 that Supabase links the Microsoft sign-in to it rather than creating a second
 user.
 
+## Sign in with a password
+
+Added November 11, 2026. The hosted admin offers email and password beside the
+email link. It needs no setting, no database change and no mail: it uses the
+same Supabase Email provider that already sends the links.
+
+Why it exists: on the organization's mailboxes, mail security opens every link
+in an incoming message before the person does. A default Supabase sign-in link
+is used up by that first open, so the person's own click arrives too late and
+the CMS reports that the link was already used. The built-in Supabase sender
+also allows only two messages an hour for the whole project. A password
+sign-in sends no message, so neither limit applies.
+
+1. **First sign-in:** the person signs in once with an email link (personal
+   mailboxes) or with a one-time link a Supabase project owner makes for them.
+2. **Set a password:** in the sidebar, choose **Password**, enter a password of
+   at least 12 characters twice and choose **Save password**. Only the
+   signed-in person can set their own password.
+3. **After that:** on the sign-in page, enter the email and password and choose
+   **Sign in**. **Email me a sign-in link** still works for anyone without a
+   password.
+
+A forgotten password is replaced the same way as a first one: sign in with a
+link, then save a new password. Access still comes only from a Super admin
+adding the person; a correct password for somebody without CMS access is
+refused and that sign-in is ended.
+
+Supabase checks the password and limits repeated attempts. Its own minimum
+length is a project setting (Authentication → Sign In / Providers → Email);
+raise it to 12 to match this screen. Editing the email template so a link
+survives a mail scan needs custom SMTP first; Supabase locks the templates
+until then.
+
 ## Compare the choices
 
 Estimates below are engineering judgments for one maintainer, including focused

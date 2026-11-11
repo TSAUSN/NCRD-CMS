@@ -11,6 +11,7 @@ import {
   IconCollection,
   IconFrame,
   IconImage,
+  IconLock,
   IconMail,
   IconMenu,
   IconPage,
@@ -29,6 +30,7 @@ import { Menu } from './ui/menu.tsx'
 import { BrandMark } from './brand-mark.tsx'
 import { navItemIsCurrent, type NavGroup, type NavIconName } from './nav.ts'
 import { useSidebarData } from './sidebar-data.tsx'
+import { usePasswordSignIn } from './account-options.tsx'
 import type { SidebarLayout } from './use-sidebar-layout.ts'
 import styles from './app-shell.module.css'
 
@@ -76,6 +78,7 @@ export function AppSidebar({
   layout,
 }: SidebarProps) {
   const { sites, sitesError, inboxCount } = useSidebarData()
+  const passwordSignIn = usePasswordSignIn()
   const { open, rail, compact, sidebar, closeButton, closeDrawer, toggleRail } = layout
   const openSearch = () => window.dispatchEvent(new Event(COMMAND_SEARCH_EVENT))
   const contentSite = Boolean(currentSite?.content)
@@ -292,6 +295,20 @@ export function AppSidebar({
             Signed in as {email}, {role}
           </span>
         </div>
+        {passwordSignIn && (
+          <Link
+            href="/account/password"
+            className="navlink"
+            aria-label="Password"
+            aria-current={pathname === '/account/password' ? 'page' : undefined}
+            title={rail ? 'Password' : undefined}
+          >
+            <span className="navlink-icon">
+              <IconLock size={18} />
+            </span>
+            <span className="navlink-label">Password</span>
+          </Link>
+        )}
         <form action={signOut}>
           <button type="submit" className="navlink navlink-button" title={rail ? 'Sign out' : undefined}>
             <span className="navlink-icon">

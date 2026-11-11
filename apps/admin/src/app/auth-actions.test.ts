@@ -8,16 +8,21 @@ const stubs = vi.hoisted(() => ({
   resolve: vi.fn(),
   accept: vi.fn(),
   revoke: vi.fn(),
+  password: vi.fn(),
+  setPassword: vi.fn(),
+  session: vi.fn(),
   set: vi.fn(),
   get: vi.fn(),
 }))
 vi.mock('server-only', () => ({}))
 vi.mock('../lib/session.ts', () => ({
-  currentSession: vi.fn(),
+  currentSession: stubs.session,
   authProvider: () => ({
     name: 'supabase',
     requestSignIn: stubs.request,
     completeCodeSignIn: stubs.exchange,
+    signInWithPassword: stubs.password,
+    setPassword: stubs.setPassword,
     revoke: stubs.revoke,
   }),
 }))
@@ -33,7 +38,7 @@ vi.mock('next/navigation', () => ({
     throw new Error(`redirect:${url}`)
   },
 }))
-import { completeSignIn, signIn } from './actions/auth.ts'
+import { completeSignIn, setPassword, signIn, signInWithPassword } from './actions/auth.ts'
 
 beforeEach(() => {
   vi.resetAllMocks()
@@ -104,4 +109,103 @@ it('sets the verified session only after resolving an authorized CMS account', a
     'refresh',
     expect.objectContaining({ secure: true, httpOnly: true }),
   )
+})
+
+const credentials = (email: string, password: string) => {
+  const form = new FormData()
+  form.set('email', email)
+  form.set('password', password)
+  return form
+}
+
+it('opens a CMS session for a correct password only after resolving an authorized CMS account', async () => {
+  const subject = { subject: 'provider-id', email: 'owner@example.test' }
+  stubs.password.mockResolvedValue({ token: 'verified-access', refreshToken: 'refresh', expiresIn: 300, subject })
+  stubs.resolve.mockResolvedValue({ principal: { userId: 'cms-owner' } })
+  await expect(signInWithPassword(credentials(' Owner@Example.test ', 'correct horse battery'))).rejects.toThrow(
+    'redirect:/',
+  )
+  expect(stubs.password).toHaveBeenCalledWith('owner@example.test', 'correct horse battery')
+  expect(stubs.resolve).toHaveBeenCalledWith(subject)
+  expect(stubs.set).toHaveBeenCalledWith(
+    HOSTED_SESSION_COOKIE,
+    'verified-access',
+    expect.objectContaining({ secure: true, httpOnly: true, maxAge: 300 }),
+  )
+  expect(stubs.set).toHaveBeenCalledWith(
+    REFRESH_COOKIE,
+    'refresh',
+    expect.objectContaining({ secure: true, httpOnly: true }),
+  )
+  expect(stubs.request).not.toHaveBeenCalled()
+})
+
+it('gives one answer for a wrong email or password and sets no session', async () => {
+  stubs.password.mockResolvedValue(null)
+  await expect(signInWithPassword(credentials('owner@example.test', 'wrong'))).rejects.toThrow(
+    'redirect:/sign-in?error=wrong-password',
+  )
+  await expect(signInWithPassword(credentials('owner@example.test', ''))).rejects.toThrow(
+    'redirect:/sign-in?error=missing-password',
+  )
+  expect(stubs.password).toHaveBeenCalledTimes(1)
+  expect(stubs.set).not.toHaveBeenCalled()
+})
+
+it('refuses a correct password for somebody without CMS access and revokes that sign-in', async () => {
+  stubs.password.mockResolvedValue({
+    token: 'verified-access',
+    refreshToken: 'refresh',
+    expiresIn: 300,
+    subject: { subject: 'provider-id', email: 'stranger@example.test' },
+  })
+  stubs.resolve.mockResolvedValue(null)
+  await expect(signInWithPassword(credentials('stranger@example.test', 'correct horse battery'))).rejects.toThrow(
+    'redirect:/sign-in?error=no-access',
+  )
+  expect(stubs.revoke).toHaveBeenCalledWith('verified-access')
+  expect(stubs.set).not.toHaveBeenCalled()
+})
+
+const newPassword = (password: string, again = password) => {
+  const form = new FormData()
+  form.set('password', password)
+  form.set('passwordAgain', again)
+  return form
+}
+
+it('saves a new password only for the signed-in person, using their own session', async () => {
+  stubs.session.mockResolvedValue({ principal: { userId: 'cms-owner' } })
+  stubs.get.mockImplementation((name: string) => (name === HOSTED_SESSION_COOKIE ? { value: 'my-access' } : undefined))
+  stubs.setPassword.mockResolvedValue('saved')
+  await expect(setPassword(newPassword('correct horse battery'))).rejects.toThrow('redirect:/account/password?saved=1')
+  expect(stubs.setPassword).toHaveBeenCalledWith('my-access', 'correct horse battery')
+})
+
+it('checks a new password before sending it anywhere', async () => {
+  stubs.session.mockResolvedValue({ principal: { userId: 'cms-owner' } })
+  stubs.get.mockReturnValue({ value: 'my-access' })
+  await expect(setPassword(newPassword('too short'))).rejects.toThrow('redirect:/account/password?error=too-short')
+  await expect(setPassword(newPassword('x'.repeat(73)))).rejects.toThrow('redirect:/account/password?error=too-long')
+  await expect(setPassword(newPassword('correct horse battery', 'correct horse batter'))).rejects.toThrow(
+    'redirect:/account/password?error=mismatch',
+  )
+  expect(stubs.setPassword).not.toHaveBeenCalled()
+})
+
+it('never sets a password for a visitor who is not signed in', async () => {
+  stubs.session.mockResolvedValue(null)
+  stubs.get.mockReturnValue({ value: 'stale-access' })
+  await expect(setPassword(newPassword('correct horse battery'))).rejects.toThrow('redirect:/sign-in')
+  expect(stubs.setPassword).not.toHaveBeenCalled()
+})
+
+it('reports a password the provider refuses and sends an ended session back to sign in', async () => {
+  stubs.session.mockResolvedValue({ principal: { userId: 'cms-owner' } })
+  stubs.get.mockReturnValue({ value: 'my-access' })
+  stubs.setPassword.mockResolvedValueOnce('weak').mockResolvedValueOnce('signed-out')
+  await expect(setPassword(newPassword('correct horse battery'))).rejects.toThrow(
+    'redirect:/account/password?error=weak',
+  )
+  await expect(setPassword(newPassword('correct horse battery'))).rejects.toThrow('redirect:/sign-in?reauth=1')
 })

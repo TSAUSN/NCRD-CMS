@@ -1,4 +1,4 @@
-import { signIn, signInWithMicrosoft } from '../actions/auth.ts'
+import { signIn, signInWithMicrosoft, signInWithPassword } from '../actions/auth.ts'
 import { authProvider, currentSession } from '../../lib/session.ts'
 import { redirect } from 'next/navigation'
 import { EntryPanel } from '../../components/entry.tsx'
@@ -21,15 +21,21 @@ export default async function SignInPage({
   let local = false
   let configured = true
   let microsoft = false
+  let passwords = false
   try {
     const provider = authProvider()
     local = provider.name === 'local'
     microsoft = typeof provider.microsoftSignInUrl === 'function'
+    passwords = typeof provider.signInWithPassword === 'function'
   } catch {
     configured = false
   }
   const messages: Record<string, string> = {
     'missing-email': 'Enter a valid email address—the one you were invited with.',
+    'missing-password': 'Enter your password. If you do not have one yet, choose “Email me a sign-in link”.',
+    'wrong-password':
+      'That email and password do not match. Try again, or choose “Email me a sign-in link” if you have not set a password.',
+    'too-many-tries': 'Too many sign-in attempts. Wait a few minutes, then try again.',
     'rate-limit': 'Please wait a minute before requesting another sign-in link.',
     unavailable: 'Sign-in is temporarily unavailable. Please try again shortly.',
     'expired-link': 'This sign-in link has expired or has already been used. Request a new link below.',
@@ -85,7 +91,9 @@ export default async function SignInPage({
       lede={
         local
           ? 'Use a sample staff account, or request your chapter editor’s sign-in link.'
-          : 'We’ll email you a link. No password to remember.'
+          : passwords
+            ? 'Use your email and password.'
+            : 'We’ll email you a link. No password to remember.'
       }
     >
       {error && messages[error] && (
@@ -104,29 +112,61 @@ export default async function SignInPage({
           <form action={signInWithMicrosoft}>
             <SignInButton label="Sign in with Microsoft" />
           </form>
-          <p className={styles.help}>Or get a sign-in link by email:</p>
+          <p className={styles.help}>{passwords ? 'Or use your email:' : 'Or get a sign-in link by email:'}</p>
         </>
       )}
-      <form action={signIn}>
-        <div className="field">
-          <label htmlFor="email">Email address</label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            required
-            maxLength={254}
-            disabled={!configured}
-            autoComplete="email"
-            placeholder="you@example.org"
-          />
-        </div>
-        <SignInButton disabled={!configured} label={local ? 'Continue to local CMS' : 'Send me a link'} />
-      </form>
-      <p className="entry-note">
-        There is no password to remember or lose. Signing in does not by itself give you access to a site — somebody who
-        already looks after one has to invite you first.
-      </p>
+      {passwords ? (
+        <>
+          <form action={signInWithPassword}>
+            <div className="field">
+              <label htmlFor="email">Email address</label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                required
+                maxLength={254}
+                autoComplete="username"
+                placeholder="you@example.org"
+              />
+            </div>
+            <div className="field">
+              <label htmlFor="password">Password</label>
+              <input id="password" name="password" type="password" required autoComplete="current-password" />
+            </div>
+            <SignInButton label="Sign in" />
+            <SignInButton label="Email me a sign-in link" formAction={signIn} />
+          </form>
+          <p className="entry-note">
+            No password yet, or forgot it? Enter your email and choose “Email me a sign-in link”. Once you are in, set a
+            password under Password in the sidebar. Signing in does not by itself give you access to a site — somebody
+            who already looks after one has to invite you first.
+          </p>
+        </>
+      ) : (
+        <>
+          <form action={signIn}>
+            <div className="field">
+              <label htmlFor="email">Email address</label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                required
+                maxLength={254}
+                disabled={!configured}
+                autoComplete="email"
+                placeholder="you@example.org"
+              />
+            </div>
+            <SignInButton disabled={!configured} label={local ? 'Continue to local CMS' : 'Send me a link'} />
+          </form>
+          <p className="entry-note">
+            There is no password to remember or lose. Signing in does not by itself give you access to a site — somebody
+            who already looks after one has to invite you first.
+          </p>
+        </>
+      )}
       {local && (
         <details className={styles.local}>
           <summary>About local sign-in</summary>

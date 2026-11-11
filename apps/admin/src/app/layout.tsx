@@ -3,7 +3,8 @@ import { headers } from 'next/headers'
 import './globals.css'
 import '../styles/tokens.css'
 import { CommandSearch } from '../components/command-search.tsx'
-import { currentSession } from '../lib/session.ts'
+import { authProvider, currentSession } from '../lib/session.ts'
+import { AccountOptions } from '../components/account-options.tsx'
 import { DraftLeavePrompt } from '../components/draft-leave-prompt.tsx'
 import { NavigationHistory } from '../components/ui/navigation-history.tsx'
 import { SidebarSession } from '../components/sidebar-data.tsx'
@@ -16,6 +17,12 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   const session = await currentSession()
   const scope = session ? sidebarScope(session) : null
   const canvasOrigin = (await headers()).get('x-cms-canvas-origin') ?? ''
+  let passwordSignIn = false
+  try {
+    passwordSignIn = typeof authProvider().setPassword === 'function'
+  } catch {
+    /* Sign-in is not configured; the sign-in page says so. */
+  }
   return (
     <html lang="en" data-cms-canvas-origin={canvasOrigin}>
       <body>
@@ -27,7 +34,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
           Skip to content
         </a>
         <SidebarSession scope={scope} />
-        {children}
+        <AccountOptions passwordSignIn={passwordSignIn}>{children}</AccountOptions>
       </body>
     </html>
   )

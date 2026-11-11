@@ -10,12 +10,42 @@ import {
   resolvePrincipal,
   localSessionCookieSecure,
   HOSTED_SESSION_COOKIE,
+  PASSWORD_MAX_BYTES,
+  PASSWORD_MIN_LENGTH,
   REFRESH_COOKIE,
   REFRESH_COOKIE_MAX_AGE,
   SESSION_COOKIE,
   SIGN_IN_PROOF_COOKIE,
+  type AuthProvider,
+  type VerifiedAuthSession,
 } from '@cms/platform'
-import { authProvider } from '../../lib/session.ts'
+import { authProvider, currentSession } from '../../lib/session.ts'
+
+/** A verified sign-in becomes a CMS session only for somebody with CMS access. */
+async function openSession(provider: AuthProvider, verified: VerifiedAuthSession): Promise<string> {
+  const session = await resolvePrincipal(verified.subject)
+  if (!session) {
+    await provider.revoke?.(verified.token).catch(() => {})
+    return '/sign-in?error=no-access'
+  }
+  await acceptInvite(verified.subject)
+  const jar = await cookies()
+  jar.set(HOSTED_SESSION_COOKIE, verified.token, {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: true,
+    path: '/',
+    maxAge: verified.expiresIn,
+  })
+  jar.set(REFRESH_COOKIE, verified.refreshToken, {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: true,
+    path: '/',
+    maxAge: REFRESH_COOKIE_MAX_AGE,
+  })
+  return '/'
+}
 
 export async function signIn(formData: FormData): Promise<void> {
   const email = String(formData.get('email') ?? '')
@@ -112,32 +142,66 @@ export async function completeSignIn(formData: FormData): Promise<void> {
         ? await provider.completeCodeSignIn?.(code, verifier)
         : null
       : await provider.completeSignIn?.(tokenHash)
-    if (verified) {
-      const session = await resolvePrincipal(verified.subject)
-      if (session) {
-        await acceptInvite(verified.subject)
-        ;(await cookies()).set(HOSTED_SESSION_COOKIE, verified.token, {
-          httpOnly: true,
-          sameSite: 'lax',
-          secure: true,
-          path: '/',
-          maxAge: verified.expiresIn,
-        })
-        ;(await cookies()).set(REFRESH_COOKIE, verified.refreshToken, {
-          httpOnly: true,
-          sameSite: 'lax',
-          secure: true,
-          path: '/',
-          maxAge: REFRESH_COOKIE_MAX_AGE,
-        })
-        destination = '/'
-      } else {
-        await provider.revoke?.(verified.token).catch(() => {})
-        destination = '/sign-in?error=no-access'
-      }
-    }
+    if (verified) destination = await openSession(provider, verified)
   } catch {
     destination = '/sign-in?error=unavailable'
+  }
+  redirect(destination)
+}
+
+/** Signs in with an email and password. One answer covers a wrong email and a wrong password. */
+export async function signInWithPassword(formData: FormData): Promise<void> {
+  const email = String(formData.get('email') ?? '')
+    .trim()
+    .toLowerCase()
+  const password = String(formData.get('password') ?? '')
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) redirect('/sign-in?error=missing-email')
+  if (!password) redirect('/sign-in?error=missing-password')
+
+  let destination = '/sign-in?error=wrong-password'
+  try {
+    const provider = authProvider()
+    if (!provider.signInWithPassword) destination = '/sign-in?error=unavailable'
+    else {
+      const verified = await provider.signInWithPassword(email, password)
+      if (verified) destination = await openSession(provider, verified)
+    }
+  } catch (error) {
+    destination =
+      error instanceof AuthServiceError && error.kind === 'rate_limit'
+        ? '/sign-in?error=too-many-tries'
+        : '/sign-in?error=unavailable'
+  }
+  redirect(destination)
+}
+
+/** Sets or replaces the signed-in person's own password. Nobody else's can be set here. */
+export async function setPassword(formData: FormData): Promise<void> {
+  const password = String(formData.get('password') ?? '')
+  const again = String(formData.get('passwordAgain') ?? '')
+  if (!(await currentSession())) redirect('/sign-in')
+  if (password.length < PASSWORD_MIN_LENGTH) redirect('/account/password?error=too-short')
+  if (Buffer.byteLength(password) > PASSWORD_MAX_BYTES) redirect('/account/password?error=too-long')
+  if (password !== again) redirect('/account/password?error=mismatch')
+
+  let destination = '/account/password?error=unavailable'
+  try {
+    const provider = authProvider()
+    const token = (await cookies()).get(HOSTED_SESSION_COOKIE)?.value
+    if (provider.setPassword && token) {
+      const result = await provider.setPassword(token, password)
+      destination =
+        result === 'saved'
+          ? '/account/password?saved=1'
+          : result === 'signed-out'
+            ? '/sign-in?reauth=1'
+            : `/account/password?error=${result}`
+    }
+  } catch (error) {
+    destination =
+      error instanceof AuthServiceError && error.kind === 'rate_limit'
+        ? '/account/password?error=too-many-tries'
+        : '/account/password?error=unavailable'
   }
   redirect(destination)
 }

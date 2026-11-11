@@ -1,5 +1,11 @@
 import { countPerfAuth } from './perf-trace.ts'
-import { createLocalAuthProvider, type AuthProvider, type AuthSubject, type VerifiedAuthSession } from './session.ts'
+import {
+  PASSWORD_MAX_BYTES,
+  createLocalAuthProvider,
+  type AuthProvider,
+  type AuthSubject,
+  type VerifiedAuthSession,
+} from './session.ts'
 import { createHash, randomBytes } from 'node:crypto'
 
 type Environment = Record<string, string | undefined>
@@ -119,11 +125,16 @@ export function createSupabaseAuthProvider(
     }
   }
 
-  async function request(path: string, body?: Record<string, unknown>, token?: string): Promise<Response> {
+  async function request(
+    path: string,
+    body?: Record<string, unknown>,
+    token?: string,
+    method: 'POST' | 'PUT' = 'POST',
+  ): Promise<Response> {
     try {
       countPerfAuth('outboundAuthCalls')
       return await fetcher(`${origin}/auth/v1${path}`, {
-        method: body ? 'POST' : 'GET',
+        method: body ? method : 'GET',
         headers: {
           apikey: config.publishableKey,
           ...(body ? { 'Content-Type': 'application/json' } : {}),
@@ -251,6 +262,29 @@ export function createSupabaseAuthProvider(
       )
         return null
       return verifiedSession(await request('/token?grant_type=pkce', { auth_code: code, code_verifier: verifier }))
+    },
+    // A password sign-in sends no email, so neither a mail scanner opening the
+    // link first nor the provider's hourly email limit can block it.
+    async signInWithPassword(email, password) {
+      if (!password || Buffer.byteLength(password) > PASSWORD_MAX_BYTES) return null
+      return verifiedSession(await request('/token?grant_type=password', { email, password }))
+    },
+    async setPassword(token, password) {
+      if (!token || token.length > 3800 || /\s/.test(token)) return 'signed-out'
+      const response = await request('/user', { password }, token, 'PUT')
+      if (response.ok) return 'saved'
+      if (response.status === 429) throw new AuthServiceError('rate_limit')
+      if ([400, 401, 403].includes(response.status)) return 'signed-out'
+      if (response.status === 422) {
+        let reason: unknown
+        try {
+          reason = ((await response.json()) as { error_code?: unknown })?.error_code
+        } catch {
+          reason = undefined
+        }
+        return reason === 'same_password' ? 'unchanged' : 'weak'
+      }
+      throw new AuthServiceError('unavailable')
     },
     // Microsoft returns the browser to the same confirmation page as an email
     // link, with a one-time code that completeCodeSignIn exchanges.

@@ -3784,3 +3784,17 @@ real constraint intact; deployed ticket lifetimes and grants do not change.
 Keep private artifacts outside Git and delete capabilities after verification.
 Any changed output byte or new failing gate leaves the refactor on its own branch.
 Existing failures require the same-code baseline evidence described above.
+
+
+## Password sign-in beside email links — November 11, 2026
+
+Hosted sign-in accepts an email and password through the existing Supabase
+Email provider, and a signed-in person can set their own password under
+Password in the sidebar. Email links remain. Cause: the organization's mail
+security opened a sign-in link eight seconds after it was sent and used it up
+before its owner clicked (Supabase Auth log, November 11), and the built-in
+sender allows two messages an hour. No migration, setting or key is added; the
+admin still holds only the publishable key, and a password is set with the
+person's own session. The confirmation page now says when a link was already
+used. Reverse by removing the two provider methods, their actions, the
+`/account/password` page and the second sign-in button; no data changes.

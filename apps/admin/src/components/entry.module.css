@@ -70,6 +70,22 @@
   color: var(--text-on-dark);
   box-shadow: none;
 }
+/* A second way to send the same form sits under the main button and reads as the quieter choice. */
+.form :global(button.secondary) {
+  margin-block-start: var(--space-3);
+  background: var(--surface);
+  color: var(--sa-navy);
+  border: var(--line-thin) solid var(--line-strong);
+}
+.form :global(button.secondary:hover) {
+  background: var(--surface-3);
+  border-color: var(--sa-navy);
+}
+.form :global(button.secondary:disabled) {
+  background: var(--surface-3);
+  border-color: var(--line);
+  color: var(--ink-3);
+}
 .form :global(.entry-note) {
   margin: var(--space-4) 0 0;
   padding-top: var(--space-4);

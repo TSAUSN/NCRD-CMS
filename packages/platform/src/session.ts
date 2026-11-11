@@ -30,9 +30,20 @@ export type AuthProvider = {
   completeCodeSignIn?(code: string, verifier: string): Promise<VerifiedAuthSession | null>
   /** Where to send the browser to sign in with the organization's Microsoft account, when enabled. */
   microsoftSignInUrl?(codeChallenge: string): string
+  /** Sign in without sending an email. Null for a wrong email or password. */
+  signInWithPassword?(email: string, password: string): Promise<VerifiedAuthSession | null>
+  /** Set or replace the signed-in person's own password, using their current session. */
+  setPassword?(token: string, password: string): Promise<PasswordChange>
   refresh?(refreshToken: string): Promise<VerifiedAuthSession | null>
   revoke?(token: string): Promise<void>
 }
+
+/** `signed-out` means the session can no longer change the password; sign in again first. */
+export type PasswordChange = 'saved' | 'weak' | 'unchanged' | 'signed-out'
+
+/** bcrypt, which the hosted provider uses, reads at most 72 bytes of a password. */
+export const PASSWORD_MIN_LENGTH = 12
+export const PASSWORD_MAX_BYTES = 72
 
 export const SESSION_COOKIE = 'cms_session'
 export const HOSTED_SESSION_COOKIE = '__Host-cms_session'

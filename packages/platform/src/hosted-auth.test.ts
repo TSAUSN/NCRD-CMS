@@ -255,6 +255,71 @@ describe('hosted email verification', () => {
   })
 })
 
+describe('password sign-in', () => {
+  const session = { access_token: 'verified-token', refresh_token: 'rotated-refresh', expires_in: 3600 }
+  it('signs in without sending an email and independently verifies the returned user', async () => {
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValueOnce(json(session)).mockResolvedValueOnce(json(user))
+    const provider = createSupabaseAuthProvider(config, fetcher)
+    expect(await provider.signInWithPassword!('editor@example.test', 'correct horse battery')).toMatchObject({
+      token: 'verified-token',
+      subject: { subject: user.id, email: 'editor@example.test' },
+    })
+    expect(String(fetcher.mock.calls[0]![0])).toBe('https://project.supabase.co/auth/v1/token?grant_type=password')
+    expect(JSON.parse(fetcher.mock.calls[0]![1]!.body as string)).toEqual({
+      email: 'editor@example.test',
+      password: 'correct horse battery',
+    })
+    expect(String(fetcher.mock.calls[1]![0])).toContain('/user')
+  })
+  it('gives no session for a wrong email or password, and never sends an oversized password', async () => {
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(json({ error_code: 'invalid_credentials' }, 400))
+    const provider = createSupabaseAuthProvider(config, fetcher)
+    expect(await provider.signInWithPassword!('editor@example.test', 'wrong password')).toBeNull()
+    expect(await provider.signInWithPassword!('editor@example.test', '')).toBeNull()
+    expect(await provider.signInWithPassword!('editor@example.test', 'x'.repeat(73))).toBeNull()
+    expect(fetcher).toHaveBeenCalledTimes(1)
+  })
+  it('refuses a session whose email the provider has not confirmed', async () => {
+    const fetcher = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(json(session))
+      .mockResolvedValueOnce(json({ ...user, email_confirmed_at: null }))
+    expect(
+      await createSupabaseAuthProvider(config, fetcher).signInWithPassword!('editor@example.test', 'a password'),
+    ).toBeNull()
+  })
+  it('reports too many attempts as a rate limit', async () => {
+    const provider = createSupabaseAuthProvider(config, vi.fn<typeof fetch>().mockResolvedValue(json({}, 429)))
+    await expect(provider.signInWithPassword!('editor@example.test', 'a password')).rejects.toMatchObject({
+      kind: 'rate_limit',
+    })
+  })
+  it('sets the signed-in person’s own password with their session, never an administrator key', async () => {
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(json(user))
+    const provider = createSupabaseAuthProvider(config, fetcher)
+    expect(await provider.setPassword!('access-token', 'correct horse battery')).toBe('saved')
+    const [url, init] = fetcher.mock.calls[0]!
+    expect(String(url)).toBe('https://project.supabase.co/auth/v1/user')
+    expect(init!.method).toBe('PUT')
+    expect(init!.headers).toMatchObject({ apikey: 'sb_publishable_test', Authorization: 'Bearer access-token' })
+    expect(JSON.parse(init!.body as string)).toEqual({ password: 'correct horse battery' })
+  })
+  it('explains a refused password without changing anything', async () => {
+    const answer = (body: unknown, status: number) =>
+      createSupabaseAuthProvider(config, vi.fn<typeof fetch>().mockResolvedValue(json(body, status))).setPassword!(
+        'access-token',
+        'a new password',
+      )
+    expect(await answer({ error_code: 'weak_password' }, 422)).toBe('weak')
+    expect(await answer({ error_code: 'same_password' }, 422)).toBe('unchanged')
+    expect(await answer({ error_code: 'session_not_found' }, 403)).toBe('signed-out')
+    await expect(answer({}, 500)).rejects.toMatchObject({ kind: 'unavailable' })
+    const fetcher = vi.fn<typeof fetch>()
+    expect(await createSupabaseAuthProvider(config, fetcher).setPassword!('', 'a new password')).toBe('signed-out')
+    expect(fetcher).not.toHaveBeenCalled()
+  })
+})
+
 describe('Microsoft sign-in through the Supabase Azure provider', () => {
   it('is off unless explicitly enabled', () => {
     expect(createSupabaseAuthProvider(config).microsoftSignInUrl).toBeUndefined()
