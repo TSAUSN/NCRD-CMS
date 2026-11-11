@@ -159,3 +159,5 @@ export {
   nationalNavigationScriptHash,
   hasNationalNavigation,
 } from './national-navigation-runtime.ts'
+
+export { googleAnalyticsForPage, googleAnalyticsBootstrap, googleAnalyticsScriptHash } from './google-analytics.ts'

@@ -1,3 +1,4 @@
+import { googleAnalyticsForPage, googleAnalyticsTags } from '../google-analytics.ts'
 import { withoutUnavailablePictures } from '../unavailable-pictures.ts'
 import { renderedFeatures } from '../feature-markers.ts'
 import { isReportIndexPage, isReportIndexRow, REPORT_INDEX_CSS } from '../report-index.ts'
@@ -46,6 +47,7 @@ export type PageDocument = {
    * refused value is gone and the site's own address is in its place.
    */
   canonical: CanonicalDecision
+  analyticsMeasurementId?: string
 }
 
 /** Social crawlers require an absolute image URL; staging uses the live canonical origin. */
@@ -76,6 +78,10 @@ export function renderPage(input: {
   const original = originalLayout(shell.site_files, manifest.page.id)
   const parsedSettings = !original ? SitePublicSettings.safeParse(shell.settings) : null
   const siteSettings = parsedSettings?.success ? parsedSettings.data : undefined
+  const analyticsMeasurementId =
+    !original && !options.preview && !options.visitorPreview && !options.sectionOnly && options.providerEmbeds !== false
+      ? googleAnalyticsForPage(siteSettings, isStaging)
+      : undefined
   const title = manifest.meta.title?.trim() || manifest.page.title
   const description = manifest.meta.description?.trim() || siteSettings?.general?.description || ''
   // A verified live host remains canonical even on staging.
@@ -261,8 +267,15 @@ export function renderPage(input: {
     (enhance && options.providerEmbeds !== false && features.scheduleFilter
       ? fixedRuntimeTag('schedule', externalRuntimes)
       : '') +
+    (analyticsMeasurementId ? googleAnalyticsTags(analyticsMeasurementId) : '') +
     siteFiles.bodyEnd +
     `</body></html>`
 
-  return { html, title, noindex, canonical: canonicalDecision }
+  return {
+    html,
+    title,
+    noindex,
+    canonical: canonicalDecision,
+    ...(analyticsMeasurementId ? { analyticsMeasurementId } : {}),
+  }
 }

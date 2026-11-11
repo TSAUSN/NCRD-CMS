@@ -832,6 +832,10 @@
     {
       "name": "0209_add_person_without_mail.sql",
       "checksum": "2701abf8cf22f6b1"
+    },
+    {
+      "name": "0210_site_google_analytics.sql",
+      "checksum": "bc862b134572a17e"
     }
   ]
 }

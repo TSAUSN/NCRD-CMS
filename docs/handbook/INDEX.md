@@ -35,6 +35,7 @@ Permissions are enforced by the database, not only by the screens.
 | See what changed before publishing | [publishing/review-changes.md](publishing/review-changes.md) | Whole guide |
 | Fix a publishing check | [publishing/checks.md](publishing/checks.md) | Whole guide |
 | Restore an older version | [publishing/review-changes.md](publishing/review-changes.md) | "Restore as new draft" |
+| Connect a site to GA4 | [site-setup/analytics.md](site-setup/analytics.md) | Measurement ID, tracking and test-address switches |
 | Write, tag and publish a story | [editing/stories.md](editing/stories.md), [editing/story-tags.md](editing/story-tags.md) | Whole guides |
 | Publish or schedule a story | [editing/story-publishing.md](editing/story-publishing.md) | Whole guide |
 | Choose which stories lead the Newsroom | [editing/newsroom-order.md](editing/newsroom-order.md) | Whole guide |

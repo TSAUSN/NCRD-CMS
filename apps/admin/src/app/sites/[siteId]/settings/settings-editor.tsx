@@ -10,7 +10,7 @@ import { TextLink } from '../../../../components/ui/text-link.tsx'
 import { SettingsNavigation } from '../../../../components/settings-navigation.tsx'
 import { savePublicSiteSettings, prepareSiteSettingsPublication } from './public-settings-actions.ts'
 import shared from '../../../../components/workspace.module.css'
-type Block = 'social' | 'search' | 'general'
+type Block = 'social' | 'search' | 'general' | 'analytics'
 export function useSettingsDraft<T>(
   siteId: string,
   archived: boolean,

@@ -81,12 +81,34 @@ export const SiteSearchSharing = z
     hints: plain(500),
   })
   .strict()
+export const GA4_MEASUREMENT_ID = /^G-[A-Z0-9]{4,20}$/
+export const SiteAnalytics = z
+  .object({
+    measurementId: z
+      .string()
+      .trim()
+      .toUpperCase()
+      .refine(
+        value => value === '' || GA4_MEASUREMENT_ID.test(value),
+        'Use a GA4 Measurement ID such as G-XXXXXXXXXX.',
+      ),
+    enabled: z.boolean(),
+    includeStaging: z.boolean(),
+  })
+  .strict()
+  .refine(
+    value => !value.enabled || GA4_MEASUREMENT_ID.test(value.measurementId),
+    'Add the Measurement ID before enabling tracking.',
+  )
+export type SiteAnalytics = z.infer<typeof SiteAnalytics>
+
 /** Optional blocks preserve legacy public output until the site adopts them. */
 export const SitePublicSettings = z
   .object({
     schemaVersion: z.literal(1),
     name: plain(120).min(1),
     dataValues: DataValues.optional(),
+    analytics: SiteAnalytics.optional(),
     general: SiteGeneral.optional(),
     search: SiteSearchSharing.optional(),
     social: z

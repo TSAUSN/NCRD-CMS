@@ -3849,3 +3849,33 @@ The reference check passes on a new disposable PostgreSQL 16 cluster with
 version 16 tools. Pin the checks job to Ubuntu 24.04 and assert the dump and
 restore major before migrating. Preserve the exact catalog comparison and
 all policy tests; no generated SQL or immutable migration is changed.
+
+
+## 2026-11-11 — Per-site GA4 configuration and tracking
+
+Cagatay requested Jon's per-site Analytics fields and working tracking as the
+first phase, with in-CMS reporting left for a later Data API connection. This
+adds the narrowly typed optional Analytics block to site settings, superseding
+the older no-analytics-settings scope for this feature only. Settings follow
+the existing administrator-only drafts, immutable releases and review flow.
+Tracking defaults off; test addresses require a separate explicit choice.
+CMS screens, private visitor/editor previews, section and scriptless renders
+do not load this runtime. Public output and CSP remain byte-identical when
+Analytics is absent or disabled. The per-ID bootstrap uses an exact script
+hash and the governed Google endpoint policy; no arbitrary script field is
+introduced. Query strings are omitted from the configured initial page URL.
+
+Migration 0210 must be reviewed and applied by the owning database operator
+before deploying the matching application. No property, ID or Google access
+is created automatically, and no hosted settings are enabled by this change.
+
+
+## 2026-11-11 — Verify the browser-test Node toolchain
+
+After the runner/PostgreSQL correction, CI passed its database suites and
+application builds, then Node 24.22.2 failed browser-spec module discovery.
+The exact same module-loading failure reproduces locally with that Node
+version; all 657 specs are discovered with Node 24.15.0. Pin CI's Node 24
+toolchain to 24.15.0 while this Playwright/native-TypeScript interoperability
+issue is investigated. Keep every browser assertion, timeout and source opt-in
+unchanged. This pin does not change the deployed application dependencies.
