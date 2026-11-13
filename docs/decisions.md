@@ -3866,3 +3866,13 @@ steps and common user terms, with an explicit route to other roles' matching
 help. Match the handbook to current workflows; retain the historical RoleViews
 proposal as a proposal. No account/site action, migration, role change, invitation,
 content publication or domain operation is performed by this documentation work.
+
+
+## 2026-11-13 — Keep password reveal controls compact
+
+Scope entry-panel primary button sizing to explicit submit buttons. Applying
+full-width styling to every nested button made Show/Hide consume the password
+row and shrink the input to a sliver. Use the shared eye/eye-off icons inside the field with a full touch target,
+reserved text padding and accessible Show/Hide labels. Keep the same input,
+masking state, form value and authentication actions on both sign-in and account
+password forms.

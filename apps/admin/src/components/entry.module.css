@@ -59,7 +59,7 @@
   border-radius: var(--radius-control);
   font-size: var(--text-body);
 }
-.form button {
+.form button[type='submit'] {
   width: 100%;
   min-height: var(--entry-control);
   padding: var(--space-2) var(--space-4);
