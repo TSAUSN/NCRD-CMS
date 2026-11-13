@@ -62,6 +62,8 @@ export async function infrastructure(c, options) {
   projectGrant('builder', 'roles/logging.logWriter')
   projectGrant('worker', 'roles/firebasehosting.admin')
   projectGrant('admin', 'roles/firebasehosting.admin')
+  projectGrant('worker', 'roles/serviceusage.serviceUsageConsumer')
+  projectGrant('admin', 'roles/serviceusage.serviceUsageConsumer')
   cloud(c, [
     'artifacts',
     'repositories',

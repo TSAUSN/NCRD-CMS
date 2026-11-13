@@ -77,6 +77,7 @@ export function bootstrapPlan(config, target) {
         notes: [
           'Every create first checks existence; existing resources are never deleted. SQL creation additionally requires --allow-create-sql.',
           'Adds Firebase with the Management API and narrowly scoped IAM grants; no service-account keys.',
+          'Admin and Worker receive Hosting Admin and Service Usage Consumer so Firebase requests can use this project as their quota project.',
         ],
       },
       {

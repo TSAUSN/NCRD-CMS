@@ -56,8 +56,11 @@ Cloud Scheduler, Monitoring and Logging.
 
 Runtime grants: Admin/Site/Worker/Operator receive SQL connector access. Admin
 uploads media, Site reads media, Worker processes media, Operator reads media and
-writes backups. Admin/Worker manage Hosting; Worker reads the one public Run
-service. Builder writes only its registry and logs and reads its source bucket.
+writes backups. Admin/Worker receive Hosting Admin and Service Usage Consumer
+for Hosting requests that identify this project in `X-Goog-User-Project`; the
+Hosting role alone does not include `serviceusage.services.use`. Worker reads the
+one public Run service. Builder writes only its registry and logs and reads its
+source bucket.
 Secrets are granted only to the corresponding runtime identity; database owner DB/backup
 key go only to Operator. Scheduler invokes only Worker and the backup job.
 

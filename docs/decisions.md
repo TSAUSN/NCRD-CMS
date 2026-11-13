@@ -3891,3 +3891,14 @@ immutable migration, production database or runtime behavior is changed.
 PostgreSQL 16.16 introduced the internal attribute versioning used here;
 [`pg_attribute`](https://www.postgresql.org/docs/16/catalog-pg-attribute.html)
 documents that `pg_attver` cannot be set through DDL.
+
+### 2026-11-13 — Firebase runtime quota-project permission
+
+Admin and Worker already identify the Firebase project as their quota project.
+The empty-project setup now also grants `roles/serviceusage.serviceUsageConsumer`
+to those two runtime identities; Hosting Admin does not include
+`serviceusage.services.use`. The same two grants were approved and applied to
+the existing organization project, with an exact IAM before/after comparison.
+This correction does not change human ownership, billing configuration, DNS,
+alert policies or stored content. Retained failed deliveries still require
+separate diagnosis and recovery; a successful IAM write is not delivery proof.
