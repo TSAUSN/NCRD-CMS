@@ -92,10 +92,27 @@ jobs:
       - name: Script tests
         run: node --test scripts/*.test.mjs scripts/golden/*.test.mjs
 
+      # The floating PG16 service can receive a security update before the runner
+      # image does. Old pg_dump emits internal pg_attver values from PG16.16+.
+      - name: Update PostgreSQL reference tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends postgresql-client-16
+          echo '/usr/lib/postgresql/16/bin' >> "$GITHUB_PATH"
+        timeout-minutes: 5
+
       - name: Verify PostgreSQL reference tools
         run: |
           pg_dump --version | grep -E '^pg_dump \(PostgreSQL\) 16\.'
           pg_restore --version | grep -E '^pg_restore \(PostgreSQL\) 16\.'
+          server_version="$(psql "$DATABASE_URL" -XAtc 'SHOW server_version_num')"
+          for tool in pg_dump pg_restore; do
+            client_patch="$("$tool" --version | sed -nE 's/^[^ ]+ \(PostgreSQL\) 16\.([0-9]+).*/\1/p')"
+            if [ -z "$client_patch" ] || [ "$server_version" -lt 160000 ] || [ "$server_version" -ge 170000 ] || [ "$((160000 + client_patch))" -lt "$server_version" ]; then
+              echo "::error::$tool must be PostgreSQL 16 and at least as new as the test server ($server_version)."
+              exit 1
+            fi
+          done
 
       # Applies every migration to an empty database, exactly as a deploy does.
       - name: Migrate a clean database

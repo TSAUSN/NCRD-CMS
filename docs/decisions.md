@@ -3876,3 +3876,18 @@ row and shrink the input to a sliver. Use the shared eye/eye-off icons inside th
 reserved text padding and accessible Show/Hide labels. Keep the same input,
 masking state, form value and authentication actions on both sign-in and account
 password forms.
+
+## 2026-11-13 — Match CI dump tools to the PostgreSQL security release
+
+The floating PostgreSQL 16 CI service advanced to 16.16 while Ubuntu's runner
+image still supplied 16.15 dump/restore tools. The older client emitted 680
+internal `pg_attver` column-version settings, making only the generated
+`catalog.sql` reference differ. Update the CI client package before database
+tests, put its versioned binaries first on PATH, and refuse clients older than
+the test server. Retain exact SQL/reference, owner, grant, policy and checksum
+assertions; show the actual SQL diff on future failures. No generated reference,
+immutable migration, production database or runtime behavior is changed.
+
+PostgreSQL 16.16 introduced the internal attribute versioning used here;
+[`pg_attribute`](https://www.postgresql.org/docs/16/catalog-pg-attribute.html)
+documents that `pg_attver` cannot be set through DDL.
