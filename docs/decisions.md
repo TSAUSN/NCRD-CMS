@@ -3882,9 +3882,9 @@ password forms.
 The floating PostgreSQL 16 CI service advanced to 16.16 while Ubuntu's runner
 image still supplied 16.15 dump/restore tools. The older client emitted 680
 internal `pg_attver` column-version settings, making only the generated
-`catalog.sql` reference differ. Update the CI client package before database
-tests, put its versioned binaries first on PATH, and refuse clients older than
-the test server. Retain exact SQL/reference, owner, grant, policy and checksum
+`catalog.sql` reference differ. Configure the official PostgreSQL APT repository with its verified signing-key
+fingerprint, update only the CI client package before database tests, put its
+versioned binaries first on PATH, and refuse clients older than the test server. Retain exact SQL/reference, owner, grant, policy and checksum
 assertions; show the actual SQL diff on future failures. No generated reference,
 immutable migration, production database or runtime behavior is changed.
 
