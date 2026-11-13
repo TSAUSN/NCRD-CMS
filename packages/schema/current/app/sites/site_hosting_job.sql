@@ -19,6 +19,11 @@ BEGIN
   RAISE EXCEPTION 'hosting event is not held by this lease' USING ERRCODE='CMS04';
  END IF;
  SELECT * INTO site FROM public.sites WHERE id=event.site_id;
+ IF event.payload ? 'hosting_recovery_target' AND (
+  site.id IS NULL OR site.archived_at IS NOT NULL OR site.status='archived'
+  OR event.payload->>'site_id' IS DISTINCT FROM site.id::text
+  OR event.payload->'hosting_recovery_target' IS DISTINCT FROM jsonb_build_object('staging_hostname',site.staging_hostname)
+ ) THEN RAISE EXCEPTION 'hosting recovery target changed; inspect this delivery before retrying' USING ERRCODE='CMS04'; END IF;
  IF site IS NULL OR site.archived_at IS NOT NULL OR site.status='archived' THEN RETURN NULL; END IF;
  RETURN jsonb_build_object('site_id',site.id,'staging_hostname',site.staging_hostname);
 END $function$

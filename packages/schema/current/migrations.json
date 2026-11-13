@@ -832,6 +832,10 @@
     {
       "name": "0209_add_person_without_mail.sql",
       "checksum": "2701abf8cf22f6b1"
+    },
+    {
+      "name": "0211_hosting_delivery_recovery.sql",
+      "checksum": "97d9f65a98fbbcf3"
     }
   ]
 }

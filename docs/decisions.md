@@ -3902,3 +3902,18 @@ the existing organization project, with an exact IAM before/after comparison.
 This correction does not change human ownership, billing configuration, DNS,
 alert policies or stored content. Retained failed deliveries still require
 separate diagnosis and recovery; a successful IAM write is not delivery proof.
+
+### 2026-11-13 — Audited Hosting delivery recovery, pending live approval
+
+Migration 0211 introduces a private append-only retry receipt and an explicit
+Super-admin-only Hosting recovery command. Applying it creates no work or data
+backfill. Up to 500 matching failures share one guarded, current-target retry;
+original failed rows remain unchanged. A pending/dead retry or obsolete target
+does not resolve a failure. Domain recovery also requires a fresh provider
+result. Worker job readers validate the pinned address/revision, including after
+a domain provider call. Unrelated jobs and existing thumbnail recovery remain
+unchanged. Local upgrade tests compare every existing application table and
+function owner/ACL; worker tests use simulated providers. No live migration,
+retry, DNS change or alert-policy change is authorized by these local receipts.
+The current Cloud Build guard compares image/source migration files, so its
+separate operator rollout must be reviewed before any live application.

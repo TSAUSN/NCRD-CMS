@@ -9,7 +9,7 @@ CREATE OR REPLACE FUNCTION app.domain_job(p_event_id bigint, p_token uuid)
  SECURITY DEFINER
  SET search_path TO 'pg_catalog', 'public'
 AS $function$
-DECLARE event RECORD; d RECORD; staging text;
+DECLARE event RECORD; d RECORD; site RECORD; staging text;
 BEGIN
  PERFORM app.require_worker();
  SELECT * INTO event FROM public.outbox WHERE id=p_event_id FOR UPDATE;
@@ -19,8 +19,16 @@ BEGIN
   RAISE EXCEPTION 'domain event is not held by this lease' USING ERRCODE='CMS04';
  END IF;
  SELECT * INTO d FROM public.domains WHERE id=(event.payload->>'domain_id')::uuid AND site_id=event.site_id;
+ SELECT * INTO site FROM public.sites WHERE id=event.site_id;
+ IF event.payload ? 'hosting_recovery_target' AND (
+  d.id IS NULL OR d.removed_at IS NOT NULL OR d.kind='staging' OR d.status='removing'
+  OR site.id IS NULL OR site.archived_at IS NOT NULL OR site.status='archived'
+  OR event.payload->>'revision' IS DISTINCT FROM d.revision::text
+  OR event.payload->'hosting_recovery_target' IS DISTINCT FROM jsonb_build_object(
+   'staging_hostname',site.staging_hostname,'domain_id',d.id,'hostname',d.hostname_normalized,'revision',d.revision)
+ ) THEN RAISE EXCEPTION 'domain recovery target changed; inspect this delivery before retrying' USING ERRCODE='CMS04'; END IF;
  IF d IS NULL OR d.removed_at IS NOT NULL THEN RETURN NULL; END IF;
- SELECT staging_hostname INTO staging FROM public.sites WHERE id=d.site_id;
+ staging:=site.staging_hostname;
  RETURN jsonb_build_object('id',d.id,'site_id',d.site_id,'hostname',d.hostname_normalized,'status',d.status,
   'revision',d.revision,'verification_token',d.verify_token,'provider_ref',d.provider_ref,'staging_hostname',staging);
 END $function$

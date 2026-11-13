@@ -59,6 +59,7 @@ Permissions are enforced by the database, not only by the screens.
 | Run tests | [docs/operations.md](../operations.md). Build the admin and site before browser tests; they refuse a stale build. |
 | Format code | `pnpm format`. CI checks it with `pnpm format:check`. |
 | Back up and recover | [upgrades/backup-recovery.md](upgrades/backup-recovery.md) |
+| Review audited Hosting retry recovery | [upgrades/hosting-delivery-recovery.md](upgrades/hosting-delivery-recovery.md) |
 | Prepare a clean hosted content copy | [hosting/local-staging.md](hosting/local-staging.md#prepare-the-maintainer-review-hosted-copy) |
 | Bootstrap an empty organization project (administrator operated) | [hosting/bootstrap.md](hosting/bootstrap.md) |
 | Receive the private release and sign-in packet | [hosting/private-release-handoff.md](hosting/private-release-handoff.md) |

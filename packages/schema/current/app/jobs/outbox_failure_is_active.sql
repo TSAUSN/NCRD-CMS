@@ -12,5 +12,13 @@ AS $function$
  SELECT EXISTS(SELECT 1 FROM public.outbox failed WHERE failed.id=p_id AND failed.status='dead'
  AND NOT (failed.event_type='section_def.thumbnail_requested' AND EXISTS(SELECT 1 FROM public.sites s WHERE s.id=failed.site_id AND (s.archived_at IS NOT NULL OR s.status='archived')))
  AND NOT EXISTS(SELECT 1 FROM app.thumbnail_retry_receipts receipt JOIN public.outbox retry ON retry.id=receipt.retry_id
- WHERE receipt.failed_id=failed.id AND retry.status IN ('delivered','dead')))
+ WHERE receipt.failed_id=failed.id AND retry.status IN ('delivered','dead'))
+ AND NOT EXISTS(SELECT 1 FROM app.hosting_retry_receipts receipt JOIN public.outbox retry ON retry.id=receipt.retry_id
+ WHERE receipt.failed_id=failed.id AND retry.site_id=failed.site_id AND retry.event_type=failed.event_type
+ AND retry.processed_at>=failed.failed_at
+ AND (NOT (failed.payload ? 'hosting_recovery_target') OR failed.payload->'hosting_recovery_target'=receipt.target)
+ AND CASE WHEN failed.event_type='domain.sync' THEN
+  failed.payload->>'domain_id'=retry.payload->>'domain_id' AND failed.payload->>'revision'=retry.payload->>'revision'
+  ELSE failed.payload->>'site_id'=retry.payload->>'site_id' END
+ AND app.hosting_delivery_succeeded(retry.id,receipt.target)))
 $function$

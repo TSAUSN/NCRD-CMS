@@ -346,6 +346,23 @@ CREATE TABLE public.canvas_preview_tickets (
 ALTER TABLE public.canvas_preview_tickets OWNER TO cms_migration_owner;
 
 --
+-- Name: hosting_retry_receipts; Type: TABLE; Schema: app; Owner: cms_migration_owner
+--
+
+CREATE TABLE app.hosting_retry_receipts (
+    failed_id bigint NOT NULL,
+    retry_id bigint NOT NULL,
+    requested_by uuid NOT NULL,
+    target jsonb NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT hosting_retry_receipts_check CHECK ((retry_id > failed_id)),
+    CONSTRAINT hosting_retry_receipts_target_check CHECK ((jsonb_typeof(target) = 'object'::text))
+);
+
+
+ALTER TABLE app.hosting_retry_receipts OWNER TO cms_migration_owner;
+
+--
 -- Name: media_cleanup_claims; Type: TABLE; Schema: app; Owner: cms_migration_owner
 --
 
@@ -2132,6 +2149,14 @@ CREATE TABLE public.v1_import_targets (
 ALTER TABLE public.v1_import_targets OWNER TO cms_migration_owner;
 
 --
+-- Name: hosting_retry_receipts hosting_retry_receipts_pkey; Type: CONSTRAINT; Schema: app; Owner: cms_migration_owner
+--
+
+ALTER TABLE ONLY app.hosting_retry_receipts
+    ADD CONSTRAINT hosting_retry_receipts_pkey PRIMARY KEY (failed_id, retry_id);
+
+
+--
 -- Name: media_cleanup_claims media_cleanup_claims_media_id_key; Type: CONSTRAINT; Schema: app; Owner: cms_migration_owner
 --
 
@@ -3460,6 +3485,13 @@ ALTER TABLE ONLY public.v1_import_targets
 
 
 --
+-- Name: hosting_retry_receipts_retry; Type: INDEX; Schema: app; Owner: cms_migration_owner
+--
+
+CREATE INDEX hosting_retry_receipts_retry ON app.hosting_retry_receipts USING btree (retry_id);
+
+
+--
 -- Name: media_upload_intents_expiry; Type: INDEX; Schema: app; Owner: cms_migration_owner
 --
 
@@ -3716,6 +3748,20 @@ CREATE INDEX submissions_site_status ON public.submissions USING btree (site_id,
 --
 
 CREATE INDEX submissions_submitter_status ON public.submissions USING btree (submitted_by, status, created_at DESC);
+
+
+--
+-- Name: hosting_retry_receipts hosting_retry_receipts_append_only; Type: TRIGGER; Schema: app; Owner: cms_migration_owner
+--
+
+CREATE TRIGGER hosting_retry_receipts_append_only BEFORE DELETE OR UPDATE ON app.hosting_retry_receipts FOR EACH ROW EXECUTE FUNCTION app.hosting_retry_receipt_is_append_only();
+
+
+--
+-- Name: hosting_retry_receipts hosting_retry_receipts_no_truncate; Type: TRIGGER; Schema: app; Owner: cms_migration_owner
+--
+
+CREATE TRIGGER hosting_retry_receipts_no_truncate BEFORE TRUNCATE ON app.hosting_retry_receipts FOR EACH STATEMENT EXECUTE FUNCTION app.hosting_retry_receipt_is_append_only();
 
 
 --
@@ -4262,6 +4308,30 @@ CREATE TRIGGER zz_page_redirect_conflict AFTER INSERT OR UPDATE OF slug, archive
 --
 
 CREATE TRIGGER zz_published_redirect_conflict AFTER INSERT OR UPDATE OF path ON public.published_routes FOR EACH ROW EXECUTE FUNCTION app.guard_page_redirect_conflict();
+
+
+--
+-- Name: hosting_retry_receipts hosting_retry_receipts_failed_id_fkey; Type: FK CONSTRAINT; Schema: app; Owner: cms_migration_owner
+--
+
+ALTER TABLE ONLY app.hosting_retry_receipts
+    ADD CONSTRAINT hosting_retry_receipts_failed_id_fkey FOREIGN KEY (failed_id) REFERENCES public.outbox(id);
+
+
+--
+-- Name: hosting_retry_receipts hosting_retry_receipts_requested_by_fkey; Type: FK CONSTRAINT; Schema: app; Owner: cms_migration_owner
+--
+
+ALTER TABLE ONLY app.hosting_retry_receipts
+    ADD CONSTRAINT hosting_retry_receipts_requested_by_fkey FOREIGN KEY (requested_by) REFERENCES public.app_users(id);
+
+
+--
+-- Name: hosting_retry_receipts hosting_retry_receipts_retry_id_fkey; Type: FK CONSTRAINT; Schema: app; Owner: cms_migration_owner
+--
+
+ALTER TABLE ONLY app.hosting_retry_receipts
+    ADD CONSTRAINT hosting_retry_receipts_retry_id_fkey FOREIGN KEY (retry_id) REFERENCES public.outbox(id);
 
 
 --
@@ -8527,6 +8597,20 @@ GRANT ALL ON FUNCTION app.has_site_access(site uuid) TO cms_worker;
 
 
 --
+-- Name: FUNCTION hosting_delivery_succeeded(p_id bigint, p_target jsonb); Type: ACL; Schema: app; Owner: cms_migration_owner
+--
+
+REVOKE ALL ON FUNCTION app.hosting_delivery_succeeded(p_id bigint, p_target jsonb) FROM PUBLIC;
+
+
+--
+-- Name: FUNCTION hosting_retry_receipt_is_append_only(); Type: ACL; Schema: app; Owner: cms_migration_owner
+--
+
+REVOKE ALL ON FUNCTION app.hosting_retry_receipt_is_append_only() FROM PUBLIC;
+
+
+--
 -- Name: FUNCTION import_site_asset(p_site uuid, p_id uuid, p_kind text, p_key text, p_mime text, p_bytes bigint, p_hash text, p_name text, p_font text, p_provenance jsonb); Type: ACL; Schema: app; Owner: cms_migration_owner
 --
 
@@ -10074,6 +10158,14 @@ GRANT ALL ON FUNCTION app.restore_version_as_draft(p_page_id uuid, p_expected_re
 --
 
 REVOKE ALL ON FUNCTION app.retry_delay(p_attempt integer) FROM PUBLIC;
+
+
+--
+-- Name: FUNCTION retry_hosting_delivery(p_failed_id bigint); Type: ACL; Schema: app; Owner: cms_migration_owner
+--
+
+REVOKE ALL ON FUNCTION app.retry_hosting_delivery(p_failed_id bigint) FROM PUBLIC;
+GRANT ALL ON FUNCTION app.retry_hosting_delivery(p_failed_id bigint) TO cms_authenticated_user;
 
 
 --

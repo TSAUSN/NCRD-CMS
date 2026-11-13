@@ -3601,3 +3601,16 @@ Record the reference and any remaining difference/reason for each screen. Run th
 4. Complete the SPEC acceptance walk, including required browser coverage and admin comparisons against the approved mockups. Resolve failures or record reviewed deferred work before release acceptance.
 
 5. Release only reviewed, verified commits. Preserve the retained demo and record remaining work and administrator decisions.
+
+
+### Hosting delivery recovery — prepared November 13, 2026
+
+The explicit Super admin command in migration 0211 can link up to 500 matching
+dead domain/Hosting deliveries to one current-target retry. It preserves each
+original failure and appends a private receipt and audit record. Health resolves
+a linked issue only after a matching delivered retry, with fresh stored provider
+proof for domains; changed targets and failed retries stay unresolved. Applying
+the migration alone queues no work. Ordinary worker behavior, tenant access,
+publication and unrelated job types retain their prior contracts. This is a
+locally tested review candidate; production migration and execution are separate
+approval gates. See [the operator guide](docs/handbook/upgrades/hosting-delivery-recovery.md).
