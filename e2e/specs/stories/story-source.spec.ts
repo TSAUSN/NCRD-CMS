@@ -180,7 +180,7 @@ test('manual Story check shows saved status, drafts, progress and safe retry wit
     expect(reads).toBe(3)
     await capture('connection-lost')
     await page.getByRole('button', { name: 'Retry check', exact: true }).click()
-    await expect(page.getByText(/0 new stories, 0 updated, 0 no longer/)).toBeVisible()
+    await expect(page.getByText('No changes found. Saved stories are unchanged.', { exact: true })).toBeVisible()
     expect(reads).toBe(3)
     expect(requests).toBe(4)
     const current = (
