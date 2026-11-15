@@ -34,6 +34,26 @@ because code and tests cite its section numbers ("SPEC §8.6" means revision 7).
 
 ## Current release state
 
+### Personal V2 work authorized November 15, 2026
+
+The current personal-lab task starts from `45f15d4` on
+`lab/overnight-v2-20261115`: improve domains and their UX, verify Jon's story/tag,
+font, saved-number and role workflows, and prepare Microsoft **through Supabase**
+while keeping passwords. Direct Entra is deferred. This supersedes the older
+Friday-only test scope **for the isolated personal copy only**. It does not
+authorize changes to NCRD, production domains, billing plans or SMTP rollout.
+
+The controlled personal `cms-test.englishwithcagatay.com` connection has reached
+Live/HTTPS; the older ownership-only domain note below is historical. Real
+Microsoft tenant acceptance, GA IDs/property access and full hosted role/browser
+acceptance remain explicit gates. See the
+[IT checklist](docs/handbook/hosting/microsoft-sign-in-it-setup.md) and
+[dated schema/feature review](docs/handbook/maintainers/schema-and-feature-review-2026-11-15.md).
+The frozen-release snapshot below is retained as historical evidence; it is not
+proof of the current personal or NCRD runtime revision.
+
+### Frozen release snapshot
+
 The release is `v2026.11.06`. Its runtime-identical review build was `e51b4b5`.
 The hosted personal review copy is a separate deployment; the frozen tag does not
 prove that copy runs the same revision. Organization deployment, public-invocation

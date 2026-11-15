@@ -3945,3 +3945,22 @@ Sources: [Next.js Server Actions advisory](https://github.com/vercel/next.js/sec
 [Zod collection-size fix](https://github.com/colinhacks/zod/commit/a0ebf97),
 [Vite editor fix](https://github.com/vitejs/launch-editor/security/advisories/GHSA-587h-7wmj-h5pm),
 [Vitest mock-registration fix](https://github.com/vitest-dev/vitest/security/advisories/GHSA-qxg6-89mg-rqv8).
+
+### 2026-11-15 — Prepare Supabase Microsoft sign-in and clarify domain setup
+
+The owner selected Microsoft through the existing Supabase Azure provider and
+retained password sign-in. Direct Entra is deferred. Keep the Microsoft button
+configuration gated until IT supplies the approved tenant/app/provider setup.
+Preserve the existing provider identity and product permissions; a presentation
+method cookie only selects safe recovery wording and is not identity proof.
+
+The personal domain candidate uses the existing narrow commands and shared
+controls. Add the missing Settings → Domains route, visible setup stages,
+responsive DNS records and exact per-value copying. Provider instructions are
+not a full DNS-zone inventory. Keep routing/mail records and confirmation before
+removal; do not guess DNS values or make refreshing a substitute for recovery.
+
+The schema inventory and focused tests distinguish future features, unrun hosted
+checks and retained helper definitions. No migration or schema cleanup is added
+by this work. Deployment is limited to the isolated personal project; NCRD and
+its configuration are unchanged.

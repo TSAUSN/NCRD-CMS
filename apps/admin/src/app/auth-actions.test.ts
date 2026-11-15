@@ -1,5 +1,6 @@
 import { beforeEach, expect, it, vi } from 'vitest'
 import { HOSTED_SESSION_COOKIE, REFRESH_COOKIE, SIGN_IN_PROOF_COOKIE } from '@cms/platform'
+import { SIGN_IN_METHOD_COOKIE } from '../lib/sign-in-flow.ts'
 
 const stubs = vi.hoisted(() => ({
   asUser: vi.fn(),
@@ -13,6 +14,7 @@ const stubs = vi.hoisted(() => ({
   session: vi.fn(),
   set: vi.fn(),
   get: vi.fn(),
+  microsoft: vi.fn(),
 }))
 vi.mock('server-only', () => ({}))
 vi.mock('../lib/session.ts', () => ({
@@ -23,6 +25,7 @@ vi.mock('../lib/session.ts', () => ({
     completeCodeSignIn: stubs.exchange,
     signInWithPassword: stubs.password,
     setPassword: stubs.setPassword,
+    microsoftSignInUrl: stubs.microsoft,
     revoke: stubs.revoke,
   }),
 }))
@@ -38,7 +41,7 @@ vi.mock('next/navigation', () => ({
     throw new Error(`redirect:${url}`)
   },
 }))
-import { completeSignIn, setPassword, signIn, signInWithPassword } from './actions/auth.ts'
+import { completeSignIn, setPassword, signIn, signInWithMicrosoft, signInWithPassword } from './actions/auth.ts'
 
 beforeEach(() => {
   vi.resetAllMocks()
@@ -69,6 +72,37 @@ it('does not exchange a foreign-browser code with no initiating proof', async ()
   await expect(completeSignIn(form)).rejects.toThrow('redirect:/sign-in?error=expired-link')
   expect(stubs.exchange).not.toHaveBeenCalled()
   expect(stubs.set).toHaveBeenCalledWith(SIGN_IN_PROOF_COOKIE, '', expect.objectContaining({ secure: true, maxAge: 0 }))
+  expect(stubs.set.mock.calls.some(([name]) => [HOSTED_SESSION_COOKIE, REFRESH_COOKIE].includes(name))).toBe(false)
+})
+
+it('starts Microsoft with a browser-bound proof and records only a short-lived presentation context', async () => {
+  stubs.microsoft.mockReturnValue('https://project.supabase.co/auth/v1/authorize?provider=azure')
+  await expect(signInWithMicrosoft()).rejects.toThrow(
+    'redirect:https://project.supabase.co/auth/v1/authorize?provider=azure',
+  )
+  const proof = stubs.set.mock.calls.find(([name]) => name === SIGN_IN_PROOF_COOKIE)!
+  expect(proof[2]).toMatchObject({ httpOnly: true, secure: true, sameSite: 'lax', path: '/', maxAge: 600 })
+  expect(stubs.microsoft.mock.calls[0]![0]).not.toBe(proof[1])
+  expect(stubs.microsoft.mock.calls[0]![0]).toMatch(/^[a-zA-Z0-9_-]{43}$/)
+  expect(stubs.set).toHaveBeenCalledWith(
+    SIGN_IN_METHOD_COOKIE,
+    'microsoft',
+    expect.objectContaining({ secure: true, httpOnly: true, maxAge: 600 }),
+  )
+  expect(stubs.resolve).not.toHaveBeenCalled()
+})
+
+it('a refused Microsoft exchange consumes its proof, offers password fallback and never opens a session', async () => {
+  stubs.get.mockImplementation((name: string) => ({
+    value: name === SIGN_IN_METHOD_COOKIE ? 'microsoft' : 'browser-proof',
+  }))
+  stubs.exchange.mockResolvedValue(null)
+  const form = new FormData()
+  form.set('authCode', '11111111-1111-4111-8111-111111111111')
+  await expect(completeSignIn(form)).rejects.toThrow('redirect:/sign-in?error=microsoft-incomplete')
+  expect(stubs.set).toHaveBeenCalledWith(SIGN_IN_PROOF_COOKIE, '', expect.objectContaining({ maxAge: 0 }))
+  expect(stubs.set).toHaveBeenCalledWith(SIGN_IN_METHOD_COOKIE, '', expect.objectContaining({ maxAge: 0 }))
+  expect(stubs.resolve).not.toHaveBeenCalled()
   expect(stubs.set.mock.calls.some(([name]) => [HOSTED_SESSION_COOKIE, REFRESH_COOKIE].includes(name))).toBe(false)
 })
 

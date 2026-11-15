@@ -4,6 +4,7 @@ export function SettingsNavigation({ siteId, current }: { siteId: string; curren
   const base = '/sites/' + siteId + '/settings'
   const items = [
     ['General', base],
+    ['Domains', '/sites/' + siteId + '/domains'],
     ['Publishing & approval', base + '?tab=publishing'],
     ['Review reminders', base + '?tab=reviews'],
     ['Search & sharing', base + '/search'],

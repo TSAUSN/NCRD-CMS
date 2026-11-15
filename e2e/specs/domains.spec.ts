@@ -65,7 +65,12 @@ test('connects a pair, shows exact DNS records, verifies public routing and revo
     .getByRole('main')
     .getByRole('link', { name: 'Demo site', exact: true })
     .getAttribute('href')
-  await page.goto(sitePath + '/domains')
+  await page.goto(sitePath + '/settings')
+  await page
+    .getByRole('navigation', { name: 'Settings tabs', exact: true })
+    .getByRole('link', { name: 'Domains', exact: true })
+    .click()
+  await page.getByText('Before you change DNS', { exact: true }).click()
   await expect(page.getByRole('region', { name: 'Connection checklist' })).toContainText('Your hosting operator:')
   await expect(page.getByRole('region', { name: 'Connection checklist' })).toContainText(
     'Keep the existing nameservers',
@@ -82,6 +87,7 @@ test('connects a pair, shows exact DNS records, verifies public routing and revo
   await runConnection(host)
   await page.getByRole('button', { name: 'Refresh domain status' }).click()
   await expect(domain.getByText('Live', { exact: true })).toBeVisible()
+  await domain.getByText('DNS instructions and verification', { exact: true }).click()
   const reader = await browser.newContext({ timezoneId: 'Asia/Tokyo' })
   try {
     const reopened = await reader.newPage()
@@ -104,10 +110,21 @@ test('connects a pair, shows exact DNS records, verifies public routing and revo
   await expect(domain.getByRole('table')).toContainText(`_cms-verify.${host}`)
   const folder = resolve('../.r8-progress/admin-domains')
   await mkdir(folder, { recursive: true })
-  for (const width of [1440, 1024]) {
+  for (const width of [1440, 1024, 390, 320]) {
     await page.setViewportSize({ width, height: width === 1440 ? 900 : 768 })
+    if (width <= 390) await expect(page.locator('#cms-sidebar')).not.toBeInViewport()
     await domain.scrollIntoViewIfNeeded()
-    await page.screenshot({ path: resolve(folder, 'domains-' + width + '.png') })
+    const bounds = await domain.boundingBox()
+    expect(bounds?.x).toBeGreaterThanOrEqual(0)
+    expect((bounds?.x ?? 0) + (bounds?.width ?? 0)).toBeLessThanOrEqual(width)
+    const caption = await domain.locator('caption').boundingBox()
+    expect(caption?.width).toBeGreaterThan(width / 2)
+    expect(caption?.height).toBeLessThan(100)
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
+    await expect(
+      domain.getByRole('button', { name: `Copy TXT value for _cms-verify.${host}`, exact: true }),
+    ).toBeVisible()
+    await page.screenshot({ path: resolve(folder, 'domains-' + width + '.png'), fullPage: true })
   }
   await expect(domain.getByRole('row').filter({ hasText: '192.0.2.1' })).toContainText('Remove')
   await expect(domain.getByRole('row').filter({ hasText: 'pki.goog' })).toContainText('Add')

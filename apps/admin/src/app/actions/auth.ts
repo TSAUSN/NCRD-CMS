@@ -20,6 +20,7 @@ import {
   type VerifiedAuthSession,
 } from '@cms/platform'
 import { authProvider, currentSession } from '../../lib/session.ts'
+import { SIGN_IN_METHOD_COOKIE, signInMethod } from '../../lib/sign-in-flow.ts'
 
 /** A verified sign-in becomes a CMS session only for somebody with CMS access. */
 async function openSession(provider: AuthProvider, verified: VerifiedAuthSession): Promise<string> {
@@ -92,6 +93,13 @@ export async function signIn(formData: FormData): Promise<void> {
           path: '/',
           maxAge: 3600,
         })
+      ;(await cookies()).set(SIGN_IN_METHOD_COOKIE, 'email', {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'lax',
+        path: '/',
+        maxAge: 3600,
+      })
       await provider.requestSignIn(email, { invited, ...(proof ? { codeChallenge: proof.challenge } : {}) })
     } else {
       destination = '/sign-in?error=unavailable'
@@ -119,6 +127,13 @@ export async function signInWithMicrosoft(): Promise<void> {
         path: '/',
         maxAge: 600,
       })
+      ;(await cookies()).set(SIGN_IN_METHOD_COOKIE, 'microsoft', {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'lax',
+        path: '/',
+        maxAge: 600,
+      })
       destination = provider.microsoftSignInUrl(proof.challenge)
     }
   } catch {
@@ -134,9 +149,12 @@ export async function completeSignIn(formData: FormData): Promise<void> {
   try {
     const provider = authProvider()
     const jar = await cookies()
+    const method = signInMethod(jar.get(SIGN_IN_METHOD_COOKIE)?.value)
+    if (method === 'microsoft') destination = '/sign-in?error=microsoft-incomplete'
     const verifier = jar.get(SIGN_IN_PROOF_COOKIE)?.value
     // The browser proof is single-use, including on a refused exchange.
     jar.set(SIGN_IN_PROOF_COOKIE, '', { httpOnly: true, secure: true, sameSite: 'lax', path: '/', maxAge: 0 })
+    jar.set(SIGN_IN_METHOD_COOKIE, '', { httpOnly: true, secure: true, sameSite: 'lax', path: '/', maxAge: 0 })
     const verified = code
       ? verifier
         ? await provider.completeCodeSignIn?.(code, verifier)

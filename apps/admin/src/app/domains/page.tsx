@@ -4,7 +4,7 @@ import { GuardedLink as Link } from '../../components/guarded-link.tsx'
 import { AppShell } from '../../components/app-shell.tsx'
 import { navigationFor } from '../../components/nav.ts'
 import { PageHeader } from '../../components/shell.tsx'
-import { Card, EmptyState } from '../../components/ui/index.ts'
+import { Badge, Card, EmptyState } from '../../components/ui/index.ts'
 import recordTableStyles from '../../components/workspace-styles/record-table.module.css'
 import ownedStyles from './page-styles.module.css'
 import { currentSession } from '../../lib/session.ts'
@@ -33,17 +33,17 @@ export default async function Domains() {
         <PageHeader
           title="Domains"
           crumbs={[{ label: 'Home', href: '/' }, { label: 'Domains' }]}
-          lede="Web addresses for your sites. This list is read-only."
+          lede="See which addresses are ready and open a site’s settings to connect or manage its domains."
         />
         <Card title="Web addresses" density="compact">
           {rows.length ? (
             <div className={recordTableStyles.tableWrap}>
-              <p className={ownedStyles.addressScrollHint}>Scroll sideways to see all address details.</p>
               <table
                 className={
                   recordTableStyles.table + ' ' + recordTableStyles.compactTable + ' ' + ownedStyles.addressTable
                 }
                 aria-label="Domains"
+                role="table"
               >
                 <thead>
                   <tr>
@@ -56,22 +56,38 @@ export default async function Domains() {
                     </th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody role="rowgroup">
                   {rows.map(row => (
-                    <tr key={row.site_id + row.hostname}>
-                      <td>
+                    <tr key={row.site_id + row.hostname} role="row">
+                      <td data-label="Address" role="cell">
                         <code>{row.hostname}</code>
                       </td>
-                      <td>
+                      <td data-label="Site" role="cell">
                         <Link href={'/sites/' + row.site_id}>{row.site_name}</Link>
                       </td>
-                      <td>{row.kind === 'staging' ? 'Test address' : row.kind}</td>
-                      <td>
+                      <td data-label="Type" role="cell">
                         {row.kind === 'staging'
-                          ? stagingAddressStatusLabel(row.hostname, row.status)
-                          : domainStatusLabel(row.status)}
+                          ? 'Test address'
+                          : row.kind === 'primary'
+                            ? 'Primary address'
+                            : 'Redirect'}
                       </td>
-                      <td>
+                      <td data-label="Status" role="cell">
+                        <Badge
+                          tone={
+                            ['ready', 'live'].includes(row.status)
+                              ? 'live'
+                              : row.status === 'error'
+                                ? 'error'
+                                : 'pending'
+                          }
+                        >
+                          {row.kind === 'staging'
+                            ? stagingAddressStatusLabel(row.hostname, row.status)
+                            : domainStatusLabel(row.status)}
+                        </Badge>
+                      </td>
+                      <td data-label="Manage" role="cell">
                         <Link href={'/sites/' + row.site_id + '/domains'}>Open site settings</Link>
                       </td>
                     </tr>

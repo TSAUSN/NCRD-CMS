@@ -1,12 +1,18 @@
 # Custom domains: steps and rollback
 
-For the maintainer and authorized DNS administrator, after the native-address review.
-No DNS/custom-domain change is authorized for this release.
+For the maintainer and authorized DNS administrator.
 
-Friday starts on `*.web.app`. Inspect Domains and its instructions during the
-demo; keep real-domain cutover separate. Personal-review evidence proves CMS TXT
-ownership only. Certificate activation and actual custom-host routing remain
-unrehearsed, so this is a runbook, not a completed live-domain claim.
+**Personal-lab update, November 15:** the explicitly authorized
+`cms-test.englishwithcagatay.com` test address is Live, has a valid HTTPS
+connection and serves the personal SAWSO copy. Its native `*.web.app` address
+continues to work. This proves that controlled test, not an NCRD/production
+cutover. Root/www/mail DNS records and the organization's project are outside
+this personal change. Preserve the previous records and private receipts.
+
+In the candidate UI, open **Settings → Domains**. Address preparation, DNS
+verification and HTTPS are separate visible steps. Provider instructions are not
+a complete DNS-zone inventory; retain working routing, verification and email
+records even when a later check no longer lists them as required changes.
 
 ## Prepare a test connection first
 
@@ -17,7 +23,7 @@ unrehearsed, so this is a runbook, not a completed live-domain claim.
 2. Back up database/media and record the deployed digest, native site address and
    primary/alias state. Confirm both native public sites work, tenant isolation
    holds and the organization public-invocation policy permits the runtime.
-3. As Super admin, open **Site → Domains → Connect an address**. Enter only the
+3. As Super admin, open **Site → Settings → Domains → Connect an address**. Enter only the
    full hostname (no scheme/path/port). Leave the www checkbox off for a test
    subdomain unless the matching alias is separately approved. Choose **Connect
    domain** once and wait for its reservation/worker receipt.

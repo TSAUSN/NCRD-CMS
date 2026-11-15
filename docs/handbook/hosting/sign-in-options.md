@@ -1,8 +1,18 @@
-# Sign-in options after Friday
+# Sign-in options and IT setup
 
 For the platform lead, IT and the next maintainer. Last checked: November 5, 2026.
 
-**Friday's decision:** only a site editor signs in, using the existing personal Supabase
+## Current decision — November 15, 2026
+
+Microsoft through the existing Supabase Azure provider is the selected path.
+Keep password sign-in. Direct Entra and provider replacement are deferred.
+The [IT setup and acceptance checklist](microsoft-sign-in-it-setup.md) records
+callbacks, safe activation order, test cases and rollback. Microsoft remains
+hidden until its provider is configured; code readiness is not tenant acceptance.
+The older Friday-only scope below is historical and does not describe the
+newly authorized personal-lab testing. NCRD changes remain separately approved.
+
+**Historical Friday decision:** only a site editor signs in, using the existing personal Supabase
 Auth project. Keep its existing provider and subject mapping. Add the exact new
 admin `/auth/confirm` callback while preserving the personal-review/older callbacks.
 No SMTP setup, new provider, real-editor invitation or account linking is required
@@ -17,7 +27,8 @@ people during Friday's Super-admin-only test.
 
 The admin can offer Microsoft sign-in through the Supabase project's Azure
 provider. It is off unless `AUTH_MICROSOFT_ENABLED=true` is set on the Admin
-service. Email links keep working alongside it.
+service. Password sign-in stays available alongside it. Email links remain an
+optional fallback with the delivery limitations described below.
 
 1. **Microsoft (IT):** in Microsoft Entra ID, register an app for the
    organization's accounts only (single tenant). Add the Supabase callback
@@ -45,10 +56,10 @@ Added November 11, 2026. The hosted admin offers email and password beside the
 email link. It needs no setting, no database change and no mail: it uses the
 same Supabase Email provider that already sends the links.
 
-Why it exists: on the organization's mailboxes, mail security opens every link
-in an incoming message before the person does. A default Supabase sign-in link
-is used up by that first open, so the person's own click arrives too late and
-the CMS reports that the link was already used. The built-in Supabase sender
+Why it exists: the reported incomplete/used email links are consistent with
+mail security scanning or an already consumed link; the mailbox-specific cause
+has not been proven. A default Supabase link can be consumed before the person
+uses it. Password sign-in avoids that emailed-link dependency. The built-in Supabase sender
 also allows only two messages an hour for the whole project. A password
 sign-in sends no message, so neither limit applies.
 

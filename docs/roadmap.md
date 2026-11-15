@@ -4,6 +4,15 @@
 The release is `v2026.11.06`; `e51b4b5` was the runtime-identical review build.
 Deployment uses the reviewed release ref and private verification receipts.
 
+## Personal-lab follow-up — November 15
+
+The current task is limited to the isolated personal V2 copy. Microsoft through
+Supabase plus password fallback is selected; direct Entra is deferred. Domains
+and Jon's remaining acceptance scenarios take priority. The
+[dated schema/feature review](handbook/maintainers/schema-and-feature-review-2026-11-15.md)
+distinguishes built features, unrun checks, editorial gaps and deliberately
+future work. The older frozen-release snapshot is not a live status claim.
+
 ## Implemented scope
 
 | Work package | Capability | Remaining acceptance |

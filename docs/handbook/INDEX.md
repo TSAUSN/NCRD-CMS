@@ -66,9 +66,10 @@ Permissions are enforced by the database, not only by the screens.
 | Run Friday deployment checks and rollback | [hosting/friday-go-live.md](hosting/friday-go-live.md) |
 | Size the database and review measured speed | [hosting/speed-and-size.md](hosting/speed-and-size.md) |
 | Deploy the verified Google review and roll back | [hosting/go-live.md](hosting/go-live.md) |
-| Compare future organization sign-in choices | [hosting/sign-in-options.md](hosting/sign-in-options.md) | Super-admin-only Friday decision, effort, identity mapping and switch/rollback |
+| Prepare Microsoft sign-in with IT | [hosting/microsoft-sign-in-it-setup.md](hosting/microsoft-sign-in-it-setup.md) | Supabase Azure setup, password fallback, acceptance and rollback |
+| Compare organization sign-in choices | [hosting/sign-in-options.md](hosting/sign-in-options.md) | Provider ownership, identity mapping and historical alternatives |
 | Review public access and publishable keys with IT | [hosting/public-access-it.md](hosting/public-access-it.md) | One-page access/keys/policy note |
-| Prepare domain connection and routing rollback | [hosting/domains.md](hosting/domains.md) | Controlled test first; no DNS action for this release |
+| Prepare domain connection and routing rollback | [hosting/domains.md](hosting/domains.md) | Controlled personal HTTPS evidence; exact DNS and separate cutover approval |
 | Plan hosting | [hosting/environments.md](hosting/environments.md) and [deploy/google/README.md](../../deploy/google/README.md) |
 | Upgrade a running copy | [upgrades/staging-production.md](upgrades/staging-production.md) |
 | See why something was decided | [docs/decisions.md](../decisions.md) and [docs/adr/](../adr/) |
@@ -82,3 +83,5 @@ Permissions are enforced by the database, not only by the screens.
 - Update the matching guide in the same commit as a feature change. Each guide has a title, a one-line summary, its audience and the date it was last checked.
 - A guide describes what the product does today. Planned work belongs in [docs/roadmap.md](../roadmap.md).
 - Nothing in this handbook authorizes cloud changes, deployment or automated drafting. Hosting steps are plans until they are checked against a real, administrator-provided project.
+
+[November 15 schema and unfinished-feature review](maintainers/schema-and-feature-review-2026-11-15.md)

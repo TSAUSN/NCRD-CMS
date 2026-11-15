@@ -4,6 +4,7 @@ import { completeSignIn } from '../../actions/auth.ts'
 import { SignInButton } from '../../sign-in/submit-button.tsx'
 import { cookies } from 'next/headers'
 import { SIGN_IN_PROOF_COOKIE } from '@cms/platform'
+import { confirmationState, SIGN_IN_METHOD_COOKIE, signInMethod } from '../../../lib/sign-in-flow.ts'
 
 export const dynamic = 'force-dynamic'
 export const metadata = { title: 'Confirm sign-in', robots: { index: false, follow: false }, referrer: 'no-referrer' }
@@ -21,12 +22,16 @@ export default async function ConfirmSignIn({
   // emailed link was already opened once, for example by a mail security scan.
   // Supabase can also put errors in a URL fragment, which the server cannot
   // read. The incomplete-link fallback must offer the same safe recovery.
-  const spent = !code && !tokenHash && Boolean(error || errorCode)
-  const codeValid = code && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(code)
-  const browserProof = (await cookies()).has(SIGN_IN_PROOF_COOKIE)
-  const valid = codeValid
-    ? browserProof
-    : !code && tokenHash && /^[a-zA-Z0-9_-]{20,512}$/.test(tokenHash) && type === 'email'
+  const jar = await cookies()
+  const method = signInMethod(jar.get(SIGN_IN_METHOD_COOKIE)?.value)
+  const { valid, codeValid, message } = confirmationState({
+    code,
+    tokenHash,
+    type,
+    providerError: Boolean(error || errorCode),
+    browserProof: jar.has(SIGN_IN_PROOF_COOKIE),
+    method,
+  })
   return (
     <EntryPanel
       heading="Confirm sign-in"
@@ -35,7 +40,9 @@ export default async function ConfirmSignIn({
           ? code
             ? 'Continue to finish signing in.'
             : 'Continue to sign in using the link from your email.'
-          : 'Use your password or request a new sign-in link.'
+          : method === 'microsoft'
+            ? 'Try Microsoft again, or use your password.'
+            : 'Use your password or request a new sign-in link.'
       }
     >
       {valid ? (
@@ -48,13 +55,7 @@ export default async function ConfirmSignIn({
           <SignInButton label="Continue to CMS" />
         </form>
       ) : (
-        <p role="alert">
-          {codeValid && !browserProof
-            ? 'Open this link in the browser where you requested it, or start sign-in again here.'
-            : spent
-              ? 'This sign-in link was already used or has expired. Some email systems open links to check them before you do, which uses the link up. Sign in with your password, or request another link.'
-              : 'This sign-in link is incomplete, expired or already used. Sign in with your password, or request a new link.'}
-        </p>
+        <p role="alert">{message}</p>
       )}
       <p className="entry-note">
         <Link href="/sign-in">Go to sign in</Link>

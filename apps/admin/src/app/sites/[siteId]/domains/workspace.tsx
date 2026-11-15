@@ -3,11 +3,13 @@ import { useEffect, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { GuardedLink as Link } from '../../../../components/guarded-link.tsx'
 import { ConfirmDialog } from '../../../../components/confirm.tsx'
-import { domainStatusLabel, recordsText, type DomainRow } from '../../../../lib/domains.ts'
-import { reviewTime } from '../../../../lib/review-time.ts'
-import workspace from '../../../../components/workspace.module.css'
-import workspaceFormsStyles from '../../../../components/workspace-styles/workspace-forms.module.css'
-import recordTableStyles from '../../../../components/workspace-styles/record-table.module.css'
+import { type DomainRow } from '../../../../lib/domains.ts'
+import { Button } from '../../../../components/ui/button.tsx'
+import { Card } from '../../../../components/ui/card.tsx'
+import { Field } from '../../../../components/ui/field.tsx'
+import { Disclosure } from '../../../../components/ui/disclosure.tsx'
+import { DomainCard } from './domain-card.tsx'
+import styles from './domain-styles.module.css'
 import { changeDomain } from './actions.ts'
 
 export function DomainWorkspace({
@@ -32,7 +34,7 @@ export function DomainWorkspace({
   const [confirmation, setConfirmation] = useState('')
   const [pending, startTransition] = useTransition()
   useEffect(() => {
-    if (!rows.some(row => !row.removed_at && row.status !== 'live')) return
+    if (!rows.some(row => !row.removed_at && !['live', 'error'].includes(row.status))) return
     const timer = setInterval(() => router.refresh(), 15_000)
     return () => clearInterval(timer)
   }, [rows, router])
@@ -52,8 +54,12 @@ export function DomainWorkspace({
       router.refresh()
     })
   }
+  function feedback(message: string, failed = false) {
+    setError(failed ? message : '')
+    setNotice(failed ? '' : message)
+  }
   return (
-    <div className={workspaceFormsStyles.compactForm + ' ' + workspace.denseStack}>
+    <div className={styles.workspace}>
       {notice && (
         <p className="notice" role="status">
           {notice}
@@ -64,160 +70,45 @@ export function DomainWorkspace({
           {error}
         </p>
       )}
-      {canManage && canConnect && !archived && (
-        <form
-          className={'card stack ' + workspaceFormsStyles.formPanel}
-          onSubmit={e => {
-            e.preventDefault()
-            run({ action: 'add', siteId, hostname, withWww })
-          }}
-        >
-          <h2>Connect an address</h2>
-          <label>
-            Hostname
-            <input
-              required
-              autoComplete="off"
-              placeholder="test-one.example.org"
-              aria-describedby="domain-hostname-help"
-              value={hostname}
-              onChange={e => setHostname(e.target.value)}
-            />
-          </label>
-          <p className="hint" id="domain-hostname-help">
-            Use the full website address, without https:// or a path. Your DNS provider’s nameservers do not go in this
-            field.
-          </p>
-          <label>
-            <input type="checkbox" checked={withWww} onChange={e => setWithWww(e.target.checked)} /> Also connect the
-            matching www or non-www address
-          </label>
-          <p className="hint">
-            Connecting a test subdomain? Leave this unchecked unless you also control and need its www address.
-          </p>
-          <p className="hint">
-            You must control this domain. The first custom address becomes primary; later addresses redirect to it until
-            you choose Make primary. Add the displayed DNS records at your provider. Checks run every 10 minutes.
-          </p>
-          <button className="btn btn-primary" disabled={pending}>
-            Connect domain
-          </button>
-        </form>
-      )}
-      <div className="schema-section-head domains-head">
-        <h2>Connected addresses</h2>
-        <button type="button" className="btn secondary small" onClick={() => router.refresh()} disabled={pending}>
+      <div className={styles.heading}>
+        <div>
+          <h2>Connected addresses</h2>
+          <p className={styles.muted}>Follow each address from setup to a secure, live website.</p>
+        </div>
+        <Button variant="secondary" onClick={() => router.refresh()} disabled={pending}>
           Refresh domain status
-        </button>
+        </Button>
       </div>
-      {rows.length === 0 && <p className="card">No custom domains are connected yet.</p>}
+      {rows.length === 0 && (
+        <Card density="summary">
+          <p>No custom domains yet. Connect an address below to get its exact DNS instructions.</p>
+        </Card>
+      )}
       {rows.map(row => (
-        <section
-          className={'card stack ' + workspaceFormsStyles.formPanel}
-          key={row.id}
-          aria-label={`Domain ${row.hostname_normalized}`}
-        >
-          <h2>{row.hostname_normalized}</h2>
-          <p>
-            <strong>
-              {!row.removed_at && row.status === 'pending_dns' && !row.dns_records?.length
-                ? 'Preparing DNS instructions'
-                : domainStatusLabel(row.removed_at ? 'removed' : row.status)}
-            </strong>{' '}
-            ·{' '}
-            {row.kind === 'primary'
-              ? 'Primary address'
-              : row.kind === 'staging'
-                ? 'Staging address'
-                : `Redirects to ${row.redirect_hostname}`}
-          </p>
-          {!row.removed_at && row.status === 'pending_dns' && !row.dns_records?.length && (
-            <p className="notice" role="note">
-              The hosting service has not returned DNS records yet. A hosting administrator should check failed
-              background work before you change DNS. Refreshing this page does not retry a failed task.{' '}
-              <Link href="/help?topic=domains">Domain setup help</Link>
-            </p>
-          )}
-          {row.last_checked_at && <p className="hint">Last checked: {reviewTime(row.last_checked_at)}</p>}
-          {row.error_detail && !row.removed_at && <p className="notice">{row.error_detail}</p>}
-          {!!row.dns_records?.length && !row.removed_at && (
-            <>
-              <h3>DNS records</h3>
-              <p className="hint">
-                Use the full name shown. Providers that append your domain automatically may ask for @ or only the first
-                label. Apex CNAME records require DNS flattening; use only the allocated A records when supplied.
-              </p>
-              <p className="hint">
-                Follow the action on each row. Remove only the exact conflicting record listed; keep unrelated email and
-                verification records.
-              </p>
-              <div className="domain-records-scroll">
-                <table className={'domain-records ' + recordTableStyles.table + ' ' + recordTableStyles.compactTable}>
-                  <caption>Records for {row.hostname_normalized}</caption>
-                  <thead>
-                    <tr>
-                      <th scope="col">Action</th>
-                      <th scope="col">Type</th>
-                      <th scope="col">Name</th>
-                      <th scope="col">Value</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {row.dns_records.map((record, i) => (
-                      <tr key={i}>
-                        <td>
-                          <span className={record.action === 'REMOVE' ? 'domain-record-remove' : 'domain-record-add'}>
-                            {record.action === 'REMOVE' ? 'Remove' : 'Add'}
-                          </span>
-                        </td>
-                        <td>{record.type}</td>
-                        <td>
-                          <code>{record.name}</code>
-                        </td>
-                        <td>
-                          <code>{record.value}</code>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              <button
-                className="btn"
-                onClick={() =>
-                  void navigator.clipboard.writeText(recordsText(row.dns_records ?? [])).then(
-                    () => setNotice('DNS records copied.'),
-                    () => setError('Copy was unavailable. Select the records in the table.'),
-                  )
-                }
-              >
-                Copy DNS records
-              </button>
-            </>
-          )}
+        <DomainCard row={row} key={row.id} feedback={feedback}>
           {canManage && !row.removed_at && row.kind !== 'staging' && (
-            <div className="actions">
+            <div className={styles.actions}>
               {canConnect && (
-                <button
-                  className="btn"
+                <Button
+                  variant="secondary"
                   disabled={pending}
                   onClick={() => run({ action: 'check', siteId, id: row.id, revision: row.revision })}
                 >
                   {row.status === 'removing' ? 'Retry cleanup' : 'Verify now'}
-                </button>
+                </Button>
               )}
               {row.status === 'live' && row.kind !== 'primary' && (
-                <button
-                  className="btn"
+                <Button
+                  variant="secondary"
                   disabled={pending}
                   onClick={() => run({ action: 'primary', siteId, id: row.id, revision: row.revision })}
                 >
                   Make primary
-                </button>
+                </Button>
               )}
               {row.status !== 'removing' && (
-                <button
-                  className="btn btn-danger"
+                <Button
+                  variant="destructive"
                   disabled={pending}
                   onClick={() => {
                     setError('')
@@ -226,25 +117,81 @@ export function DomainWorkspace({
                   }}
                 >
                   Remove domain
-                </button>
+                </Button>
               )}
             </div>
           )}
-          {row.events.length > 0 && (
-            <details>
-              <summary>Status history</summary>
-              <ol>
-                {row.events.map((event, i) => (
-                  <li key={i}>
-                    {domainStatusLabel(event.status)} · {reviewTime(event.at)}
-                    {event.detail ? ` — ${event.detail}` : ''}
-                  </li>
-                ))}
-              </ol>
-            </details>
-          )}
-        </section>
+        </DomainCard>
       ))}
+      {canManage && canConnect && !archived && (
+        <Card
+          title="Connect an address"
+          description="Use a domain or subdomain you control. We’ll generate the records for its DNS provider."
+          density="settings"
+        >
+          <form
+            className={styles.workspace}
+            onSubmit={event => {
+              event.preventDefault()
+              run({ action: 'add', siteId, hostname, withWww })
+            }}
+          >
+            <div className={styles.connect}>
+              <Field id="domain-hostname" label="Hostname" help="Full website address, without https:// or a path.">
+                <input
+                  required
+                  autoComplete="off"
+                  autoCapitalize="none"
+                  spellCheck={false}
+                  placeholder="test-one.example.org"
+                  value={hostname}
+                  onChange={event => setHostname(event.target.value)}
+                  disabled={pending}
+                />
+              </Field>
+              <Button type="submit" loading={pending}>
+                Connect domain
+              </Button>
+            </div>
+            <label className={styles.choice}>
+              <input
+                type="checkbox"
+                checked={withWww}
+                disabled={pending}
+                onChange={event => setWithWww(event.target.checked)}
+              />
+              Also connect the matching www or non-www address
+            </label>
+            <p className={styles.muted}>
+              For a test subdomain, leave this unchecked unless you also need its www address. The first custom address
+              becomes primary; additional addresses redirect to it until you choose Make primary.
+            </p>
+          </form>
+        </Card>
+      )}
+      <section aria-label="Connection checklist">
+        <Disclosure title="Before you change DNS">
+          <ol>
+            <li>
+              <strong>Your domain owner:</strong> confirm the full website address and the DNS provider where its
+              records are managed.
+            </li>
+            <li>
+              <strong>Your hosting operator:</strong> make the CMS publicly reachable with domain verification and
+              HTTPS. A local preview cannot receive public visitors.
+            </li>
+            <li>
+              <strong>Use the exact records here:</strong> connect the address, wait for its instructions, add those
+              records at your provider, then choose Verify now.
+            </li>
+          </ol>
+          <p>
+            Keep the existing nameservers and unrelated records, especially email records. Nameservers are not website
+            addresses and do not belong in the Hostname field. Do not guess an IP address.
+          </p>
+          <Link href="/help?topic=domains">Read domain setup help</Link>
+        </Disclosure>
+      </section>
       {removing && (
         <ConfirmDialog
           title={`Remove ${removing.hostname_normalized}?`}
