@@ -33,7 +33,7 @@
   },
   "devDependencies": {
     "typescript": "^7.0.2",
-    "vitest": "^4.1.11",
+    "vitest": "^4.1.12",
     "@types/node": "^26.2.0",
     "@types/pg": "^8.15.5"
   }

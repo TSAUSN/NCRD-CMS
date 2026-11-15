@@ -3917,3 +3917,31 @@ function owner/ACL; worker tests use simulated providers. No live migration,
 retry, DNS change or alert-policy change is authorized by these local receipts.
 The current Cloud Build guard compares image/source migration files, so its
 separate operator rollout must be reviewed before any live application.
+
+### 2026-11-15 — Update the locked production security baseline
+
+The production dependency audit reported Next.js 16.3.8 and Zod 4.4.3 in
+published advisories. Update the same major versions to Next.js 16.4.1 and Zod
+4.6.6, including their lockfile resolutions. The CMS uses Server Actions, so the
+Next.js denial-of-service fix is relevant. Image optimization is disabled and
+Sharp already meets the image advisory's fixed version; no typed-array
+`use cache` function was found. Those configuration checks do not replace the
+framework update or establish that an installation was exploited.
+
+The development-only chain also uses Vitest 4.1.12 and a narrow override from
+the existing Vite 8.2.2 resolution to 8.2.4. These same-minor patches address the
+published mock-registration and development-server/editor advisories without
+adding a browser-accessible test server to the hosted application.
+
+Validate the patched dependencies with the complete unit, real-role database,
+build and browser gates. The production dependency audit after the update
+reports zero known advisories; this is a registry snapshot, not a guarantee
+that the application has no security defects. Deploy only to the authorized
+personal lab until the organization reviews its backport. No database schema,
+hosting tier or billing-plan update is part of this dependency change.
+
+Sources: [Next.js Server Actions advisory](https://github.com/vercel/next.js/security/advisories/GHSA-p3m5-59mp-jv5r),
+[Next.js 16.4.1](https://github.com/vercel/next.js/releases/tag/v16.4.1),
+[Zod collection-size fix](https://github.com/colinhacks/zod/commit/a0ebf97),
+[Vite editor fix](https://github.com/vitejs/launch-editor/security/advisories/GHSA-587h-7wmj-h5pm),
+[Vitest mock-registration fix](https://github.com/vitest-dev/vitest/security/advisories/GHSA-qxg6-89mg-rqv8).

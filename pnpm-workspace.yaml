@@ -4,3 +4,6 @@ packages:
   - e2e
 allowBuilds:
   esbuild: true
+overrides:
+  # Vitest's existing Vite resolution; keep the same minor with its security fixes.
+  vite@8.2.2: 8.2.4
