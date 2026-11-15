@@ -1,6 +1,14 @@
 import { GuardedLink } from './guarded-link.tsx'
 import shared from './workspace.module.css'
-export function SettingsNavigation({ siteId, current }: { siteId: string; current: string }) {
+export function SettingsNavigation({
+  siteId,
+  current,
+  layout = 'rail',
+}: {
+  siteId: string
+  current: string
+  layout?: 'rail' | 'tabs'
+}) {
   const base = '/sites/' + siteId + '/settings'
   const items = [
     ['General', base],
@@ -13,7 +21,12 @@ export function SettingsNavigation({ siteId, current }: { siteId: string; curren
     ['Advanced', base + '?tab=advanced'],
   ]
   return (
-    <nav className={shared.workspaceRail} data-position="sticky" aria-label="Settings tabs">
+    <nav
+      className={shared.workspaceRail}
+      data-position={layout === 'rail' ? 'sticky' : undefined}
+      data-layout={layout}
+      aria-label="Settings tabs"
+    >
       {items.map(([name, href]) => (
         <GuardedLink key={name} href={href!} aria-current={name === current ? 'page' : undefined}>
           {name}

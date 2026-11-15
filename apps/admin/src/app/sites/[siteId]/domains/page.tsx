@@ -46,7 +46,7 @@ export default async function Domains({ params }: { params: Promise<{ siteId: st
           ]}
           lede="Connect a web address to this site and choose the one visitors use."
         />
-        <SettingsNavigation siteId={siteId} current="Domains" />
+        <SettingsNavigation siteId={siteId} current="Domains" layout="tabs" />
         <Card
           title="Test address"
           description="Use this address to review the site while you connect a custom domain. Test pages ask search engines not to index them."

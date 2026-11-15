@@ -3964,3 +3964,7 @@ The schema inventory and focused tests distinguish future features, unrun hosted
 checks and retained helper definitions. No migration or schema cleanup is added
 by this work. Deployment is limited to the isolated personal project; NCRD and
 its configuration are unchanged.
+
+### November 15, 2026 — compact domain settings navigation
+
+The hosted visual review caught the settings rail rendered above the domain workspace. Domain settings now choose a wrapping tab layout with 44-pixel targets, while the existing side rails remain unchanged. The browser regression checks desktop navigation height and target sizes at all four review widths. No domain commands or schema change.

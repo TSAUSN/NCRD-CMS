@@ -113,6 +113,15 @@ test('connects a pair, shows exact DNS records, verifies public routing and revo
   for (const width of [1440, 1024, 390, 320]) {
     await page.setViewportSize({ width, height: width === 1440 ? 900 : 768 })
     if (width <= 390) await expect(page.locator('#cms-sidebar')).not.toBeInViewport()
+    const settingsNav = page.getByRole('navigation', { name: 'Settings tabs', exact: true })
+    const navBounds = await settingsNav.boundingBox()
+    // A vertical settings rail without its side-by-side layout pushes the
+    // domain status below the desktop fold. Tabs must wrap compactly here.
+    if (width === 1440) expect(navBounds?.height).toBeLessThanOrEqual(100)
+    for (const link of await settingsNav.getByRole('link').all())
+      expect((await link.boundingBox())?.height).toBeGreaterThanOrEqual(44)
+    await page.getByRole('heading', { name: 'Settings', exact: true }).scrollIntoViewIfNeeded()
+    await page.screenshot({ path: resolve(folder, 'navigation-' + width + '.png') })
     await domain.scrollIntoViewIfNeeded()
     const bounds = await domain.boundingBox()
     expect(bounds?.x).toBeGreaterThanOrEqual(0)
