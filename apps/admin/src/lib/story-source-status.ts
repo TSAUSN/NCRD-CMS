@@ -29,5 +29,6 @@ export function storySourceResult(check: StorySourceCheck) {
           ? 'The check timed out. Saved stories are unchanged. Check again.'
           : 'The feed could not be reached. Saved stories are unchanged. Check again when connected.'
   const n = (key: 'added' | 'updated' | 'removed' | 'preserved') => check.result[key] ?? 0
+  if (!n('added') && !n('updated') && !n('removed')) return 'No changes found. Saved stories are unchanged.'
   return `${n('added')} new ${n('added') === 1 ? 'story' : 'stories'}, ${n('updated')} updated, ${n('removed')} no longer in the feed. Saved as drafts for review.${n('preserved') ? ' ' + n('preserved') + ' CMS text ' + (n('preserved') === 1 ? 'edit kept.' : 'edits kept.') : ''}`
 }

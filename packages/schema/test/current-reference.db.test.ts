@@ -15,7 +15,7 @@ describe('readable current SQL reference', () => {
   it('matches every generated definition, table/policy/grant catalog and migration checksum from a fresh database', async () => {
     const url = new URL(requireTestDatabase())
     url.pathname = '/' + db.name
-    const files = await referenceFiles(url.href)
+    const files = await referenceFiles(url.href, { localTestPort: url.port })
     const directory = resolve(import.meta.dirname, '../current')
     const stale = staleReference(files, directory)
     for (const file of stale) {

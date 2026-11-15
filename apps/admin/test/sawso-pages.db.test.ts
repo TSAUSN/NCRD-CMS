@@ -4,6 +4,7 @@ import { TestDatabase } from '@cms/schema/testing'
 import { seedScenario, type Scenario } from '@cms/schema/fixtures'
 import { mapErrors } from '@cms/domain'
 import { renderPage } from '@cms/renderer'
+import { currentSawsoFixtureStories } from './current-sawso-fixture-stories.ts'
 let db: TestDatabase, s: Scenario
 vi.mock('@cms/platform', async original => ({
   ...(await original<object>()),
@@ -77,7 +78,10 @@ it('publishes approved public pages with one automatic story template and an imm
   const envelope = (row: any) =>
     row.render_manifest.sections.find((s: any) => s.def.slug === 'core-stories')?.instance.values.stories.entries
   expect(envelope(health)).toHaveLength(6)
-  expect(envelope(capacity)).toHaveLength(1)
+  const current = await currentSawsoFixtureStories(db)
+  expect(envelope(capacity)).toHaveLength(
+    current.filter(row => row.values.tags.split(',').includes('capacity-building')).length,
+  )
   expect(envelope(livelihoods)).toHaveLength(0)
   expect(envelope(family)).toBeUndefined()
   const list = news.render_manifest.sections.find((s: any) => s.def.slug === 'core-story-split').instance.values.stories

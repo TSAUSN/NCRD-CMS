@@ -89,9 +89,7 @@ test('Home matches the Main card hierarchy and shared navigation keeps visible i
       else expect(boxes[2]!.y).toBeGreaterThan(boxes[0]!.y)
       await expectVisibleIcons(sidebar.getByRole('navigation', { name: 'Sections of the CMS', exact: true }))
     }
-    const tools = main
-      .locator('details')
-      .filter({ has: page.getByText('Test tools (this computer only)', { exact: true }) })
+    const tools = main.locator('details').filter({ has: page.getByText('System status', { exact: true }) })
     await expect(tools).not.toHaveAttribute('open', '')
     await expect(main.getByText('The worker is not running', { exact: true })).not.toBeVisible()
     const archived = main.getByText(/^Archived sites \(\d+\)$/, { exact: true })
@@ -127,9 +125,9 @@ test('Home matches the Main card hierarchy and shared navigation keeps visible i
     ).toBe('none')
     await capture('site-actions')
     await page.keyboard.press('Escape')
-    await main.getByText('Test tools (this computer only)', { exact: true }).click()
+    await main.getByText('System status', { exact: true }).click()
     await expect(main.getByText('The worker is not running', { exact: true })).toBeVisible()
-    await main.getByText('Test tools (this computer only)', { exact: true }).click()
+    await main.getByText('System status', { exact: true }).click()
     let labels: string[] | undefined
     for (const route of ['header', 'chapters']) {
       await page.goto('/sites/' + chapter.site + '/' + route)

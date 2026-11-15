@@ -20,6 +20,43 @@ const config = {
 }
 const routing = { rewrites: [{ glob: '**', run: { serviceId: 'cms-site', region: 'us-central1' } }] }
 
+it('reports only a denied permission from a Hosting error, without logging the upstream message', async () => {
+  const fetcher = vi.fn<typeof fetch>().mockResolvedValue(
+    Response.json(
+      {
+        error: {
+          message: "Permission 'run.services.get' denied on private-project (request-token=private-token)",
+        },
+      },
+      { status: 403 },
+    ),
+  )
+  const hosting = createFirebaseHostingClient({ ...config, fetcher })
+  await expect(hosting.ensureSite(site.stagingHostname)).rejects.toThrow(
+    'Firebase Hosting returned HTTP 403 (permission run.services.get was denied)',
+  )
+  fetcher.mockResolvedValueOnce(
+    Response.json({ error: { message: 'private-token https://private.example/' } }, { status: 403 }),
+  )
+  await expect(hosting.ensureSite(site.stagingHostname)).rejects.toThrow(/^Firebase Hosting returned HTTP 403$/)
+})
+
+it('acknowledges a domain conflict only after confirming the reservation on this site', async () => {
+  const fetcher = vi
+    .fn<typeof fetch>()
+    .mockResolvedValueOnce(new Response('', { status: 404 }))
+    .mockResolvedValueOnce(new Response('', { status: 409 }))
+    .mockResolvedValueOnce(new Response('', { status: 404 }))
+  const hosting = createFirebaseHostingClient({ ...config, fetcher })
+  await expect(hosting.attachDomain(host, site.stagingHostname)).rejects.toThrow('already connected elsewhere')
+  fetcher
+    .mockResolvedValueOnce(new Response('', { status: 404 }))
+    .mockResolvedValueOnce(new Response('', { status: 409 }))
+    .mockResolvedValueOnce(Response.json({ name: `projects/${config.projectId}/sites/${id}/customDomains/${host}` }))
+  await expect(hosting.attachDomain(host, site.stagingHostname)).resolves.toBeUndefined()
+  expect(fetcher).toHaveBeenCalledTimes(6)
+})
+
 it('creates the site/rewrite and recovers a committed release without repeating it after a lost response', async () => {
   let exists = false,
     released = false

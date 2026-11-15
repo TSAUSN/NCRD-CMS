@@ -55,8 +55,19 @@ export function createFirebaseHostingClient(options: FirebaseHostingOptions) {
       return null
     }
     if (!response.ok) {
-      await response.body?.cancel()
-      throw new Error(`Firebase Hosting returned HTTP ${response.status}`)
+      // Keep provider diagnostics actionable without copying project IDs,
+      // request URLs, credentials or an arbitrary upstream message to our logs.
+      const error = (await response.json().catch(() => null)) as { error?: { message?: unknown } } | null
+      const message = error?.error?.message
+      const permission =
+        response.status === 403 && typeof message === 'string'
+          ? message.match(
+              /Permission '(run\.services\.get|serviceusage\.services\.use|firebasehosting\.[a-zA-Z.]+)' denied/,
+            )?.[1]
+          : undefined
+      throw new Error(
+        `Firebase Hosting returned HTTP ${response.status}${permission ? ` (permission ${permission} was denied)` : ''}`,
+      )
     }
     return response.status === 204 ? null : response.json()
   }
@@ -113,12 +124,16 @@ export function createFirebaseHostingClient(options: FirebaseHostingOptions) {
     async attachDomain(hostname: string, stagingHostname: string): Promise<void> {
       const id = siteId(stagingHostname)
       if (await this.customDomain(hostname, stagingHostname)) return
-      await request(
+      const created = await request(
         `projects/${options.projectId}/sites/${id}/customDomains?customDomainId=${encodeURIComponent(hostname)}`,
         'POST',
         { certPreference: 'GROUPED' },
         [409],
       )
+      if (created === null && !(await this.customDomain(hostname, stagingHostname)))
+        throw new Error(
+          'The address is already connected elsewhere in Firebase Hosting. Check its existing hosting connection before retrying.',
+        )
     },
     async detachDomain(hostname: string, stagingHostname: string): Promise<void> {
       const id = siteId(stagingHostname)

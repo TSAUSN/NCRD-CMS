@@ -109,7 +109,8 @@ export function FontLibrary(props: FontLibraryProps) {
             <Note>Create a page and set a staging address before checking these fonts.</Note>
           ) : status === 'loaded' ? (
             <Note tone="success">
-              Kit connected. 4 font families found. Fonts load at {host}. Live addresses must be checked at launch.
+              Kit connected. 4 font families found. Fonts load in this preview at {host}. Check the published address
+              separately after saving and publishing the site look.
             </Note>
           ) : status === 'unavailable' ? (
             <Note tone="warning">
@@ -219,9 +220,15 @@ export function FontLibrary(props: FontLibraryProps) {
                   <tr>
                     <td title={liveHost}>{liveHost}</td>
                     <td>
-                      <Badge>Check at launch</Badge>
+                      <Badge>
+                        {tokens.fonts.adobeKit?.domains.includes(liveHost) ? 'Included in draft' : 'Not included'}
+                      </Badge>
                     </td>
-                    <td />
+                    <td>
+                      <Button variant="secondary" size="s" disabled={pending || status === 'checking'} onClick={check}>
+                        Include and recheck
+                      </Button>
+                    </td>
                   </tr>
                 )}
               </tbody>

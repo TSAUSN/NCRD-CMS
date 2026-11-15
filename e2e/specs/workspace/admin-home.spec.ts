@@ -160,7 +160,7 @@ test('Admin Home shows saved attention, immediate authenticated pictures and rec
           await expect(main.getByText('Nothing needs your attention', { exact: true })).toBeVisible()
           await expect(main.getByText('Background jobs', { exact: true })).toHaveCount(0)
         } else {
-          await expect(main.getByText('Test tools (this computer only)', { exact: true })).toBeVisible()
+          await expect(main.getByText('System status', { exact: true })).toBeVisible()
           await expect(main.getByText('The worker is not running', { exact: true })).not.toBeVisible()
         }
         for (const width of [1440, 1024, 390]) {
@@ -185,9 +185,9 @@ test('Admin Home shows saved attention, immediate authenticated pictures and rec
           await page.screenshot({ path: resolve(folder, account.role + '-' + width + '.png'), animations: 'disabled' })
         }
         if (account.role === 'superadmin') {
-          await main.getByText('Test tools (this computer only)', { exact: true }).click()
+          await main.getByText('System status', { exact: true }).click()
           await expect(main.getByText('The worker is not running', { exact: true })).toBeVisible()
-          await main.getByText('Test tools (this computer only)', { exact: true }).click()
+          await main.getByText('System status', { exact: true }).click()
         }
         await main.getByText('More tasks', { exact: true }).click()
         await expect(main.getByRole('heading', { name: 'What would you like to do?', exact: true })).toBeVisible()

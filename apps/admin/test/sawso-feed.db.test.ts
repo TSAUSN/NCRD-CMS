@@ -3,6 +3,7 @@ import { beforeAll, afterAll, it, expect, vi } from 'vitest'
 import { TestDatabase } from '@cms/schema/testing'
 import { seedScenario, type Scenario } from '@cms/schema/fixtures'
 import { mapErrors } from '@cms/domain'
+import { currentSawsoFixtureStories } from './current-sawso-fixture-stories.ts'
 let db: TestDatabase, s: Scenario
 vi.mock('@cms/platform', async original => ({
   ...(await original<object>()),
@@ -80,5 +81,8 @@ it('publishes six newest Health stories and freezes the13-month cutoff in the pu
     }
     return result
   })
-  expect(Object.values(counts)).toEqual([17, 11, 7, 5, 3, 1, 0, 0])
+  const current = await currentSawsoFixtureStories(db)
+  expect(Object.values(counts)).toEqual(
+    Object.keys(counts).map(tag => current.filter(row => row.values.tags.split(',').includes(tag)).length),
+  )
 }, 120000)

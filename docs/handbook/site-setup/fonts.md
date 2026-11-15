@@ -2,7 +2,7 @@
 
 Connect the approved Adobe kit, check the staging address and save font choices as a private draft.
 
-For: Site admins and Super admins. Last checked: 2026-10-31.
+For: Site admins and Super admins. Last checked: 2026-11-15.
 
 Open Site look, then Fonts. The approved stylesheet is
 `https://use.typekit.net/euh2hvn.css`. Check kit opens a private preview on this
@@ -21,8 +21,11 @@ Save draft stores the choices without changing the public site. Publish opens
 a review step, then the existing Publish workspace. A conflicting save asks you
 to reload; another person’s saved choices are not overwritten.
 
-The connection reports only the address actually checked. A live address says
-Check at launch. A failed font check keeps the template’s stand-ins and explains
+The connection reports only the preview address actually checked. Check again
+keeps the selected heading and body families. A verified primary address can be
+included in the private draft from the address table; save and publish the site
+look before checking fonts on that public address. Included in draft describes
+the CMS allowance, not an Adobe entitlement or a successful public font check. A failed font check keeps the template’s stand-ins and explains
 that either the Adobe account’s allowed-address list or the network needs
 attention. Ask the Adobe account owner to add the displayed hostname, then press
 Check again. This CMS does not change the Adobe account or buy a licence.
