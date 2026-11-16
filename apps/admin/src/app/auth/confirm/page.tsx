@@ -32,33 +32,43 @@ export default async function ConfirmSignIn({
     browserProof: jar.has(SIGN_IN_PROOF_COOKIE),
     method,
   })
+  const recovery = method === 'recovery' || type === 'recovery'
   return (
     <EntryPanel
-      heading="Confirm sign-in"
+      heading={recovery ? 'Confirm password recovery' : 'Confirm sign-in'}
       lede={
         valid
-          ? code
-            ? 'Continue to finish signing in.'
-            : 'Continue to sign in using the link from your email.'
-          : method === 'microsoft'
-            ? 'Try Microsoft again, or use your password.'
-            : 'Use your password or request a new sign-in link.'
+          ? recovery
+            ? 'Continue to choose your new password.'
+            : code
+              ? 'Continue to finish signing in.'
+              : 'Continue to sign in using the link from your email.'
+          : recovery
+            ? 'Request a new recovery email to continue.'
+            : method === 'microsoft'
+              ? 'Try Microsoft again, or use your password.'
+              : 'Use your password or request a new sign-in link.'
       }
     >
       {valid ? (
         <form action={completeSignIn}>
+          <input type="hidden" name="type" value={type === 'recovery' ? 'recovery' : 'email'} />
           {codeValid ? (
             <input type="hidden" name="authCode" value={code} />
           ) : (
             <input type="hidden" name="tokenHash" value={tokenHash} />
           )}
-          <SignInButton label="Continue to CMS" />
+          <SignInButton label={recovery ? 'Continue to reset password' : 'Continue to CMS'} />
         </form>
       ) : (
         <p role="alert">{message}</p>
       )}
       <p className="entry-note">
-        <Link href="/sign-in">Go to sign in</Link>
+        {recovery ? (
+          <Link href="/sign-in/reset">Request a new recovery email</Link>
+        ) : (
+          <Link href="/sign-in">Go to sign in</Link>
+        )}
       </p>
     </EntryPanel>
   )

@@ -3968,3 +3968,25 @@ its configuration are unchanged.
 ### November 15, 2026 — compact domain settings navigation
 
 The hosted visual review caught the settings rail rendered above the domain workspace. Domain settings now choose a wrapping tab layout with 44-pixel targets, while the existing side rails remain unchanged. The browser regression checks desktop navigation height and target sizes at all four review widths. No domain commands or schema change.
+
+
+### 2026-11-16 — NCRD recovery and reviewed personal fixes
+
+The owner authorized the NCRD release of the tested personal domain/font and
+Microsoft-preparation changes, dependency patches and signed-out recovery.
+Exclude Analytics migration 0212; do not modify applied migrations or copy lab
+data/configuration into NCRD. Retain the existing deployment and rollback path.
+
+Password recovery requests use the provider's `/recover` endpoint with PKCE.
+The browser's explicit confirmation exchanges its credential; GET does not
+exchange it. A verified identity must pass the same CMS membership gate before
+opening its own Password screen. Existing accounts/roles remain authoritative.
+Optional email-code verification uses recovery type and the requesting browser's
+email cookie, never an arbitrary submitted replacement address. It remains off
+until email actually includes the code. Generic request receipts and provider
+rate limits are preserved; no secret/service-role key is used by runtime auth.
+
+The default sender's locked templates are an external dependency for scanner-safe
+links/codes. Do not claim that adding `/recover` makes Jon's corporate-mail flow
+proven. IT or the owner must provide the approved email sender. Real Microsoft
+activation and Jon's own password/fresh-login acceptance are separate steps.

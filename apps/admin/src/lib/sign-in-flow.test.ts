@@ -15,7 +15,7 @@ it('keeps the legacy email token narrowly scoped and never treats method context
   const tokenHash = 'a'.repeat(64)
   expect(confirmationState({ ...base }).valid).toBe(false)
   expect(confirmationState({ ...base, tokenHash, type: 'email', browserProof: false }).valid).toBe(true)
-  expect(confirmationState({ ...base, tokenHash, type: 'recovery' }).valid).toBe(false)
+  expect(confirmationState({ ...base, tokenHash, type: 'invite' }).valid).toBe(false)
   expect(confirmationState({ ...base, tokenHash, type: 'email', code: 'bad' }).valid).toBe(false)
   expect(signInMethod('untrusted')).toBe('email')
 })

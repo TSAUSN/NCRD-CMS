@@ -4,6 +4,16 @@
 The release is `v2026.11.06`; `e51b4b5` was the runtime-identical review build.
 Deployment uses the reviewed release ref and private verification receipts.
 
+## NCRD release — November 16
+
+The owner authorized a reviewed NCRD rollout of the tested personal fixes and
+signed-out password recovery. No Analytics migration is included. Preserve
+current content, roles and cloud settings; keep Microsoft disabled for IT.
+Code entry requires an actual code-bearing recovery email before enabling
+`AUTH_RECOVERY_CODE_ENABLED`. Default-sender scanner mitigation remains an
+email-configuration dependency. Verify the exact live release and ordinary
+recovery/account-access flows before declaring acceptance complete.
+
 ## Personal-lab follow-up — November 15
 
 The current task is limited to the isolated personal V2 copy. Microsoft through

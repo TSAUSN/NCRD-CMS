@@ -72,8 +72,24 @@ sign-in sends no message, so neither limit applies.
    **Sign in**. **Email me a sign-in link** still works for anyone without a
    password.
 
-A forgotten password is replaced the same way as a first one: sign in with a
-link, then save a new password. Access still comes only from a Super admin
+For a forgotten password, choose **Forgot your password?** on the signed-out
+screen. Request a recovery email, open the latest message in the same browser
+and choose **Continue to reset password**. The CMS verifies the recovery
+credential and existing access before opening **Password**, where the person
+chooses their own new password. Sign out, then verify a fresh password login.
+No Supabase dashboard or existing CMS session is needed to request recovery.
+
+The default Supabase recovery link can still be consumed by a mail scanner
+before reaching the CMS. Custom SMTP is currently required to customize the
+NCRD email on its existing plan. With an approved sender, use a direct CMS
+confirmation link containing `token_hash={{ .TokenHash }}&type=recovery`, or
+include `{{ .Token }}` and enable `AUTH_RECOVERY_CODE_ENABLED=true` only after
+confirming that the recovery email actually contains a code. Code verification
+uses type `recovery` and the requested address held in an HttpOnly cookie.
+Never switch on code entry while the provider sends a link-only email.
+
+Recovery requests return a generic receipt for nonexistent accounts, do not
+create users, retain provider rate limits and never assign a shared password. Access still comes only from a Super admin
 adding the person; a correct password for somebody without CMS access is
 refused and that sign-in is ended.
 

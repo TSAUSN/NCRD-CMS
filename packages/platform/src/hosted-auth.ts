@@ -250,9 +250,25 @@ export function createSupabaseAuthProvider(
       if ([400, 422].includes(response.status)) return
       if (!response.ok) throw new AuthServiceError('unavailable')
     },
-    async completeSignIn(tokenHash) {
-      if (!/^[a-zA-Z0-9_-]{20,512}$/.test(tokenHash)) return null
-      const response = await request('/verify', { token_hash: tokenHash, type: 'email' })
+    async requestPasswordRecovery(email, codeChallenge) {
+      if (!/^[a-zA-Z0-9_-]{43}$/.test(codeChallenge)) throw new AuthServiceError('unavailable')
+      const response = await request(`/recover?redirect_to=${encodeURIComponent(`${adminOrigin}/auth/confirm`)}`, {
+        email,
+        code_challenge: codeChallenge,
+        code_challenge_method: 's256',
+      })
+      if (response.status === 429) throw new AuthServiceError('rate_limit')
+      // A missing or unconfirmed account gets the same public receipt.
+      if ([400, 422].includes(response.status)) return
+      if (!response.ok) throw new AuthServiceError('unavailable')
+    },
+    async completeRecoveryCode(email, code) {
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254 || !/^\d{6,10}$/.test(code)) return null
+      return verifiedSession(await request('/verify', { email, token: code, type: 'recovery' }))
+    },
+    async completeSignIn(tokenHash, type = 'email') {
+      if (!/^[a-zA-Z0-9_-]{20,512}$/.test(tokenHash) || !['email', 'recovery'].includes(type)) return null
+      const response = await request('/verify', { token_hash: tokenHash, type })
       return verifiedSession(response)
     },
     async completeCodeSignIn(code, verifier) {

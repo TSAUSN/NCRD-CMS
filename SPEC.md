@@ -34,6 +34,22 @@ because code and tests cite its section numbers ("SPEC §8.6" means revision 7).
 
 ## Current release state
 
+### NCRD release authorized November 16, 2026
+
+Port the tested personal domain/font/Microsoft-preparation fixes and dependency
+patches to NCRD through reviewed Git source and the existing Google release
+procedure. Add signed-out password recovery without changing user identities,
+roles, existing content or immutable migrations. Analytics migration 0212 is
+excluded from this release. Microsoft stays disabled pending IT configuration.
+
+Recovery sends a provider recovery email and opens the existing Password screen
+only after provider verification and the normal CMS access check. Optional code
+entry stays off until a real recovery-code email template is configured. NCRD's
+default sender currently locks custom templates, so scanner-safe email delivery
+still needs an approved SMTP sender or separately approved provider configuration.
+Do not call that external dependency resolved by deploying the recovery UI.
+Jon's own password entry and fresh-login acceptance follow deployment.
+
 ### Personal V2 work authorized November 15, 2026
 
 The current personal-lab task starts from `45f15d4` on
