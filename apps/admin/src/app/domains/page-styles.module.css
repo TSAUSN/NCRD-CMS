@@ -1,19 +1,45 @@
-.addressScrollHint {
-  display: none;
+.addressTable.addressTable {
+  min-width: 0;
+  width: 100%;
+}
+.addressTable code {
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 @media (max-width: 767px) {
-  .addressTable.addressTable {
-    min-width: var(--size-760);
-    table-layout: auto;
-  }
-  .addressTable code {
-    white-space: nowrap;
-  }
-  .addressScrollHint {
+  .addressTable.addressTable,
+  .addressTable tbody,
+  .addressTable tr,
+  .addressTable td {
     display: block;
-    margin: 0;
+    width: 100%;
+    min-width: 0;
+  }
+  .addressTable thead {
+    position: absolute;
+    width: var(--line-thin);
+    height: var(--line-thin);
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  .addressTable tr {
     padding: var(--space-3) var(--space-4);
+    border-bottom: var(--line-thin) solid var(--border);
+  }
+  .addressTable td {
+    display: grid;
+    grid-template-columns: calc(var(--space-5) * 4) minmax(0, 1fr);
+    gap: var(--space-2);
+    padding: var(--space-2) 0;
+    border: 0;
+  }
+  .addressTable td::before {
+    content: attr(data-label);
     color: var(--text-muted);
-    font-size: var(--text-meta);
+    font-size: var(--text-help);
+    font-weight: var(--weight-semibold);
+  }
+  .addressTable td > * {
+    min-width: 0;
   }
 }

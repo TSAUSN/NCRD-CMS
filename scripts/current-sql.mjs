@@ -34,17 +34,21 @@ function command(program, args, env) {
   if (r.status !== 0) throw Error('Current SQL reference ' + program + ' failed; connection output omitted.')
   return r.stdout
 }
-export async function referenceFiles(connectionString) {
+export async function referenceFiles(connectionString, { localTestPort = '54329' } = {}) {
   const connection = new URL(connectionString)
   if (
+    !/^[1-9]\d{0,4}$/.test(localTestPort) ||
+    Number(localTestPort) > 65535 ||
     !['postgres:', 'postgresql:'].includes(connection.protocol) ||
     !['127.0.0.1', 'localhost'].includes(connection.hostname) ||
-    connection.port !== '54329' ||
+    connection.port !== localTestPort ||
     !/^\/(?:cms_e2e_refactor|cms_test_template|cms_t_[a-z0-9_]+)$/.test(connection.pathname) ||
     connection.search ||
     connection.hash
   )
-    throw Error('Current SQL reference only reads explicitly disposable local test databases on54329.')
+    throw Error(
+      'Current SQL reference only reads explicitly disposable local test databases on the selected local test port.',
+    )
   const env = {
     ...process.env,
     PGHOST: connection.hostname,
@@ -131,7 +135,9 @@ export function staleReference(files, directory) {
     )
 }
 async function main() {
-  const files = await referenceFiles(process.env.CURRENT_SQL_DATABASE_URL ?? '')
+  const files = await referenceFiles(process.env.CURRENT_SQL_DATABASE_URL ?? '', {
+    localTestPort: process.env.CURRENT_SQL_LOCAL_TEST_PORT ?? '54329',
+  })
   const out = join(root, 'packages/schema/current')
   const stale = staleReference(files, out)
   if (process.argv.includes('--check')) {

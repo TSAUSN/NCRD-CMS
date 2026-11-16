@@ -137,9 +137,9 @@ test.describe('route protection', () => {
 test.describe('operational visibility', () => {
   test('the dashboard states the worker is not running rather than staying silent', async ({ page }) => {
     await signIn(page, 'root@example.test')
-    await page.getByText('Test tools (this computer only)', { exact: true }).click()
+    await page.getByText('System status', { exact: true }).click()
     // No worker runs during the e2e suite, and that is exactly the case the
-    // Super-admin Test tools must report it — v1's scheduling queue was inert and only honest
+    // Super-admin System status must report it — v1's scheduling queue was inert and only honest
     // labelling kept it from being a lie (SPEC §6.8, D7).
     // Named, rather than reported as a colour with the word "Error" on it: the
     // chip carries the app-wide vocabulary and the sentence beside it carries
@@ -150,7 +150,7 @@ test.describe('operational visibility', () => {
 
   test('shows queue figures so a stalled queue is visible in the app', async ({ page }) => {
     await signIn(page, 'root@example.test')
-    await page.getByText('Test tools (this computer only)', { exact: true }).click()
+    await page.getByText('System status', { exact: true }).click()
     await expect(page.getByText('Waiting to send')).toBeVisible()
     await expect(page.getByText('Gave up')).toBeVisible()
     await expect(page.getByText('Oldest waiting')).toBeVisible()

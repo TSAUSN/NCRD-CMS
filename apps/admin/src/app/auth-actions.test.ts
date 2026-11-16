@@ -1,5 +1,6 @@
 import { beforeEach, expect, it, vi } from 'vitest'
 import { HOSTED_SESSION_COOKIE, REFRESH_COOKIE, SIGN_IN_PROOF_COOKIE } from '@cms/platform'
+import { RECOVERY_EMAIL_COOKIE, SIGN_IN_METHOD_COOKIE } from '../lib/sign-in-flow.ts'
 
 const stubs = vi.hoisted(() => ({
   asUser: vi.fn(),
@@ -13,6 +14,10 @@ const stubs = vi.hoisted(() => ({
   session: vi.fn(),
   set: vi.fn(),
   get: vi.fn(),
+  microsoft: vi.fn(),
+  recoveryRequest: vi.fn(),
+  recoveryCode: vi.fn(),
+  completeHash: vi.fn(),
 }))
 vi.mock('server-only', () => ({}))
 vi.mock('../lib/session.ts', () => ({
@@ -20,9 +25,13 @@ vi.mock('../lib/session.ts', () => ({
   authProvider: () => ({
     name: 'supabase',
     requestSignIn: stubs.request,
+    requestPasswordRecovery: stubs.recoveryRequest,
+    completeRecoveryCode: stubs.recoveryCode,
+    completeSignIn: stubs.completeHash,
     completeCodeSignIn: stubs.exchange,
     signInWithPassword: stubs.password,
     setPassword: stubs.setPassword,
+    microsoftSignInUrl: stubs.microsoft,
     revoke: stubs.revoke,
   }),
 }))
@@ -38,10 +47,19 @@ vi.mock('next/navigation', () => ({
     throw new Error(`redirect:${url}`)
   },
 }))
-import { completeSignIn, setPassword, signIn, signInWithPassword } from './actions/auth.ts'
+import {
+  completeSignIn,
+  completeRecoveryCode,
+  requestPasswordRecovery,
+  setPassword,
+  signIn,
+  signInWithMicrosoft,
+  signInWithPassword,
+} from './actions/auth.ts'
 
 beforeEach(() => {
   vi.resetAllMocks()
+  vi.unstubAllEnvs()
   stubs.revoke.mockResolvedValue(undefined)
   stubs.asUser.mockImplementation(async (_actor, action) =>
     action({ query: async () => ({ rows: [{ invited: true }] }) }),
@@ -69,6 +87,37 @@ it('does not exchange a foreign-browser code with no initiating proof', async ()
   await expect(completeSignIn(form)).rejects.toThrow('redirect:/sign-in?error=expired-link')
   expect(stubs.exchange).not.toHaveBeenCalled()
   expect(stubs.set).toHaveBeenCalledWith(SIGN_IN_PROOF_COOKIE, '', expect.objectContaining({ secure: true, maxAge: 0 }))
+  expect(stubs.set.mock.calls.some(([name]) => [HOSTED_SESSION_COOKIE, REFRESH_COOKIE].includes(name))).toBe(false)
+})
+
+it('starts Microsoft with a browser-bound proof and records only a short-lived presentation context', async () => {
+  stubs.microsoft.mockReturnValue('https://project.supabase.co/auth/v1/authorize?provider=azure')
+  await expect(signInWithMicrosoft()).rejects.toThrow(
+    'redirect:https://project.supabase.co/auth/v1/authorize?provider=azure',
+  )
+  const proof = stubs.set.mock.calls.find(([name]) => name === SIGN_IN_PROOF_COOKIE)!
+  expect(proof[2]).toMatchObject({ httpOnly: true, secure: true, sameSite: 'lax', path: '/', maxAge: 600 })
+  expect(stubs.microsoft.mock.calls[0]![0]).not.toBe(proof[1])
+  expect(stubs.microsoft.mock.calls[0]![0]).toMatch(/^[a-zA-Z0-9_-]{43}$/)
+  expect(stubs.set).toHaveBeenCalledWith(
+    SIGN_IN_METHOD_COOKIE,
+    'microsoft',
+    expect.objectContaining({ secure: true, httpOnly: true, maxAge: 600 }),
+  )
+  expect(stubs.resolve).not.toHaveBeenCalled()
+})
+
+it('a refused Microsoft exchange consumes its proof, offers password fallback and never opens a session', async () => {
+  stubs.get.mockImplementation((name: string) => ({
+    value: name === SIGN_IN_METHOD_COOKIE ? 'microsoft' : 'browser-proof',
+  }))
+  stubs.exchange.mockResolvedValue(null)
+  const form = new FormData()
+  form.set('authCode', '11111111-1111-4111-8111-111111111111')
+  await expect(completeSignIn(form)).rejects.toThrow('redirect:/sign-in?error=microsoft-incomplete')
+  expect(stubs.set).toHaveBeenCalledWith(SIGN_IN_PROOF_COOKIE, '', expect.objectContaining({ maxAge: 0 }))
+  expect(stubs.set).toHaveBeenCalledWith(SIGN_IN_METHOD_COOKIE, '', expect.objectContaining({ maxAge: 0 }))
+  expect(stubs.resolve).not.toHaveBeenCalled()
   expect(stubs.set.mock.calls.some(([name]) => [HOSTED_SESSION_COOKIE, REFRESH_COOKIE].includes(name))).toBe(false)
 })
 
@@ -208,4 +257,112 @@ it('reports a password the provider refuses and sends an ended session back to s
     'redirect:/account/password?error=weak',
   )
   await expect(setPassword(newPassword('correct horse battery'))).rejects.toThrow('redirect:/sign-in?reauth=1')
+})
+
+it('starts password recovery without a signed-in session, an account lookup or any public signup', async () => {
+  await expect(requestPasswordRecovery(credentials(' Owner@Example.test ', ''))).rejects.toThrow(
+    'redirect:/sign-in/reset?sent=1',
+  )
+  expect(stubs.recoveryRequest).toHaveBeenCalledWith('owner@example.test', expect.stringMatching(/^[a-zA-Z0-9_-]{43}$/))
+  expect(stubs.set).toHaveBeenCalledWith(
+    RECOVERY_EMAIL_COOKIE,
+    'owner@example.test',
+    expect.objectContaining({ secure: true, httpOnly: true, path: '/', maxAge: 3600 }),
+  )
+  expect(stubs.session).not.toHaveBeenCalled()
+  expect(stubs.asUser).not.toHaveBeenCalled()
+  expect(stubs.password).not.toHaveBeenCalled()
+})
+
+it('exchanges a recovery link for the same authorized account and opens its Password screen', async () => {
+  stubs.get.mockImplementation((name: string) => ({
+    value: name === SIGN_IN_METHOD_COOKIE ? 'recovery' : 'browser-proof',
+  }))
+  const subject = { subject: 'existing-provider-id', email: 'owner@example.test' }
+  stubs.exchange.mockResolvedValue({ token: 'verified-access', refreshToken: 'refresh', expiresIn: 300, subject })
+  stubs.resolve.mockResolvedValue({ principal: { userId: 'existing-cms-owner' } })
+  const form = new FormData()
+  form.set('authCode', '11111111-1111-4111-8111-111111111111')
+  await expect(completeSignIn(form)).rejects.toThrow('redirect:/account/password')
+  expect(stubs.resolve).toHaveBeenCalledWith(subject)
+  expect(stubs.setPassword).not.toHaveBeenCalled()
+})
+
+it('verifies a direct recovery hash with recovery type and does not consume it on page render', async () => {
+  const form = new FormData()
+  form.set('tokenHash', 'a'.repeat(64))
+  form.set('type', 'recovery')
+  stubs.completeHash.mockResolvedValue(null)
+  await expect(completeSignIn(form)).rejects.toThrow('redirect:/sign-in/reset?error=invalid-link')
+  expect(stubs.completeHash).toHaveBeenCalledWith('a'.repeat(64), 'recovery')
+  expect(stubs.resolve).not.toHaveBeenCalled()
+})
+
+it('does not exchange a foreign-browser recovery code or set session cookies', async () => {
+  stubs.get.mockImplementation((name: string) => (name === SIGN_IN_METHOD_COOKIE ? { value: 'recovery' } : undefined))
+  const form = new FormData()
+  form.set('authCode', '11111111-1111-4111-8111-111111111111')
+  await expect(completeSignIn(form)).rejects.toThrow('redirect:/sign-in/reset?error=invalid-link')
+  expect(stubs.exchange).not.toHaveBeenCalled()
+  expect(stubs.resolve).not.toHaveBeenCalled()
+  expect(stubs.set.mock.calls.some(([name]) => [HOSTED_SESSION_COOKIE, REFRESH_COOKIE].includes(name))).toBe(false)
+})
+
+it('keeps code entry off until its actual email template is configured', async () => {
+  await expect(completeRecoveryCode(new FormData())).rejects.toThrow('redirect:/sign-in/reset?error=unavailable')
+  expect(stubs.recoveryCode).not.toHaveBeenCalled()
+})
+
+it('uses the requested email from its HttpOnly cookie, not a submitted replacement, and preserves the CMS access gate', async () => {
+  vi.stubEnv('AUTH_RECOVERY_CODE_ENABLED', 'true')
+  stubs.get.mockImplementation((name: string) => ({
+    value: name === RECOVERY_EMAIL_COOKIE ? 'owner@example.test' : 'recovery',
+  }))
+  stubs.recoveryCode.mockResolvedValue({
+    token: 'verified-access',
+    refreshToken: 'refresh',
+    expiresIn: 300,
+    subject: { subject: 'existing-provider-id', email: 'owner@example.test' },
+  })
+  stubs.resolve.mockResolvedValue(null)
+  const form = new FormData()
+  form.set('code', '123456')
+  form.set('email', 'other@example.test')
+  await expect(completeRecoveryCode(form)).rejects.toThrow('redirect:/sign-in?error=no-access')
+  expect(stubs.recoveryCode).toHaveBeenCalledWith('owner@example.test', '123456')
+  expect(stubs.revoke).toHaveBeenCalledWith('verified-access')
+  expect(stubs.set.mock.calls.some(([name]) => [HOSTED_SESSION_COOKIE, REFRESH_COOKIE].includes(name))).toBe(false)
+})
+
+it('opens the password screen after a verified recovery code and clears its temporary browser state', async () => {
+  vi.stubEnv('AUTH_RECOVERY_CODE_ENABLED', 'true')
+  stubs.get.mockImplementation((name: string) => ({
+    value: name === RECOVERY_EMAIL_COOKIE ? 'owner@example.test' : 'recovery',
+  }))
+  stubs.recoveryCode.mockResolvedValue({
+    token: 'verified-access',
+    refreshToken: 'refresh',
+    expiresIn: 300,
+    subject: { subject: 'existing-provider-id', email: 'owner@example.test' },
+  })
+  stubs.resolve.mockResolvedValue({ principal: { userId: 'existing-cms-owner' } })
+  const form = new FormData()
+  form.set('code', '123456')
+  await expect(completeRecoveryCode(form)).rejects.toThrow('redirect:/account/password')
+  expect(stubs.set).toHaveBeenCalledWith(RECOVERY_EMAIL_COOKIE, '', expect.objectContaining({ maxAge: 0 }))
+  expect(stubs.setPassword).not.toHaveBeenCalled()
+})
+
+it('rejects an expired recovery code without opening a session or changing a password', async () => {
+  vi.stubEnv('AUTH_RECOVERY_CODE_ENABLED', 'true')
+  stubs.get.mockImplementation((name: string) => ({
+    value: name === RECOVERY_EMAIL_COOKIE ? 'owner@example.test' : 'recovery',
+  }))
+  stubs.recoveryCode.mockResolvedValue(null)
+  const form = new FormData()
+  form.set('code', '123456')
+  await expect(completeRecoveryCode(form)).rejects.toThrow('redirect:/sign-in/reset?sent=1&error=invalid-code')
+  expect(stubs.resolve).not.toHaveBeenCalled()
+  expect(stubs.setPassword).not.toHaveBeenCalled()
+  expect(stubs.set).not.toHaveBeenCalled()
 })

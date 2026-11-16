@@ -9,7 +9,7 @@ test('Overview keeps zero-count tags, separates current and live coverage, links
   browser,
 }, info) => {
   test.setTimeout(120000)
-  const f = await sawsoFixture(true, true),
+  const f = await sawsoFixture(true, true, '2026-11-09'),
     email = 'coverage-' + randomUUID().slice(0, 8) + '@example.test',
     folder = resolve('../.r8-progress/round3/stories-overview/' + info.project.name)
   await mkdir(folder, { recursive: true })

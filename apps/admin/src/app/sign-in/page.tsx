@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { signIn, signInWithMicrosoft, signInWithPassword } from '../actions/auth.ts'
 import { authProvider, currentSession } from '../../lib/session.ts'
 import { redirect } from 'next/navigation'
@@ -23,11 +24,13 @@ export default async function SignInPage({
   let configured = true
   let microsoft = false
   let passwords = false
+  let recovery = false
   try {
     const provider = authProvider()
     local = provider.name === 'local'
     microsoft = typeof provider.microsoftSignInUrl === 'function'
     passwords = typeof provider.signInWithPassword === 'function'
+    recovery = typeof provider.requestPasswordRecovery === 'function'
   } catch {
     configured = false
   }
@@ -39,9 +42,11 @@ export default async function SignInPage({
     'too-many-tries': 'Too many sign-in attempts. Wait a few minutes, then try again.',
     'rate-limit': 'Please wait a minute before requesting another sign-in link.',
     unavailable: 'Sign-in is temporarily unavailable. Please try again shortly.',
+    'microsoft-incomplete':
+      'Microsoft sign-in did not finish. Try again, or use your email and password. If your organization blocks sign-in, ask your CMS administrator to check the Microsoft setup with IT.',
     'expired-link': 'This sign-in link has expired or has already been used. Request a new link below.',
     'no-access':
-      'Your email was verified, but you do not have access to this CMS. Ask your site administrator for an invitation.',
+      'Your account was verified, but you do not have access to this CMS. Ask your site administrator for an invitation.',
   }
 
   if (configured && sent === '1' && !error)
@@ -111,9 +116,11 @@ export default async function SignInPage({
       {microsoft && (
         <>
           <form action={signInWithMicrosoft}>
-            <SignInButton label="Sign in with Microsoft" />
+            <SignInButton label="Sign in with Microsoft" microsoft />
           </form>
-          <p className={styles.help}>{passwords ? 'Or use your email:' : 'Or get a sign-in link by email:'}</p>
+          <p className={`${styles.help} ${styles.alternative}`}>
+            {passwords ? 'Or use your email and password:' : 'Or get a sign-in link by email:'}
+          </p>
         </>
       )}
       {passwords ? (
@@ -139,9 +146,18 @@ export default async function SignInPage({
             <SignInButton label="Email me a sign-in link" formAction={signIn} />
           </form>
           <p className="entry-note">
-            No password yet, or forgot it? Enter your email and choose “Email me a sign-in link”. Once you are in, set a
-            password under Password in the sidebar. Signing in does not by itself give you access to a site — somebody
-            who already looks after one has to invite you first.
+            {recovery ? (
+              <>
+                <Link href="/sign-in/reset">Forgot your password?</Link> Request a recovery email to choose a new one.
+              </>
+            ) : (
+              <>
+                No password yet? Enter your email and choose “Email me a sign-in link”. Once you are in, set a password
+                under Password in the sidebar.
+              </>
+            )}{' '}
+            Signing in does not by itself give you access to a site — somebody who already looks after one has to invite
+            you first.
           </p>
         </>
       ) : (

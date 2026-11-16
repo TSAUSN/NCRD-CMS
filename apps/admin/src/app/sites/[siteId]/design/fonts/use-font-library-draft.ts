@@ -19,7 +19,7 @@ export type FontLibraryProps = {
   liveHost: string | null
 }
 
-export function useFontLibraryDraft({ siteId, initial, chapter, origin }: FontLibraryProps) {
+export function useFontLibraryDraft({ siteId, initial, chapter, origin, liveHost }: FontLibraryProps) {
   const [tokens, setTokens] = useState<ThemeTokens>(() => structuredClone(initial.draft))
   const [saved, setSaved] = useState(JSON.stringify(initial.draft))
   const [revision, setRevision] = useState(initial.revision)
@@ -117,12 +117,14 @@ export function useFontLibraryDraft({ siteId, initial, chapter, origin }: FontLi
       ...current,
       fonts: {
         ...current.fonts,
-        heading: chapter ? current.fonts.heading : defaultHeading,
-        body: defaultBody,
+        heading: current.fonts.adobeKit?.enabled || chapter ? current.fonts.heading : defaultHeading,
+        body: current.fonts.adobeKit?.enabled ? current.fonts.body : defaultBody,
         adobeKit: {
           id: 'euh2hvn',
           enabled: true,
-          domains: [...new Set([host, ...(current.fonts.adobeKit?.domains ?? [])])].slice(0, 10),
+          domains: [
+            ...new Set([host, ...(liveHost ? [liveHost] : []), ...(current.fonts.adobeKit?.domains ?? [])]),
+          ].slice(0, 10),
         },
       },
     }))

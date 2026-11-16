@@ -128,7 +128,7 @@ beforeAll(async () => {
   )
   before = await fingerprints()
   access = await existingFunctionAccess()
-  applied = await migrate(url)
+  applied = await migrate(url, { through: '0211_hosting_delivery_recovery.sql' })
 })
 afterAll(async () => {
   await client?.end()
@@ -152,7 +152,9 @@ it('preserves every existing function owner and execute grant', async () => {
   for (const row of access as { signature: string }[]) expect(after.get(row.signature)).toEqual(row)
 })
 it('reruns through the migration ledger without new work or changed data', async () => {
-  expect((await migrate(url)).every(x => x.alreadyApplied)).toBe(true)
+  expect((await migrate(url, { through: '0211_hosting_delivery_recovery.sql' })).every(x => x.alreadyApplied)).toBe(
+    true,
+  )
   expect(await fingerprints(Object.keys(before))).toEqual(before)
   expect((await client.query('SELECT count(*) FROM app.hosting_retry_receipts')).rows[0]!.count).toBe('0')
 })

@@ -68,7 +68,7 @@ test('national logo, tracked buttons and dropdown groups remain usable without J
     await mkdir(folder, { recursive: true })
     await page.route(url, route => route.fulfill({ status: 200, contentType: 'text/html', body: html }))
     await page.goto(url)
-    for (const width of [1440, 1024, 390]) {
+    for (const width of [1440, 1024, 390, 320]) {
       await page.setViewportSize({ width, height: 900 })
       await expect(page.locator('header img[alt="The Salvation Army"]')).toBeVisible()
       const menu = page.getByRole('navigation', { name: 'Phone menu', exact: true })
@@ -169,7 +169,7 @@ test('the existing Menu follows rendered label width and returns to the desktop 
       .evaluateAll(nodes => nodes.every(n => getComputedStyle(n).whiteSpace === 'nowrap')),
   ).toBe(true)
   await page.screenshot({ path: resolve(folder, 'fits-1440.png') })
-  for (const width of [1024, 390]) {
+  for (const width of [1024, 390, 320]) {
     await page.setViewportSize({ width, height: 900 })
     await expect(toggle).toBeVisible()
     await expect(nav).toBeHidden()

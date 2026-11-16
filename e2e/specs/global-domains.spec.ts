@@ -11,17 +11,13 @@ test('global Domains reads existing addresses for a Super Admin and grants no ed
   await expect(page.getByRole('table', { name: 'Domains', exact: true })).toContainText('demo.staging.localhost')
   await expect(page.getByRole('button', { name: 'Connect a domain', exact: true })).toHaveCount(0)
   await expect(page.getByRole('row').filter({ hasText: 'demo.staging.localhost' })).toContainText('Local preview')
-  for (const width of [1440, 1024, 390]) {
+  for (const width of [1440, 1024, 390, 320]) {
     await page.setViewportSize({ width, height: 900 })
-    if (width === 390) {
-      await expect(page.getByText('Scroll sideways to see all address details.', { exact: true })).toBeVisible()
-      expect(
-        await page
-          .getByRole('row')
-          .filter({ hasText: 'demo.staging.localhost' })
-          .locator('code')
-          .evaluate(node => node.getBoundingClientRect().height),
-      ).toBeLessThan(30)
+    if (width <= 390) {
+      await expect(page.locator('#cms-sidebar')).not.toBeInViewport()
+      const row = page.getByRole('row').filter({ hasText: 'demo.staging.localhost' })
+      await expect(row.getByRole('link', { name: 'Open site settings' })).toBeVisible()
+      expect(await row.evaluate(node => node.scrollWidth <= node.clientWidth)).toBe(true)
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
     }
     await page.screenshot({ path: `../.r8-progress/polish-domains-${width}.png` })

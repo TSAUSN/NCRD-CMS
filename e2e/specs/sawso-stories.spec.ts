@@ -10,7 +10,7 @@ test('a new site admin checks story coverage, tags a story, publishes it and rem
   browser,
 }) => {
   test.setTimeout(240000)
-  const f = await sawsoFixture(true, true),
+  const f = await sawsoFixture(true, true, '2026-11-09'),
     email = 'stories-' + randomUUID().slice(0, 8) + '@example.test',
     folder = resolve('../.r8-progress/sawso/stories')
   await mkdir(folder, { recursive: true })

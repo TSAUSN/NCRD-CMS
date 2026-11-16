@@ -163,7 +163,9 @@ export const helpTopics: HelpTopic[] = [
     audience: 'all',
     text: [
       'Open Password in the sidebar while signed in. Type the new password twice and choose Save password. It changes only your own account. Use at least 12 characters.',
-      'On the sign-in screen, enter your email and password, then choose Sign in. An email link remains available. Request it and open it in the same browser, using the same CMS hostname.',
+      'On the sign-in screen, enter your email and password, then choose Sign in. Use the eye button to show or hide your typing. An email link remains available; request it and open it in the same browser, using the same CMS hostname.',
+      'If Sign in with Microsoft appears, choose it to use the Microsoft account approved by your organization. Finish in the browser where you started. Microsoft sign-in does not give you new CMS permissions; your assigned sites and role still apply. If it does not finish, return to sign-in and use your password.',
+      'If you forgot your password, choose Forgot your password? on the sign-in screen. Request a recovery email, finish its verification in the same browser and choose your own new password. If freshly received recovery links are already expired, ask the CMS administrator to check email delivery.',
       'An incomplete or expired email link cannot be repaired by refreshing it. Use your password or request a fresh link. Your mail security service may open a link before you do; ask the administrator about mail delivery if this keeps happening.',
     ],
     href: '/account/password',
@@ -225,7 +227,8 @@ export const helpTopics: HelpTopic[] = [
     title: 'Connect a test domain and get DNS instructions',
     audience: 'operator',
     text: [
-      'In the site’s Domains screen, reserve the intended test hostname once. Wait for the hosting service to return the exact DNS records. If no records are shown, hosting setup is still incomplete; refreshing does not fix a failed background task.',
+      'Open the site’s Settings → Domains. Reserve the intended test hostname once. Wait for the hosting service to return the exact DNS records. If no records are shown, hosting setup is still incomplete; refreshing does not fix a failed background task.',
+      'Follow the three setup stages: Prepare address, Verify DNS and Secure with HTTPS. Copy individual names/values or all DNS instructions. These instructions are not a complete list of your DNS records; keep working routing, verification and email records even when they are not listed.',
       'The Google project administrator should inspect Background work for domain.sync or site.hosting_requested errors. A Firebase Hosting 403 requires checking the runtime service account, project configuration and permissions before retrying the failed task.',
       'Give the DNS administrator only the records displayed for this hostname, including the CMS verification TXT. Keep unrelated mail and verification records. Do not guess an IP, change nameservers or copy another project’s records.',
       'After the DNS administrator applies the approved records, use Verify now. DNS verification, certificate issuance and Live are separate stages. Verify HTTPS, nested pages, images, fonts and redirects before calling the domain ready.',

@@ -3917,3 +3917,76 @@ function owner/ACL; worker tests use simulated providers. No live migration,
 retry, DNS change or alert-policy change is authorized by these local receipts.
 The current Cloud Build guard compares image/source migration files, so its
 separate operator rollout must be reviewed before any live application.
+
+### 2026-11-15 — Update the locked production security baseline
+
+The production dependency audit reported Next.js 16.3.8 and Zod 4.4.3 in
+published advisories. Update the same major versions to Next.js 16.4.1 and Zod
+4.6.6, including their lockfile resolutions. The CMS uses Server Actions, so the
+Next.js denial-of-service fix is relevant. Image optimization is disabled and
+Sharp already meets the image advisory's fixed version; no typed-array
+`use cache` function was found. Those configuration checks do not replace the
+framework update or establish that an installation was exploited.
+
+The development-only chain also uses Vitest 4.1.12 and a narrow override from
+the existing Vite 8.2.2 resolution to 8.2.4. These same-minor patches address the
+published mock-registration and development-server/editor advisories without
+adding a browser-accessible test server to the hosted application.
+
+Validate the patched dependencies with the complete unit, real-role database,
+build and browser gates. The production dependency audit after the update
+reports zero known advisories; this is a registry snapshot, not a guarantee
+that the application has no security defects. Deploy only to the authorized
+personal lab until the organization reviews its backport. No database schema,
+hosting tier or billing-plan update is part of this dependency change.
+
+Sources: [Next.js Server Actions advisory](https://github.com/vercel/next.js/security/advisories/GHSA-p3m5-59mp-jv5r),
+[Next.js 16.4.1](https://github.com/vercel/next.js/releases/tag/v16.4.1),
+[Zod collection-size fix](https://github.com/colinhacks/zod/commit/a0ebf97),
+[Vite editor fix](https://github.com/vitejs/launch-editor/security/advisories/GHSA-587h-7wmj-h5pm),
+[Vitest mock-registration fix](https://github.com/vitest-dev/vitest/security/advisories/GHSA-qxg6-89mg-rqv8).
+
+### 2026-11-15 — Prepare Supabase Microsoft sign-in and clarify domain setup
+
+The owner selected Microsoft through the existing Supabase Azure provider and
+retained password sign-in. Direct Entra is deferred. Keep the Microsoft button
+configuration gated until IT supplies the approved tenant/app/provider setup.
+Preserve the existing provider identity and product permissions; a presentation
+method cookie only selects safe recovery wording and is not identity proof.
+
+The personal domain candidate uses the existing narrow commands and shared
+controls. Add the missing Settings → Domains route, visible setup stages,
+responsive DNS records and exact per-value copying. Provider instructions are
+not a full DNS-zone inventory. Keep routing/mail records and confirmation before
+removal; do not guess DNS values or make refreshing a substitute for recovery.
+
+The schema inventory and focused tests distinguish future features, unrun hosted
+checks and retained helper definitions. No migration or schema cleanup is added
+by this work. Deployment is limited to the isolated personal project; NCRD and
+its configuration are unchanged.
+
+### November 15, 2026 — compact domain settings navigation
+
+The hosted visual review caught the settings rail rendered above the domain workspace. Domain settings now choose a wrapping tab layout with 44-pixel targets, while the existing side rails remain unchanged. The browser regression checks desktop navigation height and target sizes at all four review widths. No domain commands or schema change.
+
+
+### 2026-11-16 — NCRD recovery and reviewed personal fixes
+
+The owner authorized the NCRD release of the tested personal domain/font and
+Microsoft-preparation changes, dependency patches and signed-out recovery.
+Exclude Analytics migration 0212; do not modify applied migrations or copy lab
+data/configuration into NCRD. Retain the existing deployment and rollback path.
+
+Password recovery requests use the provider's `/recover` endpoint with PKCE.
+The browser's explicit confirmation exchanges its credential; GET does not
+exchange it. A verified identity must pass the same CMS membership gate before
+opening its own Password screen. Existing accounts/roles remain authoritative.
+Optional email-code verification uses recovery type and the requesting browser's
+email cookie, never an arbitrary submitted replacement address. It remains off
+until email actually includes the code. Generic request receipts and provider
+rate limits are preserved; no secret/service-role key is used by runtime auth.
+
+The default sender's locked templates are an external dependency for scanner-safe
+links/codes. Do not claim that adding `/recover` makes Jon's corporate-mail flow
+proven. IT or the owner must provide the approved email sender. Real Microsoft
+activation and Jon's own password/fresh-login acceptance are separate steps.

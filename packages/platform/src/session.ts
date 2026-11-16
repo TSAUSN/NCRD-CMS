@@ -26,7 +26,11 @@ export type AuthProvider = {
   /** Mint the value the local adapter stores in a cookie. Hosted providers do not implement this. */
   issue?(subject: AuthSubject): Promise<string>
   requestSignIn?(email: string, options?: { invited: boolean; codeChallenge?: string }): Promise<void>
-  completeSignIn?(tokenHash: string): Promise<VerifiedAuthSession | null>
+  completeSignIn?(tokenHash: string, type?: 'email' | 'recovery'): Promise<VerifiedAuthSession | null>
+  /** Requests recovery without creating an account or exposing whether it exists. */
+  requestPasswordRecovery?(email: string, codeChallenge: string): Promise<void>
+  /** Verifies a recovery email code; a regular login code cannot be used here. */
+  completeRecoveryCode?(email: string, code: string): Promise<VerifiedAuthSession | null>
   completeCodeSignIn?(code: string, verifier: string): Promise<VerifiedAuthSession | null>
   /** Where to send the browser to sign in with the organization's Microsoft account, when enabled. */
   microsoftSignInUrl?(codeChallenge: string): string

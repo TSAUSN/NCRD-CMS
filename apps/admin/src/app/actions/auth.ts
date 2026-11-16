@@ -20,6 +20,7 @@ import {
   type VerifiedAuthSession,
 } from '@cms/platform'
 import { authProvider, currentSession } from '../../lib/session.ts'
+import { RECOVERY_EMAIL_COOKIE, SIGN_IN_METHOD_COOKIE, signInMethod } from '../../lib/sign-in-flow.ts'
 
 /** A verified sign-in becomes a CMS session only for somebody with CMS access. */
 async function openSession(provider: AuthProvider, verified: VerifiedAuthSession): Promise<string> {
@@ -92,6 +93,13 @@ export async function signIn(formData: FormData): Promise<void> {
           path: '/',
           maxAge: 3600,
         })
+      ;(await cookies()).set(SIGN_IN_METHOD_COOKIE, 'email', {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'lax',
+        path: '/',
+        maxAge: 3600,
+      })
       await provider.requestSignIn(email, { invited, ...(proof ? { codeChallenge: proof.challenge } : {}) })
     } else {
       destination = '/sign-in?error=unavailable'
@@ -119,6 +127,13 @@ export async function signInWithMicrosoft(): Promise<void> {
         path: '/',
         maxAge: 600,
       })
+      ;(await cookies()).set(SIGN_IN_METHOD_COOKIE, 'microsoft', {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'lax',
+        path: '/',
+        maxAge: 600,
+      })
       destination = provider.microsoftSignInUrl(proof.challenge)
     }
   } catch {
@@ -130,21 +145,87 @@ export async function signInWithMicrosoft(): Promise<void> {
 export async function completeSignIn(formData: FormData): Promise<void> {
   const tokenHash = String(formData.get('tokenHash') ?? '')
   const code = String(formData.get('authCode') ?? '')
+  const type = formData.get('type') === 'recovery' ? 'recovery' : 'email'
   let destination = '/sign-in?error=expired-link'
   try {
     const provider = authProvider()
     const jar = await cookies()
+    const method = signInMethod(jar.get(SIGN_IN_METHOD_COOKIE)?.value)
+    if (method === 'microsoft') destination = '/sign-in?error=microsoft-incomplete'
+    const recovery = method === 'recovery' || type === 'recovery'
+    if (recovery) destination = '/sign-in/reset?error=invalid-link'
     const verifier = jar.get(SIGN_IN_PROOF_COOKIE)?.value
     // The browser proof is single-use, including on a refused exchange.
     jar.set(SIGN_IN_PROOF_COOKIE, '', { httpOnly: true, secure: true, sameSite: 'lax', path: '/', maxAge: 0 })
+    jar.set(SIGN_IN_METHOD_COOKIE, '', { httpOnly: true, secure: true, sameSite: 'lax', path: '/', maxAge: 0 })
     const verified = code
       ? verifier
         ? await provider.completeCodeSignIn?.(code, verifier)
         : null
-      : await provider.completeSignIn?.(tokenHash)
-    if (verified) destination = await openSession(provider, verified)
+      : await provider.completeSignIn?.(tokenHash, type)
+    if (verified) {
+      destination = await openSession(provider, verified)
+      if (recovery && destination === '/') destination = '/account/password'
+      jar.set(RECOVERY_EMAIL_COOKIE, '', { httpOnly: true, secure: true, sameSite: 'lax', path: '/', maxAge: 0 })
+    }
   } catch {
     destination = '/sign-in?error=unavailable'
+  }
+  redirect(destination)
+}
+
+/** Start recovery from the signed-out screen; no administrator or existing session is needed. */
+export async function requestPasswordRecovery(formData: FormData): Promise<void> {
+  const email = String(formData.get('email') ?? '')
+    .trim()
+    .toLowerCase()
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) redirect('/sign-in/reset?error=missing-email')
+  let destination = '/sign-in/reset?sent=1'
+  try {
+    const provider = authProvider()
+    if (!provider.requestPasswordRecovery) destination = '/sign-in/reset?error=unavailable'
+    else {
+      const proof = createSignInProof()
+      const jar = await cookies()
+      const options = { httpOnly: true, secure: true, sameSite: 'lax' as const, path: '/', maxAge: 3600 }
+      jar.set(SIGN_IN_PROOF_COOKIE, proof.verifier, options)
+      jar.set(SIGN_IN_METHOD_COOKIE, 'recovery', options)
+      jar.set(RECOVERY_EMAIL_COOKIE, email, options)
+      await provider.requestPasswordRecovery(email, proof.challenge)
+    }
+  } catch (error) {
+    destination =
+      error instanceof AuthServiceError && error.kind === 'rate_limit'
+        ? '/sign-in/reset?error=rate-limit'
+        : '/sign-in/reset?error=unavailable'
+  }
+  redirect(destination)
+}
+
+/** Optional code entry is enabled only after the recovery email contains a code. */
+export async function completeRecoveryCode(formData: FormData): Promise<void> {
+  if (process.env['AUTH_RECOVERY_CODE_ENABLED'] !== 'true') redirect('/sign-in/reset?error=unavailable')
+  const jar = await cookies()
+  const email = jar.get(RECOVERY_EMAIL_COOKIE)?.value
+  const code = String(formData.get('code') ?? '').trim()
+  if (!email || signInMethod(jar.get(SIGN_IN_METHOD_COOKIE)?.value) !== 'recovery')
+    redirect('/sign-in/reset?error=start-again')
+  if (!/^\d{6,10}$/.test(code)) redirect('/sign-in/reset?sent=1&error=invalid-code')
+  let destination = '/sign-in/reset?sent=1&error=invalid-code'
+  try {
+    const provider = authProvider()
+    const verified = await provider.completeRecoveryCode?.(email, code)
+    if (verified) {
+      destination = await openSession(provider, verified)
+      if (destination === '/') destination = '/account/password'
+      for (const name of [SIGN_IN_PROOF_COOKIE, SIGN_IN_METHOD_COOKIE, RECOVERY_EMAIL_COOKIE])
+        jar.set(name, '', { httpOnly: true, secure: true, sameSite: 'lax', path: '/', maxAge: 0 })
+    }
+  } catch (error) {
+    destination =
+      error instanceof AuthServiceError && error.kind === 'rate_limit'
+        ? '/sign-in/reset?sent=1&error=rate-limit'
+        : '/sign-in/reset?sent=1&error=unavailable'
   }
   redirect(destination)
 }
@@ -215,6 +296,8 @@ export async function signOut(): Promise<void> {
     // A provider outage must not stop this browser from ending its CMS session.
   }
   jar.delete(SESSION_COOKIE)
+  for (const name of [SIGN_IN_METHOD_COOKIE, RECOVERY_EMAIL_COOKIE])
+    jar.set(name, '', { httpOnly: true, secure: true, sameSite: 'lax', path: '/', maxAge: 0 })
   jar.set(SIGN_IN_PROOF_COOKIE, '', { httpOnly: true, secure: true, sameSite: 'lax', path: '/', maxAge: 0 })
   jar.set(HOSTED_SESSION_COOKIE, '', { httpOnly: true, secure: true, sameSite: 'lax', path: '/', maxAge: 0 })
   jar.set(REFRESH_COOKIE, '', { httpOnly: true, secure: true, sameSite: 'lax', path: '/', maxAge: 0 })

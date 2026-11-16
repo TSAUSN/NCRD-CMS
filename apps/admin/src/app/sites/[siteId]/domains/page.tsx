@@ -3,10 +3,15 @@ import { notFound } from 'next/navigation'
 import { asUser } from '@cms/platform'
 import { AppShell } from '../../../../components/app-shell.tsx'
 import { navigationFor } from '../../../../components/nav.ts'
-import { PageHeader, siteAreaTabs } from '../../../../components/shell.tsx'
+import { PageHeader } from '../../../../components/shell.tsx'
+import { SettingsNavigation } from '../../../../components/settings-navigation.tsx'
 import { getSite, roleLabel } from '../../../../lib/queries.ts'
 import { currentSession } from '../../../../lib/session.ts'
 import { DOMAIN_ROWS_SQL, type DomainRow } from '../../../../lib/domains.ts'
+import { Card } from '../../../../components/ui/card.tsx'
+import { Badge } from '../../../../components/ui/status-pill.tsx'
+import { stagingAddressStatusLabel } from '../../../../lib/domains.ts'
+import styles from './domain-styles.module.css'
 import { DomainWorkspace } from './workspace.tsx'
 import { localDomainsUnavailable, LOCAL_DOMAIN_GUIDANCE } from '../../../../lib/domain-setup.ts'
 export const dynamic = 'force-dynamic'
@@ -16,12 +21,18 @@ export default async function Domains({ params }: { params: Promise<{ siteId: st
   const { siteId } = await params
   const site = await getSite(session.principal.userId, siteId)
   if (!site) notFound()
-  const [rows, role] = await Promise.all([
+  const [rows, role, hosting] = await Promise.all([
     asUser(
       { userId: session.principal.userId },
       async client => (await client.query<DomainRow>(DOMAIN_ROWS_SQL, [siteId])).rows,
     ),
     roleLabel(session.principal.userId),
+    asUser(
+      { userId: session.principal.userId },
+      async client =>
+        (await client.query<{ status: string }>('SELECT app.site_hosting_status($1) AS status', [siteId])).rows[0]
+          ?.status ?? 'preparing',
+    ),
   ])
   return (
     <AppShell email={session.email} role={role} groups={navigationFor(site, session.principal)}>
@@ -34,12 +45,25 @@ export default async function Domains({ params }: { params: Promise<{ siteId: st
             { label: 'Settings' },
           ]}
           lede="Connect a web address to this site and choose the one visitors use."
-          tabs={siteAreaTabs(siteId, 'settings', 'domains')}
         />
-        <p>
-          Staging address: {site.staging_hostname ?? 'Not configured'}. Staging pages ask search engines not to index
-          them.
-        </p>
+        <SettingsNavigation siteId={siteId} current="Domains" layout="tabs" />
+        <Card
+          title="Test address"
+          description="Use this address to review the site while you connect a custom domain. Test pages ask search engines not to index them."
+          density="settings"
+        >
+          <div className={styles.heading}>
+            <code className={styles.hostname}>{site.staging_hostname ?? 'Not configured'}</code>
+            <Badge tone={hosting === 'ready' ? 'live' : hosting === 'error' ? 'error' : 'pending'}>
+              {site.staging_hostname ? stagingAddressStatusLabel(site.staging_hostname, hosting) : 'Not configured'}
+            </Badge>
+          </div>
+          {hosting === 'ready' && site.staging_hostname?.endsWith('.web.app') && (
+            <a href={`https://${site.staging_hostname}`} target="_blank" rel="noopener noreferrer">
+              Open test site <span className="sr-only">(opens in a new tab)</span>
+            </a>
+          )}
+        </Card>
         {!session.principal.isSuperAdmin && (
           <p className="notice">
             You can inspect these addresses. Only a Super Admin can connect, verify, change or remove domains.
@@ -51,29 +75,6 @@ export default async function Domains({ params }: { params: Promise<{ siteId: st
             <p>{LOCAL_DOMAIN_GUIDANCE}</p>
           </section>
         )}
-        <section className={'card stack ' + workspaceFormsStyles.formPanel} aria-label="Connection checklist">
-          <h2>What you need to connect</h2>
-          <ol>
-            <li>
-              <strong>Your domain owner:</strong> supply the full website addresses to test, such as{' '}
-              <code>test-one.example.org</code> and <code>test-two.example.org</code>. Connect each address inside the
-              site it should display.
-            </li>
-            <li>
-              <strong>Your hosting operator:</strong> make the CMS publicly reachable and configure domain verification
-              and HTTPS. A localhost preview cannot receive visitors from public DNS.
-            </li>
-            <li>
-              <strong>The CMS and your domain owner:</strong> connect an address here to generate its exact A or CNAME,
-              ownership TXT and any certificate records. Your domain owner adds them at the DNS provider; then use
-              Verify now.
-            </li>
-          </ol>
-          <p className="hint">
-            Nameserver addresses identify your DNS service. Enter the website address you want visitors to use, rather
-            than an ns1 or ns2 nameserver. Keep the existing nameservers when adding these records.
-          </p>
-        </section>
         {process.env['CMS_LOCAL_TEST_MODE'] === 'true' && process.env['DOMAIN_PROVIDER'] === 'fake' && (
           <p className="notice">
             This local pilot uses simulated domain checks. No DNS records or certificates are changed outside the pilot.

@@ -23,6 +23,10 @@
   line-height: var(--line-body);
   margin: 0 0 var(--space-4);
 }
+.alternative {
+  margin-block-start: var(--space-3);
+  text-align: center;
+}
 .action {
   display: flex;
   width: 100%;
