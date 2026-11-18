@@ -4006,7 +4006,11 @@ push when Zesty has a newer version. A push PATCHes a new version and publishes
 it immediately; Zesty's version history is the rollback. The item, model and
 field are constants in code, and every request is built from them, checked
 against a three-entry allowlist (read, save, publish that item) and sent without
-following redirects, so the token is never used for any other Zesty content. Each push is logged
+following redirects, so the token is never used for any other Zesty content.
+At Jon's request on 2026-11-18, the recent sign-in window for every sensitive
+CMS action (people and access, site archive and creation, domain removal,
+templates, site portability and Current Disasters pushes) is 90 minutes instead
+of 15. A refreshed session still does not count as a new sign-in. Each push is logged
 with the user and versions. Admin `img-src` allows `*.media.zestyio.com` for
 card thumbnails. No schema change.
 

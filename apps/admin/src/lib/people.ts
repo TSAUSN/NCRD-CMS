@@ -51,11 +51,19 @@ export function listPeople(userId: string): Promise<PersonRow[]> {
   )
 }
 
-export function recentlyAuthenticated(authenticatedAt: number | undefined, now = Date.now()): boolean {
+/** How long a sign-in counts as recent for sensitive changes, across the whole CMS. */
+export const RECENT_SIGN_IN_MINUTES = 90
+
+/** Whether the sign-in is recent enough for a sensitive change. */
+export function recentlyAuthenticated(
+  authenticatedAt: number | undefined,
+  now = Date.now(),
+  windowMinutes = RECENT_SIGN_IN_MINUTES,
+): boolean {
   return (
     authenticatedAt !== undefined &&
     Number.isFinite(authenticatedAt) &&
-    authenticatedAt * 1000 >= now - 15 * 60_000 &&
+    authenticatedAt * 1000 >= now - windowMinutes * 60_000 &&
     authenticatedAt * 1000 <= now + 30_000
   )
 }
