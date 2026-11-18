@@ -1,7 +1,7 @@
 'use client'
 import { useMemo, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { Badge, Button, Card, CardContent, Field, IconButton, Note } from '../../../components/ui/index.ts'
+import { Badge, Button, Card, CardContent, Field, IconButton, Note, TextLink } from '../../../components/ui/index.ts'
 import { ConfirmDialog } from '../../../components/confirm.tsx'
 import { IconArrowDown, IconArrowUp, IconEye, IconEyeOff, IconPlus, IconTrash } from '../../../components/icons.tsx'
 import {
@@ -53,7 +53,7 @@ export function DisasterEditor({ version, updatedAt, initialItems, livePage }: P
   const [edits, setEdits] = useState<CardEdit[]>(original)
   const [open, setOpen] = useState<string | null>(null)
   const [confirming, setConfirming] = useState(false)
-  const [result, setResult] = useState<{ ok: boolean; message: string } | null>(null)
+  const [result, setResult] = useState<{ ok: boolean; message: string; reauthenticate?: true } | null>(null)
   const [serverProblems, setServerProblems] = useState<CardProblem[]>([])
   const [pending, startTransition] = useTransition()
   const [showProblems, setShowProblems] = useState(false)
@@ -99,7 +99,11 @@ export function DisasterEditor({ version, updatedAt, initialItems, livePage }: P
     startTransition(async () => {
       const outcome = await pushCurrentDisasters({ version, edits })
       setConfirming(false)
-      setResult({ ok: outcome.ok, message: outcome.message })
+      setResult({
+        ok: outcome.ok,
+        message: outcome.message,
+        ...(!outcome.ok && outcome.reauthenticate ? { reauthenticate: true } : {}),
+      })
       setServerProblems(outcome.ok ? [] : (outcome.problems ?? []))
       if (outcome.ok) {
         setShowProblems(false)
@@ -148,9 +152,17 @@ export function DisasterEditor({ version, updatedAt, initialItems, livePage }: P
             </div>
           </div>
           {result && (
-            <p className={'notice ' + (result.ok ? 'notice-ok' : 'notice-error')} role={result.ok ? 'status' : 'alert'}>
-              {result.message}
-            </p>
+            <div
+              className={'notice ' + (result.ok ? 'notice-ok' : 'notice-error')}
+              role={result.ok ? 'status' : 'alert'}
+            >
+              <p>{result.message}</p>
+              {result.reauthenticate && (
+                <TextLink href="/sign-in?reauth=1" target="_blank" rel="noopener">
+                  Confirm sign-in in a new tab
+                </TextLink>
+              )}
+            </div>
           )}
         </CardContent>
       </Card>
