@@ -37,6 +37,8 @@ const REVIEWED: Record<string, string> = {
   use_page_recipe: 'checks has_site_access on the recipe’s site',
   current_user_id: 'the actor primitive itself: the active user named by app.user_id, or null',
   is_super_admin: 'predicate on the current actor',
+  current_tools:
+    'reviewed November 18: returns only the tool grants of current_user_id(); no caller-selected user, and null actor yields an empty list',
   site_role: 'predicate on the current actor',
   scheduling_available: 'requires current_user_id() and reports only worker liveness',
   release_schedule_capability:

@@ -1,6 +1,8 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
+import { canUseTool } from '@cms/domain'
+import { asUser } from '@cms/platform'
 import { authProvider, currentSession } from '../../../lib/session.ts'
 import { recentlyAuthenticated } from '../../../lib/people.ts'
 import {
@@ -79,8 +81,8 @@ function readEdits(value: unknown): CardEdit[] | null {
 /** Saves the edited cards as a new version of the Zesty page and publishes it on the live site. */
 export async function pushCurrentDisasters(input: { version: unknown; edits: unknown }): Promise<PushResult> {
   const session = await currentSession()
-  if (!session?.principal.isSuperAdmin)
-    return { ok: false, message: 'Only a super admin can change Current Disasters.' }
+  const denied = { ok: false, message: 'Only a Disaster Manager or super admin can change Current Disasters.' } as const
+  if (!session || !canUseTool(session.principal, 'current_disasters')) return denied
   if (authProvider().name !== 'local' && !recentlyAuthenticated(session.authenticatedAt))
     return {
       ok: false,
@@ -95,6 +97,13 @@ export async function pushCurrentDisasters(input: { version: unknown; edits: unk
   if (problems.length) return { ok: false, message: 'Fix the highlighted fields before pushing.', problems }
   const settings = zestyConfig()
   if (!settings.ok) return { ok: false, message: 'The Zesty connection is not set up on this server.' }
+  // The session can be up to a request old; the database decides whether this person still holds the grant.
+  const allowed = await asUser(
+    { userId: session.principal.userId },
+    async client =>
+      (await client.query<{ ok: boolean }>("SELECT app.can_use_tool('current_disasters') AS ok")).rows[0]?.ok === true,
+  )
+  if (!allowed) return denied
   try {
     const current = await readDisasterItem(settings.config)
     assertVersion(current, version)

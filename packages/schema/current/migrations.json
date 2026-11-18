@@ -836,6 +836,10 @@
     {
       "name": "0211_hosting_delivery_recovery.sql",
       "checksum": "97d9f65a98fbbcf3"
+    },
+    {
+      "name": "0213_disaster_managers.sql",
+      "checksum": "083bd3a75459a14a"
     }
   ]
 }

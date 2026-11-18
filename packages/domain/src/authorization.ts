@@ -23,6 +23,26 @@ export type Principal = {
   memberships: ReadonlyMap<string, SiteRole>
   divisionScopes?: ReadonlyMap<string, { siteId: string; name: string }>
   pageScopes?: ReadonlyMap<string, { siteId: string; role: 'contributor' | 'editor' }>
+  /** Tools granted to this person, such as `current_disasters` for a Disaster Manager. Super admins may use every tool. */
+  tools?: ReadonlySet<string>
+}
+
+/** Whether a person may use a CMS tool. The database re-checks with app.can_use_tool. */
+export function canUseTool(principal: Pick<Principal, 'isSuperAdmin' | 'tools'>, tool: string): boolean {
+  return principal.isSuperAdmin || Boolean(principal.tools?.has(tool))
+}
+
+/** A person whose only access is one or more tools: no site, page or division access. */
+export function toolsOnly(
+  principal: Pick<Principal, 'isSuperAdmin' | 'memberships' | 'pageScopes' | 'divisionScopes' | 'tools'>,
+): boolean {
+  return (
+    !principal.isSuperAdmin &&
+    Boolean(principal.tools?.size) &&
+    !principal.memberships.size &&
+    !principal.pageScopes?.size &&
+    !principal.divisionScopes?.size
+  )
 }
 
 const TIERS: Record<SiteRole, readonly Capability[]> = {

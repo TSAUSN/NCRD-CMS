@@ -11,6 +11,8 @@ export type PersonRow = {
   revision: string
   accepted: boolean
   super_admin: boolean
+  /** Tool grants, such as `current_disasters` for a Disaster Manager. */
+  tools: string[]
   memberships: SiteAssignment[]
   pageAssignments: PageAssignment[]
   divisionAssignments: DivisionAssignment[]
@@ -28,6 +30,7 @@ export function listPeople(userId: string): Promise<PersonRow[]> {
         await client.query<PersonRow>(`
     SELECT u.id,u.email,u.display_name,u.status,u.revision,u.auth_subject IS NOT NULL AS accepted,
       EXISTS(SELECT 1 FROM global_roles WHERE user_id=u.id) AS super_admin,
+      COALESCE((SELECT jsonb_agg(tool ORDER BY tool) FROM tool_grants WHERE user_id=u.id),'[]') AS tools,
       COALESCE((SELECT jsonb_agg(jsonb_build_object('siteId',m.site_id,'role',m.role) ORDER BY m.site_id)
         FROM site_memberships m WHERE m.user_id=u.id),'[]') AS memberships,
       COALESCE((SELECT jsonb_agg(jsonb_build_object('pageId',p.id,'siteId',p.site_id,'chapterId',c.id,'title',v.config->>'name',

@@ -21,6 +21,19 @@ export const globalRoles = pgTable('global_roles', {
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 })
 
+/** Tool grants such as `current_disasters` (Disaster Manager), migration 0213. Written only through app.set_tool_grant and app.add_tool_person. */
+export const toolGrants = pgTable(
+  'tool_grants',
+  {
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => appUsers.id),
+    tool: text('tool').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  table => [primaryKey({ columns: [table.userId, table.tool] })],
+)
+
 export const siteMemberships = pgTable(
   'site_memberships',
   {

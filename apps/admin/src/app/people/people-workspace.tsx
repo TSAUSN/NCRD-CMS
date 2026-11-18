@@ -254,6 +254,7 @@ export function PeopleWorkspace({
                   ['Admin', 'Pages and shared building blocks on their assigned sites.'],
                   ['Site editor', 'Edits and publishes the pages their access allows.'],
                   ['Content creator', 'Prepares drafts and submits changes for approval.'],
+                  ['Disaster Manager', 'Edits and publishes the Current Disasters cards on salvationarmyusa.org.'],
                 ].map(([name, description]) => (
                   <div key={name} className={recordTableStyles.rowCopy}>
                     <strong>{name}</strong>

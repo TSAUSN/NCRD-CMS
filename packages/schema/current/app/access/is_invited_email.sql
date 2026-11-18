@@ -12,5 +12,6 @@ AS $function$
  SELECT EXISTS(SELECT 1 FROM public.app_users u WHERE email=lower(p_email) AND status='active' AND (
   EXISTS(SELECT 1 FROM public.site_memberships WHERE user_id=u.id) OR EXISTS(SELECT 1 FROM public.global_roles WHERE user_id=u.id)
   OR EXISTS(SELECT 1 FROM public.chapter_division_memberships WHERE user_id=u.id)
-  OR EXISTS(SELECT 1 FROM public.page_memberships m WHERE m.user_id=u.id AND app.page_role_as(u.id,m.page_id) IS NOT NULL)))
+  OR EXISTS(SELECT 1 FROM public.page_memberships m WHERE m.user_id=u.id AND app.page_role_as(u.id,m.page_id) IS NOT NULL)
+  OR EXISTS(SELECT 1 FROM public.tool_grants WHERE user_id=u.id)))
 $function$

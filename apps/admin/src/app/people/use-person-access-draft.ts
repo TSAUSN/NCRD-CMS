@@ -37,6 +37,7 @@ export function usePersonAccessDraft({
     email: person?.email ?? '',
     status: person?.status ?? 'active',
     memberships: person?.memberships ?? [],
+    disasterManager: Boolean(person?.tools.includes('current_disasters')),
     revision: person?.revision ?? '0',
   }
   const setup = useBrowserSetup({
@@ -73,10 +74,18 @@ export function usePersonAccessDraft({
         seenSites.add(item.siteId)
         memberships.push({ siteId: item.siteId, role: item.role })
       }
-      return { name: data.name, email: data.email, status: data.status, memberships, revision: data.revision }
+      return {
+        name: data.name,
+        email: data.email,
+        status: data.status,
+        memberships,
+        // Drafts saved before the Disaster Manager choice existed start without it.
+        disasterManager: data.disasterManager === true,
+        revision: data.revision,
+      }
     },
   })
-  const { name, email, status, memberships, revision } = setup.value
+  const { name, email, status, memberships, disasterManager, revision } = setup.value
   const busy = pending || setup.loading
   const assignedSites = new Set(person?.memberships.map(item => item.siteId))
   const availableSites = sites.filter(site => !site.archived || assignedSites.has(site.id))
@@ -123,10 +132,10 @@ export function usePersonAccessDraft({
   function save() {
     run(() =>
       person
-        ? updatePerson({ id: person.id, revision, name, status, memberships })
+        ? updatePerson({ id: person.id, revision, name, status, memberships, disasterManager })
         : invitationsEnabled
-          ? invitePerson({ email, name, memberships })
-          : addPerson({ email, name, memberships }),
+          ? invitePerson({ email, name, memberships, disasterManager })
+          : addPerson({ email, name, memberships, disasterManager }),
     )
   }
 
@@ -143,6 +152,7 @@ export function usePersonAccessDraft({
     email,
     status,
     memberships,
+    disasterManager,
     busy,
     availableSites,
     unavailable,

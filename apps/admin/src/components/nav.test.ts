@@ -21,10 +21,28 @@ describe('the sidebar’s destinations', () => {
     ])
   })
 
-  it('offers Current Disasters to super admins only, because pushing it publishes the national site', () => {
+  it('offers Current Disasters only to super admins and Disaster Managers, because pushing it publishes the national site', () => {
     const editor = { isSuperAdmin: false, memberships: new Map([['abc', 'site_admin']]) }
     expect(navigationFor(undefined, editor)[0]!.items.map(item => item.href)).not.toContain('/tools/current-disasters')
     expect(navigationFor(undefined)[0]!.items.map(item => item.href)).not.toContain('/tools/current-disasters')
+    const editorWhoManagesDisasters = { ...editor, tools: new Set(['current_disasters']) }
+    expect(navigationFor(undefined, editorWhoManagesDisasters)[0]!.items.map(item => item.href)).toContain(
+      '/tools/current-disasters',
+    )
+  })
+
+  it('scopes a Disaster Manager with no other access to Current Disasters alone', () => {
+    const manager = {
+      isSuperAdmin: false,
+      memberships: new Map<string, string>(),
+      tools: new Set(['current_disasters']),
+    }
+    expect(navigationFor(undefined, manager)).toEqual([
+      {
+        label: 'CMS',
+        items: [{ href: '/tools/current-disasters', label: 'Current Disasters', icon: 'disasters', match: 'prefix' }],
+      },
+    ])
   })
 
   it('adds a group named after the site, and only then', () => {

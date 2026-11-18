@@ -2055,6 +2055,20 @@ CREATE TABLE public.themes (
 ALTER TABLE public.themes OWNER TO cms_migration_owner;
 
 --
+-- Name: tool_grants; Type: TABLE; Schema: public; Owner: cms_migration_owner
+--
+
+CREATE TABLE public.tool_grants (
+    user_id uuid NOT NULL,
+    tool text NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT tool_grants_tool_check CHECK ((tool = 'current_disasters'::text))
+);
+
+
+ALTER TABLE public.tool_grants OWNER TO cms_migration_owner;
+
+--
 -- Name: v1_import_decisions; Type: TABLE; Schema: public; Owner: cms_migration_owner
 --
 
@@ -3421,6 +3435,14 @@ ALTER TABLE ONLY public.themes
 
 
 --
+-- Name: tool_grants tool_grants_pkey; Type: CONSTRAINT; Schema: public; Owner: cms_migration_owner
+--
+
+ALTER TABLE ONLY public.tool_grants
+    ADD CONSTRAINT tool_grants_pkey PRIMARY KEY (user_id, tool);
+
+
+--
 -- Name: v1_import_decisions v1_import_decisions_pkey; Type: CONSTRAINT; Schema: public; Owner: cms_migration_owner
 --
 
@@ -4259,6 +4281,13 @@ CREATE TRIGGER sites_insert_default_global_elements AFTER INSERT ON public.sites
 --
 
 CREATE TRIGGER submissions_capture_story_review AFTER INSERT ON public.submissions FOR EACH ROW EXECUTE FUNCTION app.capture_story_review();
+
+
+--
+-- Name: tool_grants tool_grants_advance_person; Type: TRIGGER; Schema: public; Owner: cms_migration_owner
+--
+
+CREATE TRIGGER tool_grants_advance_person AFTER INSERT OR DELETE OR UPDATE ON public.tool_grants FOR EACH ROW EXECUTE FUNCTION app.membership_advances_person();
 
 
 --
@@ -5895,6 +5924,14 @@ ALTER TABLE ONLY public.themes
 
 
 --
+-- Name: tool_grants tool_grants_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: cms_migration_owner
+--
+
+ALTER TABLE ONLY public.tool_grants
+    ADD CONSTRAINT tool_grants_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.app_users(id) ON DELETE CASCADE;
+
+
+--
 -- Name: v1_import_decisions v1_import_decisions_created_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: cms_migration_owner
 --
 
@@ -7071,6 +7108,19 @@ CREATE POLICY themes_member ON public.themes FOR SELECT TO cms_authenticated_use
 
 
 --
+-- Name: tool_grants; Type: ROW SECURITY; Schema: public; Owner: cms_migration_owner
+--
+
+ALTER TABLE public.tool_grants ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: tool_grants tool_grants_self; Type: POLICY; Schema: public; Owner: cms_migration_owner
+--
+
+CREATE POLICY tool_grants_self ON public.tool_grants FOR SELECT TO cms_authenticated_user USING (((user_id = app.current_user_id()) OR app.is_super_admin()));
+
+
+--
 -- Name: v1_import_decisions; Type: ROW SECURITY; Schema: public; Owner: cms_migration_owner
 --
 
@@ -7206,6 +7256,14 @@ GRANT ALL ON FUNCTION app.add_page_comment(p_page_id uuid, p_version_id uuid, p_
 
 REVOKE ALL ON FUNCTION app.add_person(p_email text, p_name text, p_memberships jsonb) FROM PUBLIC;
 GRANT ALL ON FUNCTION app.add_person(p_email text, p_name text, p_memberships jsonb) TO cms_authenticated_user;
+
+
+--
+-- Name: FUNCTION add_tool_person(p_email text, p_name text, p_tool text); Type: ACL; Schema: app; Owner: cms_migration_owner
+--
+
+REVOKE ALL ON FUNCTION app.add_tool_person(p_email text, p_name text, p_tool text) FROM PUBLIC;
+GRANT ALL ON FUNCTION app.add_tool_person(p_email text, p_name text, p_tool text) TO cms_authenticated_user;
 
 
 --
@@ -7568,6 +7626,14 @@ REVOKE ALL ON FUNCTION app.can_publish_page_as(p_user uuid, p_page uuid) FROM PU
 
 REVOKE ALL ON FUNCTION app.can_review(site uuid) FROM PUBLIC;
 GRANT ALL ON FUNCTION app.can_review(site uuid) TO cms_authenticated_user;
+
+
+--
+-- Name: FUNCTION can_use_tool(p_tool text); Type: ACL; Schema: app; Owner: cms_migration_owner
+--
+
+REVOKE ALL ON FUNCTION app.can_use_tool(p_tool text) FROM PUBLIC;
+GRANT ALL ON FUNCTION app.can_use_tool(p_tool text) TO cms_authenticated_user;
 
 
 --
@@ -8033,6 +8099,14 @@ GRANT ALL ON FUNCTION app.current_sanitizer_policy_version() TO cms_authenticate
 
 REVOKE ALL ON FUNCTION app.current_structured_schema_version() FROM PUBLIC;
 GRANT ALL ON FUNCTION app.current_structured_schema_version() TO cms_authenticated_user;
+
+
+--
+-- Name: FUNCTION current_tools(); Type: ACL; Schema: app; Owner: cms_migration_owner
+--
+
+REVOKE ALL ON FUNCTION app.current_tools() FROM PUBLIC;
+GRANT ALL ON FUNCTION app.current_tools() TO cms_authenticated_user;
 
 
 --
@@ -10516,6 +10590,14 @@ GRANT ALL ON FUNCTION app.set_site_membership(p_user_id uuid, p_site_id uuid, p_
 
 
 --
+-- Name: FUNCTION set_tool_grant(p_user_id uuid, p_expected_revision bigint, p_tool text, p_enabled boolean); Type: ACL; Schema: app; Owner: cms_migration_owner
+--
+
+REVOKE ALL ON FUNCTION app.set_tool_grant(p_user_id uuid, p_expected_revision bigint, p_tool text, p_enabled boolean) FROM PUBLIC;
+GRANT ALL ON FUNCTION app.set_tool_grant(p_user_id uuid, p_expected_revision bigint, p_tool text, p_enabled boolean) TO cms_authenticated_user;
+
+
+--
 -- Name: FUNCTION set_user_status(p_user_id uuid, p_status public.user_status); Type: ACL; Schema: app; Owner: cms_migration_owner
 --
 
@@ -12411,6 +12493,13 @@ GRANT SELECT ON TABLE public.theme_versions TO cms_authenticated_user;
 --
 
 GRANT SELECT ON TABLE public.themes TO cms_authenticated_user;
+
+
+--
+-- Name: TABLE tool_grants; Type: ACL; Schema: public; Owner: cms_migration_owner
+--
+
+GRANT SELECT ON TABLE public.tool_grants TO cms_authenticated_user;
 
 
 --
