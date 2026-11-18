@@ -16,6 +16,10 @@ import styles from './disaster-editor.module.css'
 
 type Props = { version: number; updatedAt: string | null; initialItems: DisasterItem[]; livePage: string }
 
+/** Shown on a new card until the editor adds the disaster's own image. */
+const PLACEHOLDER_IMAGE =
+  'https://8hxvw8tw.media.zestyio.com/2026---ALM---DHQ---Web-Banner---Hurricane-Isaias-EDS_02-copia.B1lzDVuofl.png'
+
 const ZESTY_MEDIA = /^https:\/\/[a-z0-9-]+\.media\.zestyio\.com\//i
 
 function toEdit(item: DisasterItem): CardEdit {
@@ -40,7 +44,7 @@ function blankCard(): CardEdit {
     hidden: false,
     title: '',
     description: '',
-    imageUrl: '',
+    imageUrl: PLACEHOLDER_IMAGE,
     learnMore: { href: '', label: 'Learn More' },
     donate: { href: '', label: 'Donate' },
   }
