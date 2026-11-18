@@ -1,5 +1,7 @@
 # Friday go-live: administrator-run production test
 
+Historical November 6 installation procedure. [NCRD production](../../production.md) records the serving release. The [custom-domain guide](domains.md) explains how to connect a site that is already hosted.
+
 For the platform lead and Google project administrator.
 **Release tag:** `v2026.11.06`. Its runtime-identical review build was `e51b4b5`.
 Deploy the verified release commit; the private handoff records the full SHA.

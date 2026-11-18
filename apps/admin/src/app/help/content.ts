@@ -226,12 +226,15 @@ export const helpTopics: HelpTopic[] = [
     id: 'domains',
     title: 'Connect a test domain and get DNS instructions',
     audience: 'operator',
+    keywords:
+      'go live take a site online custom hostname squarespace firebase certificate https tls cname txt waiting for dns',
     text: [
-      'Open the site’s Settings → Domains. Reserve the intended test hostname once. Wait for the hosting service to return the exact DNS records. If no records are shown, hosting setup is still incomplete; refreshing does not fix a failed background task.',
-      'Follow the three setup stages: Prepare address, Verify DNS and Secure with HTTPS. Copy individual names/values or all DNS instructions. These instructions are not a complete list of your DNS records; keep working routing, verification and email records even when they are not listed.',
-      'The Google project administrator should inspect Background work for domain.sync or site.hosting_requested errors. A Firebase Hosting 403 requires checking the runtime service account, project configuration and permissions before retrying the failed task.',
-      'Give the DNS administrator only the records displayed for this hostname, including the CMS verification TXT. Keep unrelated mail and verification records. Do not guess an IP, change nameservers or copy another project’s records.',
-      'After the DNS administrator applies the approved records, use Verify now. DNS verification, certificate issuance and Live are separate stages. Verify HTTPS, nested pages, images, fonts and redirects before calling the domain ready.',
+      'A site can serve published pages at its native test address while its custom address is connecting. Settings → Domains reserves the chosen hostname. The CMS worker registers it with the Firebase Hosting site for that website.',
+      'The DNS owner publishes the exact Add and Remove records shown on the domain card. The CMS ownership TXT and the Firebase routing or certificate records serve different purposes. The table shows requested changes to the zone, and unrelated working records stay in place.',
+      'Verify now queues a check. Refresh domain status reads the latest saved result. Waiting for DNS can persist after the records first appear, and Issuing certificate means HTTPS is still being prepared.',
+      'If the address reaches a Firebase placeholder or HTTPS rejects its certificate, check the exact hostname and the mapping, ownership and certificate on the intended Firebase Hosting site. A correctly registered address needs no second CMS allowlist. Adobe Fonts has its own hostname allowance after the site is reachable.',
+      'Live means the provider checks passed. Visitor checks use ordinary HTTPS requests to the homepage and an inner page, plus navigation, images, fonts and redirects. If an active Firebase domain works with a fresh query string but ordinary URLs show a cached 404, the hosting operator can refresh the affected site with a same-configuration Hosting release.',
+      'Preparing DNS instructions or a stale last-check time can indicate background work needs attention. The cloud operator can inspect domain.sync or site.hosting_requested for provider or runtime permission errors.',
     ],
   },
   {
@@ -258,7 +261,7 @@ export const helpTopics: HelpTopic[] = [
     title: 'Publish a code change and verify the build',
     audience: 'operator',
     text: [
-      'Check the change locally, commit the reviewed files to main and push. For the organization’s automatic Google deployment, the commit message must not contain [skip ci].',
+      'NCRD production deploys through Google Cloud Build. A reviewed push to main can trigger a deployment when the commit has no [skip ci] marker. The production migration guard checks the schema before the release proceeds.',
       'Watch Google Cloud Build to completion. A GitHub Actions allowance failure is separate from the Google build. Ask the project administrator for the build logs if your Google account cannot read them.',
       'Compare the deployed /health version with the full commit SHA. Confirm the Admin and public Site are healthy, then test the changed user flow. A successful push alone does not prove the change is live.',
       'A staging hostname or Git branch is not database isolation. Use a separate database, media and workers for staging before testing destructive or schema-changing work.',

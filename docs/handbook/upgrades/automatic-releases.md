@@ -1,25 +1,29 @@
-# Publish staging and production from GitHub
+# How CMS code releases reach Google Cloud
 
-The `staging` branch tests and publishes to the GitHub **staging**
-environment. The `main` branch tests and publishes to **production**.
-The environments must point to different Cloud projects and databases.
-Pull requests and manual CI runs can test code without deploying it.
+## Active production path
 
-If the repository already has branches under `staging/`, Git cannot also
-create a branch named `staging`. Keep the existing branches and choose one
-release branch under that prefix, such as `staging/cms-release`. Set its
-exact name in the repository variable `CMS_STAGING_BRANCH`. Use that same
-name in the staging environment's branch rule and federation condition.
+NCRD production deploys through Google Cloud Build trigger `ncrd-cms-deploy`.
+A reviewed push to `main` without `[skip ci]` can start the production build.
+The build uses `deploy/google/cloudbuild-deploy.yaml`. Its migration guard
+compares the candidate migration set with the serving image. A schema-changing
+release follows the reviewed migration procedure before deployment is retried.
+Admin and Site `/health` report the serving commit. The Worker remains private.
 
+[Production overview](../../production.md) records the live release. The
+[deployment decision](../../decisions.md#production-deploys-through-a-cloud-build-trigger--november-9-2026)
+explains how this path replaced GitHub Actions for NCRD.
 
-## Current production path
+## Optional GitHub Actions staging and production setup
 
-Production currently deploys through the Cloud Build trigger `ncrd-cms-deploy`,
-not GitHub Actions. See [the decision](../../decisions.md#production-deploys-through-a-cloud-build-trigger--november-9-2026)
-and `deploy/google/cloudbuild-deploy.yaml`. A push to `main` without `[skip ci]`
-deploys after its migration guard passes. When migrations change, apply them
-with the operator runbook, then re-run the failed build. The GitHub setup below
-remains available when Actions minutes return.
+The workflows below describe a separate setup. With environment-specific
+credentials and deploy flags, the chosen staging branch targets staging and
+`main` targets its own production environment. Separate projects and databases
+keep staging jobs from reaching production data. Pull requests can run checks
+without deploying.
+
+Git cannot hold both a branch named `staging` and a branch under `staging/`.
+An installation that uses `staging/cms-release` supplies that exact branch in
+`CMS_STAGING_BRANCH`, the GitHub branch rules and the Google federation condition.
 
 ## Enable the two environments
 

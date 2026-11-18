@@ -4,9 +4,11 @@ For the platform lead and Google project administrator. Source comes from the
 organization GitHub repository at a reviewed release ref. The first deployment
 uses [bootstrap](../../docs/handbook/hosting/bootstrap.md) and the ordered
 [Friday go-live](../../docs/handbook/hosting/friday-go-live.md) runbook.
-Existing deployments use [ship an update](../../docs/handbook/upgrades/ship-an-update.md).
-For opted-in branch deployments to existing services, use
-[automatic releases](../../docs/handbook/upgrades/automatic-releases.md).
+[NCRD production](../../docs/production.md) uses the Google Cloud Build path
+described in [automatic releases](../../docs/handbook/upgrades/automatic-releases.md).
+[Ship an update](../../docs/handbook/upgrades/ship-an-update.md) covers a manual,
+reviewed deployment. [Custom domains](../../docs/handbook/hosting/domains.md)
+covers connecting a hostname to a site that is already hosted.
 The existing personal review identifiers are in
 [review-environment.md](../../docs/handbook/hosting/review-environment.md).
 

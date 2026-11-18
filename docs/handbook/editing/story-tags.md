@@ -40,10 +40,11 @@ still works. Zero assigned stories is a review prompt, not an automatic error.
 The summaries do not change assignments or publish anything. For searchable
 steps, open Help in the CMS sidebar and search for story tags.
 
-The current TagManager comparison at 1440/1024 uses shared navigation, buttons,
-row menus and region checkboxes. Normal saves still preserve identities and
-story assignments. The final numbered acceptance and reviewer visual sign-off
-remain open.
+The live Newsroom’s sector and region filters were checked on November 18. They
+display eligible published stories, so a tag can have assignments in Manage tags
+while showing no results on a public page. A story’s publication state,
+visibility and the [13-month feed window](stories.md) all affect inclusion.
+The tags with no assignments are an editorial review aid.
 
 If you choose another CMS destination while a tag or group-name edit is open,
 Keep editing returns to its fields. Save draft and leave checks the name,

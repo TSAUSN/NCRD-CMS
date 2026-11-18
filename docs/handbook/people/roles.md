@@ -1,8 +1,8 @@
 # Roles and site assignments
 
-For all CMS users. Last checked: November 11, 2026 against the current role,
-navigation and account-management code. This guide explains supported work;
-full hosted acceptance with each real role remains a release check.
+This guide describes the CMS roles and account-management code, including the
+November 18 Disaster Manager grant. Full hosted acceptance with each real role
+remains a release check.
 
 ## Start with your role
 
@@ -61,6 +61,21 @@ changes the account's permissions.
 - **Chapter/division team:** [chapter setup and destinations](../site-setup/chapter-destinations.md).
 - **Hosting operator:** [domain checks](../hosting/domains.md),
   [deployment](../upgrades/ship-an-update.md), [backup/recovery](../upgrades/backup-recovery.md).
+
+## Current Disasters
+
+A Super admin can grant **Disaster Manager** in **People & access → Tools**.
+A tool-only account opens **Current Disasters** after sign-in. A person with
+other CMS assignments also sees their usual site navigation.
+
+The tool loads the current Zesty version of the national page’s disaster cards.
+Supported cards can be added, reordered, hidden or edited. Other page blocks
+are preserved. **Push** publishes the changed cards directly in Zesty. The
+server asks for a fresh sign-in after the 90-minute window. If the page changed
+in Zesty since it was opened, the tool reports a version conflict. The previous
+published version can be recovered in Zesty’s version history.
+[Operations setup](../../operations.md) ·
+[Maintainer map](../maintainers/where-things-live.md).
 
 ## Narrow access and missing access
 

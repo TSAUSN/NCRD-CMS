@@ -3,12 +3,11 @@
 Running, testing, hosting and recovering CMS V2. The system itself is described
 in [architecture.md](architecture.md).
 
-**Production-site boundary:** this CMS is independent of Salvation Army live
-websites. Demo archives are local copies of the maintainer’s rebuilds/files.
-Do not use Salvation Army credentials, attach their production domains, or
-access Zesty/cPanel to edit live pages for CMS development or hosting. The
-deployment kit prepares a separate CMS staging environment only; it never
-deploys or connects production websites.
+The [NCRD production overview](production.md) records the organization’s
+running CMS. Local demo archives are independent copies of the approved example
+sites. Connecting an existing Salvation Army website, changing its DNS or
+editing its Zesty/cPanel content is a separate action. The [domain guide](handbook/hosting/domains.md)
+explains how native CMS addresses and custom hostnames are provisioned.
 
 ## Requirements
 

@@ -1,9 +1,9 @@
 # Where things live
 
-For a maintainer opening CMS V2 for the first time. Last checked November 8, 2026.
-Start with [architecture](../../architecture.md), the current [SPEC status](../../../SPEC.md)
-and [local setup](../hosting/local-demo.md). Product task instructions are in the
-[handbook index](../INDEX.md); the Friday deployment procedure is separate.
+For a maintainer opening CMS V2 for the first time. The [production overview](../../production.md)
+names the NCRD environment, [architecture](../../architecture.md) explains the
+layers, and [local setup](../hosting/local-demo.md) describes a disposable instance.
+The [handbook index](../INDEX.md) shows how a CMS user completes each task.
 
 ## Follow a change from screen to database to renderer
 
@@ -22,6 +22,8 @@ remain the executable authority; never edit a past migration or apply the refere
 | Page History | `app/pages/[pageId]/history/`; `lib/page-history.ts` | Search current index for page version/restore commands | Admin `preview/[versionId]/route.ts` uses the same renderer with read-only options | `activity-history`, `page-lifecycle`, `preview-layout` |
 | Stories, tags and feeds | `app/sites/[siteId]/stories/actions.ts`, `tags/actions.ts` → `lib/stories-edit.ts`, `stories-tags.ts`, `story-list-commands.ts` | Collection-entry commands and Story review/placement helpers | `packages/renderer/src/newsroom.ts` and `story-*` modules | `sawso-stories`, `sawso-create-story`, `stories/stories-list`, `stories/story-*` |
 | Chapters and divisions | `app/sites/[siteId]/chapters/actions.ts` → `lib/chapters.ts`, `local-chapter-mail.ts` | `app.create_division_chapter`, `app.create_chapter_page`, chapter setup/team commands | `echelon-*.ts` and chapter-directory widget in renderer | `echelon-access`, `echelon-teams`, `chapters/chapter-division`, `chapters/echelon-directory` |
+| Section library and page templates | `app/sites/[siteId]/sections/`, `recipes/`; `app/actions/section-definitions.ts`; `lib/page-recipes.ts` | `app.save_section_def_version`, `app.save_page_recipe`, `app.use_page_recipe` | Shared section renderer reads pinned definitions and copied instance values | `section-library/sections`, `section-library/template` |
+| Site setup and content portability | `app/sites/new/actions.ts`; `app/sites/import/`; `app/api/sites/[siteId]/export/route.ts` → `lib/site-portability-handler.ts` | `app.create_site`, `app.import_site_content`, `app.export_site_content` | Imported drafts use the regular publisher before becoming public | `site-wizard-pages`, `site-portability`, `site-settings/archive-import-leave` |
 | Header, menu and Footer | `app/sites/[siteId]/{header,footer}/actions.ts`; legacy routes `navigation/`, `global-elements/` | `app.save_navigation_draft`, `app.save_global_elements_draft`, corresponding publish commands | `frame/site-frame.ts`, `national-*`, `echelon-*`; `canvas-page-handler.ts` | `global-elements-workspace`, `frame-source-drafts`, `public-site/national-frame` |
 | Site look and fonts | `app/sites/[siteId]/design/`, `design/fonts/` → site-look/theme actions under `app/actions/` and page `site-look-actions.ts` | `app.save_theme_draft`, `app.publish_theme` | `theme/theme-css.ts`, font registry, presentation CSS in renderer; local licensed-font routes | `theme-workspace`, `fonts`, `site-look/preview-fonts`, `site-look/font-leave`, `editor/isolated-canvas` |
 | Media and documents | `app/sites/[siteId]/media/`, `documents/`; `app/api/media/` → `lib/media-*-repository.ts` | Upload lifecycle, metadata/organization, replacement and public resolution commands | `packages/platform/src/storage.ts`, media delivery repositories; image handling in renderer | `media-*`, `documents-workspace`, `document-upload-http`, `image-focus` |
@@ -30,7 +32,9 @@ remain the executable authority; never edit a past migration or apply the refere
 | Lists and items | `app/sites/[siteId]/content/`; `app/collection-review-actions.ts` → `lib/collection-*.ts` | Collection schema/entry/review commands | Shared list bindings and site widgets | `collections-workspace`, `collection-richtext`, `collection-options-http` |
 | Publish, review and schedule | `app/actions/page-publish.ts`, `reviews.ts`; page `page-{review,schedule}-actions.ts` → `lib/releases.ts` | `app.publish_page`, release prepare/publish and scheduled-action lease commands | Published projections are read by `apps/site`; same `render.ts` | `publishing/publishing`, `editor-publish-review`, `publishing/page-schedule`, `scheduled-supersession` |
 | People and access | `app/people/actions.ts` → `lib/people.ts`, `people-access.ts`; `lib/session.ts` resolves the verified identity | `app.add_person`, membership/invitation commands, `app.resolve_session` | No public people directory or role checks in markup; PostgreSQL authorizes | `people`, `people-scopes`, dedicated `e2e/no-mail.spec.ts` |
-| Domains and routing | `app/sites/[siteId]/domains/actions.ts`; global `app/domains/` → domain adapters in `packages/platform` | Domain create/verify/activate and host resolution commands | `apps/site` Host routing; Firebase Hosting adapter | `domains`, `global-domains`, `public-contract`, `echelon-redirects` |
+| Current Disasters | `app/tools/current-disasters/page.tsx` and `actions.ts` → `lib/disaster-cards.ts`, `lib/zesty-disasters.ts` | `app.can_use_tool`, `app.set_tool_grant`, `app.add_tool_person` (migration 0213) | Zesty publishes the fixed national page item and owns version history | `disaster-cards.test.ts`, `zesty-disasters.test.ts`, `disaster-managers.db.test.ts` |
+| Domains and routing | `app/sites/[siteId]/domains/actions.ts` and global `app/domains/` → `apps/worker/src/domains.ts` → `packages/platform/src/firebase-domains.ts` | `app.add_domain`, `app.check_domain`, `app.domain_job`, `app.record_domain_result`; `public_api.resolve_host` | Firebase Hosting → public Site service; primary and alias state in the published shell | `domains`, `global-domains`, `domain-lifecycle.db.test.ts`, worker `domains.db.test.ts` |
+| Sign-in and recovery | `app/sign-in/`, `app/sign-in/reset/page.tsx`, `app/auth/confirm/page.tsx` → `app/actions/auth.ts` → `packages/platform/src/hosted-auth.ts` | `app.resolve_session`, `app.attach_auth_subject`, CMS membership checks | Admin only; Supabase owns identity and the Auth email sender | `auth-actions.test.ts`, `sign-in-pages.test.tsx`, platform `password-recovery.test.ts` |
 
 Inside `app/sites/[siteId]/content/`, `collections-workspace.tsx` owns
 list draft commands and dialogs. `collection-record-list.tsx` owns the rows,
@@ -59,7 +63,7 @@ Keep existing assertions when reorganizing tests. Unit tests sit beside
 code; real database tests are `packages/schema/test/*.db.test.ts` and package/app
 `test/` folders. Permission claims need the real-role tests, not only unit mocks.
 
-## Boundaries to keep
+## What each boundary protects
 
 - A server action resolves a verified session, checks input/recent authentication
   as required, then calls a narrow SQL command. A hidden button is not a permission.
@@ -76,7 +80,7 @@ code; real database tests are `packages/schema/test/*.db.test.ts` and package/ap
   [refactor gates](refactor-gates.md). Keep preview/session state outside Git and
   remove it when the walk ends.
 
-## Commands and deliberate remaining work
+## Local verification commands
 
 Use Node 24 and the pinned pnpm. `pnpm typecheck`, `pnpm test`, `pnpm test:db`
 and current app builds are separate evidence. Supply `V1_ROOT` to run all licensed
@@ -85,7 +89,29 @@ local-source importer cases; a skipped source suite does not prove parity.
 local database; `pnpm schema:reference:check` and its database test catch drift.
 Browser tests use `E2E_DATABASE` and configurable `E2E_ADMIN_PORT`/`E2E_SITE_PORT`.
 
-## Make your first small change
+## Which source answers which question
+
+| Question | Source |
+| --- | --- |
+| What should the feature do? | [SPEC](../../../SPEC.md) and the task’s [handbook guide](../INDEX.md) |
+| What do the current branch’s app and database do? | The route, command, renderer and tests above, plus the numbered SQL migrations |
+| What is running in NCRD? | The dated [production overview](../../production.md) and serving Admin and Site `/health` responses |
+| What changed and why? | [Decision record](../../decisions.md), [ADRs](../../adr/) and the Git history for the owning files |
+
+## Follow the dependencies of a change
+
+A label change on the Domains screen stays in Admin. A change to what counts as
+Live also touches the Firebase state mapping, the Worker receipt, the SQL
+transition and the public hostname. Domain lifecycle tests exercise the local
+contract. External DNS and certificate behavior still come from the provider.
+
+A tag rename preserves the tag ID, so existing story assignments and renderer
+filters stay attached. Changing matching behavior reaches the collection
+entry/schema commands, visibility and date filters, and the shared Newsroom
+renderer. The relevant tests include `stories-tags.db.test.ts`,
+`story-tag-selection.db.test.ts` and `e2e/specs/stories/tag-manager.spec.ts`.
+
+## Examples in the editor and renderer
 
 **Edit the Header & menu dialog.** Start in
 `app/sites/[siteId]/header/page.tsx` and follow `HeaderMenuWorkspace` in

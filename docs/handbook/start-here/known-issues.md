@@ -1,4 +1,6 @@
-# Friday test-phase known issues
+# Known issues and historical release evidence
+
+The [NCRD production overview](../../production.md) describes the current system. The following Friday test-phase observations are retained as dated evidence for the November 6 release. Current SAWSO hosting is covered in the [domain guide](../hosting/domains.md).
 
 Release tag: `v2026.11.06`. Runtime-identical review build: `e51b4b5`. Exact commit, complete gate results and hosted
 acceptance belong in the top handoff and SPEC. Do not deploy a moving branch tip.
@@ -16,7 +18,7 @@ small test size. Keep the existing bounded pools. The dedicated upgrade and its
 restart downtime are documented in [speed and size](../hosting/speed-and-size.md);
 it needs later budget approval and is outside this cleanup’s scope.
 
-## Accepted Friday scope and Google project administrator/IT gates
+## Historical November 6 scope and operator gates
 
 The personal review copy uses the existing Supabase sign-in. No SMTP or
 real-editor rollout is included. Adding a person can record CMS access; it does

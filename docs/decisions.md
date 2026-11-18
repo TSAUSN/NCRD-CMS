@@ -3991,6 +3991,28 @@ links/codes. Do not claim that adding `/recover` makes Jon's corporate-mail flow
 proven. IT or the owner must provide the approved email sender. Real Microsoft
 activation and Jon's own password/fresh-login acceptance are separate steps.
 
+
+### 2026-11-16 — NCRD Auth email uses Resend custom SMTP
+
+Later on November 16, NCRD connected Supabase Auth to the verified Resend
+sending subdomain. The recovery and magic-link templates use the CMS confirmation
+flow. The owner verified recovery and fresh password sign-in. This resolved the
+default-sender dependency described in the release entry above. The provider
+settings and operator responsibilities are summarized in [production](production.md)
+and [authentication and email delivery](handbook/hosting/sign-in-options.md).
+
+### 2026-11-18 — DNS publication and a working site are distinct milestones
+
+SAWSO’s custom address was already registered on the intended Firebase Hosting
+site by the CMS worker. After the DNS change, HTTPS first failed certificate
+validation, then validated and returned Firebase Site Not Found. The native site
+kept serving its published pages. After the CMS recorded Live, the plain public
+URLs still served cached Firebase 404s, while fresh requests returned CMS content.
+A new live Firebase Hosting release with the same rewrite and both original files
+cleared the observed errors. The plain homepage and Newsroom returned HTTP 200.
+The [domain guide](handbook/hosting/domains.md) records the release, the required
+service read permission and the public verification.
+
 ### 2026-11-18 — Current Disasters Zesty tool
 
 Jon reported that the platform lead approved a super-admin tool that edits the

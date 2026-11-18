@@ -1,27 +1,18 @@
 # Delivery roadmap
 
-[SPEC release state](../SPEC.md#current-release-state) controls the current milestone.
-The release is `v2026.11.06`; `e51b4b5` was the runtime-identical review build.
-Deployment uses the reviewed release ref and private verification receipts.
+The [NCRD production overview](production.md) records the serving release and deployment
+settings. The [product spec](../SPEC.md#current-release-state) records the intended
+scope. November 6 release evidence and the November 15 personal-lab review are
+historical checks for their own builds and environments.
 
-## NCRD release — November 16
+## Current production follow-up
 
-The owner authorized a reviewed NCRD rollout of the tested personal fixes and
-signed-out password recovery. No Analytics migration is included. Preserve
-current content, roles and cloud settings; keep Microsoft disabled for IT.
-Code entry requires an actual code-bearing recovery email before enabling
-`AUTH_RECOVERY_CODE_ENABLED`. Default-sender scanner mitigation remains an
-email-configuration dependency. Verify the exact live release and ordinary
-recovery/account-access flows before declaring acceptance complete.
-
-## Personal-lab follow-up — November 15
-
-The current task is limited to the isolated personal V2 copy. Microsoft through
-Supabase plus password fallback is selected; direct Entra is deferred. Domains
-and Jon's remaining acceptance scenarios take priority. The
-[dated schema/feature review](handbook/maintainers/schema-and-feature-review-2026-11-15.md)
-distinguishes built features, unrun checks, editorial gaps and deliberately
-future work. The older frozen-release snapshot is not a live status claim.
+The November 16 NCRD build includes the reviewed domain changes and signed-out
+recovery. Supabase Auth email uses Resend custom SMTP. Microsoft setup remains
+with IT. The [domain guide](handbook/hosting/domains.md) records SAWSO’s current
+connection evidence and same-configuration Hosting redeploy. The November 18
+Current Disasters releases added a scoped Zesty tool and Disaster Manager grant.
+Per-site Analytics is a separate feature and migration.
 
 ## Implemented scope
 
@@ -40,7 +31,7 @@ future work. The older frozen-release snapshot is not a live status claim.
 
 | Work package | Requirement | Gate |
 | --- | --- | --- |
-| HO-1 | Organization Google deployment | Administrator checklist, approved budget/public invocation, exact revision, restore/media verification, sign-in and operational acceptance |
+| HO-1 | Organization Google deployment | NCRD is serving on Google Cloud. Wider role and restore acceptance are separate operational checks. |
 | HO-2 | Static public publishing | ADR 0012 and its release gates; dynamic rendering remains active |
 | HO-3 | Current hosting cost brief | Dated provider estimates and platform-lead review; no zero-cost guarantee |
 | MG-5 | Human Needs Index commissioning | Existing imported output remains frozen; domain/Tableau/cutover decisions separately reviewed |

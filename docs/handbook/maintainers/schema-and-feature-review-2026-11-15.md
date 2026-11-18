@@ -1,5 +1,7 @@
 # Schema and unfinished-feature review — November 15, 2026
 
+This is a dated personal-lab review. The [NCRD production overview](../../production.md) records later organizational deployment and Auth mail changes.
+
 Scope: personal V2 candidate on `lab/overnight-v2-20261115`, starting from
 `45f15d4`. This review does not apply SQL, rewrite immutable migrations or change
 NCRD. The current reference contains **210 migrations, 86 tables and 552 function

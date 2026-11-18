@@ -34,21 +34,24 @@ because code and tests cite its section numbers ("SPEC §8.6" means revision 7).
 
 ## Current release state
 
-### NCRD release authorized November 16, 2026
+### NCRD release deployed November 16, 2026
 
-Port the tested personal domain/font/Microsoft-preparation fixes and dependency
-patches to NCRD through reviewed Git source and the existing Google release
-procedure. Add signed-out password recovery without changing user identities,
-roles, existing content or immutable migrations. Analytics migration 0212 is
-excluded from this release. Microsoft stays disabled pending IT configuration.
+The November 16 release includes the reviewed domain, font, Microsoft-preparation
+and dependency changes plus signed-out password recovery. Analytics migration
+0212 is excluded. The [NCRD production overview](docs/production.md) identifies
+the current commit, runtime services, authentication and deployment path.
 
-Recovery sends a provider recovery email and opens the existing Password screen
-only after provider verification and the normal CMS access check. Optional code
-entry stays off until a real recovery-code email template is configured. NCRD's
-default sender currently locks custom templates, so scanner-safe email delivery
-still needs an approved SMTP sender or separately approved provider configuration.
-Do not call that external dependency resolved by deploying the recovery UI.
-Jon's own password entry and fresh-login acceptance follow deployment.
+Resend custom SMTP for Supabase Auth was configured November 16. The owner’s
+link-based recovery and fresh password sign-in passed. Recovery verifies the
+provider credential and normal CMS membership before opening the user’s Password
+screen. Optional recovery codes remain disabled. Microsoft requires IT activation.
+
+The November 18 [SAWSO domain record](docs/handbook/hosting/domains.md#ncrd-example-checked-november-18-2026)
+describes the Firebase Hosting redeploy that restored the homepage and Newsroom.
+The same day’s CMS releases added [Current Disasters](docs/handbook/people/roles.md#current-disasters)
+and the scoped Disaster Manager grant in migration 0213. The older review
+deployment and frozen-release evidence
+below describe their own environment and date.
 
 ### Personal V2 work authorized November 15, 2026
 
@@ -70,7 +73,7 @@ proof of the current personal or NCRD runtime revision.
 
 ### Frozen release snapshot
 
-The release is `v2026.11.06`. Its runtime-identical review build was `e51b4b5`.
+The November 6 release was `v2026.11.06`. Its runtime-identical review build was `e51b4b5`.
 The hosted personal review copy is a separate deployment; the frozen tag does not
 prove that copy runs the same revision. Organization deployment, public-invocation
 policy, notification delivery and the ordinary-browser acceptance route remain
@@ -111,9 +114,9 @@ project administrator performs organization commands using the ordered
 3. **Hosted speed.** Saves and publishes on the shared-core database sometimes sit at "pending" or "preparing". One image check took 41 seconds before migration 0205. Review measurements and sizing are in hosting/speed-and-size.md; repeat the slowest steps on the organization deployment.
 4. **Remaining role scenarios:** Echelon national page and media (11), division team member (12), chapter contributor (13), Symposium Editor (14), urgent fix (8), contributor review (9), all-roles screens (15).
 
-### Open delivery requirements
+### Original delivery requirements
 
-These were not specified, or were explicitly out of scope, but the next milestone needs them. Each one needs a decision or a plan before deployment.
+This table records the gates from the frozen review phase. Later organization deployment, email and domain status are recorded at the top of this section and in the [NCRD production overview](docs/production.md).
 
 | # | Gap | Why it matters | What to do |
 |---|---|---|---|

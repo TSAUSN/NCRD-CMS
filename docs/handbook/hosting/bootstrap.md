@@ -1,5 +1,7 @@
 # Bootstrap an empty Google project
 
+This procedure describes an additional Google installation. Its original review prerequisites refer to the November 6 release. [NCRD production](../../production.md) already runs its own services and Auth email.
+
 For the platform lead and Google project administrator.
 The Google project administrator performs organization deployment. Local checks
 and a personal review restore do not prove an empty-project installation.
