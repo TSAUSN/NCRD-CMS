@@ -1,50 +1,62 @@
 # Working on CMS V2
 
-Read `SPEC.md`, `docs/roadmap.md`, `docs/architecture.md` and the relevant
-handbook guide before changing an area. Revision 8 is the product direction;
-revision 7 remains in `docs/archive/` because code cites its section numbers.
-The handbook starts at `docs/handbook/INDEX.md`.
+[Production](docs/production.md) records the deployed NCRD environment.
+[Architecture](docs/architecture.md) explains how requests, data and releases
+flow. [Where things live](docs/handbook/maintainers/where-things-live.md) maps
+each feature to its screen, actions, database commands and tests. The relevant
+[handbook guide](docs/handbook/INDEX.md) describes the user flow. [SPEC](SPEC.md)
+revision 8 defines product intent and the [roadmap](docs/roadmap.md) records
+deferred work. Code comments that cite revision 7 refer to `docs/archive/`.
 
-## Scope and safety
+The context needed for a change depends on which layers it touches. For example,
+rewording a domain status starts in the Admin view. Changing when the status
+becomes Live also affects Firebase provider results, the Worker receipt, SQL
+host resolution and public routing.
 
-- Work on one branch in one checkout per task; use an isolated worktree when requested.
-- Organization cloud commands are performed by the Google project administrator.
-  Prepare and verify deployment plans locally. Never change production DNS,
-  Zesty/cPanel pages or live-site routing without explicit authorization.
-- Import only approved local source copies. Keep credentials, dumps, raw preview
-  tickets and verification receipts outside Git. Never copy source-site secrets.
-- Public copy comes verbatim from approved sources. Missing content uses tracked
-  bracketed samples; fictional people are labelled “(sample)”.
-- Never edit `packages/schema/migrations/`, including comments. Applied checksums
-  are immutable. Introduce schema changes through new reviewed migrations only
-  when schema work is explicitly in scope.
-- Never point test harnesses or a general worker at a retained or review database.
+## Environment and data boundaries
 
-## Implementation and review
+Each task uses one branch in one checkout. Organization cloud changes belong to
+the Google project administrator. An explicit authorization is needed for
+production DNS, site routing, Zesty/cPanel edits, billing, account creation or
+irreversible changes. A local change can be prepared and verified independently.
 
-- Use Node 24 and the pinned pnpm version. Follow `docs/operations.md` for setup.
-- Preserve tenant isolation, RLS, narrow commands, immutable releases and the shared
-  sanitizing renderer. Section fields cannot introduce scripts. Reviewed site-owned
-  scripts require exact per-site CSP approval and the normal release flow.
-- Use design tokens and shared controls. No new raw colours or spacing outside
-  tokens, and no new rules in `globals.css`.
-- Keep modules focused. Split files above about 800 lines before extending them;
-  the page editor is a known exception tracked for a separate reviewed refactor.
-- Shared renderer and SQL logic should use declared capabilities rather than site
-  slugs. Preserve imported markup, styling and interactions against approved local sources.
-- Check admin at 1440/1024 and public output at 390. Inspect screenshots when a
-  visual change is in scope. UI acceptance belongs to the designated reviewer.
-- Run one browser suite at a time with at most two workers. Keep assertions,
-  timeouts and source opt-ins intact. Record failures without concealing them.
-- Run relevant checks and format only changed source files before committing.
-  Never run a formatter over immutable migrations.
-- Inspect the staged diff. Use the configured contributor identity, with no
-  attribution trailer. Verify locally and batch pushes within the CI budget;
-  use `[skip ci]` while the repository's Actions allowance is exhausted.
-- Keep documentation current and concise. Record decisions in `docs/decisions.md`;
-  Git history is the change log. Commit screenshots only as approved design references.
-- For unfamiliar Next.js APIs, read the installed `next/dist/docs/` first.
+Approved local sources supply public copy and imports. Missing copy remains a
+tracked sample. Fictional people are marked “(sample)”. Credentials, database
+dumps, private preview tickets and verification receipts live outside Git.
+Test harnesses and general workers use disposable environments because they can
+reset databases or deliver queued jobs.
 
-Account creation, spending, irreversible remote changes and production cutover
-require the responsible administrator's approval. Preserve the reviewed release
-scope; report gaps and evidence in SPEC without expanding the task silently.
+## How changes interact with the stack
+
+PostgreSQL checks tenant and role scope. Narrow commands preserve revisions,
+versions and outbox receipts. Applied migrations are immutable and checksummed,
+including comments. An approved schema change uses a new migration.
+The shared renderer sanitizes sections. Reviewed site-owned scripts have exact
+site-level CSP approval and go through the normal release flow.
+
+Admin uses shared controls and design tokens. CSS imports in `globals.css`
+establish shared order and remain an import list. Shared values come from tokens,
+including colors and spacing. Feature rules stay with their owners and shared
+behavior uses declared site capabilities. Splitting modules above about 800 lines
+by responsibility keeps extensions focused. The page editor has a separately
+tracked refactor.
+Imported markup, design and interactions are checked against approved sources.
+
+## Local checks and release evidence
+
+The local toolchain is Node 24 and the pinned pnpm. [Operations](docs/operations.md)
+covers setup. The installed `next/dist/docs/` reflects the Next.js version in use.
+
+Verification depends on the layer changed. Admin checks use 1440 and 1024 pixel
+widths. Public mobile output is checked at 390 pixels. A visual change has
+screenshots for the designated reviewer. Browser suites share test resources and
+run one at a time with at most two workers. Assertions, timeouts and source
+opt-ins remain meaningful across changes. Reports include any failures.
+
+Formatting applies to changed source, with immutable migrations left alone.
+The staged diff and configured contributor identity are the release record.
+Normal commits use no attribution trailer. Production Cloud Build filters
+`[skip ci]` as well as GitHub Actions, so the authorized release procedure
+determines whether that marker belongs in a commit. Product decisions are recorded
+in `docs/decisions.md`. Git history records the changes. Committed screenshots
+are approved design references. SPEC records gaps without expanding release scope.

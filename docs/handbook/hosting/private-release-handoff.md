@@ -1,5 +1,7 @@
 # Private release handoff checklist
 
+[The NCRD production overview](../../production.md) describes the existing organization installation, including configured Auth email. This checklist is for transferring source and private inputs to a new installation.
+
 For the maintainer and the receiving platform administrator. The release is
 `v2026.11.06`; `e51b4b5` was the runtime-identical review build. Record the
 full Git commit and deployed image digest separately. A current environment’s

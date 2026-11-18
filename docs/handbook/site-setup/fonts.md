@@ -1,5 +1,7 @@
 # Fonts
 
+A valid HTTPS connection is the first check for a new custom hostname. Adobe kit hostname allowance applies to fonts after the site opens. The [domain guide](../hosting/domains.md) describes Firebase routing and TLS.
+
 Connect the approved Adobe kit, check the staging address and save font choices as a private draft.
 
 For: Site admins and Super admins. Last checked: 2026-11-15.

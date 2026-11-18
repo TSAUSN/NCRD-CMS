@@ -2,9 +2,9 @@
 
 Where to find the steps for a task, for editors, site admins and maintainers.
 
-For: Editors, maintainers and site admins. Last checked: 2026-11-05.
+For editors, maintainers and site admins. [Live Help](https://ncrd-cms-admin-57223803907.us-central1.run.app/help) is the shortest path for an editor. The [production overview](../production.md) records the NCRD environment.
 
-Every change an editor makes stays a private draft until it is reviewed and published.
+Website content stays in private drafts until publication.
 Permissions are enforced by the database, not only by the screens.
 
 ## How do I…
@@ -43,6 +43,7 @@ Permissions are enforced by the database, not only by the screens.
 | Set up a new site | [site-setup/create-a-site.md](site-setup/create-a-site.md) | Whole guide |
 | Set up Echelon chapters and their pages | [site-setup/echelon-templates.md](site-setup/echelon-templates.md), [site-setup/chapter-destinations.md](site-setup/chapter-destinations.md) | Whole guides |
 | Add a person or change their site access | [people/adding-a-person.md](people/adding-a-person.md) | Access creation, sign-in prerequisite and restricted view |
+| Edit the national Current Disasters cards | [people/roles.md](people/roles.md#current-disasters) | Disaster Manager, direct Zesty publication and recovery |
 | Decide who can do what | [people/roles.md](people/roles.md) | Role/scope boundaries and common tasks; hosted role acceptance is separate |
 | Recover from a problem | [fixing-things/common-problems.md](fixing-things/common-problems.md) | Whole guide |
 
@@ -69,19 +70,18 @@ Permissions are enforced by the database, not only by the screens.
 | Prepare Microsoft sign-in with IT | [hosting/microsoft-sign-in-it-setup.md](hosting/microsoft-sign-in-it-setup.md) | Supabase Azure setup, password fallback, acceptance and rollback |
 | Compare organization sign-in choices | [hosting/sign-in-options.md](hosting/sign-in-options.md) | Provider ownership, identity mapping and historical alternatives |
 | Review public access and publishable keys with IT | [hosting/public-access-it.md](hosting/public-access-it.md) | One-page access/keys/policy note |
-| Prepare domain connection and routing rollback | [hosting/domains.md](hosting/domains.md) | Controlled personal HTTPS evidence; exact DNS and separate cutover approval |
+| Take a site online at its own address | [hosting/domains.md](hosting/domains.md) | CMS, DNS and Firebase responsibilities, HTTPS checks and routing recovery |
 | Plan hosting | [hosting/environments.md](hosting/environments.md) and [deploy/google/README.md](../../deploy/google/README.md) |
 | Upgrade a running copy | [upgrades/staging-production.md](upgrades/staging-production.md) |
 | See why something was decided | [docs/decisions.md](../decisions.md) and [docs/adr/](../adr/) |
 | See what is planned | [docs/roadmap.md](../roadmap.md) and [SPEC.md](../../SPEC.md) |
-
 | Review deferred work and observed hosting workarounds | [maintainers/known-next-improvements.md](maintainers/known-next-improvements.md) |
 
-## Rules for changes
+## How to read the guides
 
-- Keep Postgres permissions, immutable versions and the normal draft, review and release commands. Never write around them.
-- Update the matching guide in the same commit as a feature change. Each guide has a title, a one-line summary, its audience and the date it was last checked.
-- A guide describes what the product does today. Planned work belongs in [docs/roadmap.md](../roadmap.md).
-- Nothing in this handbook authorizes cloud changes, deployment or automated drafting. Hosting steps are plans until they are checked against a real, administrator-provided project.
+Task guides explain supported workflows. The [feature map](maintainers/where-things-live.md)
+connects a task to the code and checks that maintain it. The [roadmap](../roadmap.md)
+records planned work. Historical guides and acceptance results refer to the named
+release or environment.
 
 [November 15 schema and unfinished-feature review](maintainers/schema-and-feature-review-2026-11-15.md)

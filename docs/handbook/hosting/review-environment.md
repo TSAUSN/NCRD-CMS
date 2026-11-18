@@ -1,8 +1,9 @@
 # Personal review environment
 
 This is the personal review deployment, separate from the organization project.
-The release is `v2026.11.06`. The November 6 review served the runtime-identical
-build `e51b4b5`. Check the current Admin and Site `/health` before a new review.
+The November 6 review served `e51b4b5`, runtime-identical to the frozen
+`v2026.11.06` tag. Admin and Site `/health` identify the current personal build.
+[NCRD production](../../production.md) has a separate release and environment.
 
 The identifiers below are placeholders. Supply actual values through a private
 operator configuration; this document grants no permission to deploy. Verify the account, project and deployed revision at action time.

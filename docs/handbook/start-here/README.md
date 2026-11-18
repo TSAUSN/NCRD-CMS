@@ -27,10 +27,11 @@ Check the publishing review carefully so unrelated drafts stay private.
 | Division team member | Works with the assigned division's chapters; other divisions remain outside that assignment. |
 | Chapter contributor | Edits the assigned chapter page and submits changes for approval. |
 
-A sign-in does not grant access by itself. Use your assigned email and password
-when already configured. A new person needs their approved first-sign-in flow;
-ask the operator if email delivery is unavailable. Once signed in, **Password**
-lets you set your own password. Microsoft appears only after IT configures it.
+Supabase confirms your identity and the CMS loads the site assignments for that
+account. NCRD offers password sign-in, email links and signed-out password
+recovery. **Password** lets a signed-in user set their own password. The
+[sign-in guide](sign-in.md) explains each flow. Microsoft remains disabled
+pending IT setup.
 
 Open **Help** in the sidebar to start with your role, search tasks and open one
 guide at a time. Start with [Roles and assignments](../people/roles.md),

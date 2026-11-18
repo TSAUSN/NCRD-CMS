@@ -1,6 +1,6 @@
 # Ship a tested update
 
-For maintainers and the Google project administrator. First installations follow
+This manual procedure covers a controlled update. [NCRD’s active Cloud Build path](automatic-releases.md#active-production-path) is the usual production route. First installations follow
 [bootstrap](../hosting/bootstrap.md) and [Friday go-live](../hosting/friday-go-live.md).
 The personal review identifiers are kept in [review-environment.md](../hosting/review-environment.md).
 

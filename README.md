@@ -10,11 +10,13 @@ ready; every site keeps its own look. It replaces the V1 CMS's architecture
 editing-experience overhaul, a shared core section library, and moving real
 sites onto the platform, starting with SAWSO and Echelon.
 
-## Release
-`v2026.11.06` is the release. `e51b4b5` was the runtime-identical review build.
-Check the deployed revision through `/health`. Use the
-[private handoff checklist](docs/handbook/hosting/private-release-handoff.md)
-to verify the source, content and sign-in inputs for a new installation.
+## NCRD production
+
+The [production overview](docs/production.md) records the serving source revision,
+public addresses, sign-in configuration and deployment path. The original
+November 6 handover release remains recorded in [release history](SPEC.md#frozen-release-snapshot).
+The [private handoff checklist](docs/handbook/hosting/private-release-handoff.md)
+describes the inputs for a new installation.
 
 ## Maintaining this code
 
@@ -31,7 +33,7 @@ the product and its acceptance checks.
 
 ## Start here
 
-- **Read the handbook:** open [docs/handbook.html](docs/handbook.html) in a browser. It is one readable page covering what the CMS is, how it works, where the code lives, how to run and deploy it, known issues and its history.
+- **Learn the CMS:** [Live Help](https://ncrd-cms-admin-57223803907.us-central1.run.app/help) is searchable by role. [The visual handbook](docs/handbook.html) opens in a browser from this checkout and explains the editor, publishing, domains and operations.
 - **Run it:** `pnpm install`, then `pnpm demo` (details below).
 - **How do I…?** The [handbook index](docs/handbook/INDEX.md) maps everyday tasks to step-by-step guides.
 - **How it is built:** [docs/architecture.md](docs/architecture.md).
@@ -76,8 +78,9 @@ access, protected shared sections, recorded invitations, division approval,
 January/July checks, redirects, search and picture focus controls. Public pages
 work on phones; CMS editing targets laptops and desktops.
 
-The hosted personal review and local examples are separate environments. Organisation hosting, static publishing, the cost
-brief and operations handover remain separate work in [docs/roadmap.md](docs/roadmap.md).
+NCRD production, the hosted personal review and the local demo are independent
+environments. [The roadmap](docs/roadmap.md) records deferred capabilities and
+remaining acceptance work.
 
 ## Documentation
 

@@ -158,6 +158,8 @@ td.mono, .mono { font-family: var(--font-mono); font-size: 0.84rem; }
 }
 @media (max-width: 560px) { .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (prefers-reduced-motion: no-preference) { .chapter { animation: rise .25s ease-out; } @keyframes rise { from { transform: translateY(4px); } to { transform: none; } } }
+.domain-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (max-width: 620px) { .domain-steps { grid-template-columns: minmax(0, 1fr); } }
 </style>
 </head>
 <body>
@@ -169,7 +171,7 @@ td.mono, .mono { font-family: var(--font-mono); font-size: 0.84rem; }
       <ol class="toc" id="toc"></ol>
       <div class="chips" id="chips"></div>
     </nav>
-    <div class="meta">Describes commit <code>181fe954</code><br>Checked November 9, 2026</div>
+    <div class="meta">Updated November 18, 2026<br><a href="https://github.com/TSAUSN/NCRD-CMS/blob/main/docs/production.md">NCRD production overview</a></div>
   </aside>
 
   <main id="main">
@@ -182,48 +184,42 @@ td.mono, .mono { font-family: var(--font-mono); font-size: 0.84rem; }
 
   <p>It runs SAWSO and the Echelon sites today, with Better Together 2027 and Human Needs Index kept as reference imports. One installation serves every site: one admin app, one public website app, one background worker and one Postgres database.</p>
 
-  <div class="stats">
-    <div class="stat"><b>3</b><span>apps: admin, public site, worker</span></div>
-    <div class="stat"><b>6</b><span>shared packages</span></div>
-    <div class="stat"><b>~80</b><span>database tables</span></div>
-    <div class="stat"><b>548</b><span>database functions</span></div>
-    <div class="stat"><b>6,389</b><span>unit and database tests</span></div>
-    <div class="stat"><b>657</b><span>browser tests per browser</span></div>
-  </div>
+  <div class="note"><strong>Where to start</strong><p><a href="https://ncrd-cms-admin-57223803907.us-central1.run.app/help">Live CMS Help</a> has searchable instructions by role. This visual handbook explains how the system fits together. The <a href="https://github.com/TSAUSN/NCRD-CMS/blob/main/docs/production.md">production overview</a> records the serving build and environment.</p></div>
 
   <h2>Five ideas that explain everything else</h2>
   <ol class="steps">
     <li><b>A page is a list of sections.</b> A section is a designed block, such as a hero, cards or an FAQ, plus the words and pictures poured into it. Sections come from a library each site shares.</li>
     <li><b>Nothing goes live until it is published.</b> Every save is a private draft. Visitors only ever see published versions.</li>
-    <li><b>Nothing is ever overwritten.</b> Every save adds a new version and keeps the old ones. History and restore work because of this.</li>
-    <li><b>The database is the security guard.</b> Who can see or change what is enforced inside Postgres, not just hidden on screen. A bug in a screen cannot leak one site's content to another.</li>
-    <li><b>One renderer draws both the preview and the live page.</b> What an editor sees in the editor is built by the same code that builds the public page, so they cannot drift apart.</li>
+    <li><b>Content saves create versions.</b> The draft and published versions stay separate. History can restore an earlier version into a new draft.</li>
+    <li><b>The database is the security guard.</b> Postgres checks the user's site, role and permissions again when a command runs. The screen uses those same permissions to show the right controls.</li>
+    <li><b>One renderer draws both the preview and the live page.</b> The renderer is shared. The editor can preview a draft while visitors see the published version.</li>
   </ol>
 
   <h2>Find what you need</h2>
   <div class="cards">
-    <div class="card"><h3>I edit a website</h3><p>Roles, everyday tasks and what each button does.</p><a class="go" href="#using">Using the CMS →</a></div>
+    <div class="card"><h3>I edit a website</h3><p>Roles, publishing and everyday editing tasks.</p><a class="go" href="#using">Using the CMS →</a></div>
     <div class="card"><h3>I need to understand how it works</h3><p>The pieces, how a change reaches the public page, and how security is enforced.</p><a class="go" href="#how-it-works">How it works →</a></div>
-    <div class="card"><h3>I'm changing the code</h3><p>What each folder does, where a feature lives, and the rules never to break.</p><a class="go" href="#code-map">Code map →</a></div>
+    <div class="card"><h3>I'm changing the code</h3><p>Where a feature lives and which dependencies a change can affect.</p><a class="go" href="#code-map">Code map →</a></div>
+    <div class="card"><h3>I’m connecting a site address</h3><p>How CMS setup, DNS and Firebase turn a hostname into a working website.</p><a class="go" href="#domains">Take a site online →</a></div>
     <div class="card"><h3>I run or deploy it</h3><p>Local setup, tests, deploying to Google Cloud, backups and rollback.</p><a class="go" href="#running">Running it →</a></div>
     <div class="card"><h3>Something looks wrong</h3><p>Known glitches and limits, with workarounds.</p><a class="go" href="#known-issues">Known issues →</a></div>
     <div class="card"><h3>Why is it built this way?</h3><p>How it grew from V1 to today, and what each rebuild fixed.</p><a class="go" href="#history">History →</a></div>
   </div>
 
   <h2>Where the full detail lives</h2>
-  <p>This handbook is the readable overview. The repository holds the step-by-step detail and stays the source of truth:</p>
+  <p>This handbook is the readable overview. The links below open the detailed guides in the NCRD GitHub repository.</p>
   <div class="table-wrap"><table>
     <thead><tr><th>In the repository</th><th>What it holds</th></tr></thead>
     <tbody>
-      <tr><td class="mono">README.md</td><td>What it is, how to run the demo, where to go next.</td></tr>
-      <tr><td class="mono">AGENTS.md</td><td>The first file an AI coding agent reads: conventions, checks and rules.</td></tr>
-      <tr><td class="mono">docs/handbook/INDEX.md</td><td>"How do I…" table that maps every everyday task to a step-by-step guide.</td></tr>
-      <tr><td class="mono">docs/architecture.md</td><td>The technical design in depth.</td></tr>
-      <tr><td class="mono">docs/handbook/maintainers/where-things-live.md</td><td>For each feature: screen, server action, database command, renderer and tests.</td></tr>
-      <tr><td class="mono">docs/operations.md</td><td>Running, testing, hosting, backups.</td></tr>
-      <tr><td class="mono">deploy/google/README.md</td><td>Deploying on Google Cloud.</td></tr>
-      <tr><td class="mono">packages/schema/current/README.md</td><td>Every database function as it exists today, one file each.</td></tr>
-      <tr><td class="mono">SPEC.md</td><td>What the product should do and how it is accepted.</td></tr>
+      <tr><td class="mono"><a href="https://github.com/TSAUSN/NCRD-CMS/blob/main/README.md">README.md</a></td><td>What it is, how to run the demo, where to go next.</td></tr>
+      <tr><td class="mono"><a href="https://github.com/TSAUSN/NCRD-CMS/blob/main/AGENTS.md">AGENTS.md</a></td><td>Repository context, conventions and test requirements for a maintainer or AI coding agent.</td></tr>
+      <tr><td class="mono"><a href="https://github.com/TSAUSN/NCRD-CMS/blob/main/docs/handbook/INDEX.md">docs/handbook/INDEX.md</a></td><td>"How do I…" table that maps every everyday task to a step-by-step guide.</td></tr>
+      <tr><td class="mono"><a href="https://github.com/TSAUSN/NCRD-CMS/blob/main/docs/architecture.md">docs/architecture.md</a></td><td>The technical design in depth.</td></tr>
+      <tr><td class="mono"><a href="https://github.com/TSAUSN/NCRD-CMS/blob/main/docs/handbook/maintainers/where-things-live.md">docs/handbook/maintainers/where-things-live.md</a></td><td>For each feature: screen, server action, database command, renderer and tests.</td></tr>
+      <tr><td class="mono"><a href="https://github.com/TSAUSN/NCRD-CMS/blob/main/docs/operations.md">docs/operations.md</a></td><td>Running, testing, hosting, backups.</td></tr>
+      <tr><td class="mono"><a href="https://github.com/TSAUSN/NCRD-CMS/blob/main/deploy/google/README.md">deploy/google/README.md</a></td><td>Deploying on Google Cloud.</td></tr>
+      <tr><td class="mono"><a href="https://github.com/TSAUSN/NCRD-CMS/blob/main/packages/schema/current/README.md">packages/schema/current/README.md</a></td><td>Every database function as it exists today, one file each.</td></tr>
+      <tr><td class="mono"><a href="https://github.com/TSAUSN/NCRD-CMS/blob/main/SPEC.md">SPEC.md</a></td><td>What the product should do and how it is accepted.</td></tr>
       <tr><td class="mono">docs/decisions.md, docs/adr/</td><td>Why particular choices were made.</td></tr>
     </tbody>
   </table></div>
@@ -292,7 +288,7 @@ td.mono, .mono { font-family: var(--font-mono); font-size: 0.84rem; }
       <tr><td class="mono">cms_migration_owner</td><td>Migrations and backups only</td><td>Everything</td><td>Be used by a running app</td></tr>
     </tbody>
   </table></div>
-  <p>People get roles per site, described in <a href="#using">Using the CMS</a>. Sign-in is an email link through Supabase when hosted, and a local-only login for development. Public pages contain their content before any script runs, and only reviewed, application-owned scripts are allowed.</p>
+  <p>People get roles per site, described in <a href="#using">Using the CMS</a>. Hosted sign-in uses Supabase for passwords, email links and password recovery. The local demo uses a local-only login. Public pages contain their content before any script runs, and only reviewed, application-owned scripts are allowed.</p>
 
   <h2>Background work</h2>
   <p>The worker reads two job tables in Postgres: an <b>outbox</b> of events written during publishing, and <b>scheduled actions</b>. Jobs are claimed with leases, retried with backoff and set aside if they keep failing. On Google Cloud the worker runs as a private web service that a scheduler calls every minute; it finishes its current job before replying.</p>
@@ -351,7 +347,7 @@ td.mono, .mono { font-family: var(--font-mono); font-size: 0.84rem; }
       <tr><td class="mono">app/people/</td><td>People and access.</td></tr>
       <tr><td class="mono">app/inbox/</td><td>Reviews waiting for a decision.</td></tr>
       <tr><td class="mono">app/api/</td><td>Endpoints for uploads, previews and the worker's scheduled-release call.</td></tr>
-      <tr><td class="mono">app/sign-in/, app/auth/</td><td>Email-link sign-in and its callback.</td></tr>
+      <tr><td class="mono">app/sign-in/, app/auth/</td><td>Password sign-in, email links, password recovery and the hosted callback.</td></tr>
       <tr><td class="mono">app/health/</td><td>Health check that reports the running commit.</td></tr>
       <tr><td class="mono">lib/</td><td>The logic behind the screens, one file per job: stories, releases, media, chapters, people, page history and so on. Tests sit next to each file.</td></tr>
       <tr><td class="mono">server/queries/</td><td>Read-only database queries, one file per kind of data: pages, sites, media, navigation, theme, sections.</td></tr>
@@ -397,7 +393,7 @@ td.mono, .mono { font-family: var(--font-mono); font-size: 0.84rem; }
   </table></div>
 
   <h2>Where a feature lives</h2>
-  <p>Most features follow the same path: a screen in <code>app/</code> calls a server action, which calls logic in <code>lib/</code>, which calls a database command that re-checks permission. The public side reads the result through the renderer. The full table with exact files and test names is in <code>docs/handbook/maintainers/where-things-live.md</code>.</p>
+  <p>Most features follow the same path: a screen in <code>app/</code> calls a server action, which calls logic in <code>lib/</code>, which calls a database command that re-checks permission. The public side reads the result through the renderer. The full table with exact files and test names is in <a href="https://github.com/TSAUSN/NCRD-CMS/blob/main/docs/handbook/maintainers/where-things-live.md"><code>docs/handbook/maintainers/where-things-live.md</code></a>.</p>
   <div class="table-wrap"><table>
     <thead><tr><th>Feature</th><th>Screen</th><th>Logic</th><th>Database command</th></tr></thead>
     <tbody>
@@ -420,7 +416,7 @@ td.mono, .mono { font-family: var(--font-mono); font-size: 0.84rem; }
 <section class="chapter" id="using" data-title="Using the CMS" hidden>
   <p class="eyebrow">Chapter 4 · Using the CMS</p>
   <h1>Roles and everyday tasks</h1>
-  <p class="lede">Everything an editor does stays a private draft until it is published. Each person sees only the controls for their work, and the database enforces it.</p>
+  <p class="lede">Website content stays in private drafts until publication. CMS roles and assignments determine the controls each person sees, and the database enforces those permissions.</p>
 
   <h2>Who can do what</h2>
   <div class="table-wrap"><table>
@@ -437,12 +433,14 @@ td.mono, .mono { font-family: var(--font-mono); font-size: 0.84rem; }
     </tbody>
   </table></div>
   <p>In the database these are <code>super_admin</code>, <code>site_admin</code>, <code>editor</code> and <code>contributor</code>. "Page editor" is a contributor limited to assigned pages. On Echelon, chapter volunteers are content creators for their chapter, and division accounts are site editors who approve chapter changes.</p>
-  <div class="note warn"><strong>Still open</strong><p>This table is the agreed target and the screens follow it, but it should be reviewed before real editors are added. Site admins cannot manage people yet; only Super admins can.</p></div>
+  <p>Super admins manage People &amp; access. They can grant <b>Disaster Manager</b> for the national <b>Current Disasters</b> tool. A tool-only account goes straight there. Pushing changes publishes the cards in Zesty. <a href="https://github.com/TSAUSN/NCRD-CMS/blob/main/docs/handbook/people/roles.md#current-disasters">Current Disasters and roles</a></p>
 
   <h2>Everyday tasks</h2>
-  <p>Short versions below. Each links to the full guide in <code>docs/handbook/</code>.</p>
+  <p><a href="https://github.com/TSAUSN/NCRD-CMS/blob/main/docs/handbook/start-here/sign-in.md">Sign-in and password recovery</a> · <a href="https://github.com/TSAUSN/NCRD-CMS/blob/main/docs/handbook/editing/story-tags.md">Manage story tags</a> · <a href="#domains">Take a site online</a></p>
+  <p>Each task links to its detailed guide. <a href="https://ncrd-cms-admin-57223803907.us-central1.run.app/help">Live Help</a> is searchable from the CMS sidebar.</p>
 
   <h3>Edit a page</h3>
+  <p><a href="https://github.com/TSAUSN/NCRD-CMS/blob/main/docs/handbook/editing/pages.md">Read the guide</a></p>
   <ol class="steps">
     <li>Open the site, then <b>Pages</b>, and choose the page.</li>
     <li>Click the words or picture you want to change on the page itself, or pick it in the structure tree. Settings for the selected item appear on the right.</li>
@@ -452,9 +450,11 @@ td.mono, .mono { font-family: var(--font-mono); font-size: 0.84rem; }
   <p class="mono">Guide: editing/pages.md, editing/titles-and-links.md, editing/cards.md, editing/hero-slides.md</p>
 
   <h3>Add a section</h3>
+  <p><a href="https://github.com/TSAUSN/NCRD-CMS/blob/main/docs/handbook/editing/adding-sections.md">Read the guide</a></p>
   <p>Open the library from the editor and insert a section at a chosen position, by button, keyboard or dragging it onto the page. Site editors and below don't see this; it is for Admins and Super admins. <span class="mono">Guide: editing/adding-sections.md</span></p>
 
   <h3>Publish, schedule and restore</h3>
+  <p><a href="https://github.com/TSAUSN/NCRD-CMS/blob/main/docs/handbook/publishing/publish-a-page.md">Read the guide</a></p>
   <ul>
     <li><b>Publish</b> shows exactly what will change and any publishing checks. Some checks can be overridden with a recorded reason.</li>
     <li><b>Publish later</b> schedules the exact reviewed version for a time. Later edits need their own review.</li>
@@ -463,32 +463,66 @@ td.mono, .mono { font-family: var(--font-mono); font-size: 0.84rem; }
   <p class="mono">Guide: publishing/publish-a-page.md, publishing/schedule-a-page.md, publishing/review-changes.md, publishing/checks.md</p>
 
   <h3>Stories</h3>
+  <p><a href="https://github.com/TSAUSN/NCRD-CMS/blob/main/docs/handbook/editing/stories.md">Read the guide</a></p>
   <p>Write a story, give it main and secondary tags, and publish or schedule it. The Newsroom order, the story map and Split View are set from the Stories screen. <b>Check for new stories</b> looks for new items from the connected story source. <span class="mono">Guide: editing/stories.md, story-tags.md, story-publishing.md, newsroom-order.md, story-world.md, story-split.md</span></p>
 
   <h3>Media</h3>
+  <p><a href="https://github.com/TSAUSN/NCRD-CMS/blob/main/docs/handbook/editing/media.md">Read the guide</a></p>
   <p>Upload photos and files to the site's library, describe them for screen readers, organize them, and set where a picture focuses when it's cropped. <span class="mono">Guide: editing/media.md</span></p>
 
   <h3>Header, menu and footer</h3>
+  <p><a href="https://github.com/TSAUSN/NCRD-CMS/blob/main/docs/handbook/site-setup/header-menu-footer.md">Read the guide</a></p>
   <p>Admins change the logo, header buttons, menu items and their order, and the footer. Changes are drafts until published. <span class="mono">Guide: site-setup/header-menu-footer.md</span></p>
 
   <h3>Site look and fonts</h3>
+  <p><a href="https://github.com/TSAUSN/NCRD-CMS/blob/main/docs/handbook/site-setup/fonts.md">Read the guide</a></p>
   <p>Admins change colours, buttons and fonts with a live preview. A contrast check warns when text would be hard to read. <span class="mono">Guide: site-setup/site-look.md, site-setup/fonts.md</span></p>
 
   <h3>Echelon chapters</h3>
+  <p><a href="https://github.com/TSAUSN/NCRD-CMS/blob/main/docs/handbook/site-setup/chapter-destinations.md">Read the guide</a></p>
   <p>Each chapter has its own page with shared parts protected. Volunteers edit their chapter and send changes to their division, which approves and publishes. <span class="mono">Guide: site-setup/echelon-templates.md, site-setup/chapter-destinations.md</span></p>
 
   <h3>Contact messages</h3>
+  <p><a href="https://github.com/TSAUSN/NCRD-CMS/blob/main/docs/handbook/start-here/known-issues.md#delivery-and-imported-content">Contact inbox and delivery</a></p>
   <p>Contact form submissions are saved in <b>Settings → Contact messages</b> for site admins. The CMS does not email them, so someone needs to check the inbox.</p>
 
   <h3>Add a person</h3>
+  <p><a href="https://github.com/TSAUSN/NCRD-CMS/blob/main/docs/handbook/people/adding-a-person.md">Read the guide</a></p>
   <p>Super admins open <b>People</b>. Because email isn't set up, <b>Add person</b> creates their access without sending an invitation; the person then signs in with their own email link once email delivery works. <span class="mono">Guide: people/adding-a-person.md</span></p>
 
-  <div class="note"><strong>Coming from Symphony?</strong><p><code>docs/handbook/start-here/coming-from-symphony.md</code> maps Symphony terms to their CMS names, and <code>start-here/glossary.md</code> explains every word the screens use.</p></div>
+  <div class="note"><strong>Coming from Symphony?</strong><p><a href="https://github.com/TSAUSN/NCRD-CMS/blob/main/docs/handbook/start-here/coming-from-symphony.md"><code>docs/handbook/start-here/coming-from-symphony.md</code></a> maps Symphony terms to their CMS names, and <code>start-here/glossary.md</code> explains every word the screens use.</p></div>
+</section>
+
+<!-- ============ DOMAINS ============ -->
+<section class="chapter" id="domains" data-title="Take a site online" hidden>
+  <p class="eyebrow">Chapter 5 · Domains</p>
+  <h1>Take a site online</h1>
+  <p class="lede">A published page can already be visible at the native test address while a custom hostname is still connecting. DNS, Firebase Hosting and the CMS each have a role.</p>
+  <div class="cards domain-steps">
+    <div class="card">
+      <h3>CMS prepares the address</h3>
+      <p>In <b>Settings → Domains</b>, the selected site reserves the hostname. The worker registers it with that site’s Firebase Hosting instance and brings back DNS instructions.</p>
+    </div>
+    <div class="card">
+      <h3>The DNS owner publishes the records</h3>
+      <p><b>Copy DNS records</b> gives the exact names and values. The routing record points to hosting. The CMS TXT verifies the connection. The Firebase certificate TXT answers the certificate challenge.</p>
+    </div>
+    <div class="card">
+      <h3>Firebase activates HTTPS</h3>
+      <p>DNS can point at Firebase before the certificate covers the domain. <b>Verify now</b> queues a check. <b>Last checked</b> shows when the CMS received a result.</p>
+    </div>
+    <div class="card">
+      <h3>The custom name serves the site</h3>
+      <p>With a valid certificate, the homepage, an inner page, menus and images should all come from the intended CMS site. Adobe Fonts has its own hostname setting.</p>
+    </div>
+  </div>
+  <div class="note"><strong>If the address reaches Firebase but the site does not open</strong><p>Check the exact hostname and the Firebase Hosting site association, ownership and certificate. A placeholder or certificate mismatch may occur during setup. If Firebase is active and fresh requests show the real site while plain URLs return a cached error, a same-configuration Hosting redeploy can refresh the cache. SAWSO’s plain homepage and Newsroom passed after that step. The normal CMS flow creates the Firebase mapping. The <a href="https://github.com/TSAUSN/NCRD-CMS/blob/main/docs/handbook/hosting/domains.md">custom-domain guide</a> explains each status, the dated SAWSO example and what the hosting operator can check.</p></div>
+  <p><a href="https://github.com/TSAUSN/NCRD-CMS/blob/main/docs/handbook/hosting/go-live.md">Google hosting and first installation</a> · <a href="https://github.com/TSAUSN/NCRD-CMS/blob/main/docs/handbook/site-setup/fonts.md">Check the Adobe kit on the live address</a></p>
 </section>
 
 <!-- ============ RUNNING ============ -->
 <section class="chapter" id="running" data-title="Running it" hidden>
-  <p class="eyebrow">Chapter 5 · Running it</p>
+  <p class="eyebrow">Chapter 6 · Running it</p>
   <h1>Setup, tests, deploying and recovery</h1>
   <p class="lede">For whoever runs the CMS: on a laptop, in testing and on Google Cloud.</p>
 
@@ -506,7 +540,7 @@ pnpm demo</code></pre>
       <tr><td class="mono">pnpm test</td><td>Unit tests</td></tr>
       <tr><td class="mono">pnpm test:db</td><td>Database rules against a real, disposable Postgres</td></tr>
       <tr><td class="mono">pnpm build</td><td>Builds every app; browser tests refuse a stale build</td></tr>
-      <tr><td class="mono">pnpm test:e2e</td><td>Browser journeys in Chromium and WebKit</td></tr>
+      <tr><td class="mono">pnpm test:e2e</td><td>Focused browser journeys in Chromium by default</td></tr>
       <tr><td class="mono">pnpm verify</td><td>All of the above in order</td></tr>
       <tr><td class="mono">pnpm format:check</td><td>Code formatting</td></tr>
     </tbody>
@@ -514,7 +548,7 @@ pnpm demo</code></pre>
   <p>Run one browser suite at a time, with at most two workers. Never point tests at a database you want to keep.</p>
 
   <h2>Deploy to Google Cloud</h2>
-  <p>Source comes from the organization's GitHub repository at a reviewed commit. The first installation follows <code>docs/handbook/hosting/bootstrap.md</code>; the project administrator runs the organization commands. In order:</p>
+  <p>Source comes from the organization's GitHub repository at a reviewed commit. The first installation follows <a href="https://github.com/TSAUSN/NCRD-CMS/blob/main/docs/handbook/hosting/bootstrap.md"><code>docs/handbook/hosting/bootstrap.md</code></a>; the project administrator runs the organization commands. In order:</p>
   <ol class="steps">
     <li><b>Administrative setup.</b> Project, region, billing and budget alerts, permissions, and an IT-approved way to make the sites public.</li>
     <li><b>Infrastructure.</b> Enable the Google services (Cloud Run, Cloud SQL, Storage, Artifact Registry, Cloud Build, Secret Manager, Firebase Hosting, Scheduler, Monitoring). Create a separate identity for each part; no exported keys.</li>
@@ -524,10 +558,10 @@ pnpm demo</code></pre>
     <li><b>Routing and sign-in.</b> Firebase Hosting gives each site a review address that forwards to the public site. Add the new Admin <code>/auth/confirm</code> address to Supabase's allowed sign-in callbacks, or sign-in fails.</li>
     <li><b>Operations.</b> Set the minute trigger for the Worker, the backup trigger and health alerts. Check a backup reads back and an alert arrives before turning on scheduling.</li>
   </ol>
-  <p>Full steps: <code>deploy/google/README.md</code>. The list of private inputs is in <code>deploy/google/bootstrap.example.json</code>; copy it outside the repository before filling it in.</p>
+  <p>Full steps: <a href="https://github.com/TSAUSN/NCRD-CMS/blob/main/deploy/google/README.md"><code>deploy/google/README.md</code></a>. The list of private inputs is in <a href="https://github.com/TSAUSN/NCRD-CMS/blob/main/deploy/google/bootstrap.example.json"><code>deploy/google/bootstrap.example.json</code></a>; copy it outside the repository before filling it in.</p>
 
   <h2>What gets handed over privately</h2>
-  <p>None of this goes in GitHub. The checklist is <code>docs/handbook/hosting/private-release-handoff.md</code>.</p>
+  <p>None of this goes in GitHub. The checklist is <a href="https://github.com/TSAUSN/NCRD-CMS/blob/main/docs/handbook/hosting/private-release-handoff.md"><code>docs/handbook/hosting/private-release-handoff.md</code></a>.</p>
   <ul>
     <li>The cleaned database export and its SHA-256 checksum</li>
     <li>The database fingerprints file</li>
@@ -544,7 +578,7 @@ pnpm demo</code></pre>
     <li>Review the staged changes, commit and push to the branch for the target environment.</li>
     <li>Deploy to staging first, check health and the main routes, then production.</li>
   </ol>
-  <p>Separate staging and production with automatic releases are described in <code>docs/handbook/upgrades/automatic-releases.md</code>. Automatic deploys stay off until the deploy identities exist.</p>
+  <p>NCRD uses the Cloud Build trigger <code>ncrd-cms-deploy</code>. A reviewed push to <code>main</code> can trigger that deployment. A separate environment has separate credentials and data. The <a href="https://github.com/TSAUSN/NCRD-CMS/blob/main/docs/handbook/upgrades/automatic-releases.md">release guide</a> explains the migration check and the GitHub Actions alternative.</p>
 
   <h2>Back up, recover and roll back</h2>
   <ul>
@@ -553,67 +587,45 @@ pnpm demo</code></pre>
     <li><b>Lost database:</b> restore the backup into a new, empty database and check it before switching services to it. Never downgrade a migration or restore over live content.</li>
     <li>Never start a general worker against a restored copy; queued schedules and emails in it are real jobs.</li>
   </ul>
-  <p>Detail: <code>docs/handbook/upgrades/backup-recovery.md</code> and <code>docs/operations.md</code>.</p>
+  <p>Detail: <a href="https://github.com/TSAUSN/NCRD-CMS/blob/main/docs/handbook/upgrades/backup-recovery.md"><code>docs/handbook/upgrades/backup-recovery.md</code></a> and <a href="https://github.com/TSAUSN/NCRD-CMS/blob/main/docs/operations.md"><code>docs/operations.md</code></a>.</p>
 
   <h2>Sign-in and email</h2>
-  <p>Sign-in uses Supabase email links. The Supabase project should be owned by the organization, not an individual account; Supabase can transfer a project between organizations. Email delivery is not set up: Supabase's built-in sender only reaches members of the Supabase project team, so real editors need a custom email sender (SMTP) configured in Supabase before they can sign in. Options are compared in <code>docs/handbook/hosting/sign-in-options.md</code>.</p>
+  <p>Supabase Auth handles password sign-in, one-time email links and password recovery. NCRD sends Auth email via Resend custom SMTP using <code>auth.usnsandbox.org</code>. Owner recovery and a fresh password login passed on November 16, 2026. Microsoft sign-in is prepared for IT and is disabled in NCRD.</p>
+  <p>Supabase verifies identity. CMS access comes from PostgreSQL membership. Staff without a site assignment may sign in and still have no sites to open. <a href="https://github.com/TSAUSN/NCRD-CMS/blob/main/docs/handbook/start-here/sign-in.md">Editor sign-in guide</a> · <a href="https://github.com/TSAUSN/NCRD-CMS/blob/main/docs/handbook/hosting/sign-in-options.md">Authentication and email delivery</a></p>
 </section>
 
 <!-- ============ CHANGING ============ -->
 <section class="chapter" id="changing" data-title="Changing the code" hidden>
-  <p class="eyebrow">Chapter 6 · Changing the code</p>
-  <h1>Rules for developers and AI agents</h1>
-  <p class="lede">The same rules apply to people and to AI coding agents. Agents should read <code>AGENTS.md</code> in the repository first; this chapter is the plain-language version.</p>
+  <p class="eyebrow">Chapter 7 · Changing the code</p>
+  <h1>How changes fit together</h1>
+  <p class="lede">The <a href="https://github.com/TSAUSN/NCRD-CMS/blob/main/AGENTS.md">repository instructions</a> give a new maintainer or AI coding agent its working context. The <a href="https://github.com/TSAUSN/NCRD-CMS/blob/main/docs/production.md">production overview</a> identifies the live environment.</p>
 
-  <h2>Never do these</h2>
-  <ul class="never">
-    <li><b>Edit an existing migration</b> in <code>packages/schema/migrations/</code>, even a comment. Applied migrations are checksummed. Add a new migration instead.</li>
-    <li><b>Write around the database commands.</b> Every change goes through the normal draft, review and release commands so permissions, versions and the audit log stay correct.</li>
-    <li><b>Weaken site isolation</b> or row-level security, or give an app's database login more access to make something work.</li>
-    <li><b>Bypass the shared renderer</b> or its sanitizer. Section fields cannot add scripts.</li>
-    <li><b>Commit secrets</b>, database exports, credentials or private manifests.</li>
-    <li><b>Point tests at a database you want to keep.</b></li>
-    <li><b>Weaken a test</b> or raise a timeout to get a pass.</li>
-  </ul>
+  <h2>Follow a feature through the stack</h2>
+  <p>A screen goes through a server action to a narrow database command. The command checks the user’s scope and saves a new version. A separate release makes that version visible to the shared renderer. The <a href="https://github.com/TSAUSN/NCRD-CMS/blob/main/docs/handbook/maintainers/where-things-live.md">feature map</a> gives the paths and tests.</p>
+  <p>For domains, changing a label is an Admin change. Changing which hostnames can be marked Live also affects the Firebase adapter, background jobs, the stored status and public routing. For story tags, stable tag IDs keep assignments and public filters attached when a label is renamed.</p>
 
-  <h2>Conventions</h2>
+  <h2>Why the boundaries matter</h2>
   <ul>
-    <li>Use design tokens and the shared UI components. No raw colours or spacing, and no new rules in <code>globals.css</code>.</li>
-    <li>Keep files under about 800 lines and functions under 300. Split by responsibility, not to make a number smaller.</li>
-    <li>Site-specific behaviour goes behind site settings or capabilities, not checks on a site's name.</li>
-    <li>Comments explain why, only where the code isn't obvious.</li>
-    <li>Check admin screens at 1440 and 1024 pixels wide and public pages at 390.</li>
-    <li>Update the matching handbook guide in the same commit as the feature.</li>
+    <li><b>Database commands</b> keep permissions, versions and audit events in the same operation. Tests that use the actual database roles can verify that boundary.</li>
+    <li><b>Applied SQL migrations</b> are checksummed. New schema changes use a new migration. The generated SQL reference shows current definitions.</li>
+    <li><b>The shared renderer</b> controls HTML, styles and allowed scripts for previews and public pages. A renderer change can affect both views.</li>
+    <li><b>Isolated development</b> gives tests their own sample content and database. Production backups, credentials and private manifests live outside Git.</li>
   </ul>
-
-  <h2>Before you commit</h2>
-  <ol class="steps">
-    <li>Run the checks that cover your change: typecheck, unit, database, and the related browser tests.</li>
-    <li>Format only the files you changed (<code>pnpm format</code>), never the migrations.</li>
-    <li>Read the staged diff. Make sure nothing private is in it.</li>
-  </ol>
-
-  <h2>How to approach a change</h2>
-  <ol class="steps">
-    <li>Find the feature in <code>docs/handbook/maintainers/where-things-live.md</code>.</li>
-    <li>Read the screen, its server action, the logic in <code>lib/</code> and the current database command in <code>packages/schema/current/</code>.</li>
-    <li>Read the existing tests for that feature; they describe the intended behaviour.</li>
-    <li>Make the change, add or update tests, and update the guide.</li>
-  </ol>
+  <p>The <a href="https://github.com/TSAUSN/NCRD-CMS/blob/main/docs/operations.md">operations guide</a> lists the local checks. The test that matters depends on what changes, from a visual check for a label to database and browser coverage for a permissions or publishing change.</p>
 </section>
 
 <!-- ============ KNOWN ISSUES ============ -->
 <section class="chapter" id="known-issues" data-title="Known issues" hidden>
-  <p class="eyebrow">Chapter 7 · Known issues</p>
+  <p class="eyebrow">Chapter 8 · Known issues</p>
   <h1>Known glitches and limits</h1>
-  <p class="lede">Checked November 9, 2026, on commit <code>181fe954</code>. Unit, database and full Chromium tests pass. Full WebKit passed 652 of 653; the one failure was in a test and is fixed.</p>
+  <p class="lede">The items below include operational behavior and historical observations. The <a href="https://github.com/TSAUSN/NCRD-CMS/blob/main/docs/production.md">production overview</a> names the live build. Exact test results apply to the release on which they were recorded.</p>
 
   <div class="table-wrap"><table>
-    <thead><tr><th>What you see</th><th>Why</th><th>What to do</th><th>Status</th></tr></thead>
+    <thead><tr><th>What you see</th><th>Why</th><th>Where to look</th><th>Status</th></tr></thead>
     <tbody>
       <tr><td>A Header or Footer preview stays blank</td><td>Seen only in a background Chrome tab with debugging tools attached. Cause not found.</td><td>Use <b>Try preview again</b> once, or open the preview in a new tab. Your draft is safe.</td><td><span class="pill open">Open</span></td></tr>
-      <tr><td>No invitation or notification emails</td><td>Email delivery is not configured.</td><td>Add people with <b>Add person</b>. Check <b>Settings → Contact messages</b> for form submissions.</td><td><span class="pill open">Needs setup</span></td></tr>
-      <tr><td>New editors can't sign in</td><td>Supabase's built-in sender only emails its own project team.</td><td>Configure a custom email sender in Supabase.</td><td><span class="pill open">Needs setup</span></td></tr>
+      <tr><td>Access or contact messages do not produce an email</td><td>Auth email and worker notifications are separate. The contact inbox stores submissions in the CMS.</td><td><b>People &amp; access</b> shows assignments. <b>Settings → Contact messages</b> shows submissions.</td><td><span class="pill limit">Separate paths</span></td></tr>
+      <tr><td>A sign-in or recovery link expires</td><td>Auth links are single-use. NCRD sends them through Supabase and Resend.</td><td>A fresh link or password can sign in. The operator can inspect repeated delivery problems.</td><td><span class="pill limit">Auth behavior</span></td></tr>
       <tr><td>First load after a quiet period takes about 11 seconds</td><td>Servers scale to zero when idle to save cost, then start up again.</td><td>Wait for it. Keeping one instance always on removes this but costs more.</td><td><span class="pill limit">Hosting choice</span></td></tr>
       <tr><td>Public sites go down if Cloud Run or the database does</td><td>Pages are built on request from the live database. Static publishing is planned separately.</td><td>Watch health alerts.</td><td><span class="pill limit">Accepted for testing</span></td></tr>
       <tr><td>Some screens are slow on the review copy</td><td>The test database is the smallest Cloud SQL tier.</td><td>A larger tier is described in <code>hosting/speed-and-size.md</code>.</td><td><span class="pill limit">Hosting choice</span></td></tr>
@@ -621,7 +633,7 @@ pnpm demo</code></pre>
       <tr><td>Site admins can't manage people</td><td>People management is Super admin only for now.</td><td>Ask a Super admin.</td><td><span class="pill open">Open</span></td></tr>
       <tr><td>Better Together 2027 and Human Needs Index screens differ, and not everything is editable</td><td>They are imported reference sites kept with their original designs.</td><td>Use them as references; edit SAWSO and Echelon normally.</td><td><span class="pill limit">By design</span></td></tr>
       <tr><td>Editing on a phone is awkward</td><td>The editor targets laptops and desktops. Public pages work on phones.</td><td>Edit on a computer.</td><td><span class="pill limit">By design</span></td></tr>
-      <tr><td>Custom domains aren't connected</td><td>Sites use their Firebase review addresses. Domain and DNS work is a separate step.</td><td>See <code>hosting/domains.md</code>.</td><td><span class="pill open">Next step</span></td></tr>
+      <tr><td>A custom address is still connecting</td><td>Native Firebase addresses remain available while DNS ownership and HTTPS are verified.</td><td><a href="#domains">Take a site online</a> explains how to check the exact hostname.</td><td><span class="pill limit">Check live status</span></td></tr>
       <tr><td>A few older browser tests share test data</td><td>The Navigation and Header/Footer test suites haven't been isolated like the others.</td><td>If one fails, run it alone before investigating.</td><td><span class="pill open">Test cleanup</span></td></tr>
     </tbody>
   </table></div>
@@ -629,7 +641,7 @@ pnpm demo</code></pre>
 
 <!-- ============ HISTORY ============ -->
 <section class="chapter" id="history" data-title="History" hidden>
-  <p class="eyebrow">Chapter 8 · History</p>
+  <p class="eyebrow">Chapter 9 · History</p>
   <h1>How it got here</h1>
   <p class="lede">The CMS was rebuilt once and refactored twice. Each step kept what worked and fixed what the previous design couldn't.</p>
 

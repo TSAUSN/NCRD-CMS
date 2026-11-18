@@ -18,17 +18,18 @@ How CMS V2 is built, for whoever works on it next. What it should do is in
 
 One container image runs the `admin`, `site`, `worker`, `worker-http`, `migrate` and
 `drain` roles (a worker that empties the queue once and exits, for hosts without an
-always-on process). There is one database for every site; tenancy is enforced
-inside Postgres. The Google profile uses `worker-http`: the same full handler
+always-on process). One shared database serves all sites in an installation. PostgreSQL enforces tenant boundaries. The Google profile uses `worker-http`: the same full handler
 set runs during an authenticated request and finishes or settles its current
 item before replying. Durable leases survive termination. Request-worker health
 expires after 150 seconds; timed publishing requires verified independent
 monitoring. Private media uses attached Google identities instead of exported service keys.
 Firebase Hosting supplies each site's native review address and custom-domain
 certificates, forwarding to the shared public renderer. Current deployment,
-capacity, domain and human-verification status belongs in
-[SPEC's readiness section](../SPEC.md#current-release-state)
-and [Google operations](../deploy/google/README.md), not this architecture overview.
+capacity, and verification status are recorded in the [production overview](production.md).
+[Google operations](../deploy/google/README.md) describes the installation profile.
+[Custom domains](handbook/hosting/domains.md) explains the DNS-to-Firebase path
+and [sign-in options](handbook/hosting/sign-in-options.md) explains how Supabase
+Auth and its SMTP sender fit alongside PostgreSQL membership.
 
 For a feature's route → action → SQL → renderer → tests, use the
 [maintainer map](handbook/maintainers/where-things-live.md).
@@ -218,11 +219,23 @@ Four database identities, each a separate login (ADR 0002):
 
 People have per-site roles — contributor (suggests changes for review), editor
 (edits and publishes), site admin (design, sections, collection fields) — and super admins
-manage installations. Sign-in is an email link (Supabase in hosted builds,
-a loopback-only local login for development). The admin sends a per-request
+manage installations. Hosted Supabase Auth handles password sign-in, one-time
+email links and recovery. The local demo uses a loopback-only local login. The
+admin resolves CMS assignments after authentication. A Disaster Manager holds
+the scoped `current_disasters` tool grant. The admin sends a per-request
 nonce Content-Security-Policy; public pages allow only governed, application-owned
 script enhancements and remain useful without JavaScript. The maintained
 threat model is [threat-model.md](threat-model.md).
+
+## Current Disasters and Zesty
+
+Current Disasters is a scoped Admin tool outside the ordinary CMS publication
+pipeline. The route reads a fixed Zesty item and makes recognized disaster cards
+editable while preserving other markup. On Push, the server checks the database
+grant and recent sign-in, compares the latest Zesty version with the version the
+editor opened, then saves and publishes the changed item in Zesty. Zesty version
+history is the recovery path. The [feature map](handbook/maintainers/where-things-live.md)
+points to the adapter, card parser and permission tests.
 
 ## Background work
 

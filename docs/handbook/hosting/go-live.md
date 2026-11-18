@@ -1,7 +1,17 @@
-# Host and verify a review copy on Google
+# Take a site online on Google Cloud
+
+On an existing NCRD installation, a published site can be viewed at the native
+Firebase address under **Settings → Domains**. That screen is also where a Super
+admin connects a custom hostname. The [custom-domain guide](domains.md) explains
+what the CMS handles, what belongs to the DNS owner, and how to verify the HTTPS
+address serves the published site.
+
+The rest of this runbook describes a new Google-hosted installation. The
+[production overview](../../production.md) describes the installation already
+serving NCRD.
 
 For the maintainer and Google project administrator.
-Last checked: November 4, 2026.
+The installation sequence below was recorded November 4, 2026.
 
 Use [review-environment.md](review-environment.md) to identify the existing personal
 review. For a new installation, follow [bootstrap](bootstrap.md) and the ordered

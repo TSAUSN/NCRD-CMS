@@ -1,29 +1,30 @@
-# Sign-in options and IT setup
+# Authentication and email delivery
 
-For the platform lead, IT and the next maintainer. Last checked: November 5, 2026.
+This guide explains how hosted identity, Auth email and CMS access fit together.
+The [editor sign-in guide](../start-here/sign-in.md) covers the screen controls.
 
-## Current decision — November 15, 2026
+## NCRD configuration
 
-Microsoft through the existing Supabase Azure provider is the selected path.
-Keep password sign-in. Direct Entra and provider replacement are deferred.
-The [IT setup and acceptance checklist](microsoft-sign-in-it-setup.md) records
-callbacks, safe activation order, test cases and rollback. Microsoft remains
-hidden until its provider is configured; code readiness is not tenant acceptance.
-The older Friday-only scope below is historical and does not describe the
-newly authorized personal-lab testing. NCRD changes remain separately approved.
+Supabase Auth handles email/password, magic links and signed-out recovery. On
+November 16, NCRD configured Resend custom SMTP for the verified sending
+subdomain `auth.usnsandbox.org` and saved link-based recovery and magic-link
+templates pointing to the CMS’s `/auth/confirm` flow. Owner recovery and a fresh
+password sign-in were verified. SMTP credentials belong in the provider’s
+configuration. The CMS worker’s contact and invitation mail is a separate path.
 
-**Historical Friday decision:** only a site editor signs in, using the existing personal Supabase
-Auth project. Keep its existing provider and subject mapping. Add the exact new
-admin `/auth/confirm` callback while preserving the personal-review/older callbacks.
-No SMTP setup, new provider, real-editor invitation or account linking is required
-for Friday. Long-term ownership is a question for the platform lead after Friday.
+The link contains a provider verification token, and the CMS confirmation step
+redeems it after an explicit user action. This helps with scanners that only
+open a URL. Failed arrivals or repeated expired links can still require checking
+the provider’s delivery and the recipient’s mail handling. Password sign-in sends
+no email. Hosted access still requires an active CMS assignment.
 
-The no-mail Add person change was already complete and tested before this scope
-change (Chromium/WebKit plus database tests), so it remains under the maintainer’s
-explicit exception. It grants product access, not sign-in. Do not use it to invite
-people during Friday's Super-admin-only test.
+Microsoft through Supabase Azure is the chosen IT path. The button is disabled
+in NCRD until IT configures the tenant and the operator enables it. Direct Entra
+and provider replacement are alternatives for a future decision. The
+[IT setup guide](microsoft-sign-in-it-setup.md) covers the required callbacks,
+identity continuity and tenant acceptance.
 
-## Turn on "Sign in with Microsoft" (through Supabase)
+## Microsoft through Supabase
 
 The admin can offer Microsoft sign-in through the Supabase project's Azure
 provider. It is off unless `AUTH_MICROSOFT_ENABLED=true` is set on the Admin
@@ -50,54 +51,23 @@ in. If Supabase already has an email-link account for the same address, check
 that Supabase links the Microsoft sign-in to it rather than creating a second
 user.
 
-## Sign in with a password
+## Password sign-in and recovery
 
-Added November 11, 2026. The hosted admin offers email and password beside the
-email link. It needs no setting, no database change and no mail: it uses the
-same Supabase Email provider that already sends the links.
+The sign-in screen uses Supabase’s Email provider. The Password screen asks
+for at least 12 characters and accepts a password only for the signed-in account.
+Supabase’s own password minimum and rate limits are provider settings.
 
-Why it exists: the reported incomplete/used email links are consistent with
-mail security scanning or an already consumed link; the mailbox-specific cause
-has not been proven. A default Supabase link can be consumed before the person
-uses it. Password sign-in avoids that emailed-link dependency. The built-in Supabase sender
-also allows only two messages an hour for the whole project. A password
-sign-in sends no message, so neither limit applies.
+From **Forgot your password?**, the requesting browser opens the newest
+recovery email and confirms it before reaching **Password**. The server returns
+the same generic request receipt for an unknown address. Verification does not
+create an account, grant a role or replace an existing CMS assignment.
 
-1. **First sign-in:** the person signs in once with an email link (personal
-   mailboxes) or with a one-time link a Supabase project owner makes for them.
-2. **Set a password:** in the sidebar, choose **Password**, enter a password of
-   at least 12 characters twice and choose **Save password**. Only the
-   signed-in person can set their own password.
-3. **After that:** on the sign-in page, enter the email and password and choose
-   **Sign in**. **Email me a sign-in link** still works for anyone without a
-   password.
-
-For a forgotten password, choose **Forgot your password?** on the signed-out
-screen. Request a recovery email, open the latest message in the same browser
-and choose **Continue to reset password**. The CMS verifies the recovery
-credential and existing access before opening **Password**, where the person
-chooses their own new password. Sign out, then verify a fresh password login.
-No Supabase dashboard or existing CMS session is needed to request recovery.
-
-The default Supabase recovery link can still be consumed by a mail scanner
-before reaching the CMS. Custom SMTP is currently required to customize the
-NCRD email on its existing plan. With an approved sender, use a direct CMS
-confirmation link containing `token_hash={{ .TokenHash }}&type=recovery`, or
-include `{{ .Token }}` and enable `AUTH_RECOVERY_CODE_ENABLED=true` only after
-confirming that the recovery email actually contains a code. Code verification
-uses type `recovery` and the requested address held in an HttpOnly cookie.
-Never switch on code entry while the provider sends a link-only email.
-
-Recovery requests return a generic receipt for nonexistent accounts, do not
-create users, retain provider rate limits and never assign a shared password. Access still comes only from a Super admin
-adding the person; a correct password for somebody without CMS access is
-refused and that sign-in is ended.
-
-Supabase checks the password and limits repeated attempts. Its own minimum
-length is a project setting (Authentication → Sign In / Providers → Email);
-raise it to 12 to match this screen. Editing the email template so a link
-survives a mail scan needs custom SMTP first; Supabase locks the templates
-until then.
+The production templates are link-based. A future code-based setup also needs a
+template containing the recovery code before enabling `AUTH_RECOVERY_CODE_ENABLED`.
+The code flow uses the recovery type and the requesting browser’s email cookie.
+Token placeholders such as `{{ .TokenHash }}` are expanded by Supabase at send
+time. The direct confirmation link and the optional recovery-code path are
+different provider configurations.
 
 ## Compare the choices
 
