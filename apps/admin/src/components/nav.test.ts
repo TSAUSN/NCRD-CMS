@@ -17,7 +17,14 @@ describe('the sidebar’s destinations', () => {
       '/people',
       '/domains',
       '/activity',
+      '/tools/current-disasters',
     ])
+  })
+
+  it('offers Current Disasters to super admins only, because pushing it publishes the national site', () => {
+    const editor = { isSuperAdmin: false, memberships: new Map([['abc', 'site_admin']]) }
+    expect(navigationFor(undefined, editor)[0]!.items.map(item => item.href)).not.toContain('/tools/current-disasters')
+    expect(navigationFor(undefined)[0]!.items.map(item => item.href)).not.toContain('/tools/current-disasters')
   })
 
   it('adds a group named after the site, and only then', () => {
@@ -108,6 +115,7 @@ describe('the sidebar’s destinations', () => {
         'media',
         'settings',
         'activity',
+        'disasters',
       ]),
     )
   })
