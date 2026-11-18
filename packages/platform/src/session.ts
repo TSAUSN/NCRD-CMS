@@ -135,13 +135,17 @@ export async function resolvePrincipal(subject: AuthSubject): Promise<Session | 
         await client.query<{
           pages: Record<string, { siteId: string; role: 'contributor' | 'editor' }>
           divisions: Record<string, { siteId: string; name: string }>
-        }>('SELECT app.current_page_scopes() AS pages, app.current_division_scopes() AS divisions')
+          tools: string[] | null
+        }>(
+          'SELECT app.current_page_scopes() AS pages, app.current_division_scopes() AS divisions, app.current_tools() AS tools',
+        )
       ).rows[0],
   )
   if (scopes?.pages && Object.keys(scopes.pages).length)
     session.principal.pageScopes = new Map(Object.entries(scopes.pages))
   if (scopes?.divisions && Object.keys(scopes.divisions).length)
     session.principal.divisionScopes = new Map(Object.entries(scopes.divisions))
+  if (scopes?.tools?.length) session.principal.tools = new Set(scopes.tools)
   return session
 }
 

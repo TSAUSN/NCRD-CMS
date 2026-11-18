@@ -1,3 +1,5 @@
+import { redirect } from 'next/navigation'
+import { toolsOnly } from '@cms/domain'
 import { AdminHome } from '../components/admin-home.tsx'
 import { primaryWorkspaceSlug } from '../lib/site-installation-settings.ts'
 import { EditorHome } from '../components/editor-home.tsx'
@@ -36,6 +38,9 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
       </EntryPanel>
     )
   }
+
+  // A Disaster Manager with no other access has one destination.
+  if (toolsOnly(session.principal)) redirect('/tools/current-disasters')
 
   const [sites, role, pages, reviewCounts] = await Promise.all([
     listSites(session.principal.userId),

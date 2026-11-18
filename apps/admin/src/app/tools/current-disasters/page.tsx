@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation'
+import { canUseTool } from '@cms/domain'
 import { AppShell } from '../../../components/app-shell.tsx'
 import { navigationFor } from '../../../components/nav.ts'
 import { PageHeader } from '../../../components/shell.tsx'
@@ -15,7 +16,7 @@ const LIVE_PAGE =
 
 export default async function CurrentDisasters() {
   const session = await currentSession()
-  if (!session?.principal.isSuperAdmin) notFound()
+  if (!session || !canUseTool(session.principal, 'current_disasters')) notFound()
   const settings = zestyConfig()
   let content
   if (!settings.ok) {
@@ -52,7 +53,11 @@ export default async function CurrentDisasters() {
     }
   }
   return (
-    <AppShell email={session.email} role="Super admin" groups={navigationFor(undefined, session.principal)}>
+    <AppShell
+      email={session.email}
+      role={session.principal.isSuperAdmin ? 'Super admin' : 'Disaster Manager'}
+      groups={navigationFor(undefined, session.principal)}
+    >
       <main id="main" className="wrap">
         <PageHeader
           title="Current Disasters"

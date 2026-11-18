@@ -4014,3 +4014,16 @@ of 15. A refreshed session still does not count as a new sign-in. Each push is l
 with the user and versions. Admin `img-src` allows `*.media.zestyio.com` for
 card thumbnails. No schema change.
 
+### 2026-11-18 — Disaster Manager tool grant
+
+At Jon's request, a Disaster Manager may use Current Disasters; only they and
+Super admins see that tab, and one with no other access sees nothing else
+(Home redirects to it). Migration 0213 adds `tool_grants` instead of a
+`global_roles` value, because any global role counts as a Super admin in the
+"keep one Super admin" check. Grants change only through audited,
+revision-checked `app.set_tool_grant` and `app.add_tool_person`; RLS shows a
+person their own grants and Super admins all of them. `is_invited_email`
+admits a tool-only person to sign in. The push action re-checks
+`app.can_use_tool` before calling Zesty. New cards start with the approved
+Hurricane Isaias placeholder image. Deploying needs the migrate job first.
+

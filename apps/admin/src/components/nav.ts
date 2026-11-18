@@ -46,6 +46,7 @@ export type NavigationAccess = {
   memberships: ReadonlyMap<string, string>
   divisionScopes?: ReadonlyMap<string, { siteId: string; name: string }>
   pageScopes?: ReadonlyMap<string, { siteId: string; role: string }>
+  tools?: ReadonlySet<string>
 }
 export function navigationFor(
   site?: {
@@ -144,6 +145,16 @@ export function navigationFor(
     ([...(access.divisionScopes?.values() ?? [])].some(scope => scope.siteId === site.id) ||
       [...(access.pageScopes?.values() ?? [])].some(scope => scope.siteId === site.id)),
   )
+  // A Disaster Manager with no other access sees only Current Disasters.
+  if (
+    access &&
+    !access.isSuperAdmin &&
+    access.tools?.has('current_disasters') &&
+    !access.memberships.size &&
+    !access.pageScopes?.size &&
+    !access.divisionScopes?.size
+  )
+    return [{ label: 'CMS', items: groups[0]!.items.filter(item => item.icon === 'disasters') }]
   return groups.map(group => ({
     ...group,
     items: group.items.filter(item =>
@@ -178,14 +189,16 @@ export function navigationFor(
                   access.memberships.get(site.id) !== 'site_admin' &&
                   item.label === 'Lists'
                 ? false
-                : item.href === '/domains' || item.icon === 'disasters'
-                  ? access?.isSuperAdmin === true
-                  : item.icon === 'people'
+                : item.icon === 'disasters'
+                  ? access?.isSuperAdmin === true || Boolean(access?.tools?.has('current_disasters'))
+                  : item.href === '/domains'
                     ? access?.isSuperAdmin === true
-                    : item.icon === 'sections'
-                      ? access?.isSuperAdmin === true ||
-                        Boolean(site && access?.memberships.get(site.id) === 'site_admin')
-                      : true,
+                    : item.icon === 'people'
+                      ? access?.isSuperAdmin === true
+                      : item.icon === 'sections'
+                        ? access?.isSuperAdmin === true ||
+                          Boolean(site && access?.memberships.get(site.id) === 'site_admin')
+                        : true,
     ),
   }))
 }

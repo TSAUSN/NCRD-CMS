@@ -6,6 +6,7 @@ import { resendInvitation, type PeopleResult } from './actions.ts'
 import { usePersonAccessDraft, type PersonEditorProps } from './use-person-access-draft.ts'
 import workspace from '../../components/workspace.module.css'
 import workspaceFormsStyles from '../../components/workspace-styles/workspace-forms.module.css'
+import selectionControlsStyles from '../../components/workspace-styles/selection-controls.module.css'
 import listInspectorStyles from '../../components/workspace-styles/list-inspector.module.css'
 import ownedStyles from './people-workspace-styles.module.css'
 
@@ -24,6 +25,7 @@ export function PersonEditor(props: PersonEditorProps) {
     email,
     status,
     memberships,
+    disasterManager,
     busy,
     availableSites,
     unavailable,
@@ -59,7 +61,9 @@ export function PersonEditor(props: PersonEditorProps) {
             <Button
               type="submit"
               form={formId}
-              disabled={busy || unavailable || !name.trim() || (!person && memberships.length === 0)}
+              disabled={
+                busy || unavailable || !name.trim() || (!person && memberships.length === 0 && !disasterManager)
+              }
             >
               {pending
                 ? 'Saving…'
@@ -201,6 +205,24 @@ export function PersonEditor(props: PersonEditorProps) {
                   ))}
                   <p>Saving account access keeps these assignments. Deactivating the account pauses all access.</p>
                 </div>
+              )}
+              {!person?.super_admin && (
+                <fieldset className={workspaceFormsStyles.formChoices + ' ' + workspace.denseStack} aria-label="Tools">
+                  <h3 className={workspace.sectionHeading}>Tools</h3>
+                  <label className={selectionControlsStyles.checkRow}>
+                    <input
+                      type="checkbox"
+                      aria-describedby="person-disaster-manager-help"
+                      checked={disasterManager}
+                      onChange={event => change({ disasterManager: event.target.checked })}
+                    />
+                    <span>Disaster Manager</span>
+                  </label>
+                  <p className="hint" id="person-disaster-manager-help">
+                    Edits and publishes the Current Disasters cards on salvationarmyusa.org. With no site access, they
+                    see only Current Disasters.
+                  </p>
+                </fieldset>
               )}
               <Disclosure
                 title="Whole-site access"

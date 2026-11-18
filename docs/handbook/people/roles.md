@@ -21,10 +21,12 @@ can differ between websites; **People & access** shows actual assignments.
 | Chapter contributor | Assigned chapter content; submit for approval | Shared national parts, other chapters and publication |
 | Division team member | Assigned division's chapters and existing approval workflow | Other divisions and global account management |
 | Comment-only reviewer | Existing comment-only review access | Content changes and publication |
+| Disaster Manager | Editing and publishing the Current Disasters cards on salvationarmyusa.org | Everything else. With no site access, they see only **Current Disasters** |
 
 Display names map to the existing permission identifiers: Super admin to
 `super_admin`, Admin to `site_admin`, Site editor to `editor`, Content creator
-to `contributor`. Assigned pages and divisions describe scope, not a new
+to `contributor`. Disaster Manager is the `current_disasters` tool grant, not a
+site role; a Super admin ticks it under **Tools** in People & access. Assigned pages and divisions describe scope, not a new
 whole-site role. Native content editors use the offered field controls; the
 older RoleViews proposal in [roles-draft.md](roles-draft.md) is not an authority
 to expose additional controls. Imported-site interfaces retain their existing
