@@ -25,6 +25,8 @@ export type PushResult =
   | { ok: true; version: number; message: string }
   | { ok: false; message: string; problems?: CardProblem[]; reauthenticate?: true; conflict?: true }
 
+/** Editors update these cards in long sessions, so a push accepts a sign-in from the last 90 minutes. */
+const CURRENT_DISASTERS_SIGN_IN_MINUTES = 90
 const KEY = /^(block-\d{1,4}|new-[a-z0-9-]{1,40})$/
 const MAX_ITEMS = 200
 
@@ -81,7 +83,10 @@ export async function pushCurrentDisasters(input: { version: unknown; edits: unk
   const session = await currentSession()
   if (!session?.principal.isSuperAdmin)
     return { ok: false, message: 'Only a super admin can change Current Disasters.' }
-  if (authProvider().name !== 'local' && !recentlyAuthenticated(session.authenticatedAt))
+  if (
+    authProvider().name !== 'local' &&
+    !recentlyAuthenticated(session.authenticatedAt, Date.now(), CURRENT_DISASTERS_SIGN_IN_MINUTES)
+  )
     return {
       ok: false,
       reauthenticate: true,

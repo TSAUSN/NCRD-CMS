@@ -51,11 +51,16 @@ export function listPeople(userId: string): Promise<PersonRow[]> {
   )
 }
 
-export function recentlyAuthenticated(authenticatedAt: number | undefined, now = Date.now()): boolean {
+/** Whether the sign-in is recent enough for a sensitive change. Most actions use the default 15 minutes. */
+export function recentlyAuthenticated(
+  authenticatedAt: number | undefined,
+  now = Date.now(),
+  windowMinutes = 15,
+): boolean {
   return (
     authenticatedAt !== undefined &&
     Number.isFinite(authenticatedAt) &&
-    authenticatedAt * 1000 >= now - 15 * 60_000 &&
+    authenticatedAt * 1000 >= now - windowMinutes * 60_000 &&
     authenticatedAt * 1000 <= now + 30_000
   )
 }
