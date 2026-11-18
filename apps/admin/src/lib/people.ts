@@ -51,11 +51,14 @@ export function listPeople(userId: string): Promise<PersonRow[]> {
   )
 }
 
-/** Whether the sign-in is recent enough for a sensitive change. Most actions use the default 15 minutes. */
+/** How long a sign-in counts as recent for sensitive changes, across the whole CMS. */
+export const RECENT_SIGN_IN_MINUTES = 90
+
+/** Whether the sign-in is recent enough for a sensitive change. */
 export function recentlyAuthenticated(
   authenticatedAt: number | undefined,
   now = Date.now(),
-  windowMinutes = 15,
+  windowMinutes = RECENT_SIGN_IN_MINUTES,
 ): boolean {
   return (
     authenticatedAt !== undefined &&

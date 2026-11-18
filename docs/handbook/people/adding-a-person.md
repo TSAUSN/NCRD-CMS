@@ -19,7 +19,7 @@ this documentation check. First-sign-in delivery still needs operator acceptance
    at least one site assignment. Use the separate chapter/division workflow
    for a volunteer who should not edit every page.
 5. Choose **Add person**, or **Create account & send invitation**. A hosted
-   account-management operation requires a sign-in within 15 minutes. If asked,
+   account-management operation requires a sign-in within 90 minutes. If asked,
    use **Confirm sign-in in a new tab**, sign in there, then retry the retained form.
 6. Read the receipt. **Add person** sends no invitation. The invitation flow
    queues a message; a queue receipt is not proof the person received it.
