@@ -1,6 +1,7 @@
 import { GuardedLink as Link } from './guarded-link.tsx'
 import { signOut } from '../app/actions/auth.ts'
 import {
+  IconAlert,
   IconHome,
   IconInfo,
   IconLocation,
@@ -51,6 +52,7 @@ const NAV_ICON = {
   people: IconPeople,
   settings: IconSettings,
   activity: IconClock,
+  disasters: IconAlert,
 } as const
 function NavIcon({ name }: { name: NavIconName }) {
   const Glyph = NAV_ICON[name]

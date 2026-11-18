@@ -228,6 +228,11 @@ provider. See [environment prerequisites](handbook/hosting/environments.md) and
    `APP_VERSION` to the image revision.
 5. **Mail.** `MAILER_PROVIDER=resend`, `RESEND_API_KEY` (send-only, worker
    only), `MAIL_FROM` on a verified sender domain.
+   **Current Disasters (optional, admin only).** `ZESTY_INSTANCE_ZUID` and the
+   `ZESTY_API_TOKEN` secret (a Zesty access token whose role can edit and
+   publish that item, granted on that item only where Zesty allows it). The
+   page is fixed in code, not configuration. Without them the screen explains
+   what is missing.
 6. **Continuous worker, monitoring and scheduling.** The finite drain defers
    section thumbnails to the browser-capable `worker` role. Supply that worker
    on a suitable separate host for the complete section-library experience.

@@ -3990,3 +3990,23 @@ The default sender's locked templates are an external dependency for scanner-saf
 links/codes. Do not claim that adding `/recover` makes Jon's corporate-mail flow
 proven. IT or the owner must provide the approved email sender. Real Microsoft
 activation and Jon's own password/fresh-login acceptance are separate steps.
+
+### 2026-11-18 — Current Disasters Zesty tool
+
+Jon reported that the platform lead approved a super-admin tool that edits the
+national page's Current Disasters cards and publishes them through the Zesty
+Instances API (approver and date to be confirmed here). This is the first §9.5
+Tools module and the only CMS path that writes to Zesty.
+
+The tool reads the item's `body` field, turns blocks that exactly match the card
+markup into plain-text fields and keeps everything else locked. The browser
+sends fields and order only; the server re-reads Zesty, rebuilds untouched
+blocks byte for byte, escapes typed text, requires https links and refuses a
+push when Zesty has a newer version. A push PATCHes a new version and publishes
+it immediately; Zesty's version history is the rollback. The item, model and
+field are constants in code, and every request is built from them, checked
+against a three-entry allowlist (read, save, publish that item) and sent without
+following redirects, so the token is never used for any other Zesty content. Each push is logged
+with the user and versions. Admin `img-src` allows `*.media.zestyio.com` for
+card thumbnails. No schema change.
+

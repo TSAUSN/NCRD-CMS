@@ -26,6 +26,7 @@ export type NavIconName =
   | 'people'
   | 'settings'
   | 'activity'
+  | 'disasters'
 
 export type NavItem = {
   href: string
@@ -68,6 +69,7 @@ export function navigationFor(
         { href: '/people', label: 'People & access', icon: 'people', match: 'prefix' },
         { href: '/domains', label: 'Domains', icon: 'settings', match: 'prefix' },
         { href: '/activity', label: 'Activity', icon: 'activity', match: 'prefix' },
+        { href: '/tools/current-disasters', label: 'Current Disasters', icon: 'disasters', match: 'prefix' },
       ],
     },
   ]
@@ -176,7 +178,7 @@ export function navigationFor(
                   access.memberships.get(site.id) !== 'site_admin' &&
                   item.label === 'Lists'
                 ? false
-                : item.href === '/domains'
+                : item.href === '/domains' || item.icon === 'disasters'
                   ? access?.isSuperAdmin === true
                   : item.icon === 'people'
                     ? access?.isSuperAdmin === true

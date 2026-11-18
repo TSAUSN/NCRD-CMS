@@ -17,7 +17,8 @@ export function adminContentSecurityPolicy(nonce: string, development = false, c
     "default-src 'self'",
     `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${development ? " 'unsafe-eval'" : ''}`,
     `style-src 'self' 'unsafe-inline' ${PREVIEW_FONT_STYLES}`,
-    `img-src 'self' data: blob: ${PREVIEW_FONT_IMAGES}`,
+    // Zesty media shows the Current Disasters card images; images load no script.
+    `img-src 'self' data: blob: ${PREVIEW_FONT_IMAGES} https://*.media.zestyio.com`,
     `font-src 'self' data: ${PREVIEW_FONT_FILES}`,
     "connect-src 'self'",
     `frame-src 'self'${frameOrigin ? ` ${frameOrigin}` : ''}`,
